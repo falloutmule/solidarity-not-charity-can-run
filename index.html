@@ -531,6 +531,16 @@ function touchDebug(data){
   const params = new URLSearchParams(location.search);
   if(params.get('touchdebug') === '1'){
     _touchDebugActive = true;
+    let _lastTouch = { type:'', target:'', x:0, y:0, consumed:false, handler:'' };
+    // Capture last touch/pointer event for diagnostics
+    ['touchstart','touchmove','touchend','pointerdown','pointermove','pointerup'].forEach(ev=>{
+      document.addEventListener(ev, e=>{
+        const t = e.changedTouches ? e.changedTouches[0] : e;
+        const tgt = e.target;
+        const id = tgt ? (tgt.id || tgt.className || tgt.tagName) : '?';
+        _lastTouch = { type:ev, target:id, x:(t.clientX|0), y:(t.clientY|0), consumed:e.defaultPrevented, handler: tgt?.dataset?.action||'' };
+      }, { passive:true, capture:true });
+    });
     document.addEventListener('DOMContentLoaded', ()=>{
       touchDebug('show');
       // Update with initial state every 500ms while in play
@@ -539,12 +549,21 @@ function touchDebug(data){
         const portrait = isMobilePortrait();
         const ml=document.getElementById('ml'), mr=document.getElementById('mr'), mg=document.getElementById('mg'), ms=document.getElementById('ms'), mm=document.getElementById('mm'), mp=document.getElementById('mp');
         const mlookpad=document.getElementById('mlookpad');
-        const zone = el=>{ const b=(el||{}).getBoundingClientRect?.(); return b ? `${b.left|0},${b.top|0} ${b.right|0}x${b.bottom|0} pe:${getComputedStyle(el).pointerEvents}` : 'n/a'; };
+        const mob=document.getElementById('mob');
+        const zone = el=>{ if(!el) return 'MISSING'; const b=el.getBoundingClientRect?.(); const pe=getComputedStyle(el).pointerEvents; const dp=getComputedStyle(el).display; return `${b?(b.left|0)+','+(b.top|0)+' '+(b.right|0)+'x'+(b.bottom|0):'?'} d:${dp} pe:${pe}`; };
+        const vv=window.visualViewport;
         touchDebug({
           orient: portrait ? 'PORTRAIT' : 'LANDSCAPE',
           state: typeof state !== 'undefined' ? ['TITLE','PLAY','LB','RES','PAUSE'][state] : '?',
           angle: typeof player !== 'undefined' ? (+player.angle).toFixed(3) : '?',
           mobileMode: typeof mobileMode !== 'undefined' ? mobileMode : '?',
+          mobileControls: typeof options !== 'undefined' ? options.mobileControls : '?',
+          mobileOverride: typeof mobileOverride !== 'undefined' ? mobileOverride : '?',
+          isMobile: typeof isMobile === 'function' ? isMobile() : '?',
+          innerWH: typeof innerWidth !== 'undefined' ? innerWidth+'x'+innerHeight : '?',
+          vvWH: vv ? (vv.width|0)+'x'+(vv.height|0) : 'n/a',
+          mobClass: mob ? mob.className : 'MISSING',
+          mobPE: mob ? getComputedStyle(mob).pointerEvents : '?',
           '#ml': zone(ml),
           '#mr': zone(mr),
           '#mlookpad': zone(mlookpad),
@@ -552,7 +571,8 @@ function touchDebug(data){
           '#ms': zone(ms),
           '#mm/map': zone(mm),
           '#mp/pause': zone(mp),
-          innerWH: typeof innerWidth !== 'undefined' ? innerWidth+'x'+innerHeight : '?',
+          lastTouch: _lastTouch.type + ' #' + _lastTouch.target + ' (' + _lastTouch.x + ',' + _lastTouch.y + ')' + (_lastTouch.consumed?' PREVENTED':'') + (_lastTouch.handler?' ['+_lastTouch.handler+']':''),
+          inp: typeof inp !== 'undefined' ? JSON.stringify({g:inp.give,s:inp.sprint,m:inp.map,p:inp.pause}) : '?',
         });
       }, 500);
     });
@@ -1407,10 +1427,73 @@ const options = {
   },
 };
 options.load();
+
+// ---------------------------------------------------------------------------
+// EMERGENCY URL FLAGS (query-param overrides for bad phone-local state)
+//   ?mobile=on          — force mobile controls visible for this page load
+//   ?resetcontrols=1     — reset control-related settings to safe defaults
+//   ?clearsave=1         — wipe active game save (NOT stats) for a fresh start
+//   ?touchdebug=1        — show live diagnostics overlay (does not block input)
+// ---------------------------------------------------------------------------
+(function applyUrlFlags(){
+  const P = new URLSearchParams(location.search);
+  // ?resetcontrols=1 — reset only control-related options to safe defaults
+  if(P.get('resetcontrols') === '1'){
+    options.mobileControls = 'auto';
+    options.lookSpeed = 1;
+    options.joySizePx = 110;
+    options.buttonSizePx = 85;
+    options.controlOpacityValue = 0.60;
+    options.minimapSizePx = 68;
+    options.touchDeadzonePx = 8;
+    options.minimapDefault = true;
+    options.mobileTurnSens = lookSensFromSpeed(options.lookSpeed);
+    options.save();
+  }
+  // ?clearsave=1 — wipe only the active game save (not stats/profile/settings)
+  if(P.get('clearsave') === '1'){
+    lsDel(K.save);
+  }
+  // ?mobile=on — force mobile mode for this load regardless of saved options
+  if(P.get('mobile') === 'on'){
+    mobileOverride = 'on';
+    options.mobileControls = 'on';
+  }
+  // ?mobile=off — force desktop mode
+  if(P.get('mobile') === 'off'){
+    mobileOverride = 'off';
+    options.mobileControls = 'off';
+  }
+})();
+
 applyMobileControlSettings();
 let showMinimap = options.minimapDefault;
 mobileOverride = options.mobileControls==='auto' ? null : options.mobileControls;
 setMobileMode(isMobile());
+
+// ?mobile=on fail-safe: after DOM is ready, force controls visible + pointer-events:auto
+if(new URLSearchParams(location.search).get('mobile') === 'on'){
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const mob = document.getElementById('mob');
+    if(mob){ mob.classList.add('show'); }
+    setMobileMode(true);
+    // Force all mobile control elements visible + interactive during PLAY
+    const force = () => {
+      if(state !== STATE.PLAY) return;
+      ['ml','mg','ms','mm','mp'].forEach(id=>{
+        const el = document.getElementById(id);
+        if(el){ el.style.display = ''; el.style.pointerEvents = 'auto'; el.style.opacity = String(options.controlOpacityValue || 0.60); }
+      });
+      const mr = document.getElementById('mr');
+      if(mr && !isMobilePortrait()){ mr.style.display = ''; mr.style.pointerEvents = 'auto'; }
+      const mlookpad = document.getElementById('mlookpad');
+      if(mlookpad && isMobilePortrait()){ mlookpad.style.display = ''; mlookpad.style.pointerEvents = 'auto'; }
+    };
+    // Run immediately and on state transitions
+    force();
+    setInterval(force, 1000);
+  });
+}
 
 // --- STATS ---
 const DEFAULT_STATS = {
