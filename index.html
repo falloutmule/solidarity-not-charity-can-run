@@ -294,13 +294,26 @@ function showToast(msg, ms){
 // Resize on orientation change with debounce
 addEventListener('orientationchange', ()=>{ _debouncedResize(); });
 
+function isOrientationPortrait(){
+  if(typeof matchMedia === 'function' && matchMedia('(orientation: portrait)').matches) return true;
+  try {
+    const t = screen.orientation && screen.orientation.type;
+    if(t && String(t).indexOf('portrait') >= 0) return true;
+  } catch(e){}
+  const vv = window.visualViewport;
+  if(vv && vv.height > vv.width) return true;
+  return innerHeight > innerWidth;
+}
 function resize(){
   // Use visualViewport for accurate mobile dimensions (accounts for address bar).
   // Do NOT multiply by devicePixelRatio — all drawing code uses CSS pixel coordinates,
   // so DPR scaling would leave the right/bottom of the backing store undrawn (black).
   // This game upscales a 320x200 buffer with pixelated rendering; DPR adds no benefit.
-  const vw = Math.round((window.visualViewport && window.visualViewport.width) || innerWidth);
-  const vh = Math.round((window.visualViewport && window.visualViewport.height) || innerHeight);
+  let vw = Math.round((window.visualViewport && window.visualViewport.width) || innerWidth);
+  let vh = Math.round((window.visualViewport && window.visualViewport.height) || innerHeight);
+  if(isOrientationPortrait() && vw > vh){
+    const t = vw; vw = vh; vh = t;
+  }
   view.width  = vw;
   view.height = vh;
   view.style.width  = vw + 'px';
@@ -392,6 +405,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
+const BUILD_ID = 'pdash2';
 let mobileMode = false; // true = show mobile overlay, hide desktop cursor
 let mobileOverride = null; // null=auto, 'on', 'off'
 let portHintShown = false;
@@ -428,12 +442,18 @@ function cycleStepValue(current, steps){ return cycleValue(nearestStep(Number(cu
 function lookSensFromSpeed(v){ return BASE_MOBILE_TURN_SENS * (Number(v)||1); }
 function lookSpeedLabel(v){ const n=Number(v)||1; return (Number.isInteger(n)?n.toFixed(1):String(n)) + 'x'; }
 function percentLabel(v){ return Math.round((Number(v)||0)*100)+'%'; }
+function layoutCssSize(){
+  let cw = Math.round(view.width || 0), ch = Math.round(view.height || 0);
+  if(mobileMode && isOrientationPortrait() && cw > ch){
+    const t = cw; cw = ch; ch = t;
+  }
+  return { cw, ch };
+}
 function isMobilePortrait(){
-  const vv=window.visualViewport;
-  const vw = Math.round(view.width || 0), vh = Math.round(view.height || 0);
-  if(mobileMode && vw > 0 && vh > vw) return true;
-  const w=Math.round((vv&&vv.width)||innerWidth), h=Math.round((vv&&vv.height)||innerHeight);
-  return !!mobileMode && h > w;
+  if(!mobileMode) return false;
+  const { cw, ch } = layoutCssSize();
+  if(ch > cw) return true;
+  return isOrientationPortrait();
 }
 function sanitizeRunnerName(v){ return String(v||'').toUpperCase().replace(/[^A-Z0-9 _\-.!]/g,'').replace(/\s+/g,' ').trim().slice(0,16) || 'RUNNER'; }
 function editRunnerName(){
@@ -650,7 +670,7 @@ function syncLookHintUI(){
   const h = document.getElementById('mlookhint');
   if(!h) return;
   const inPlay = mobileMode && state===STATE.PLAY && !paused;
-  h.style.display = (inPlay && !lookHintUsed) ? 'block' : 'none';
+  h.style.display = (inPlay && !lookHintUsed && !isMobilePortrait()) ? 'block' : 'none';
   if(!inPlay) return;
   h.classList.toggle('hide', !!lookHintUsed);
   h.style.opacity = lookHintUsed ? '0' : '1';
@@ -3127,8 +3147,9 @@ addEventListener('keydown',e=>{
 // The gameplay is a horizontal 320×200 view sitting in the upper portion of the
 // portrait screen — not stretched to fill the full portrait height.
 function portraitPlayH(){
-  // FPV panel height: landscape-aspect window at top of portrait dashboard.
-  return Math.round(view.width * (RH/RW) * 1.05);
+  const { cw } = layoutCssSize();
+  const w = cw || view.width;
+  return Math.round(w * (RH/RW) * 1.05);
 }
 const _layoutDebugActive = new URLSearchParams(location.search).get('layoutdebug') === '1';
 function rectsOverlap(a,b){
@@ -3138,7 +3159,7 @@ function rectsOverlap(a,b){
 }
 /** Portrait stacked dashboard: FPV → minimap → stats → controls dock. */
 function portraitLayout(){
-  const cw = view.width, ch = view.height;
+  const { cw, ch } = layoutCssSize();
   const fpvH = portraitPlayH();
   const miniH = Math.round(Math.max(58, Math.min(92, ch * 0.095)));
   const statsH = Math.round(Math.max(52, Math.min(76, ch * 0.078)));
@@ -3215,6 +3236,9 @@ function drawPortraitStatsPanel(){
   ctx.fillText(row3, r.x + 14, r.y + 42);
   const ut = upgradeTag();
   if(ut){ ctx.fillStyle = '#8a7a5a'; ctx.fillText(ut, r.x + 14, r.y + 56); }
+  ctx.fillStyle = '#5a4a3a';
+  ctx.font = '9px monospace';
+  ctx.fillText('build ' + BUILD_ID, r.x + r.w - 78, r.y + r.h - 10);
 }
 function drawPortraitFpvOverlay(now){
   const L = portraitLayout();
@@ -3255,7 +3279,7 @@ function drawPortraitFpvOverlay(now){
 function playfieldLayout(){
   // Use the actual canvas backing-store dimensions for perfect consistency.
   const cw = view.width, ch = view.height;
-  if(mobileMode && ch > cw){
+  if(mobileMode && isMobilePortrait()){
     const pH = portraitLayout().fpvRect.h;
     const scale = pH / RH;
     const dw = RW * scale, dh = RH * scale;
