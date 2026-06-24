@@ -77,13 +77,15 @@
   #mm{top:12px;right:8px;width:50px;height:36px;font-size:10px;z-index:14;}
   #mp{top:16px;left:16px;width:52px;height:38px;font-size:10px;z-index:14;}
   .mhw{width:38px;height:38px;border-radius:6px;}
-  /* Portrait LOOK pad: sits in the middle of the control area, below gameplay window */
+  /* Portrait LOOK pad: dedicated circular LOOK control on right side */
   #mlookpad{
-    position:absolute;left:0;right:0;bottom:0;top:0;
-    border-radius:0;background:transparent;border:none;
-    display:flex;align-items:center;justify-content:center;
-    touch-action:none;
-    z-index:9; /* below buttons but above canvas */
+    position:absolute;
+    border-radius:50%;background:rgba(200,150,60,0.15);
+    border:2px solid rgba(200,170,100,0.40);color:#c8b888;
+    display:flex;align-items:center;justify-content:center;flex-direction:column;
+    gap:2px;font-size:10px;
+    touch-action:none;user-select:none;-webkit-user-select:none;
+    z-index:12; /* same level as buttons */
   }
   #mlookpadhint{
     font:bold 10px monospace;letter-spacing:1px;color:rgba(200,180,120,0.30);
@@ -151,7 +153,7 @@
 <div id="mob">
   <div id="ml" class="mbtn"><div class="mjl" id="mjdot"></div><span class="mcap">MOVE</span></div>
     <div id="mlookpad" class="mbtn" aria-hidden="true">
-      <div id="mlookpadhint">DRAG TO LOOK</div>
+      <span>LOOK</span><span style="font-size:8px;opacity:0.7">DRAG</span>
     </div>
     <div id="mr" class="mbtn">
       <div id="mlookhint">LOOK<br>DRAG TO TURN</div>
@@ -446,7 +448,7 @@ function editRunnerName(){
 function mobileSprintCost(){ return 20; }
 function mobileSprintBurstSec(){ return 0.65 + Math.min(0.25, (player.upgrades.sprint||0)*0.08); }
 function applyMobileControlSettings(){
-  const ids=['ml','mg','ms','mm','mp'];
+  const ids=['ml','mlookpad','mg','ms','mm','mp'];
   const els=ids.map(id=>document.getElementById(id)).filter(Boolean);
   const joySize = Number(options.joySizePx)||110;
   const btnSize = Number(options.buttonSizePx)||85;
@@ -462,26 +464,32 @@ function applyMobileControlSettings(){
   // Portrait: dedicated LOOK pad in center, #mr is NOT the look zone (it's for buttons visually)
   // Portrait: GIVE/SPRINT use right side, MOVE uses left side, LOOK pad uses center
   // Landscape: #mr IS the right-side look zone, GIVE/SPRINT use left
+  // Dedicated LOOK circle (#mlookpad) — visible in BOTH portrait and landscape.
+  // Portrait: right side, mid-lower area, above GIVE/SPRINT.
+  // Landscape: right side, between MAP (top-right) and GIVE/SPRINT (lower-left).
   if(mlookpad){
+    const lookSize = portrait ? Math.round(joySize * 0.78) : Math.round(joySize * 0.72);
+    mlookpad.style.width = lookSize + 'px';
+    mlookpad.style.height = lookSize + 'px';
+    mlookpad.style.left = 'auto';
     if(portrait){
-      // PORTRAIT: LOOK is a RIGHT-SIDE vertical strip, NOT center.
-      // Layout: top gameplay window | bottom area split: MOVE (left), minimap (center),
-      // GIVE/SPRINT (far right edge), LOOK (right-side open area above GIVE/SPRINT).
+      // Portrait: right side, vertically centered in the control area below gameplay
       const pH = typeof portraitPlayH==='function' ? portraitPlayH() : Math.round(innerWidth*(RH/RW)*1.05);
-      const btnW = btnSize; // GIVE/SPRINT width
-      // LOOK pad: right-side strip from below gameplay to above the bottom controls
-      mlookpad.style.top = pH + 'px';
       const pBtnSize = Math.round(btnSize * 0.72);
-      mlookpad.style.bottom = (pBtnSize * 2 + 16) + 'px'; // room for stacked GIVE+SPRINT
-      mlookpad.style.left = 'auto';
-      mlookpad.style.right = '0px';
-      mlookpad.style.width = Math.round(innerWidth * 0.30) + 'px'; // right 30% strip
-      mlookpad.style.height = 'auto';
-      mlookpad.style.opacity = String(alpha);
-      mlookpad.style.display = '';
+      const ctrlTop = pH + 8;
+      const ctrlBot = innerHeight - (pBtnSize * 2 + 20); // above stacked GIVE+SPRINT
+      const lookCenter = ctrlTop + Math.max(lookSize, (ctrlBot - ctrlTop) / 2);
+      mlookpad.style.top = (lookCenter - lookSize/2) + 'px';
+      mlookpad.style.bottom = 'auto';
+      mlookpad.style.right = '10px';
     } else {
-      mlookpad.style.display = 'none';
+      // Landscape: right side, vertically centered between top (MAP) and bottom buttons
+      mlookpad.style.right = '14px';
+      mlookpad.style.top = '50%';
+      mlookpad.style.bottom = 'auto';
+      mlookpad.style.transform = 'translateY(-50%)';
     }
+    mlookpad.style.opacity = String(alpha);
   }
   if(mr){
     if(portrait){
@@ -649,32 +657,50 @@ function bindMobileControls(){
     tzone.id = t.identifier; tzone.active = true; tzone.lastX = t.clientX;
   },{passive:false});
 
-  // ---- portrait dedicated LOOK pad ----
-  // In portrait, look/drag is handled by #mlookpad (center area), not #mr.
-  // Unified pointer-based look works for both touch and mouse on #mlookpad.
+  // ---- dedicated LOOK circle (#mlookpad) — works in BOTH portrait and landscape ----
   const lpad = document.getElementById('mlookpad');
   let lpadPtr = null; // {id, startX}
 
-  // Unified pointerdown on lookpad: activate look
   lpad.addEventListener('pointerdown', e=>{
-    if(!isMobilePortrait()) return; // lookpad only active in portrait
     e.preventDefault(); e.stopPropagation();
     lpadPtr = { id: e.pointerId, startX: e.clientX };
     try { lpad.setPointerCapture(e.pointerId); } catch(_){}
-    if(state===STATE.PLAY && !paused && Math.abs(e.clientX - (lpadPtr?.startX||0)) > 2) dismissLookHint();
+    lpad.classList.add('pr');
+    dismissLookHint();
   },{passive:false});
 
   lpad.addEventListener('pointermove', e=>{
     if(!lpadPtr || e.pointerId !== lpadPtr.id) return;
     if(state!==STATE.PLAY || paused) return;
     const dx = e.clientX - lpadPtr.startX;
-    if(Math.abs(dx) > 1){ lpadPtr.startX = e.clientX; dismissLookHint(); }
+    if(Math.abs(dx) > 0.5){ lpadPtr.startX = e.clientX; }
     player.angle += dx * options.mobileTurnSens;
-    touchDebug({type:'port_look_move', dx, angle:player.angle});
+    touchDebug({type:'look_circle_move', orient:isMobilePortrait()?'port':'land', dx, angle:player.angle});
   },{passive:false});
 
-  lpad.addEventListener('pointerup', e=>{ if(lpadPtr && e.pointerId===lpadPtr.id){ lpadPtr=null; } },{passive:false});
-  lpad.addEventListener('pointercancel', e=>{ if(lpadPtr && e.pointerId===lpadPtr.id){ lpadPtr=null; } },{passive:false});
+  lpad.addEventListener('pointerup', e=>{ if(lpadPtr && e.pointerId===lpadPtr.id){ lpadPtr=null; lpad.classList.remove('pr'); } },{passive:false});
+  lpad.addEventListener('pointercancel', e=>{ if(lpadPtr && e.pointerId===lpadPtr.id){ lpadPtr=null; lpad.classList.remove('pr'); } },{passive:false});
+
+  // Also add touch handlers for Android Chrome reliability
+  lpad.addEventListener('touchstart', e=>{
+    e.preventDefault(); e.stopPropagation();
+    const t = e.changedTouches[0];
+    lpadPtr = { id: 'touch', startX: t.clientX };
+    lpad.classList.add('pr');
+    dismissLookHint();
+  },{passive:false});
+  lpad.addEventListener('touchmove', e=>{
+    if(!lpadPtr) return;
+    e.preventDefault(); e.stopPropagation();
+    if(state!==STATE.PLAY || paused) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - lpadPtr.startX;
+    if(Math.abs(dx) > 0.5){ lpadPtr.startX = t.clientX; }
+    player.angle += dx * options.mobileTurnSens;
+    touchDebug({type:'look_circle_touch_move', orient:isMobilePortrait()?'port':'land', dx, angle:player.angle});
+  },{passive:false});
+  lpad.addEventListener('touchend', e=>{ lpadPtr=null; lpad.classList.remove('pr'); },{passive:false});
+  lpad.addEventListener('touchcancel', e=>{ lpadPtr=null; lpad.classList.remove('pr'); },{passive:false});
 
   // ---- unified pointer look for landscape #mr ----
   // Use pointer events so both touch and mouse work on #mr in landscape.
@@ -944,7 +970,7 @@ function drawMobileMenu(){
   const playControls = mobileMode && state===STATE.PLAY && !paused;
   const mob = document.getElementById('mob');
   if(mob) mob.style.pointerEvents = playControls ? 'auto' : 'none';
-  ['ml','mr','mg','ms','mm','mp'].forEach(id=>{
+  ['ml','mr','mlookpad','mg','ms','mm','mp'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.style.display = playControls ? 'flex' : 'none';
   });
@@ -1494,14 +1520,12 @@ if(new URLSearchParams(location.search).get('mobile') === 'on'){
     // Force all mobile control elements visible + interactive during PLAY
     const force = () => {
       if(state !== STATE.PLAY) return;
-      ['ml','mg','ms','mm','mp'].forEach(id=>{
+      ['ml','mlookpad','mg','ms','mm','mp'].forEach(id=>{
         const el = document.getElementById(id);
         if(el){ el.style.display = ''; el.style.pointerEvents = 'auto'; el.style.opacity = String(options.controlOpacityValue || 0.60); }
       });
       const mr = document.getElementById('mr');
       if(mr && !isMobilePortrait()){ mr.style.display = ''; mr.style.pointerEvents = 'auto'; }
-      const mlookpad = document.getElementById('mlookpad');
-      if(mlookpad && isMobilePortrait()){ mlookpad.style.display = ''; mlookpad.style.pointerEvents = 'auto'; }
     };
     // Run immediately and on state transitions
     force();
