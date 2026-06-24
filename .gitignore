@@ -1,0 +1,23 @@
+# Temporary smoke-test scripts/output
+*_smoke.py
+*_smoke_output.json
+
+# Python/cache/editor noise
+__pycache__/
+*.pyc
+*.log
+.DS_Store
+
+# Local proof screenshots and older local reports/backups
+proof-*.png
+*.png
+index.before-*.html
+*_REPORT.md
+
+# Keep the deployment report in the repo
+!GITHUB_PAGES_DEPLOY_REPORT.md
+
+# Keep the game and project docs
+!index.html
+!README.md
+!.gitignore
