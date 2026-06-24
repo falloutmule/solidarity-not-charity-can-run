@@ -86,7 +86,7 @@
     z-index:9; /* below buttons but above canvas */
   }
   #mlookpadhint{
-    font:bold 11px monospace;letter-spacing:1.5px;color:rgba(200,180,120,0.45);
+    font:bold 10px monospace;letter-spacing:1px;color:rgba(200,180,120,0.30);
     pointer-events:none;user-select:none;text-shadow:0 1px 4px rgba(0,0,0,0.7);
     text-align:center;
   }
@@ -233,7 +233,17 @@ const zbuffer = new Float32Array(RW);          // per-column wall distance (spri
 let _resizeTimer = null;
 function _debouncedResize(){
   if(_resizeTimer) clearTimeout(_resizeTimer);
-  _resizeTimer = setTimeout(()=>{ resize(); }, 80);
+  _resizeTimer = setTimeout(()=>{
+    resize();
+    // CRITICAL: re-evaluate mobile mode and re-apply control layout on orientation/size change.
+    // Without this, #mr stays pointer-events:none after rotating from portrait to landscape.
+    if(typeof setMobileMode === 'function' && typeof isMobile === 'function'){
+      setMobileMode(isMobile());
+    }
+    if(typeof applyMobileControlSettings === 'function'){
+      applyMobileControlSettings();
+    }
+  }, 120);
 }
 function isFullscreen(){
   return !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
@@ -454,18 +464,18 @@ function applyMobileControlSettings(){
   // Landscape: #mr IS the right-side look zone, GIVE/SPRINT use left
   if(mlookpad){
     if(portrait){
-      // Center the LOOK pad between left joystick and right buttons, below gameplay.
-      // gameplay ≈ bottom ~30% of screen; controls below that.
-      // Place LOOK pad covering the middle area between ml and mg/ms.
-      // The gameplay area occupies roughly the top portraitPlayH() of the screen.
+      // PORTRAIT: LOOK is a RIGHT-SIDE vertical strip, NOT center.
+      // Layout: top gameplay window | bottom area split: MOVE (left), minimap (center),
+      // GIVE/SPRINT (far right edge), LOOK (right-side open area above GIVE/SPRINT).
       const pH = typeof portraitPlayH==='function' ? portraitPlayH() : Math.round(innerWidth*(RH/RW)*1.05);
-      const mlBottom = 22 + joySize; // bottom of joystick
-      const mgTop = Math.round(innerHeight - (btnSize+34)); // top of GIVE
+      const btnW = btnSize; // GIVE/SPRINT width
+      // LOOK pad: right-side strip from below gameplay to above the bottom controls
       mlookpad.style.top = pH + 'px';
-      mlookpad.style.bottom = Math.max(0, innerHeight - mgTop + 4) + 'px';
-      mlookpad.style.left = (joySize + 24) + 'px';
-      mlookpad.style.right = (btnSize + 24) + 'px';
-      mlookpad.style.width = 'auto';
+      const pBtnSize = Math.round(btnSize * 0.72);
+      mlookpad.style.bottom = (pBtnSize * 2 + 16) + 'px'; // room for stacked GIVE+SPRINT
+      mlookpad.style.left = 'auto';
+      mlookpad.style.right = '0px';
+      mlookpad.style.width = Math.round(innerWidth * 0.30) + 'px'; // right 30% strip
       mlookpad.style.height = 'auto';
       mlookpad.style.opacity = String(alpha);
       mlookpad.style.display = '';
@@ -490,9 +500,13 @@ function applyMobileControlSettings(){
     const h = document.getElementById('mlookhint');
     if(h){ h.style.display = portrait ? 'none' : ''; }
   }
-  [mg,ms].forEach(el=>{ if(el){ el.style.width=btnSize+'px'; el.style.height=btnSize+'px'; el.style.fontSize=Math.max(9,Math.round(btnSize*0.15))+'px'; el.style.right=(portrait?'14px':'30px'); el.style.left='auto'; }});
-  if(mg){ mg.style.top = portrait?'auto':'42%'; mg.style.bottom = portrait?(btnSize+34)+'px':'auto'; mg.style.transform = portrait?'none':'translateY(-50%)'; }
-  if(ms){ ms.style.top = portrait?'auto':'68%'; ms.style.bottom = portrait?'22px':'auto'; ms.style.transform = portrait?'none':'translateY(-50%)'; }
+  // Portrait: shrink GIVE/SPRINT and stack them at the very bottom-right edge
+  // so they don't consume the right-side LOOK strip.
+  // Landscape: keep original sizes/positions.
+  const pBtnSize = portrait ? Math.round(btnSize * 0.72) : btnSize;
+  [mg,ms].forEach(el=>{ if(el){ el.style.width=pBtnSize+'px'; el.style.height=pBtnSize+'px'; el.style.fontSize=Math.max(9,Math.round(pBtnSize*0.15))+'px'; el.style.right=(portrait?'8px':'30px'); el.style.left='auto'; }});
+  if(mg){ mg.style.top = portrait?'auto':'42%'; mg.style.bottom = portrait?(pBtnSize+8)+'px':'auto'; mg.style.transform = portrait?'none':'translateY(-50%)'; }
+  if(ms){ ms.style.top = portrait?'auto':'68%'; ms.style.bottom = portrait?'6px':'auto'; ms.style.transform = portrait?'none':'translateY(-50%)'; }
   if(mm){ mm.style.width=Math.round(btnSize*0.78)+'px'; mm.style.height=Math.round(btnSize*0.55)+'px'; mm.style.right='8px'; mm.style.top='12px'; mm.style.left='auto'; mm.style.bottom='auto'; mm.style.transform='none'; }
   if(mp){ mp.style.width=Math.round(btnSize*0.78)+'px'; mp.style.height=Math.round(btnSize*0.55)+'px'; mp.style.left='10px'; mp.style.top='10px'; mp.style.right='auto'; mp.style.bottom='auto'; }
   els.forEach(el=>{ el.style.opacity=String(alpha); });
