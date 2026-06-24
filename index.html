@@ -407,7 +407,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = '033de98';
+const BUILD_ID = 'lookgain';
 let mobileMode = false; // true = show mobile overlay, hide desktop cursor
 let mobileOverride = null; // null=auto, 'on', 'off'
 let portHintShown = false;
@@ -423,8 +423,9 @@ let lookHintShownAt = 0;
 const LOOK_HINT_TIMEOUT_MS = 5000;
 let sprintBurstUntil = 0; // mobile sprint burst end time (seconds, performance.now/1000)
 let ms_element = null; // reference to SPRINT button for visual state updates
-const BASE_MOBILE_TURN_SENS = 0.0050; // 1.0x is close to the prior MED setting; 4.0x is much faster than old HIGH.
-const LOOK_SPEED_STEPS = [0.75,1,1.25,1.5,2,2.5,3,4];
+const BASE_MOBILE_TURN_SENS = 0.0062; // per-pixel rad; 1.0x ≈ prior MED. Portrait adds extra boost via mobileLookSens().
+const LOOK_SPEED_STEPS = [0.75,1,1.25,1.5,2,2.5,3,4,5,6,8,10];
+const PORTRAIT_LOOK_BOOST = 1.72; // small LOOK circle needs more gain than landscape drag zone
 const LEGACY_LOOK_TO_SPEED = {low:0.75, med:1, high:1.5, fast:2.5};
 const JOY_SIZE_STEPS = [90,110,130,150];
 const BTN_SIZE_STEPS = [70,85,100,115];
@@ -444,6 +445,12 @@ function nearestStep(value, steps){
 }
 function cycleStepValue(current, steps){ return cycleValue(nearestStep(Number(current)||steps[0], steps), steps); }
 function lookSensFromSpeed(v){ return BASE_MOBILE_TURN_SENS * (Number(v)||1); }
+function mobileLookSens(){
+  const s = options.mobileTurnSens;
+  if(!mobileMode) return s;
+  if(isMobilePortrait()) return s * PORTRAIT_LOOK_BOOST;
+  return s * 1.06;
+}
 function lookSpeedLabel(v){ const n=Number(v)||1; return (Number.isInteger(n)?n.toFixed(1):String(n)) + 'x'; }
 function percentLabel(v){ return Math.round((Number(v)||0)*100)+'%'; }
 function layoutCssSize(){
@@ -745,8 +752,7 @@ function bindMobileControls(){
     if(!lpadMousePtr || e.pointerId !== lpadMousePtr.id) return;
     if(state!==STATE.PLAY || paused) return;
     const dx = e.clientX - lpadMousePtr.startX;
-    if(Math.abs(dx) > 0.5){ lpadMousePtr.startX = e.clientX; }
-    player.angle += dx * options.mobileTurnSens;
+    if(Math.abs(dx) > 0.2){ lpadMousePtr.startX = e.clientX; player.angle += dx * mobileLookSens(); }
     touchDebug({type:'look_circle_move', orient:isMobilePortrait()?'port':'land', dx, angle:player.angle});
   },{passive:false});
 
@@ -796,7 +802,7 @@ function bindMobileControls(){
     if(state!==STATE.PLAY || paused) return;
     const dx = e.clientX - mrPtr.startX;
     if(Math.abs(dx) > 0.5){ mrPtr.startX = e.clientX; }
-    player.angle += dx * options.mobileTurnSens;
+    player.angle += dx * mobileLookSens();
     touchDebug({type:'land_look_move', dx, angle:player.angle});
   },{passive:false});
 
@@ -883,16 +889,16 @@ function bindMobileControls(){
         tzone.lastX = t.clientX;
         if(state===STATE.PLAY && !paused){
           if(Math.abs(dx) > 2) dismissLookHint();
-          player.angle += dx * options.mobileTurnSens;
+          player.angle += dx * mobileLookSens();
         }
       }
       if(lookTouch.id !== null && t.identifier === lookTouch.id){
         handled = true;
         if(state===STATE.PLAY && !paused){
           const dx = t.clientX - lookTouch.lastX;
-          if(Math.abs(dx) > 0.5){
+          if(Math.abs(dx) > 0.2){
             lookTouch.lastX = t.clientX;
-            player.angle += dx * options.mobileTurnSens;
+            player.angle += dx * mobileLookSens();
             touchDebug({type:'look_circle_touch_move', orient:isMobilePortrait()?'port':'land', dx, angle:player.angle, joyId:joy.id, lookId:lookTouch.id});
           }
         }
