@@ -430,9 +430,7 @@ function lookSpeedLabel(v){ const n=Number(v)||1; return (Number.isInteger(n)?n.
 function percentLabel(v){ return Math.round((Number(v)||0)*100)+'%'; }
 function isMobilePortrait(){
   const vv=window.visualViewport;
-  const vw = Math.round(view.width || 0), vh = Math.round(view.height || 0);
-  if(mobileMode && vw > 0 && vh > vw) return true;
-  const w=Math.round((vv&&vv.width)||innerWidth), h=Math.round((vv&&vv.height)||innerHeight);
+  const w=Math.round((vv&&vv.width)||view.width||innerWidth), h=Math.round((vv&&vv.height)||view.height||innerHeight);
   return !!mobileMode && h > w;
 }
 function sanitizeRunnerName(v){ return String(v||'').toUpperCase().replace(/[^A-Z0-9 _\-.!]/g,'').replace(/\s+/g,' ').trim().slice(0,16) || 'RUNNER'; }
@@ -459,81 +457,78 @@ function applyMobileControlSettings(){
   const ml=document.getElementById('ml'), mr=document.getElementById('mr'), mg=document.getElementById('mg'), ms=document.getElementById('ms');
   const mm=document.getElementById('mm'), mp=document.getElementById('mp');
   const mlookpad=document.getElementById('mlookpad');
-  function placeRect(el, rect){
-    if(!el || !rect) return;
-    el.style.left = rect.left + 'px';
-    el.style.top = rect.top + 'px';
-    el.style.right = 'auto';
-    el.style.bottom = 'auto';
-    el.style.width = rect.width + 'px';
-    el.style.height = rect.height + 'px';
-    el.style.transform = 'none';
+  if(ml){
+    ml.style.width=joySize+'px'; ml.style.height=joySize+'px'; ml.style.left=(portrait?'14px':'20px'); ml.style.bottom=(portrait?'22px':'30px');
+    ml.style.top='auto'; ml.style.right='auto'; ml.style.transform='none';
   }
-  if(portrait){
-    const L = portraitLayout();
-    placeRect(ml, L.moveRect);
-    placeRect(mg, L.giveRect);
-    placeRect(ms, L.sprintRect);
-    placeRect(mlookpad, L.lookRect);
-    if(mg) mg.style.fontSize = Math.max(9, Math.round(L.giveRect.width * 0.15)) + 'px';
-    if(ms) ms.style.fontSize = Math.max(9, Math.round(L.sprintRect.width * 0.15)) + 'px';
-    const fpv = L.fpvRect;
-    const mapBtnW = Math.round(btnSize * 0.78), mapBtnH = Math.round(btnSize * 0.55);
-    if(mm){
-      mm.style.width = mapBtnW + 'px'; mm.style.height = mapBtnH + 'px';
-      mm.style.left = (fpv.w - mapBtnW - 8) + 'px'; mm.style.top = (fpv.y + 8) + 'px';
-      mm.style.right = 'auto'; mm.style.bottom = 'auto'; mm.style.transform = 'none';
-    }
-    if(mp){
-      mp.style.width = mapBtnW + 'px'; mp.style.height = mapBtnH + 'px';
-      mp.style.left = '10px'; mp.style.top = (fpv.y + 8) + 'px';
-      mp.style.right = 'auto'; mp.style.bottom = 'auto';
-    }
-  } else {
-    if(ml){
-      ml.style.width=joySize+'px'; ml.style.height=joySize+'px'; ml.style.left='20px'; ml.style.bottom='30px';
-      ml.style.top='auto'; ml.style.right='auto'; ml.style.transform='none';
-    }
-    const lookSize = Math.round(Math.max(68, joySize * 0.72));
-    if(mlookpad){
-      mlookpad.style.width = lookSize + 'px';
-      mlookpad.style.height = lookSize + 'px';
-      mlookpad.style.left = 'auto';
-      mlookpad.style.right = '16px';
-      mlookpad.style.bottom = '24px';
-      mlookpad.style.top = 'auto';
-      mlookpad.style.transform = 'none';
-      mlookpad.style.opacity = '1';
-      mlookpad.style.background = 'rgba(200,150,60,0.35)';
-      mlookpad.style.border = '2px solid rgba(220,190,100,0.80)';
-      mlookpad.style.color = '#e9d8b0';
-    }
-    [mg,ms].forEach(el=>{ if(el){ el.style.width=btnSize+'px'; el.style.height=btnSize+'px'; el.style.fontSize=Math.max(9,Math.round(btnSize*0.15))+'px'; el.style.left='auto'; el.style.right='20px'; }});
-    if(mg){ mg.style.top='42%'; mg.style.bottom='auto'; mg.style.transform='translateY(-50%)'; }
-    if(ms){ ms.style.top='68%'; ms.style.right='30px'; ms.style.transform='translateY(-50%)'; }
-    if(mm){ mm.style.width=Math.round(btnSize*0.78)+'px'; mm.style.height=Math.round(btnSize*0.55)+'px'; mm.style.right='8px'; mm.style.top='12px'; mm.style.left='auto'; mm.style.bottom='auto'; mm.style.transform='none'; }
-    if(mp){ mp.style.width=Math.round(btnSize*0.78)+'px'; mp.style.height=Math.round(btnSize*0.55)+'px'; mp.style.left='10px'; mp.style.top='10px'; mp.style.right='auto'; mp.style.bottom='auto'; }
-  }
-  if(mr){
+  // Portrait: dedicated LOOK pad in center, #mr is NOT the look zone (it's for buttons visually)
+  // Portrait: GIVE/SPRINT use right side, MOVE uses left side, LOOK pad uses center
+  // Landscape: #mr IS the right-side look zone, GIVE/SPRINT use left
+  // Dedicated LOOK circle (#mlookpad) — visible in BOTH portrait and landscape.
+  // Portrait: right side, top of control area, ABOVE GIVE/SPRINT with clear gap.
+  // Landscape: right side, vertically centered.
+  if(mlookpad){
+    const lookSize = portrait ? Math.round(Math.max(72, joySize * 0.82)) : Math.round(Math.max(68, joySize * 0.72));
+    mlookpad.style.width = lookSize + 'px';
+    mlookpad.style.height = lookSize + 'px';
+    mlookpad.style.left = 'auto';
+    mlookpad.style.transform = 'none';
     if(portrait){
-      mr.style.pointerEvents = 'none';
-      mr.style.display = 'none';
+      // Portrait: fixed positions from bottom for predictable stacking.
+      // Stack from bottom: SPRINT(6px) → GIVE → gap → LOOK → gap to gameplay
+      const pBtnS = Math.round(btnSize * 0.68); // shrunk button size
+      const sprintBottom = 6;
+      const giveBottom = sprintBottom + pBtnS + 10;        // 10px gap above SPRINT
+      const lookBottom = giveBottom + pBtnS + 14;           // 14px gap above GIVE
+      mlookpad.style.bottom = lookBottom + 'px';
+      mlookpad.style.top = 'auto';
+      mlookpad.style.right = '10px';
     } else {
-      mr.style.display = 'flex';
-      mr.style.pointerEvents = 'auto';
-      mr.style.top = '0'; mr.style.right = '0'; mr.style.bottom = 'auto'; mr.style.width = '50vw'; mr.style.height = '100%';
+      // Landscape: right side, vertically centered
+      mlookpad.style.right = '14px';
+      mlookpad.style.top = '50%';
+      mlookpad.style.bottom = 'auto';
+      mlookpad.style.transform = 'translateY(-50%)';
     }
-  }
-  {
-    const h = document.getElementById('mlookhint');
-    if(h){ h.style.display = portrait ? 'none' : ''; }
-  }
-  if(mlookpad && portrait){
+    // Make LOOK unmistakably visible — strong background + border
     mlookpad.style.opacity = '1';
     mlookpad.style.background = 'rgba(200,150,60,0.35)';
     mlookpad.style.border = '2px solid rgba(220,190,100,0.80)';
     mlookpad.style.color = '#e9d8b0';
   }
+  if(mr){
+    if(portrait){
+      // Portrait: mr is NOT the look zone — hide it from pointer events entirely.
+      // It stays in the DOM but is inert.
+      mr.style.pointerEvents = 'none';
+      mr.style.top = '0'; mr.style.right = '0'; mr.style.bottom = '0'; mr.style.width = '100%';
+    } else {
+      // Landscape: mr IS the right-side look zone.
+      mr.style.pointerEvents = 'auto';
+      mr.style.top = '0'; mr.style.right = '0'; mr.style.bottom = 'auto'; mr.style.width = '50vw'; mr.style.height = '100%';
+    }
+  }
+  // In portrait, hide the landscape LOOK hint; show it only in landscape.
+  {
+    const h = document.getElementById('mlookhint');
+    if(h){ h.style.display = portrait ? 'none' : ''; }
+  }
+  // GIVE/SPRINT positioning.
+  // Portrait: right side, stacked bottom-right, smaller.
+  // Landscape: LEFT side (so LOOK circle can use the right side without overlap).
+  const pBtnSize = portrait ? Math.round(btnSize * 0.68) : btnSize;
+  if(portrait){
+    [mg,ms].forEach(el=>{ if(el){ el.style.width=pBtnSize+'px'; el.style.height=pBtnSize+'px'; el.style.fontSize=Math.max(9,Math.round(pBtnSize*0.15))+'px'; el.style.right='10px'; el.style.left='auto'; }});
+    if(mg){ mg.style.top='auto'; mg.style.bottom=(pBtnSize + 16)+'px'; mg.style.transform='none'; }
+    if(ms){ ms.style.top='auto'; ms.style.bottom='6px'; ms.style.transform='none'; }
+  } else {
+    // Landscape: GIVE/SPRINT on LEFT side to avoid LOOK circle on right
+    [mg,ms].forEach(el=>{ if(el){ el.style.width=btnSize+'px'; el.style.height=btnSize+'px'; el.style.fontSize=Math.max(9,Math.round(btnSize*0.15))+'px'; el.style.left='30px'; el.style.right='auto'; }});
+    if(mg){ mg.style.top='42%'; mg.style.bottom='auto'; mg.style.transform='translateY(-50%)'; }
+    if(ms){ ms.style.top='68%'; ms.style.bottom='auto'; ms.style.transform='translateY(-50%)'; }
+  }
+  if(mm){ mm.style.width=Math.round(btnSize*0.78)+'px'; mm.style.height=Math.round(btnSize*0.55)+'px'; mm.style.right='8px'; mm.style.top='12px'; mm.style.left='auto'; mm.style.bottom='auto'; mm.style.transform='none'; }
+  if(mp){ mp.style.width=Math.round(btnSize*0.78)+'px'; mp.style.height=Math.round(btnSize*0.55)+'px'; mp.style.left='10px'; mp.style.top='10px'; mp.style.right='auto'; mp.style.bottom='auto'; }
   els.forEach(el=>{ el.style.opacity=String(alpha); });
   updateJoyDot(joy.x||0, joy.y||0);
 }
@@ -624,13 +619,13 @@ function touchDebug(data){
   if(params.get('layoutdebug') !== '1') return;
   document.addEventListener('DOMContentLoaded', ()=>{
     const ids = ['ml','mlookpad','mg','ms','mm','mp','mr'];
-    const colors = { ml:'#ff0', mlookpad:'#0ff', mg:'#f80', ms:'#08f', mm:'#8f0', mp:'#f08', mr:'#888' };
     function applyOutlines(){
       ids.forEach(id=>{
         const el = document.getElementById(id);
         if(!el) return;
-        el.style.outline = '3px solid ' + (colors[id] || '#ff0');
+        el.style.outline = '3px solid #ff0';
         el.style.outlineOffset = '1px';
+        // Add label
         if(!el.querySelector('._ldbg')){
           const lbl = document.createElement('div');
           lbl.className = '_ldbg';
@@ -640,7 +635,6 @@ function touchDebug(data){
           el.appendChild(lbl);
         }
       });
-      if(typeof applyMobileControlSettings === 'function') applyMobileControlSettings();
     }
     applyOutlines();
     setInterval(applyOutlines, 2000);
@@ -1016,12 +1010,10 @@ function drawMobileMenu(){
   const playControls = mobileMode && state===STATE.PLAY && !paused;
   const mob = document.getElementById('mob');
   if(mob) mob.style.pointerEvents = playControls ? 'auto' : 'none';
-  ['ml','mlookpad','mg','ms','mm','mp'].forEach(id=>{
+  ['ml','mr','mlookpad','mg','ms','mm','mp'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.style.display = playControls ? 'flex' : 'none';
   });
-  const mrEl = document.getElementById('mr');
-  if(mrEl) mrEl.style.display = (playControls && !isMobilePortrait()) ? 'flex' : 'none';
 
   if(!mobileMode){
     if(fsbtn) fsbtn.classList.remove('show');
@@ -2147,16 +2139,9 @@ function drawMinap(){
   }
   const pad = mobileMode ? 6 : 10;
   const portraitMini = isMobilePortrait();
-  let ox, oy;
-  if(mobileMode && portraitMini){
-    const L = portraitLayout();
-    const mr = L.minimapRect;
-    ox = Math.round(mr.x + (mr.w - W) / 2);
-    oy = Math.round(mr.y + (mr.h - H) / 2);
-  } else {
-    ox = mobileMode && portraitMini ? Math.round((innerWidth-W)/2) : innerWidth - W - pad - (mobileMode ? 4 : 0);
-    oy = mobileMode && portraitMini ? Math.round(innerHeight - H - 22) : pad + (mobileMode ? 48 : 0);
-  }
+  // Landscape: top-right. Portrait: bottom-center between MOVE and GIVE/SPRINT.
+  const ox = mobileMode && portraitMini ? Math.round((innerWidth-W)/2) : innerWidth - W - pad - (mobileMode ? 4 : 0);
+  const oy = mobileMode && portraitMini ? Math.round(innerHeight - H - 22) : pad + (mobileMode ? 48 : 0);
   ctx.fillStyle='rgba(20,16,12,0.7)'; ctx.fillRect(ox-3,oy-3,W+6,H+6);
   ctx.strokeStyle='rgba(180,150,100,0.4)'; ctx.lineWidth=1; ctx.strokeRect(ox-3,oy-3,W+6,H+6);
   for(let y=0;y<game.MAP_H;y++) for(let x=0;x<game.MAP_W;x++){
@@ -2222,13 +2207,8 @@ function panel(x,y,w,h){ ctx.fillStyle='rgba(18,14,10,0.66)'; ctx.fillRect(x,y,w
   ctx.strokeStyle='rgba(190,158,104,0.35)'; ctx.lineWidth=1; ctx.strokeRect(x+0.5,y+0.5,w-1,h-1); }
 function drawHUD(now){
   ctx.textBaseline='top';
-  if(mobileMode && isMobilePortrait()){
-    drawPortraitStatsPanel();
-    drawPortraitFpvOverlay(now);
-    return;
-  }
   const hudX = 8;
-  const hudY = 8;
+  const hudY = isMobilePortrait() ? 68 : 8;
   const q=(game.helped>=game.quota && game.exit && game.exit.active)?'EXIT OPEN':('quota '+game.helped+'/'+game.quota);
   const cdTag = player.giveCD>0 ? ('  handoff '+player.giveCD.toFixed(1)+'s') : '';
   const lines=[
@@ -3127,137 +3107,19 @@ addEventListener('keydown',e=>{
 // The gameplay is a horizontal 320×200 view sitting in the upper portion of the
 // portrait screen — not stretched to fill the full portrait height.
 function portraitPlayH(){
-  // FPV panel height: landscape-aspect window at top of portrait dashboard.
+  // Use the full canvas width as the crop width; target a 16:9-ish crop.
+  // playH = crops at most ~56% of the screen height, leaving room for controls.
   return Math.round(view.width * (RH/RW) * 1.05);
-}
-const _layoutDebugActive = new URLSearchParams(location.search).get('layoutdebug') === '1';
-function rectsOverlap(a,b){
-  if(!a||!b) return true;
-  return !(a.left+a.width <= b.left || b.left+b.width <= a.left ||
-           a.top+a.height <= b.top || b.top+b.height <= a.top);
-}
-/** Portrait stacked dashboard: FPV → minimap → stats → controls dock. */
-function portraitLayout(){
-  const cw = view.width, ch = view.height;
-  const fpvH = portraitPlayH();
-  const miniH = Math.round(Math.max(58, Math.min(92, ch * 0.095)));
-  const statsH = Math.round(Math.max(52, Math.min(76, ch * 0.078)));
-  const dockH = Math.max(110, ch - fpvH - miniH - statsH);
-  const fpvRect = { x:0, y:0, w:cw, h:fpvH };
-  const minimapRect = { x:0, y:fpvH, w:cw, h:miniH };
-  const statsRect = { x:0, y:fpvH + miniH, w:cw, h:statsH };
-  const controlsRect = { x:0, y:fpvH + miniH + statsH, w:cw, h:dockH };
-  const joySize = Math.round(Math.max(90, Number(options.joySizePx) || 110));
-  const lookSize = Math.round(Math.max(70, joySize * 0.78));
-  const midBtn = Math.round(Math.max(55, (Number(options.buttonSizePx) || 85) * 0.62));
-  const padB = 14, padL = 12, padR = 12, gap = 10;
-  const dockBot = controlsRect.y + controlsRect.h - padB;
-  const moveRect = { left:padL, top:dockBot - joySize, width:joySize, height:joySize };
-  const lookRect = { left:cw - padR - lookSize, top:dockBot - lookSize, width:lookSize, height:lookSize };
-  const midLeft = moveRect.left + moveRect.width + gap;
-  const midRight = lookRect.left - gap;
-  const midSpan = Math.max(0, midRight - midLeft);
-  const pairW = midBtn * 2 + gap;
-  const pairLeft = midLeft + Math.max(0, (midSpan - pairW) / 2);
-  const giveRect = { left:pairLeft, top:dockBot - midBtn, width:midBtn, height:midBtn };
-  const sprintRect = { left:pairLeft + midBtn + gap, top:dockBot - midBtn, width:midBtn, height:midBtn };
-  return { fpvRect, minimapRect, statsRect, controlsRect, moveRect, giveRect, sprintRect, lookRect };
-}
-function drawPortraitDashboardChrome(){
-  if(!mobileMode || !isMobilePortrait()) return;
-  const L = portraitLayout();
-  const y0 = L.fpvRect.h;
-  ctx.fillStyle = '#0c0a08';
-  ctx.fillRect(0, y0, view.width, view.height - y0);
-  ctx.fillStyle = 'rgba(16,12,10,0.94)';
-  ctx.fillRect(L.minimapRect.x, L.minimapRect.y, L.minimapRect.w, L.minimapRect.h);
-  ctx.fillStyle = 'rgba(14,11,9,0.96)';
-  ctx.fillRect(L.statsRect.x, L.statsRect.y, L.statsRect.w, L.statsRect.h);
-  ctx.fillStyle = 'rgba(10,8,6,0.98)';
-  ctx.fillRect(L.controlsRect.x, L.controlsRect.y, L.controlsRect.w, L.controlsRect.h);
-  ctx.strokeStyle = 'rgba(190,158,104,0.22)'; ctx.lineWidth = 1;
-  [L.minimapRect.y, L.statsRect.y, L.controlsRect.y].forEach(yy=>{
-    ctx.beginPath(); ctx.moveTo(0, yy); ctx.lineTo(view.width, yy); ctx.stroke();
-  });
-  if(_layoutDebugActive){
-    const zones = [
-      ['FPV', L.fpvRect, '#00ff66'],
-      ['MINI', L.minimapRect, '#00e5ff'],
-      ['STATS', L.statsRect, '#ff66ff'],
-      ['DOCK', L.controlsRect, '#ffee00'],
-    ];
-    ctx.font = 'bold 10px monospace';
-    zones.forEach(([lbl, r, col])=>{
-      ctx.strokeStyle = col; ctx.lineWidth = 2;
-      ctx.strokeRect(r.x + 1, r.y + 1, r.w - 2, r.h - 2);
-      ctx.fillStyle = col;
-      ctx.fillText(lbl, r.x + 4, r.y + 12);
-    });
-  }
-}
-function drawPortraitStatsPanel(){
-  const L = portraitLayout();
-  const r = L.statsRect;
-  const q = (game.helped >= game.quota && game.exit && game.exit.active) ? 'EXIT OPEN' : ('quota ' + game.helped + '/' + game.quota);
-  const cdTag = player.giveCD > 0 ? (' · handoff ' + player.giveCD.toFixed(1) + 's') : '';
-  panel(r.x + 8, r.y + 5, r.w - 16, r.h - 10);
-  ctx.font = '11px monospace';
-  const row1 = 'TIME ' + Math.max(0, game.timeLeft).toFixed(1) + '   CANS ' + player.cans + '/' + player.maxCans +
-    '   STAM ' + staminaBar();
-  const row2 = 'PEOPLE ' + game.helped + '/' + game.quota + ' helped · ' + game.delivered + ' delivered' + cdTag;
-  const row3 = 'D' + game.district + ' [' + game.modifier.toUpperCase() + '] x' + game.scoreMult +
-    '   SEED ' + game.seed + '   SCORE ' + game.totalScore + '   ' + q;
-  ctx.fillStyle = '#e9d8b0';
-  ctx.fillText(row1, r.x + 14, r.y + 10);
-  ctx.fillStyle = '#9fffb6';
-  ctx.fillText(row2, r.x + 14, r.y + 26);
-  ctx.fillStyle = '#c8b888';
-  ctx.fillText(row3, r.x + 14, r.y + 42);
-  const ut = upgradeTag();
-  if(ut){ ctx.fillStyle = '#8a7a5a'; ctx.fillText(ut, r.x + 14, r.y + 56); }
-}
-function drawPortraitFpvOverlay(now){
-  const L = portraitLayout();
-  const cx = L.fpvRect.w / 2, cy = L.fpvRect.h / 2;
-  const aim = game.aimNpc;
-  if(aim){
-    const ok = player.cans >= aim.need;
-    ctx.strokeStyle = ok ? 'rgba(140,255,170,0.95)' : 'rgba(255,140,90,0.95)';
-    ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(cx, cy, 11, 0, 7); ctx.stroke();
-    ctx.font = '12px monospace'; ctx.textAlign = 'center';
-    const lbl = aim.kind.toUpperCase() + ' · needs ' + aim.need + ' · you ' + player.cans;
-    ctx.fillStyle = 'rgba(0,0,0,0.55)'; const lw = ctx.measureText(lbl).width;
-    ctx.fillRect(cx - lw / 2 - 6, cy + 14, lw + 12, 16);
-    ctx.fillStyle = ok ? '#a8ffc0' : '#ffb088'; ctx.fillText(lbl, cx, cy + 16);
-    ctx.textAlign = 'left';
-  } else {
-    ctx.fillStyle = 'rgba(220,220,228,0.8)';
-    ctx.fillRect(cx - 1, cy - 5, 2, 4); ctx.fillRect(cx - 1, cy + 1, 2, 4);
-    ctx.fillRect(cx - 5, cy - 1, 4, 2); ctx.fillRect(cx + 1, cy - 1, 4, 2);
-  }
-  if(game.msg && game.msgT > 0){
-    ctx.font = '15px monospace';
-    const mw = ctx.measureText(game.msg).width;
-    ctx.fillStyle = 'rgba(20,16,8,0.6)'; ctx.fillRect(cx - mw / 2 - 10, 12, mw + 20, 22);
-    ctx.fillStyle = '#ffd24a'; ctx.textAlign = 'center'; ctx.fillText(game.msg, cx, 16); ctx.textAlign = 'left';
-  }
-  for(const p of game.popups){
-    ctx.font = '13px monospace'; ctx.textAlign = 'center';
-    ctx.globalAlpha = Math.max(0, Math.min(1, p.life));
-    const py = Math.min(p.y, L.fpvRect.h - 8);
-    const pw = ctx.measureText(p.text).width;
-    ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.fillRect(p.x - pw / 2 - 4, py - 2, pw + 8, 14);
-    ctx.fillStyle = p.color; ctx.fillText(p.text, p.x, py);
-    ctx.globalAlpha = 1; ctx.textAlign = 'left';
-  }
 }
 
 function playfieldLayout(){
   // Use the actual canvas backing-store dimensions for perfect consistency.
   const cw = view.width, ch = view.height;
   if(mobileMode && ch > cw){
-    const pH = portraitLayout().fpvRect.h;
-    const scale = pH / RH;
+    // Portrait: landscape-aspect gameplay window in the upper portion of the screen.
+    // Controls sit below it in the remaining space.
+    const pH = portraitPlayH();
+    const scale = pH / RH;                      // scale so 320×200 fits in pH pixels
     const dw = RW * scale, dh = RH * scale;
     return {scale,dw,dh,ox:(cw-dw)/2,oy:0, portrait:true, playH:ch, cropH:dh};
   }
@@ -3293,10 +3155,7 @@ function frame(now){
     } else if(state===STATE.PLAY && !options.reduceFx){
       ctx.fillStyle='rgba(220,180,120,0.05)'; ctx.fillRect(0,0,innerWidth,innerHeight);
     }
-    if(state===STATE.PLAY && !paused){
-      drawPortraitDashboardChrome();
-      drawHUD(now); drawMinap();
-    }
+    if(state===STATE.PLAY && !paused){ drawHUD(now); drawMinap(); }
     drawOverlays();
     drawMobileMenu();
   }
@@ -3350,31 +3209,6 @@ function getDebugState(){
   };
 }
 
-function getLayoutProof(){
-  const L = portraitLayout();
-  const domRect = id=>{
-    const el = document.getElementById(id);
-    if(!el) return null;
-    const b = el.getBoundingClientRect();
-    return { left:b.left|0, top:b.top|0, width:b.width|0, height:b.height|0 };
-  };
-  const move = domRect('ml'), give = domRect('mg'), sprint = domRect('ms'), look = domRect('mlookpad');
-  const between = give && look && move && (give.left > move.left + move.width) && (look.left > give.left + give.width);
-  return {
-    portrait: isMobilePortrait(),
-    fpvRect: L.fpvRect, minimapRect: L.minimapRect, statsRect: L.statsRect, controlsRect: L.controlsRect,
-    moveRect: move, giveRect: give, sprintRect: sprint, lookRect: look,
-    giveBetweenMoveAndLook: between,
-    overlap: {
-      giveLook: rectsOverlap(give, look),
-      sprintLook: rectsOverlap(sprint, look),
-      giveMove: rectsOverlap(give, move),
-      sprintMove: rectsOverlap(sprint, move),
-      giveSprint: rectsOverlap(give, sprint),
-    },
-  };
-}
-
 globalThis.CR = window.CR = {
   game,player,STATE,cfg,SAVE,stats,leaderboards,profile,options,dbg,
   get state(){ return state; },
@@ -3383,7 +3217,7 @@ globalThis.CR = window.CR = {
   set paused(v){ paused=!!v; },
   get mobileMode(){ return mobileMode; },
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,
-  setMobileMode,isMobile,rmenuAction,getDebugState,portraitLayout,getLayoutProof,rectsOverlap,
+  setMobileMode,isMobile,rmenuAction,getDebugState,
   editRunnerName,applyMobileControlSettings,mobileSprintCost,mobileSprintBurstSec,
   toggleFullscreen,isFullscreen,enterFullscreen,exitFullscreen,
 };
