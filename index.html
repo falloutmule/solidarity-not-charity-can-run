@@ -465,31 +465,36 @@ function applyMobileControlSettings(){
   // Portrait: GIVE/SPRINT use right side, MOVE uses left side, LOOK pad uses center
   // Landscape: #mr IS the right-side look zone, GIVE/SPRINT use left
   // Dedicated LOOK circle (#mlookpad) — visible in BOTH portrait and landscape.
-  // Portrait: right side, mid-lower area, above GIVE/SPRINT.
-  // Landscape: right side, between MAP (top-right) and GIVE/SPRINT (lower-left).
+  // Portrait: right side, top of control area, ABOVE GIVE/SPRINT with clear gap.
+  // Landscape: right side, vertically centered.
   if(mlookpad){
-    const lookSize = portrait ? Math.round(joySize * 0.78) : Math.round(joySize * 0.72);
+    const lookSize = portrait ? Math.round(Math.max(72, joySize * 0.82)) : Math.round(Math.max(68, joySize * 0.72));
     mlookpad.style.width = lookSize + 'px';
     mlookpad.style.height = lookSize + 'px';
     mlookpad.style.left = 'auto';
+    mlookpad.style.transform = 'none';
     if(portrait){
-      // Portrait: right side, vertically centered in the control area below gameplay
-      const pH = typeof portraitPlayH==='function' ? portraitPlayH() : Math.round(innerWidth*(RH/RW)*1.05);
-      const pBtnSize = Math.round(btnSize * 0.72);
-      const ctrlTop = pH + 8;
-      const ctrlBot = innerHeight - (pBtnSize * 2 + 20); // above stacked GIVE+SPRINT
-      const lookCenter = ctrlTop + Math.max(lookSize, (ctrlBot - ctrlTop) / 2);
-      mlookpad.style.top = (lookCenter - lookSize/2) + 'px';
-      mlookpad.style.bottom = 'auto';
+      // Portrait: fixed positions from bottom for predictable stacking.
+      // Stack from bottom: SPRINT(6px) → GIVE → gap → LOOK → gap to gameplay
+      const pBtnS = Math.round(btnSize * 0.68); // shrunk button size
+      const sprintBottom = 6;
+      const giveBottom = sprintBottom + pBtnS + 10;        // 10px gap above SPRINT
+      const lookBottom = giveBottom + pBtnS + 14;           // 14px gap above GIVE
+      mlookpad.style.bottom = lookBottom + 'px';
+      mlookpad.style.top = 'auto';
       mlookpad.style.right = '10px';
     } else {
-      // Landscape: right side, vertically centered between top (MAP) and bottom buttons
+      // Landscape: right side, vertically centered
       mlookpad.style.right = '14px';
       mlookpad.style.top = '50%';
       mlookpad.style.bottom = 'auto';
       mlookpad.style.transform = 'translateY(-50%)';
     }
-    mlookpad.style.opacity = String(alpha);
+    // Make LOOK unmistakably visible — strong background + border
+    mlookpad.style.opacity = '1';
+    mlookpad.style.background = 'rgba(200,150,60,0.35)';
+    mlookpad.style.border = '2px solid rgba(220,190,100,0.80)';
+    mlookpad.style.color = '#e9d8b0';
   }
   if(mr){
     if(portrait){
@@ -508,13 +513,20 @@ function applyMobileControlSettings(){
     const h = document.getElementById('mlookhint');
     if(h){ h.style.display = portrait ? 'none' : ''; }
   }
-  // Portrait: shrink GIVE/SPRINT and stack them at the very bottom-right edge
-  // so they don't consume the right-side LOOK strip.
-  // Landscape: keep original sizes/positions.
-  const pBtnSize = portrait ? Math.round(btnSize * 0.72) : btnSize;
-  [mg,ms].forEach(el=>{ if(el){ el.style.width=pBtnSize+'px'; el.style.height=pBtnSize+'px'; el.style.fontSize=Math.max(9,Math.round(pBtnSize*0.15))+'px'; el.style.right=(portrait?'8px':'30px'); el.style.left='auto'; }});
-  if(mg){ mg.style.top = portrait?'auto':'42%'; mg.style.bottom = portrait?(pBtnSize+8)+'px':'auto'; mg.style.transform = portrait?'none':'translateY(-50%)'; }
-  if(ms){ ms.style.top = portrait?'auto':'68%'; ms.style.bottom = portrait?'6px':'auto'; ms.style.transform = portrait?'none':'translateY(-50%)'; }
+  // GIVE/SPRINT positioning.
+  // Portrait: right side, stacked bottom-right, smaller.
+  // Landscape: LEFT side (so LOOK circle can use the right side without overlap).
+  const pBtnSize = portrait ? Math.round(btnSize * 0.68) : btnSize;
+  if(portrait){
+    [mg,ms].forEach(el=>{ if(el){ el.style.width=pBtnSize+'px'; el.style.height=pBtnSize+'px'; el.style.fontSize=Math.max(9,Math.round(pBtnSize*0.15))+'px'; el.style.right='10px'; el.style.left='auto'; }});
+    if(mg){ mg.style.top='auto'; mg.style.bottom=(pBtnSize + 16)+'px'; mg.style.transform='none'; }
+    if(ms){ ms.style.top='auto'; ms.style.bottom='6px'; ms.style.transform='none'; }
+  } else {
+    // Landscape: GIVE/SPRINT on LEFT side to avoid LOOK circle on right
+    [mg,ms].forEach(el=>{ if(el){ el.style.width=btnSize+'px'; el.style.height=btnSize+'px'; el.style.fontSize=Math.max(9,Math.round(btnSize*0.15))+'px'; el.style.left='30px'; el.style.right='auto'; }});
+    if(mg){ mg.style.top='42%'; mg.style.bottom='auto'; mg.style.transform='translateY(-50%)'; }
+    if(ms){ ms.style.top='68%'; ms.style.bottom='auto'; ms.style.transform='translateY(-50%)'; }
+  }
   if(mm){ mm.style.width=Math.round(btnSize*0.78)+'px'; mm.style.height=Math.round(btnSize*0.55)+'px'; mm.style.right='8px'; mm.style.top='12px'; mm.style.left='auto'; mm.style.bottom='auto'; mm.style.transform='none'; }
   if(mp){ mp.style.width=Math.round(btnSize*0.78)+'px'; mp.style.height=Math.round(btnSize*0.55)+'px'; mp.style.left='10px'; mp.style.top='10px'; mp.style.right='auto'; mp.style.bottom='auto'; }
   els.forEach(el=>{ el.style.opacity=String(alpha); });
@@ -599,6 +611,34 @@ function touchDebug(data){
       }, 500);
     });
   }
+})();
+// ---- layout debug mode (activated by ?layoutdebug=1) ----
+// Adds bright outlines to all mobile controls for screenshot verification.
+(function(){
+  const params = new URLSearchParams(location.search);
+  if(params.get('layoutdebug') !== '1') return;
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const ids = ['ml','mlookpad','mg','ms','mm','mp','mr'];
+    function applyOutlines(){
+      ids.forEach(id=>{
+        const el = document.getElementById(id);
+        if(!el) return;
+        el.style.outline = '3px solid #ff0';
+        el.style.outlineOffset = '1px';
+        // Add label
+        if(!el.querySelector('._ldbg')){
+          const lbl = document.createElement('div');
+          lbl.className = '_ldbg';
+          lbl.textContent = '#' + id;
+          lbl.style.cssText = 'position:absolute;top:-14px;left:0;font:bold 9px monospace;color:#ff0;background:#000;padding:1px 3px;border-radius:2px;pointer-events:none;z-index:9999;white-space:nowrap;';
+          el.style.position = el.style.position || 'absolute';
+          el.appendChild(lbl);
+        }
+      });
+    }
+    applyOutlines();
+    setInterval(applyOutlines, 2000);
+  });
 })();
 function syncLookHintUI(){
   const h = document.getElementById('mlookhint');
