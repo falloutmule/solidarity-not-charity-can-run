@@ -497,7 +497,6 @@ function applyMobileControlSettings(){
   if(mp){ mp.style.width=Math.round(btnSize*0.78)+'px'; mp.style.height=Math.round(btnSize*0.55)+'px'; mp.style.left='10px'; mp.style.top='10px'; mp.style.right='auto'; mp.style.bottom='auto'; }
   els.forEach(el=>{ el.style.opacity=String(alpha); });
   updateJoyDot(joy.x||0, joy.y||0);
-  _refreshRects(); // update zone rects after applying mobile layout
 }
 
 function dismissLookHint(){
@@ -588,341 +587,6 @@ function setMobileMode(on){
   const ph = document.getElementById('porthint');
   if(ph) ph.classList.remove('show');
 }
-// ============================================================
-// DOCUMENT-LEVEL TOUCH/POINTER INPUT ROUTER
-// Replaces per-element touch handlers as the authoritative
-// LOOK input layer for both portrait and landscape.
-// Classification is done by coordinate math, not DOM z-index.
-// ============================================================
-
-// ---- per-pointer router state ----
-// One entry per active pointer; keyed by pointerId.
-const _ptrs = {}; // { pointerId: { sx, sy, zone, startAngle, lastX } }
-
-// ---- zone classification helper ----
-// Returns the current rect of an element, or null.
-function _rect(id){
-  const el = document.getElementById(id);
-  if(!el) return null;
-  const b = el.getBoundingClientRect();
-  return { l: b.left, t: b.top, r: b.right, b: b.bottom,
-           w: b.width, h: b.height, cx: b.left + b.width/2, cy: b.top + b.height/2 };
-}
-
-// Current cached rects (refreshed on resize/orientation change)
-let _zoneRects = null;
-function _refreshRects(){
-  const portrait = isMobilePortrait();
-  const pH = (typeof portraitPlayH === 'function') ? portraitPlayH() : Math.round(view.width * (RH/RW) * 1.05);
-  let joySize = 110, btnSize = 85;
-  try { joySize = Number(options.joySizePx) || 110; } catch(_) {}
-  try { btnSize = Number(options.buttonSizePx) || 85; } catch(_) {}
-  const mgTop  = Math.round(innerHeight - (btnSize + 34)); // top of GIVE
-  const msBot  = 22;                                      // bottom of SPRINT
-
-  if(portrait){
-    // Portrait layout:
-    // - LOOK: center strip between joystick (left) and buttons (right), below gameplay
-    // - MOVE: bottom-left joystick
-    // - GIVE: right side, below gameplay, above SPRINT
-    // - SPRINT: right side, bottom
-    // - MAP/PAUSE: top corners (top 10% of screen)
-    // - MINIMAP: bottom-center below gameplay
-    _zoneRects = {
-      portrait,
-      look: { l: joySize + 24, t: pH, r: innerWidth - btnSize - 24, b: innerHeight },
-      move: { l: 22, t: innerHeight - joySize - 22, r: 22 + joySize, b: innerHeight - 22 },
-      give: { l: innerWidth - btnSize - 14, t: mgTop,  r: innerWidth - 14, b: mgTop + btnSize },
-      sprint:{ l: innerWidth - btnSize - 14, t: msBot, r: innerWidth - 14, b: msBot + btnSize },
-      map:  { l: innerWidth - btnSize - 14, t: 12,    r: innerWidth - 14, b: 12 + Math.round(btnSize*0.55) },
-      pause:{ l: 10, t: 10, r: 10 + Math.round(btnSize*0.78), b: 10 + Math.round(btnSize*0.55) },
-      minimap: null, // minimap is in-canvas; handled separately in drawMinap
-    };
-  } else {
-    // Landscape layout:
-    // - LOOK: right half (excluding top-buttons and bottom-area)
-    // - MOVE: left side, vertically centered-ish
-    // - GIVE: right side, mid-height
-    // - SPRINT: right side, lower
-    // - MAP: top-right corner
-    // - PAUSE: top-left corner
-    _zoneRects = {
-      portrait,
-      look: { l: innerWidth/2, t: 0, r: innerWidth, b: innerHeight },
-      move: { l: 20, t: innerHeight/2 - joySize/2, r: 20 + joySize, b: innerHeight/2 + joySize/2 },
-      give: { l: innerWidth - btnSize - 30, t: Math.round(innerHeight*0.42), r: innerWidth - 30, b: Math.round(innerHeight*0.42) + btnSize },
-      sprint:{ l: innerWidth - btnSize - 30, t: Math.round(innerHeight*0.68), r: innerWidth - 30, b: Math.round(innerHeight*0.68) + btnSize },
-      map:  { l: innerWidth - btnSize - 8, t: 12, r: innerWidth - 8, b: 12 + Math.round(btnSize*0.55) },
-      pause:{ l: 10, t: 10, r: 10 + Math.round(btnSize*0.78), b: 10 + Math.round(btnSize*0.55) },
-      minimap: null,
-    };
-  }
-}
-
-// Refresh rects on resize / orientation change
-window.addEventListener('resize', _refreshRects, { passive: true });
-window.addEventListener('orientationchange', _refreshRects, { passive: true });
-_refreshRects(); // initialise
-
-// ---- point-in-rect helper ----
-function _inRect(x, y, r){
-  if(!r) return false;
-  return x >= r.l && x <= r.r && y >= r.t && y <= r.b;
-}
-
-// ---- classify pointer position to a zone ----
-function _classifyPointer(x, y){
-  if(!_zoneRects) _refreshRects();
-  const z = _zoneRects;
-  // Check buttons first (highest priority for taps)
-  if(_inRect(x, y, z.give))  return 'GIVE';
-  if(_inRect(x, y, z.sprint)) return 'SPRINT';
-  if(_inRect(x, y, z.map))   return 'MAP';
-  if(_inRect(x, y, z.pause)) return 'PAUSE';
-  // MOVE joystick (bottom-left in portrait, left-center in landscape)
-  if(_inRect(x, y, z.move)) return 'MOVE';
-  // LOOK zone (center strip in portrait, right half in landscape)
-  if(_inRect(x, y, z.look)) return 'LOOK';
-  return 'NONE';
-}
-
-// ---- upgrade touchDebug to show raw event + classification ----
-const _origTouchDebug = touchDebug;
-let _lastRouterEvent = null;
-function touchDebug(data){
-  // Intercept router events to store last one
-  if(data && typeof data === 'object' && data._routerEvent){
-    _lastRouterEvent = data;
-  }
-  _origTouchDebug(data);
-}
-
-// ---- document-level touch router ----
-document.addEventListener('touchstart', function(e){
-  // Immediately refresh rects to be current
-  if(_zoneRects) _refreshRects();
-  for(const t of e.changedTouches){
-    const x = t.clientX, y = t.clientY;
-    const zone = _classifyPointer(x, y);
-    // Store pointer state
-    _ptrs[t.identifier] = {
-      sx: x, sy: y,
-      lastX: x, lastY: y,
-      zone: zone,
-      startAngle: (typeof player !== 'undefined') ? player.angle : 0,
-      active: true,
-      type: 'touch',
-      clientX: x, clientY: y,
-    };
-    // Log for debug
-    touchDebug({
-      _routerEvent: true,
-      type: 'touchstart', target: t.target ? (t.target.id || t.target.tagName) : '?',
-      clientX: x|0, clientY: y|0, pointerId: t.identifier,
-      pointerType: 'touch', zone,
-      lookActive: false,
-      angle: (typeof player !== 'undefined') ? (+player.angle).toFixed(3) : '?',
-      prevDelta: 0,
-    });
-    // Prevent default for all active mobile zones to block scroll/zoom
-    if(mobileMode && zone !== 'NONE'){
-      e.preventDefault();
-    }
-    // Route to per-zone action
-    if(zone === 'LOOK'){
-      _ptrs[t.identifier].lookActive = true;
-      dismissLookHint();
-    } else if(zone === 'MOVE'){
-      // Activate joystick — store base position
-      _ptrs[t.identifier].joyBaseX = x; _ptrs[t.identifier].joyBaseY = y;
-      joy.id = t.identifier; joy.active = true;
-      joy.sx = x; joy.sy = y; joy.x = 0; joy.y = 0;
-      updateJoyDot(0, 0);
-      dismissLookHint();
-    } else if(zone === 'GIVE'){
-      inp.give = true;
-      const mg = document.getElementById('mg'); if(mg) mg.classList.add('pr');
-    } else if(zone === 'SPRINT'){
-      const nowSec = performance.now()/1000;
-      const cost = mobileSprintCost();
-      if(nowSec >= sprintBurstUntil && player.stamina >= cost){
-        player.stamina = Math.max(0, player.stamina - cost);
-        sprintBurstUntil = nowSec + mobileSprintBurstSec();
-        const ms = document.getElementById('ms'); if(ms) ms.classList.add('pr');
-      }
-    } else if(zone === 'MAP'){
-      inp.map = true;
-      const mm = document.getElementById('mm'); if(mm) mm.classList.add('pr');
-    } else if(zone === 'PAUSE'){
-      inp.pause = true;
-      const mp = document.getElementById('mp'); if(mp) mp.classList.add('pr');
-    }
-  }
-},{ passive: false }); // MUST be non-passive to allow preventDefault
-
-document.addEventListener('touchmove', function(e){
-  if(!mobileMode) return;
-  e.preventDefault(); // always prevent scroll during mobile play
-  for(const t of e.changedTouches){
-    const p = _ptrs[t.identifier];
-    if(!p || !p.active) continue;
-    const x = t.clientX, y = t.clientY;
-    p.lastX = x; p.lastY = y;
-    p.clientX = x; p.clientY = y;
-    if(p.zone === 'MOVE' && joy.active && t.identifier === joy.id){
-      // Route joystick movement
-      const dx = x - joy.sx, dy = y - joy.sy;
-      const d = Math.sqrt(dx*dx + dy*dy);
-      const joySize = (typeof options !== 'undefined' && options.joySizePx) ? Number(options.joySizePx) : 110;
-      const MAX = Math.max(32, joySize * 0.35);
-      const dead = (typeof options !== 'undefined' && options.touchDeadzonePx) ? Number(options.touchDeadzonePx) : 8;
-      joy.dist = Math.min(d, MAX) / MAX;
-      if(d < dead){ joy.ang = 0; joy.x = 0; joy.y = 0; }
-      else { joy.ang = Math.atan2(dx, -dy); joy.x = Math.sin(joy.ang)*joy.dist; joy.y = Math.cos(joy.ang)*joy.dist; }
-      updateJoyDot(joy.x, joy.y);
-    } else if(p.zone === 'LOOK' && p.lookActive){
-      const dx = x - p.sx;
-      if(state === STATE.PLAY && !paused){
-        if(Math.abs(dx) > 0.5){
-          p.sx = x; // reset startX for next delta
-          const prevAngle = player.angle;
-          player.angle += dx * options.mobileTurnSens;
-          touchDebug({
-            _routerEvent: true, type: 'touchmove',
-            clientX: x|0, clientY: y|0, pointerId: t.identifier,
-            zone: 'LOOK', lookActive: true,
-            dx: dx|0,
-            angle: (+player.angle).toFixed(3),
-            delta: (+(player.angle - prevAngle)).toFixed(4),
-          });
-        }
-      }
-    }
-  }
-},{ passive: false }); // MUST be non-passive
-
-document.addEventListener('touchend', function(e){
-  for(const t of e.changedTouches){
-    const p = _ptrs[t.identifier];
-    if(!p) continue;
-    // Final debug log
-    touchDebug({
-      _routerEvent: true, type: 'touchend',
-      clientX: t.clientX|0, clientY: t.clientY|0, pointerId: t.identifier,
-      zone: p.zone, lookActive: p.lookActive || false,
-      angle: (typeof player !== 'undefined') ? (+player.angle).toFixed(3) : '?',
-    });
-    // Cleanup
-    if(p.zone === 'MOVE' && t.identifier === joy.id){
-      joy.active = false; joy.x = 0; joy.y = 0; joy.id = null;
-      updateJoyDot(0, 0);
-    }
-    if(p.zone === 'GIVE'){
-      inp.give = false;
-      const mg = document.getElementById('mg'); if(mg) mg.classList.remove('pr');
-    }
-    if(p.zone === 'MAP'){
-      inp.map = false;
-      const mm = document.getElementById('mm'); if(mm) mm.classList.remove('pr');
-    }
-    if(p.zone === 'PAUSE'){
-      inp.pause = false;
-      const mp = document.getElementById('mp'); if(mp) mp.classList.remove('pr');
-    }
-    // SPRINT button press is not cleared on touchend (burst runs to completion)
-    delete _ptrs[t.identifier];
-  }
-},{ passive: false });
-
-document.addEventListener('touchcancel', function(e){
-  for(const t of e.changedTouches){
-    const p = _ptrs[t.identifier];
-    if(!p) continue;
-    if(p.zone === 'MOVE' && t.identifier === joy.id){
-      joy.active = false; joy.x = 0; joy.y = 0; joy.id = null;
-      updateJoyDot(0, 0);
-    }
-    delete _ptrs[t.identifier];
-  }
-},{ passive: false });
-
-// ---- document-level pointer (mouse) fallback ----
-// Handles mouse on desktop when not in pointer-lock.
-let _mousePtr = null; // { zone, startX, sx }
-
-document.addEventListener('pointerdown', function(e){
-  if(!mobileMode) return; // desktop mouse handled by pointerlock
-  if(e.pointerType === 'touch') return; // touch handled above via touchstart
-  if(_mousePtr) return; // only one mouse pointer
-  if(isMobilePortrait() && !isMobilePortrait()) return; // safety check
-  const portrait = isMobilePortrait();
-  if(_zoneRects) _refreshRects();
-  const zone = _classifyPointer(e.clientX, e.clientY);
-  _mousePtr = {
-    zone: zone, sx: e.clientX, sy: e.clientY,
-    lastX: e.clientX, lastY: e.clientY,
-    lookActive: zone === 'LOOK',
-    startAngle: (typeof player !== 'undefined') ? player.angle : 0,
-    pointerId: e.pointerId,
-  };
-  e.preventDefault();
-  dismissLookHint();
-  touchDebug({
-    _routerEvent: true, type: 'pointerdown',
-    clientX: e.clientX|0, clientY: e.clientY|0, pointerId: e.pointerId,
-    pointerType: e.pointerType, zone,
-    lookActive: _mousePtr.lookActive,
-    angle: (typeof player !== 'undefined') ? (+player.angle).toFixed(3) : '?',
-  });
-  try { e.target.setPointerCapture(e.pointerId); } catch(_){}
-},{ passive: false });
-
-document.addEventListener('pointermove', function(e){
-  if(!mobileMode || e.pointerType === 'touch') return;
-  if(!_mousePtr) return;
-  if(e.pointerId !== _mousePtr.pointerId) return;
-  const dx = e.clientX - _mousePtr.lastX;
-  _mousePtr.lastX = e.clientX;
-  _mousePtr.lastY = e.clientY;
-  if(_mousePtr.lookActive && state === STATE.PLAY && !paused){
-    if(Math.abs(dx) > 0.5){
-      const prevAngle = player.angle;
-      player.angle += dx * options.mobileTurnSens;
-      touchDebug({
-        _routerEvent: true, type: 'pointermove',
-        clientX: e.clientX|0, clientY: e.clientY|0, pointerId: e.pointerId,
-        zone: 'LOOK', lookActive: true, dx: dx|0,
-        angle: (+player.angle).toFixed(3),
-        delta: (+(player.angle - prevAngle)).toFixed(4),
-      });
-    }
-  }
-},{ passive: false });
-
-document.addEventListener('pointerup', function(e){
-  if(!mobileMode || e.pointerType === 'touch') return;
-  if(!_mousePtr) return;
-  if(e.pointerId !== _mousePtr.pointerId) return;
-  touchDebug({
-    _routerEvent: true, type: 'pointerup',
-    clientX: e.clientX|0, clientY: e.clientY|0, pointerId: e.pointerId,
-    zone: _mousePtr.zone, lookActive: _mousePtr.lookActive || false,
-    angle: (typeof player !== 'undefined') ? (+player.angle).toFixed(3) : '?',
-  });
-  _mousePtr = null;
-},{ passive: false });
-
-document.addEventListener('pointercancel', function(e){
-  if(!mobileMode || e.pointerType === 'touch') return;
-  if(!_mousePtr) return;
-  if(e.pointerId !== _mousePtr.pointerId) return;
-  _mousePtr = null;
-},{ passive: false });
-
-// ============================================================
-// END DOCUMENT-LEVEL INPUT ROUTER
-// ============================================================
-
 function bindMobileControls(){
   const ml = document.getElementById('ml');
   const mr = document.getElementById('mr');
@@ -933,65 +597,125 @@ function bindMobileControls(){
   const rmenu = document.getElementById('rmenu');
   ms_element = ms;
 
-  // ---- left joystick zone (visual feedback only — actual routing in document router) ----
-  // The document-level touch router handles all MOVE logic.
-  // These touchstart listeners on ml just provide visual feedback and dismiss the hint.
+  // ---- left joystick zone ----
   ml.addEventListener('touchstart', e=>{
-    // Let the document router handle the move; this is just for visual feedback.
-    // The joystick dot will be updated by the document router.
-    dismissLookHint();
+    e.preventDefault(); e.stopPropagation();
+    const t = e.changedTouches[0];
+    joy.id = t.identifier; joy.active = true;
+    joy.sx = t.clientX; joy.sy = t.clientY; joy.x=0; joy.y=0;
+    updateJoyDot(0,0);
+    dismissLookHint(); // hide hint on first movement
   },{passive:false});
 
   // ---- right turn zone (landscape) ----
-  // DEPRECATED: Document-level touch router now handles landscape LOOK on #mr.
-  // This handler is neutralized to avoid double-processing.
   mr.addEventListener('touchstart', e=>{
-    // Document router handles this. No-op.
+    if(isMobilePortrait()) return; // guard: portrait uses mlookpad instead
+    e.preventDefault(); e.stopPropagation();
+    const t = e.changedTouches[0];
+    tzone.id = t.identifier; tzone.active = true; tzone.lastX = t.clientX;
   },{passive:false});
 
   // ---- portrait dedicated LOOK pad ----
-  // DEPRECATED: Document-level touch router now handles portrait LOOK on #mlookpad.
-  // This handler is neutralized to avoid double-processing.
+  // In portrait, look/drag is handled by #mlookpad (center area), not #mr.
+  // Unified pointer-based look works for both touch and mouse on #mlookpad.
   const lpad = document.getElementById('mlookpad');
-  let lpadPtr = null; // {id: startX} — now unused; kept for compatibility
+  let lpadPtr = null; // {id, startX}
+
+  // Unified pointerdown on lookpad: activate look
   lpad.addEventListener('pointerdown', e=>{
-    // Document router handles this. No-op.
+    if(!isMobilePortrait()) return; // lookpad only active in portrait
+    e.preventDefault(); e.stopPropagation();
+    lpadPtr = { id: e.pointerId, startX: e.clientX };
+    try { lpad.setPointerCapture(e.pointerId); } catch(_){}
+    if(state===STATE.PLAY && !paused && Math.abs(e.clientX - (lpadPtr?.startX||0)) > 2) dismissLookHint();
   },{passive:false});
-  lpad.addEventListener('pointermove', e=>{ },{passive:false});
-  lpad.addEventListener('pointerup', e=>{ },{passive:false});
-  lpad.addEventListener('pointercancel', e=>{ },{passive:false});
+
+  lpad.addEventListener('pointermove', e=>{
+    if(!lpadPtr || e.pointerId !== lpadPtr.id) return;
+    if(state!==STATE.PLAY || paused) return;
+    const dx = e.clientX - lpadPtr.startX;
+    if(Math.abs(dx) > 1){ lpadPtr.startX = e.clientX; dismissLookHint(); }
+    player.angle += dx * options.mobileTurnSens;
+    touchDebug({type:'port_look_move', dx, angle:player.angle});
+  },{passive:false});
+
+  lpad.addEventListener('pointerup', e=>{ if(lpadPtr && e.pointerId===lpadPtr.id){ lpadPtr=null; } },{passive:false});
+  lpad.addEventListener('pointercancel', e=>{ if(lpadPtr && e.pointerId===lpadPtr.id){ lpadPtr=null; } },{passive:false});
 
   // ---- unified pointer look for landscape #mr ----
-  // DEPRECATED: Document-level touch router now handles landscape LOOK on #mr.
-  // This handler is neutralized to avoid double-processing.
-  let mrPtr = null; // now unused
+  // Use pointer events so both touch and mouse work on #mr in landscape.
+  let mrPtr = null; // {id, startX}
   mr.addEventListener('pointerdown', e=>{
-    // Document router handles this. No-op.
+    if(isMobilePortrait()) return; // portrait uses mlookpad
+    if(e.pointerType === 'mouse' && !mobileMode) return; // desktop mouse handled by pointerlock
+    e.preventDefault(); e.stopPropagation();
+    mrPtr = { id: e.pointerId, startX: e.clientX };
+    try { mr.setPointerCapture(e.pointerId); } catch(_){}
+    dismissLookHint();
   },{passive:false});
-  mr.addEventListener('pointermove', e=>{ },{passive:false});
-  mr.addEventListener('pointerup', e=>{ },{passive:false});
-  mr.addEventListener('pointercancel', e=>{ },{passive:false});
+
+  mr.addEventListener('pointermove', e=>{
+    if(!mrPtr || e.pointerId !== mrPtr.id) return;
+    if(state!==STATE.PLAY || paused) return;
+    const dx = e.clientX - mrPtr.startX;
+    if(Math.abs(dx) > 0.5){ mrPtr.startX = e.clientX; }
+    player.angle += dx * options.mobileTurnSens;
+    touchDebug({type:'land_look_move', dx, angle:player.angle});
+  },{passive:false});
+
+  mr.addEventListener('pointerup', e=>{ if(mrPtr && e.pointerId===mrPtr.id){ mrPtr=null; } },{passive:false});
+  mr.addEventListener('pointercancel', e=>{ if(mrPtr && e.pointerId===mrPtr.id){ mrPtr=null; } },{passive:false});
 
   // ---- GIVE button ----
-  // DEPRECATED: Document-level touch router handles GIVE.
-  // These are neutralized to avoid double-processing.
-  mg.addEventListener('touchstart', e=>{ },{passive:false});
-  mg.addEventListener('touchend', e=>{ },{passive:false});
+  mg.addEventListener('touchstart', e=>{
+    e.preventDefault(); e.stopPropagation();
+    inp.give = true; mg.classList.add('pr');
+  },{passive:false});
+  mg.addEventListener('touchend', e=>{
+    e.preventDefault(); e.stopPropagation();
+    inp.give = false; mg.classList.remove('pr');
+  },{passive:false});
 
   // ---- SPRINT button (mobile: burst tap; desktop: Shift still works as hold) ----
-  // DEPRECATED: Document-level touch router handles SPRINT.
-  ms.addEventListener('touchstart', e=>{ },{passive:false});
-  ms.addEventListener('touchend', e=>{ },{passive:false});
+  ms.addEventListener('touchstart', e=>{
+    e.preventDefault(); e.stopPropagation();
+    // Tap triggers a short sprint burst if stamina available
+    const nowSec = performance.now()/1000;
+    const cost = mobileSprintCost();
+    if(nowSec < sprintBurstUntil) return;
+    if(player.stamina >= cost){
+      player.stamina = Math.max(0, player.stamina - cost);
+      sprintBurstUntil = nowSec + mobileSprintBurstSec();
+      ms.classList.add('pr');
+    } else {
+      ms.classList.add('pr'); setTimeout(()=>ms.classList.remove('pr'), 120);
+      beep(160,0.04,'sawtooth',0.025);
+    }
+  },{passive:false});
+  ms.addEventListener('touchend', e=>{
+    e.preventDefault(); e.stopPropagation();
+    // Do NOT cancel burst on touchend — it runs its course
+  },{passive:false});
 
   // ---- MAP button ----
-  // DEPRECATED: Document-level touch router handles MAP.
-  mmin.addEventListener('touchstart', e=>{ },{passive:false});
-  mmin.addEventListener('touchend', e=>{ },{passive:false});
+  mmin.addEventListener('touchstart', e=>{
+    e.preventDefault(); e.stopPropagation();
+    inp.map = true; mmin.classList.add('pr');
+  },{passive:false});
+  mmin.addEventListener('touchend', e=>{
+    e.preventDefault(); e.stopPropagation();
+    inp.map = false; mmin.classList.remove('pr');
+  },{passive:false});
 
   // ---- PAUSE button ----
-  // DEPRECATED: Document-level touch router handles PAUSE.
-  mpa.addEventListener('touchstart', e=>{ },{passive:false});
-  mpa.addEventListener('touchend', e=>{ },{passive:false});
+  mpa.addEventListener('touchstart', e=>{
+    e.preventDefault(); e.stopPropagation();
+    inp.pause = true; mpa.classList.add('pr');
+  },{passive:false});
+  mpa.addEventListener('touchend', e=>{
+    e.preventDefault(); e.stopPropagation();
+    inp.pause = false; mpa.classList.remove('pr');
+  },{passive:false});
   const clearHeldButtons=()=>{
     inp.give=false; inp.sprint=false; inp.map=false; inp.pause=false;
     [mg,ms,mmin,mpa].forEach(el=>el.classList.remove('pr'));
