@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -405,15 +407,17 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = '6a506d3';
+const BUILD_ID = 'mtouch1';
 let mobileMode = false; // true = show mobile overlay, hide desktop cursor
 let mobileOverride = null; // null=auto, 'on', 'off'
 let portHintShown = false;
 
 // Joystick state
 const joy = { x:0, y:0, active:false, id:null, sx:0, sy:0, ang:0, dist:0 };
-// Turn zone state
+// Turn zone state (landscape #mr)
 const tzone = { active:false, id:null, lastX:0 };
+// Dedicated LOOK circle (#mlookpad) — tracked by touch identifier for multi-touch
+const lookTouch = { id:null, lastX:0 };
 let lookHintUsed = false;
 let lookHintShownAt = 0;
 const LOOK_HINT_TIMEOUT_MS = 5000;
@@ -709,10 +713,11 @@ function bindMobileControls(){
   ml.addEventListener('touchstart', e=>{
     e.preventDefault(); e.stopPropagation();
     const t = e.changedTouches[0];
+    if(joy.active && joy.id !== null && joy.id !== t.identifier) return;
     joy.id = t.identifier; joy.active = true;
     joy.sx = t.clientX; joy.sy = t.clientY; joy.x=0; joy.y=0;
     updateJoyDot(0,0);
-    dismissLookHint(); // hide hint on first movement
+    dismissLookHint();
   },{passive:false});
 
   // ---- right turn zone (landscape) ----
@@ -725,58 +730,64 @@ function bindMobileControls(){
 
   // ---- dedicated LOOK circle (#mlookpad) — works in BOTH portrait and landscape ----
   const lpad = document.getElementById('mlookpad');
-  let lpadPtr = null; // {id, startX}
+  let lpadMousePtr = null; // mouse-only pointer look on #mlookpad
 
   lpad.addEventListener('pointerdown', e=>{
+    if(e.pointerType === 'touch') return;
     e.preventDefault(); e.stopPropagation();
-    lpadPtr = { id: e.pointerId, startX: e.clientX };
-    try { lpad.setPointerCapture(e.pointerId); } catch(_){}
+    lpadMousePtr = { id: e.pointerId, startX: e.clientX };
     lpad.classList.add('pr');
     dismissLookHint();
   },{passive:false});
 
   lpad.addEventListener('pointermove', e=>{
-    if(!lpadPtr || e.pointerId !== lpadPtr.id) return;
+    if(e.pointerType === 'touch') return;
+    if(!lpadMousePtr || e.pointerId !== lpadMousePtr.id) return;
     if(state!==STATE.PLAY || paused) return;
-    const dx = e.clientX - lpadPtr.startX;
-    if(Math.abs(dx) > 0.5){ lpadPtr.startX = e.clientX; }
+    const dx = e.clientX - lpadMousePtr.startX;
+    if(Math.abs(dx) > 0.5){ lpadMousePtr.startX = e.clientX; }
     player.angle += dx * options.mobileTurnSens;
     touchDebug({type:'look_circle_move', orient:isMobilePortrait()?'port':'land', dx, angle:player.angle});
   },{passive:false});
 
-  lpad.addEventListener('pointerup', e=>{ if(lpadPtr && e.pointerId===lpadPtr.id){ lpadPtr=null; lpad.classList.remove('pr'); } },{passive:false});
-  lpad.addEventListener('pointercancel', e=>{ if(lpadPtr && e.pointerId===lpadPtr.id){ lpadPtr=null; lpad.classList.remove('pr'); } },{passive:false});
+  lpad.addEventListener('pointerup', e=>{
+    if(e.pointerType === 'touch') return;
+    if(lpadMousePtr && e.pointerId===lpadMousePtr.id){ lpadMousePtr=null; lpad.classList.remove('pr'); }
+  },{passive:false});
+  lpad.addEventListener('pointercancel', e=>{
+    if(e.pointerType === 'touch') return;
+    if(lpadMousePtr && e.pointerId===lpadMousePtr.id){ lpadMousePtr=null; lpad.classList.remove('pr'); }
+  },{passive:false});
 
-  // Also add touch handlers for Android Chrome reliability
   lpad.addEventListener('touchstart', e=>{
     e.preventDefault(); e.stopPropagation();
-    const t = e.changedTouches[0];
-    lpadPtr = { id: 'touch', startX: t.clientX };
-    lpad.classList.add('pr');
-    dismissLookHint();
+    for(const t of e.changedTouches){
+      if(lookTouch.id !== null && lookTouch.id !== t.identifier) continue;
+      lookTouch.id = t.identifier;
+      lookTouch.lastX = t.clientX;
+      lpad.classList.add('pr');
+      dismissLookHint();
+      break;
+    }
   },{passive:false});
-  lpad.addEventListener('touchmove', e=>{
-    if(!lpadPtr) return;
-    e.preventDefault(); e.stopPropagation();
-    if(state!==STATE.PLAY || paused) return;
-    const t = e.changedTouches[0];
-    const dx = t.clientX - lpadPtr.startX;
-    if(Math.abs(dx) > 0.5){ lpadPtr.startX = t.clientX; }
-    player.angle += dx * options.mobileTurnSens;
-    touchDebug({type:'look_circle_touch_move', orient:isMobilePortrait()?'port':'land', dx, angle:player.angle});
+  lpad.addEventListener('touchcancel', e=>{
+    for(const t of e.changedTouches){
+      if(t.identifier === lookTouch.id){
+        lookTouch.id = null; lookTouch.lastX = 0;
+        lpad.classList.remove('pr');
+      }
+    }
   },{passive:false});
-  lpad.addEventListener('touchend', e=>{ lpadPtr=null; lpad.classList.remove('pr'); },{passive:false});
-  lpad.addEventListener('touchcancel', e=>{ lpadPtr=null; lpad.classList.remove('pr'); },{passive:false});
 
   // ---- unified pointer look for landscape #mr ----
   // Use pointer events so both touch and mouse work on #mr in landscape.
   let mrPtr = null; // {id, startX}
   mr.addEventListener('pointerdown', e=>{
-    if(isMobilePortrait()) return; // portrait uses mlookpad
-    if(e.pointerType === 'mouse' && !mobileMode) return; // desktop mouse handled by pointerlock
+    if(isMobilePortrait()) return;
+    if(e.pointerType === 'touch') return;
+    if(e.pointerType === 'mouse' && !mobileMode) return;
     e.preventDefault(); e.stopPropagation();
     mrPtr = { id: e.pointerId, startX: e.clientX };
-    try { mr.setPointerCapture(e.pointerId); } catch(_){}
     dismissLookHint();
   },{passive:false});
 
@@ -850,11 +861,12 @@ function bindMobileControls(){
     e.preventDefault(); e.stopPropagation(); clearHeldButtons();
   },{passive:false}));
 
-  // ---- global touchmove: route to joystick or turn ----
+  // ---- global touchmove: route joystick, landscape turn zone, LOOK circle (multi-touch) ----
   document.addEventListener('touchmove', e=>{
-    e.preventDefault();
+    let handled = false;
     for(const t of e.changedTouches){
       if(t.identifier === joy.id && joy.active){
+        handled = true;
         const dx = t.clientX - joy.sx, dy = t.clientY - joy.sy;
         const joySize = Number(options.joySizePx)||110;
         const MAX = Math.max(32, joySize * 0.35);
@@ -866,6 +878,7 @@ function bindMobileControls(){
         updateJoyDot(joy.x, joy.y);
       }
       if(t.identifier === tzone.id && tzone.active){
+        handled = true;
         const dx = t.clientX - tzone.lastX;
         tzone.lastX = t.clientX;
         if(state===STATE.PLAY && !paused){
@@ -873,13 +886,30 @@ function bindMobileControls(){
           player.angle += dx * options.mobileTurnSens;
         }
       }
+      if(lookTouch.id !== null && t.identifier === lookTouch.id){
+        handled = true;
+        if(state===STATE.PLAY && !paused){
+          const dx = t.clientX - lookTouch.lastX;
+          if(Math.abs(dx) > 0.5){
+            lookTouch.lastX = t.clientX;
+            player.angle += dx * options.mobileTurnSens;
+            touchDebug({type:'look_circle_touch_move', orient:isMobilePortrait()?'port':'land', dx, angle:player.angle, joyId:joy.id, lookId:lookTouch.id});
+          }
+        }
+      }
     }
+    if(handled) e.preventDefault();
   },{passive:false});
 
   document.addEventListener('touchend', e=>{
     for(const t of e.changedTouches){
       if(t.identifier === joy.id){ joy.active=false; joy.x=0; joy.y=0; joy.id=null; updateJoyDot(0,0); }
       if(t.identifier === tzone.id){ tzone.active=false; tzone.id=null; }
+      if(t.identifier === lookTouch.id){
+        lookTouch.id = null; lookTouch.lastX = 0;
+        const lpadEl = document.getElementById('mlookpad');
+        if(lpadEl) lpadEl.classList.remove('pr');
+      }
     }
   },{passive:false});
 
