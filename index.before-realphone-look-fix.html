@@ -77,28 +77,6 @@
   #mm{top:12px;right:8px;width:50px;height:36px;font-size:10px;z-index:14;}
   #mp{top:16px;left:16px;width:52px;height:38px;font-size:10px;z-index:14;}
   .mhw{width:38px;height:38px;border-radius:6px;}
-  /* Portrait LOOK pad: sits in the middle of the control area, below gameplay window */
-  #mlookpad{
-    position:absolute;left:0;right:0;bottom:0;top:0;
-    border-radius:0;background:transparent;border:none;
-    display:flex;align-items:center;justify-content:center;
-    touch-action:none;
-    z-index:9; /* below buttons but above canvas */
-  }
-  #mlookpadhint{
-    font:bold 11px monospace;letter-spacing:1.5px;color:rgba(200,180,120,0.45);
-    pointer-events:none;user-select:none;text-shadow:0 1px 4px rgba(0,0,0,0.7);
-    text-align:center;
-  }
-  /* ---- touch debug overlay ---- */
-  #touchdebug{
-    display:none;position:fixed;top:4px;left:4px;
-    background:rgba(0,0,0,0.82);border:1px solid rgba(255,200,80,0.5);
-    color:#ffd24a;font:10px monospace;line-height:1.55;
-    padding:5px 7px;z-index:9999;pointer-events:none;
-    max-width:210px;white-space:pre;
-    border-radius:4px;
-  }
   .mjl{
     position:absolute;width:44px;height:44px;border-radius:50%;
     background:rgba(160,130,60,0.3);border:2px solid rgba(200,170,100,0.5);
@@ -150,13 +128,10 @@
 <!-- mobile control overlay -->
 <div id="mob">
   <div id="ml" class="mbtn"><div class="mjl" id="mjdot"></div><span class="mcap">MOVE</span></div>
-    <div id="mlookpad" class="mbtn" aria-hidden="true">
-      <div id="mlookpadhint">DRAG TO LOOK</div>
-    </div>
-    <div id="mr" class="mbtn">
-      <div id="mlookhint">LOOK<br>DRAG TO TURN</div>
-      <span class="mlook-arrows" aria-hidden="true">&#8592; &#8594;</span>
-    </div>
+  <div id="mr" class="mbtn">
+    <div id="mlookhint">LOOK<br>DRAG TO TURN</div>
+    <span class="mlook-arrows" aria-hidden="true">&#8592; &#8594;</span>
+  </div>
   <div id="mg" class="mbtn">GIVE</div>
   <div id="ms" class="mbtn">SPRINT</div>
   <div id="mm" class="mbtn">MAP</div>
@@ -175,8 +150,6 @@
 <div id="fsbtn">FULLSCREEN</div>
 <!-- fullscreen unavailable toast -->
 <div id="fstoast"></div>
-<!-- touch debug overlay (gated by ?touchdebug=1) -->
-<div id="touchdebug" aria-hidden="true"></div>
 <script>
 "use strict";
 /* ============================================================================
@@ -444,48 +417,22 @@ function applyMobileControlSettings(){
   const portrait = isMobilePortrait();
   const ml=document.getElementById('ml'), mr=document.getElementById('mr'), mg=document.getElementById('mg'), ms=document.getElementById('ms');
   const mm=document.getElementById('mm'), mp=document.getElementById('mp');
-  const mlookpad=document.getElementById('mlookpad');
   if(ml){
     ml.style.width=joySize+'px'; ml.style.height=joySize+'px'; ml.style.left=(portrait?'14px':'20px'); ml.style.bottom=(portrait?'22px':'30px');
     ml.style.top='auto'; ml.style.right='auto'; ml.style.transform='none';
   }
-  // Portrait: dedicated LOOK pad in center, #mr is NOT the look zone (it's for buttons visually)
-  // Portrait: GIVE/SPRINT use right side, MOVE uses left side, LOOK pad uses center
-  // Landscape: #mr IS the right-side look zone, GIVE/SPRINT use left
-  if(mlookpad){
-    if(portrait){
-      // Center the LOOK pad between left joystick and right buttons, below gameplay.
-      // gameplay ≈ bottom ~30% of screen; controls below that.
-      // Place LOOK pad covering the middle area between ml and mg/ms.
-      // The gameplay area occupies roughly the top portraitPlayH() of the screen.
-      const pH = typeof portraitPlayH==='function' ? portraitPlayH() : Math.round(innerWidth*(RH/RW)*1.05);
-      const mlBottom = 22 + joySize; // bottom of joystick
-      const mgTop = Math.round(innerHeight - (btnSize+34)); // top of GIVE
-      mlookpad.style.top = pH + 'px';
-      mlookpad.style.bottom = Math.max(0, innerHeight - mgTop + 4) + 'px';
-      mlookpad.style.left = (joySize + 24) + 'px';
-      mlookpad.style.right = (btnSize + 24) + 'px';
-      mlookpad.style.width = 'auto';
-      mlookpad.style.height = 'auto';
-      mlookpad.style.opacity = String(alpha);
-      mlookpad.style.display = '';
-    } else {
-      mlookpad.style.display = 'none';
-    }
-  }
   if(mr){
     if(portrait){
-      // Portrait: mr is NOT the look zone — hide it from pointer events entirely.
-      // It stays in the DOM but is inert.
+      // Portrait: right half is NOT the look zone; touches pass through to the
+      // GIVE/SPRINT buttons that are visually layered above the LOOK hint.
       mr.style.pointerEvents = 'none';
       mr.style.top = '0'; mr.style.right = '0'; mr.style.bottom = '0'; mr.style.width = '100%';
     } else {
-      // Landscape: mr IS the right-side look zone.
       mr.style.pointerEvents = 'auto';
       mr.style.top = '0'; mr.style.right = '0'; mr.style.bottom = 'auto'; mr.style.width = '50vw'; mr.style.height = '100%';
     }
   }
-  // In portrait, hide the landscape LOOK hint; show it only in landscape.
+  // In portrait, hide the LOOK hint since right-half drag is disabled.
   {
     const h = document.getElementById('mlookhint');
     if(h){ h.style.display = portrait ? 'none' : ''; }
@@ -508,56 +455,6 @@ function dismissLookHint(){
   h.style.opacity = '0';
   h.style.display = 'none';
 }
-// ---- touch debug overlay (activated by ?touchdebug=1) ----
-let _tdbElement = null;
-let _touchDebugActive = false;
-function touchDebug(data){
-  const el = _tdbElement || (_tdbElement = document.getElementById('touchdebug'));
-  if(!el || !_touchDebugActive) return;
-  if(data === 'show'){
-    el.style.display = '';
-    return;
-  }
-  if(data === 'hide'){
-    el.style.display = 'none';
-    return;
-  }
-  if(typeof data === 'object' && data !== null){
-    el.textContent = Object.entries(data).map(([k,v])=>k+': '+v).join('\n');
-  }
-}
-// Parse ?touchdebug=1 on load to enable the overlay
-(function(){
-  const params = new URLSearchParams(location.search);
-  if(params.get('touchdebug') === '1'){
-    _touchDebugActive = true;
-    document.addEventListener('DOMContentLoaded', ()=>{
-      touchDebug('show');
-      // Update with initial state every 500ms while in play
-      const iv = setInterval(()=>{
-        if(!_touchDebugActive){ clearInterval(iv); return; }
-        const portrait = isMobilePortrait();
-        const ml=document.getElementById('ml'), mr=document.getElementById('mr'), mg=document.getElementById('mg'), ms=document.getElementById('ms'), mm=document.getElementById('mm'), mp=document.getElementById('mp');
-        const mlookpad=document.getElementById('mlookpad');
-        const zone = el=>{ const b=(el||{}).getBoundingClientRect?.(); return b ? `${b.left|0},${b.top|0} ${b.right|0}x${b.bottom|0} pe:${getComputedStyle(el).pointerEvents}` : 'n/a'; };
-        touchDebug({
-          orient: portrait ? 'PORTRAIT' : 'LANDSCAPE',
-          state: typeof state !== 'undefined' ? ['TITLE','PLAY','LB','RES','PAUSE'][state] : '?',
-          angle: typeof player !== 'undefined' ? (+player.angle).toFixed(3) : '?',
-          mobileMode: typeof mobileMode !== 'undefined' ? mobileMode : '?',
-          '#ml': zone(ml),
-          '#mr': zone(mr),
-          '#mlookpad': zone(mlookpad),
-          '#mg': zone(mg),
-          '#ms': zone(ms),
-          '#mm/map': zone(mm),
-          '#mp/pause': zone(mp),
-          innerWH: typeof innerWidth !== 'undefined' ? innerWidth+'x'+innerHeight : '?',
-        });
-      }, 500);
-    });
-  }
-})();
 function syncLookHintUI(){
   const h = document.getElementById('mlookhint');
   if(!h) return;
@@ -607,64 +504,14 @@ function bindMobileControls(){
     dismissLookHint(); // hide hint on first movement
   },{passive:false});
 
-  // ---- right turn zone (landscape) ----
+  // ---- right turn zone ----
+  // In portrait the right half is a button/action zone; #mr should NOT activate look there.
   mr.addEventListener('touchstart', e=>{
-    if(isMobilePortrait()) return; // guard: portrait uses mlookpad instead
+    if(isMobilePortrait()) return; // portrait: right zone is for buttons, not look
     e.preventDefault(); e.stopPropagation();
     const t = e.changedTouches[0];
     tzone.id = t.identifier; tzone.active = true; tzone.lastX = t.clientX;
   },{passive:false});
-
-  // ---- portrait dedicated LOOK pad ----
-  // In portrait, look/drag is handled by #mlookpad (center area), not #mr.
-  // Unified pointer-based look works for both touch and mouse on #mlookpad.
-  const lpad = document.getElementById('mlookpad');
-  let lpadPtr = null; // {id, startX}
-
-  // Unified pointerdown on lookpad: activate look
-  lpad.addEventListener('pointerdown', e=>{
-    if(!isMobilePortrait()) return; // lookpad only active in portrait
-    e.preventDefault(); e.stopPropagation();
-    lpadPtr = { id: e.pointerId, startX: e.clientX };
-    try { lpad.setPointerCapture(e.pointerId); } catch(_){}
-    if(state===STATE.PLAY && !paused && Math.abs(e.clientX - (lpadPtr?.startX||0)) > 2) dismissLookHint();
-  },{passive:false});
-
-  lpad.addEventListener('pointermove', e=>{
-    if(!lpadPtr || e.pointerId !== lpadPtr.id) return;
-    if(state!==STATE.PLAY || paused) return;
-    const dx = e.clientX - lpadPtr.startX;
-    if(Math.abs(dx) > 1){ lpadPtr.startX = e.clientX; dismissLookHint(); }
-    player.angle += dx * options.mobileTurnSens;
-    touchDebug({type:'port_look_move', dx, angle:player.angle});
-  },{passive:false});
-
-  lpad.addEventListener('pointerup', e=>{ if(lpadPtr && e.pointerId===lpadPtr.id){ lpadPtr=null; } },{passive:false});
-  lpad.addEventListener('pointercancel', e=>{ if(lpadPtr && e.pointerId===lpadPtr.id){ lpadPtr=null; } },{passive:false});
-
-  // ---- unified pointer look for landscape #mr ----
-  // Use pointer events so both touch and mouse work on #mr in landscape.
-  let mrPtr = null; // {id, startX}
-  mr.addEventListener('pointerdown', e=>{
-    if(isMobilePortrait()) return; // portrait uses mlookpad
-    if(e.pointerType === 'mouse' && !mobileMode) return; // desktop mouse handled by pointerlock
-    e.preventDefault(); e.stopPropagation();
-    mrPtr = { id: e.pointerId, startX: e.clientX };
-    try { mr.setPointerCapture(e.pointerId); } catch(_){}
-    dismissLookHint();
-  },{passive:false});
-
-  mr.addEventListener('pointermove', e=>{
-    if(!mrPtr || e.pointerId !== mrPtr.id) return;
-    if(state!==STATE.PLAY || paused) return;
-    const dx = e.clientX - mrPtr.startX;
-    if(Math.abs(dx) > 0.5){ mrPtr.startX = e.clientX; }
-    player.angle += dx * options.mobileTurnSens;
-    touchDebug({type:'land_look_move', dx, angle:player.angle});
-  },{passive:false});
-
-  mr.addEventListener('pointerup', e=>{ if(mrPtr && e.pointerId===mrPtr.id){ mrPtr=null; } },{passive:false});
-  mr.addEventListener('pointercancel', e=>{ if(mrPtr && e.pointerId===mrPtr.id){ mrPtr=null; } },{passive:false});
 
   // ---- GIVE button ----
   mg.addEventListener('touchstart', e=>{
