@@ -423,19 +423,10 @@ function applyMobileControlSettings(){
   }
   if(mr){
     if(portrait){
-      // Portrait: right half is NOT the look zone; touches pass through to the
-      // GIVE/SPRINT buttons that are visually layered above the LOOK hint.
-      mr.style.pointerEvents = 'none';
-      mr.style.top = '0'; mr.style.right = '0'; mr.style.bottom = '0'; mr.style.width = '100%';
+      mr.style.top='58px'; mr.style.right='0'; mr.style.bottom='170px'; mr.style.width='48vw'; mr.style.height='auto';
     } else {
-      mr.style.pointerEvents = 'auto';
-      mr.style.top = '0'; mr.style.right = '0'; mr.style.bottom = 'auto'; mr.style.width = '50vw'; mr.style.height = '100%';
+      mr.style.top='0'; mr.style.right='0'; mr.style.bottom='auto'; mr.style.width='50vw'; mr.style.height='100%';
     }
-  }
-  // In portrait, hide the LOOK hint since right-half drag is disabled.
-  {
-    const h = document.getElementById('mlookhint');
-    if(h){ h.style.display = portrait ? 'none' : ''; }
   }
   [mg,ms].forEach(el=>{ if(el){ el.style.width=btnSize+'px'; el.style.height=btnSize+'px'; el.style.fontSize=Math.max(9,Math.round(btnSize*0.15))+'px'; el.style.right=(portrait?'14px':'30px'); el.style.left='auto'; }});
   if(mg){ mg.style.top = portrait?'auto':'42%'; mg.style.bottom = portrait?(btnSize+34)+'px':'auto'; mg.style.transform = portrait?'none':'translateY(-50%)'; }
@@ -505,9 +496,7 @@ function bindMobileControls(){
   },{passive:false});
 
   // ---- right turn zone ----
-  // In portrait the right half is a button/action zone; #mr should NOT activate look there.
   mr.addEventListener('touchstart', e=>{
-    if(isMobilePortrait()) return; // portrait: right zone is for buttons, not look
     e.preventDefault(); e.stopPropagation();
     const t = e.changedTouches[0];
     tzone.id = t.identifier; tzone.active = true; tzone.lastX = t.clientX;
@@ -2789,25 +2778,15 @@ addEventListener('keydown',e=>{
 // ---------------------------------------------------------------------------
 // 13. MAIN LOOP
 // ---------------------------------------------------------------------------
-// Portrait gameplay area: fixed landscape-aspect window at top, controls below.
-// The gameplay is a horizontal 320×200 view sitting in the upper portion of the
-// portrait screen — not stretched to fill the full portrait height.
-function portraitPlayH(){
-  // Use the full canvas width as the crop width; target a 16:9-ish crop.
-  // playH = crops at most ~56% of the screen height, leaving room for controls.
-  return Math.round(view.width * (RH/RW) * 1.05);
-}
-
 function playfieldLayout(){
   // Use the actual canvas backing-store dimensions for perfect consistency.
   const cw = view.width, ch = view.height;
   if(mobileMode && ch > cw){
-    // Portrait: landscape-aspect gameplay window in the upper portion of the screen.
-    // Controls sit below it in the remaining space.
-    const pH = portraitPlayH();
-    const scale = pH / RH;                      // scale so 320×200 fits in pH pixels
-    const dw = RW * scale, dh = RH * scale;
-    return {scale,dw,dh,ox:(cw-dw)/2,oy:0, portrait:true, playH:ch, cropH:dh};
+    // Portrait uses cover scaling over the full screen so controls sit on gameplay, not a black dead zone.
+    const targetH = ch;
+    const scale = Math.max(cw/RW, targetH/RH);
+    const dw = RW*scale, dh = RH*scale;
+    return {scale,dw,dh,ox:(cw-dw)/2,oy:0,portrait:true,playH:targetH};
   }
   const fit = Math.min(cw/RW, ch/RH);
   // On mobile landscape, cover the screen so the world fills under overlays.
@@ -2815,7 +2794,7 @@ function playfieldLayout(){
     ? Math.max(cw/RW, ch/RH)
     : fit;
   const dw = RW*scale, dh = RH*scale;
-  return {scale,dw,dh,ox:(cw-dw)/2,oy:(ch-dh)/2,portrait:false,playH:ch,cropH:dh};
+  return {scale,dw,dh,ox:(cw-dw)/2,oy:(ch-dh)/2,portrait:false,playH:ch};
 }
 let last=performance.now();
 function frame(now){
