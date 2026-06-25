@@ -1,0 +1,30 @@
+{
+  "BUILD_ID": "dock2",
+  "prior": "mini1 / e422f05",
+  "viewport_note": "Desktop browser layout math at cw=1258 ch=622; portrait phone uses same dy semantics",
+  "fixed_panels": {
+    "minimapRect.top": [826, 826, 826, 826],
+    "statsRect.top": [558, 558, 558, 558],
+    "fpvRect.top": [0, 0, 0, 0],
+    "offsets": [120, 0, -120, -240]
+  },
+  "moveRect.top": {
+    "LOW_120": 1042,
+    "MID_0": 922,
+    "HIGH_-120": 802,
+    "VERY_HIGH_-240": 682
+  },
+  "menuRect.top": {
+    "LOW_120": 1100,
+    "MID_0": 980,
+    "HIGH_-120": 860,
+    "VERY_HIGH_-240": 740
+  },
+  "movement_px": {
+    "midToHigh_moveTop": 120,
+    "lowToVery_moveTop": 360,
+    "midToHigh_menuTop": 120,
+    "lowToVery_menuTop": 360
+  },
+  "old_mini1_issue": "dockDy clamped (maxUp/maxDockBot/minMoveTop) collapsed moveRect.top across settings"
+}

@@ -369,6 +369,7 @@ resize();
 // DEBUG FLAG
 // ---------------------------------------------------------------------------
 const DEBUG = new URLSearchParams(location.search).has('debug');
+const _forcePortraitLayout = new URLSearchParams(location.search).get('portraitlayout') === '1';
 const dbg = { cansSpawned:0, npcsSpawned:0, invalidPlacements:0,
               spritesSkipped:0, reachableCells:0, rejectedSpawns:0, props:0 };
 
@@ -439,7 +440,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'mini1';
+const BUILD_ID = 'dock2';
 let mobileMode = false; // true = show mobile overlay, hide desktop cursor
 let mobileOverride = null; // null=auto, 'on', 'off'
 let portHintShown = false;
@@ -528,6 +529,7 @@ function bumpControlHeight(){
   setMsg('CONTROL DOCK HEIGHT: ' + lbl);
   showToast('CONTROL DOCK HEIGHT: ' + lbl, 2200);
   try { beep(520, 0.06, 'square', 0.04); } catch(_e){}
+  syncPortraitMenuLabel();
   drawMobileMenu();
 }
 function lookSensFromSpeed(v){ return BASE_MOBILE_TURN_SENS * (Number(v)||1); }
@@ -543,7 +545,7 @@ function layoutCssSize(){
   const vv = window.visualViewport;
   let cw = Math.round((vv && vv.width) || innerWidth || view.width || 0);
   let ch = Math.round((vv && vv.height) || innerHeight || view.height || 0);
-  if(mobileMode && isOrientationPortrait() && cw > ch){
+  if(mobileMode && (_forcePortraitLayout || isOrientationPortrait()) && cw > ch){
     const t = cw; cw = ch; ch = t;
   }
   return { cw, ch };
@@ -551,11 +553,13 @@ function layoutCssSize(){
 function syncPortraitMenuLabel(){
   const mportmenu = document.getElementById('mportmenu');
   if(!mportmenu) return;
-  const want = `<span class="mportmenu-t">MENU</span><span class="mportmenu-b">${BUILD_ID}</span>`;
+  const dock = controlHeightMenuLabel(options.controlsYOffsetPx);
+  const want = `<span class="mportmenu-t">MENU</span><span class="mportmenu-b">${BUILD_ID}<br>dock: ${dock}</span>`;
   if(mportmenu.innerHTML !== want) mportmenu.innerHTML = want;
 }
 function isMobilePortrait(){
   if(!mobileInputActive()) return false;
+  if(_forcePortraitLayout) return true;
   const { cw, ch } = layoutCssSize();
   if(ch > cw) return true;
   return isOrientationPortrait();
@@ -3811,8 +3815,12 @@ function rectsOverlap(a,b){
   return !(a.left+a.width <= b.left || b.left+b.width <= a.left ||
            a.top+a.height <= b.top || b.top+b.height <= a.top);
 }
+/** Shift portrait control rect by dock offset (px). */
+function portraitShiftY(rect, dy){
+  return { left: rect.left, top: Math.round(rect.top + dy), width: rect.width, height: rect.height };
+}
 /** Portrait layout — FPV → minimap (fixed) → controls dock → stats (fixed). */
-function portraitLayout(){
+function portraitLayout(overrideYOffset){
   const { cw, ch } = layoutCssSize();
   const fpvH = portraitPlayH();
   const miniH = Math.round(Math.max(128, ch * 0.238));
@@ -3835,37 +3843,37 @@ function portraitLayout(){
   const padL = 10, padR = 10;
   const menuH = 44;
   const ctrlY0 = controlsY0;
-  const yOff = Number(options.controlsYOffsetPx) || 0;
-  const minDockH = 72;
-  const maxDown = Math.max(0, statsY - controlsY0 - minDockH);
-  const maxUp = Math.min(Math.round(controlsH * 0.58), 280);
-  const dockDy = Math.max(-maxUp, Math.min(maxDown, yOff));
-  let dockBot = ctrlY0 + Math.round(controlsH * 0.66) + dockDy;
-  const minMoveTop = ctrlY0 + menuH + 10;
-  if(dockBot - joySize < minMoveTop) dockBot = minMoveTop + joySize;
-  const maxDockBot = statsY - 6;
-  if(dockBot > maxDockBot) dockBot = maxDockBot;
-  const moveRect = { left:padL, top:dockBot - joySize, width:joySize, height:joySize };
-  const giveRect = {
+  const dockOffset = overrideYOffset !== undefined
+    ? (Number(overrideYOffset) || 0)
+    : (Number(options.controlsYOffsetPx) || 0);
+  const dy = dockOffset;
+  const baseDockBot = ctrlY0 + Math.round(controlsH * 0.66);
+  let moveRect = { left:padL, top: baseDockBot - joySize, width:joySize, height:joySize };
+  let giveRect = {
     left: moveRect.left + Math.round((joySize - giveSize) * 0.5),
     top: moveRect.top - giveSize - 12,
     width: giveSize, height: giveSize
   };
   const lookLeft = cw - padR - lookSize;
-  const lookTop = dockBot - lookSize + 2;
-  const lookRect = { left:lookLeft, top:lookTop, width:lookSize, height:lookSize };
-  const sprintRect = {
+  const lookTop = baseDockBot - lookSize + 2;
+  let lookRect = { left:lookLeft, top:lookTop, width:lookSize, height:lookSize };
+  let sprintRect = {
     left: lookLeft + Math.round(lookSize * 0.40),
     top: lookTop - Math.round(sprintSize * 0.42),
     width: sprintSize, height: sprintSize
   };
   const menuW = Math.round(Math.min(160, cw * 0.42));
-  const menuRect = {
+  let menuRect = {
     left: Math.round((cw - menuW) / 2),
-    top: Math.round(ctrlY0 + 6 + dockDy),
+    top: Math.round(ctrlY0 + 6),
     width: menuW, height: menuH
   };
-  return { fpvRect, minimapRect, statsRect, controlsRect, moveRect, giveRect, sprintRect, lookRect, menuRect, controlsYOffsetApplied: dockDy, dockDy };
+  moveRect = portraitShiftY(moveRect, dy);
+  giveRect = portraitShiftY(giveRect, dy);
+  lookRect = portraitShiftY(lookRect, dy);
+  sprintRect = portraitShiftY(sprintRect, dy);
+  menuRect = portraitShiftY(menuRect, dy);
+  return { fpvRect, minimapRect, statsRect, controlsRect, moveRect, giveRect, sprintRect, lookRect, menuRect, controlsYOffsetApplied: dy, dockDy: dy };
 }
 function drawPortraitDashboardChrome(){
   if(!mobileMode || !isMobilePortrait()) return;
@@ -3902,6 +3910,10 @@ function drawPortraitDashboardChrome(){
       ctx.fillText(lbl, r.x + 4, r.y + 12);
     });
   }
+  const dockLbl = controlHeightMenuLabel(options.controlsYOffsetPx);
+  ctx.font = 'bold 9px monospace';
+  ctx.fillStyle = 'rgba(210,170,110,0.92)';
+  ctx.fillText(BUILD_ID + ' · dock: ' + dockLbl, L.menuRect.left, L.menuRect.top + L.menuRect.height + 11);
 }
 function drawPortraitStatsPanel(){
   const L = portraitLayout();
@@ -4126,25 +4138,58 @@ function getMinimapAlignProof(){
 }
 
 function getControlDockRectProof(){
+  const { cw, ch } = layoutCssSize();
   const snap = y=>{
+    const L = portraitLayout(y);
+    const pick = r=>({ top: r.top, left: r.left, height: r.height });
+    return {
+      controlsYOffsetPx: y,
+      dockDy: L.dockDy,
+      moveRect: pick(L.moveRect),
+      giveRect: pick(L.giveRect),
+      sprintRect: pick(L.sprintRect),
+      lookRect: pick(L.lookRect),
+      menuRect: pick(L.menuRect),
+      minimapRect: { top: L.minimapRect.y, left: L.minimapRect.x, height: L.minimapRect.h },
+      statsRect: { top: L.statsRect.y, left: L.statsRect.x, height: L.statsRect.h },
+      fpvRect: { top: L.fpvRect.y, left: L.fpvRect.x, height: L.fpvRect.h },
+    };
+  };
+  const low = snap(120);
+  const mid = snap(0);
+  const high = snap(-120);
+  const veryHigh = snap(-240);
+  const domAt = y=>{
+    const saved = options.controlsYOffsetPx;
     options.controlsYOffsetPx = y;
     options.save();
     applyMobileControlSettings();
-    const L = portraitLayout();
     const r = id=>{
       const el = document.getElementById(id);
       if(!el) return null;
       const b = el.getBoundingClientRect();
       return { top: Math.round(b.top), left: Math.round(b.left) };
     };
-    return {
-      controlsYOffsetPx: y,
-      dockDy: L.dockDy,
-      layout: { minimapY: L.minimapRect.y, statsY: L.statsRect.y, fpvH: L.fpvRect.h },
-      dom: { ml: r('ml'), mg: r('mg'), ms: r('ms'), mlookpad: r('mlookpad'), mportmenu: r('mportmenu') },
-    };
+    const out = { ml: r('ml'), mg: r('mg'), ms: r('ms'), mlookpad: r('mlookpad'), mportmenu: r('mportmenu') };
+    options.controlsYOffsetPx = saved;
+    options.save();
+    return out;
   };
-  return { mid: snap(0), high: snap(-120) };
+  return {
+    BUILD_ID,
+    controlsYOffsetPx: options.controlsYOffsetPx,
+    mobileMode,
+    isMobilePortrait: isMobilePortrait(),
+    viewport: { cw, ch },
+    layout: { low, mid, high, veryHigh },
+    movement: {
+      midToHigh_moveTop: mid.moveRect.top - high.moveRect.top,
+      lowToVery_moveTop: low.moveRect.top - veryHigh.moveRect.top,
+      midToHigh_menuTop: mid.menuRect.top - high.menuRect.top,
+      lowToVery_menuTop: low.menuRect.top - veryHigh.menuRect.top,
+    },
+    domSample: domAt(options.controlsYOffsetPx),
+  };
 }
 
 globalThis.CR = window.CR = {
