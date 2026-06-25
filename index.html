@@ -133,9 +133,19 @@
   .rpan.options-tune{
     background:rgba(10,8,5,0.72);
     justify-content:flex-start;
+    align-items:stretch;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    touch-action:pan-y;
     padding-top:max(12px, env(safe-area-inset-top, 0px));
+    padding-bottom:max(24px, env(safe-area-inset-bottom, 0px));
   }
   .rpan.options-tune .rit{background:rgba(18,14,10,0.93);}
+  .rpan.options-tune .options-scroll-body{
+    width:100%;max-width:100%;box-sizing:border-box;
+    padding:0 18px;
+    padding-bottom:max(120px, env(safe-area-inset-bottom, 24px));
+  }
   .rpantit{
     font:bold 22px monospace;color:#e9d8b0;letter-spacing:2px;
     margin-bottom:18px;text-align:center;
@@ -429,7 +439,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'lvl1';
+const BUILD_ID = 'lvl2';
 let mobileMode = false; // true = show mobile overlay, hide desktop cursor
 let mobileOverride = null; // null=auto, 'on', 'off'
 let portHintShown = false;
@@ -503,7 +513,9 @@ function nearestStep(value, steps){
   return best;
 }
 function cycleStepValue(current, steps){
-  const n = nearestStep(Number(current)||steps[0], steps);
+  const raw = Number(current);
+  const safe = Number.isFinite(raw) ? raw : steps[0];
+  const n = nearestStep(safe, steps);
   return cycleValue(n, steps);
 }
 function bumpControlHeight(){
@@ -814,6 +826,7 @@ function bindMobileControls(){
   const endJoy = ()=>{
     joy.active=false; joy.id=null; joy.ptrId=null;
     joy.x=0; joy.y=0; joy.dist=0;
+    clearMoveInput();
     updateJoyDot(0,0);
   };
   ml.addEventListener('pointerdown', e=>{
@@ -1135,6 +1148,14 @@ function updateJoyDot(nx, ny){
   const travel = Math.round(joySize*0.25);
   if(dot) dot.style.transform = `translate(calc(-50% + ${nx*travel}px), calc(-50% + ${ny*travel}px))`;
 }
+function clearMoveInput(){
+  inp.fwd = false;
+  inp.back = false;
+  inp.left = false;
+  inp.right = false;
+  inp.turnLeft = false;
+  inp.turnRight = false;
+}
 function syncInpFromJoy(){
   // joy.x/joy.y are already normalized signed axes: y=forward, x=right.
   // Reading axes directly is clearer and avoids atan2 quadrant mistakes.
@@ -1378,14 +1399,14 @@ function drawMobileMenu(){
 
   // ── OPTIONS ──
   if(state === STATE.OPTIONS){
-    r.classList.toggle('options-tune', mobileMode && isMobilePortrait());
+    r.classList.toggle('options-tune', mobileMode);
     rmenuShow();
     rmenuHTML(`
+      <div class="options-scroll-body">
       <div class="rpantit">OPTIONS</div>
       <div class="rdesc" style="margin-bottom:8px;color:#6a5a4a;">build ${BUILD_ID}</div>
-      <div class="rit ctrlheight-row" data-action="option-ctrlheight" style="margin:8px 18px 10px;">CONTROL HEIGHT: ${controlHeightMenuLabel(options.controlsYOffsetPx)}</div>
-      <div class="rdesc" style="margin:0 18px 6px;color:#7a6a50;">Tap row — whole control + map band moves (see through panel)</div>
-      <div style="overflow-y:auto;max-height:58vh;width:100%;padding:0 18px;box-sizing:border-box;">
+      <div class="rit ctrlheight-row" data-action="option-ctrlheight" style="margin:8px 0 10px;">CONTROL HEIGHT: ${controlHeightMenuLabel(options.controlsYOffsetPx)}</div>
+      <div class="rdesc" style="margin:0 0 6px;color:#7a6a50;">Tap row — whole control + map band moves (see through panel)</div>
         <div class="rit" data-action="option-name">NAME: ${profile.name||'RUNNER'}</div>
         <div class="rit" data-action="option-look">LOOK SPEED: ${lookSpeedLabel(options.lookSpeed)}</div>
         <div class="rit" data-action="option-joy">JOY SIZE: ${options.joySizePx}</div>
@@ -1398,11 +1419,11 @@ function drawMobileMenu(){
         <div class="rit" data-action="option-minimap">MINIMAP DEFAULT: ${options.minimapDefault?'ON':'OFF'}</div>
         <div class="rit" data-action="option-fx">REDUCE FX: ${options.reduceFx?'ON':'OFF'}</div>
         <div class="rit" data-action="option-mouse">MOUSE: ${options.mouseSens.toFixed(4)}</div>
-      </div>
       <div class="rdesc" style="margin-top:10px;">Tap rows to cycle. SPRINT is a burst: block charge → burst.</div>
       <div class="rdesc">MOBILE: left stick=MOVE · right zone=LOOK / DRAG</div>
       <div class="rit" data-action="toggle-fs" style="margin-top:8px;">${isFullscreen()?'EXIT FULLSCREEN':'FULLSCREEN'}</div>
       <div class="rit" data-action="back-title-options" style="margin-top:6px;">← BACK</div>
+      </div>
       <span style="display:none" data-om-stamp="${_optionsMenuStamp}"></span>
     `); return;
   }
@@ -1755,7 +1776,7 @@ function clearInputState(){
   if(typeof updateJoyDot === 'function') updateJoyDot(0, 0);
   tzone.active = false; tzone.id = null;
   lookTouch.id = null; lookTouch.lastX = 0;
-  inp.fwd = inp.back = inp.left = inp.right = false;
+  clearMoveInput();
   inp.give = inp.map = inp.pause = false;
   inp._lastMap = inp._lastPause = inp._lastGive = false;
   inp._active = false;
@@ -3282,6 +3303,7 @@ function update(dt){
 
   // sync mobile joystick to inp abstraction (keyboard fallback)
   if(joy.active) syncInpFromJoy();
+  else clearMoveInput();
 
   // edge-detect for one-shot mobile actions
   if(inp.map && !inp._lastMap){ showMinimap=!showMinimap; }
