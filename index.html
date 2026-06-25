@@ -49,7 +49,7 @@
     transition:background 0.08s;
   }
   .mbtn.pr{background:rgba(200,170,100,0.55);border-color:rgba(220,200,130,0.8);}
-  #ml{bottom:30px;left:20px;width:110px;height:110px;border-radius:50%;z-index:12;flex-direction:column;gap:2px;background:rgba(20,15,10,0.15);}
+  #ml{bottom:30px;left:20px;width:110px;height:110px;border-radius:50%;z-index:22;flex-direction:column;gap:2px;background:rgba(20,15,10,0.15);touch-action:none;}
   /* Right-half LOOK zone — transparent touch overlay; gameplay shows through */
   #mr{
     top:0;right:0;width:50vw;height:100%;border-radius:0;z-index:10;
@@ -429,13 +429,35 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'move1';
+const BUILD_ID = 'move2';
 let mobileMode = false; // true = show mobile overlay, hide desktop cursor
 let mobileOverride = null; // null=auto, 'on', 'off'
 let portHintShown = false;
 
 // Joystick state
-const joy = { x:0, y:0, active:false, id:null, sx:0, sy:0, ang:0, dist:0 };
+const joy = { x:0, y:0, active:false, id:null, ptrId:null, sx:0, sy:0, ang:0, dist:0 };
+function applyJoyFromClient(cx, cy){
+  const dx = cx - joy.sx, dy = cy - joy.sy;
+  const joySize = Number(options.joySizePx)||110;
+  const MAX = Math.max(32, joySize * 0.35);
+  const d = Math.sqrt(dx*dx+dy*dy);
+  joy.dist = Math.min(d, MAX) / MAX;
+  const dead = Number(options.touchDeadzonePx)||8;
+  if(d < dead){ joy.ang = 0; joy.x = 0; joy.y = 0; joy.dist = 0; }
+  else {
+    joy.ang = Math.atan2(dx, -dy);
+    joy.x = Math.sin(joy.ang) * joy.dist;
+    joy.y = Math.cos(joy.ang) * joy.dist;
+  }
+  updateJoyDot(joy.x, joy.y);
+}
+function joyStrength(){
+  if(!joy.active) return 0;
+  return Math.max(joy.dist||0, Math.hypot(joy.x||0, joy.y||0));
+}
+function mobileInputActive(){
+  return mobileMode || options.mobileControls==='on' || mobileOverride==='on' || (typeof isMobile==='function' && isMobile());
+}
 // Turn zone state (landscape #mr)
 const tzone = { active:false, id:null, lastX:0 };
 // Dedicated LOOK circle (#mlookpad) — tracked by touch identifier for multi-touch
@@ -521,7 +543,7 @@ function syncPortraitMenuLabel(){
   if(mportmenu.innerHTML !== want) mportmenu.innerHTML = want;
 }
 function isMobilePortrait(){
-  if(!mobileMode) return false;
+  if(!mobileInputActive()) return false;
   const { cw, ch } = layoutCssSize();
   if(ch > cw) return true;
   return isOrientationPortrait();
@@ -782,15 +804,59 @@ function bindMobileControls(){
   const rmenu = document.getElementById('rmenu');
   ms_element = ms;
 
-  // ---- left joystick zone ----
+  // ---- left joystick zone (pointer capture + element touchmove for WebViews) ----
+  const beginJoy = (id, ptrId, cx, cy)=>{
+    joy.id = id; joy.ptrId = ptrId; joy.active = true;
+    joy.sx = cx; joy.sy = cy;
+    applyJoyFromClient(cx, cy);
+    dismissLookHint();
+  };
+  const endJoy = ()=>{
+    joy.active=false; joy.id=null; joy.ptrId=null;
+    joy.x=0; joy.y=0; joy.dist=0;
+    updateJoyDot(0,0);
+  };
+  ml.addEventListener('pointerdown', e=>{
+    e.preventDefault(); e.stopPropagation();
+    try{ ml.setPointerCapture(e.pointerId); }catch(_e){}
+    beginJoy(e.pointerId, e.pointerId, e.clientX, e.clientY);
+  },{passive:false});
+  ml.addEventListener('pointermove', e=>{
+    if(!joy.active || joy.ptrId !== e.pointerId) return;
+    e.preventDefault(); e.stopPropagation();
+    applyJoyFromClient(e.clientX, e.clientY);
+  },{passive:false});
+  const joyPtrUp = e=>{
+    if(joy.ptrId !== e.pointerId) return;
+    e.preventDefault(); e.stopPropagation();
+    try{ ml.releasePointerCapture(e.pointerId); }catch(_e){}
+    endJoy();
+  };
+  ml.addEventListener('pointerup', joyPtrUp, {passive:false});
+  ml.addEventListener('pointercancel', joyPtrUp, {passive:false});
   ml.addEventListener('touchstart', e=>{
     e.preventDefault(); e.stopPropagation();
     const t = e.changedTouches[0];
     if(joy.active && joy.id !== null && joy.id !== t.identifier) return;
-    joy.id = t.identifier; joy.active = true;
-    joy.sx = t.clientX; joy.sy = t.clientY; joy.x=0; joy.y=0;
-    updateJoyDot(0,0);
-    dismissLookHint();
+    beginJoy(t.identifier, null, t.clientX, t.clientY);
+  },{passive:false});
+  ml.addEventListener('touchmove', e=>{
+    if(!joy.active) return;
+    for(const t of e.changedTouches){
+      if(t.identifier !== joy.id) continue;
+      e.preventDefault(); e.stopPropagation();
+      applyJoyFromClient(t.clientX, t.clientY);
+    }
+  },{passive:false});
+  ml.addEventListener('touchend', e=>{
+    for(const t of e.changedTouches){
+      if(t.identifier === joy.id){ e.preventDefault(); e.stopPropagation(); endJoy(); }
+    }
+  },{passive:false});
+  ml.addEventListener('touchcancel', e=>{
+    for(const t of e.changedTouches){
+      if(t.identifier === joy.id){ e.preventDefault(); e.stopPropagation(); endJoy(); }
+    }
   },{passive:false});
 
   // ---- right turn zone (landscape) ----
@@ -968,15 +1034,7 @@ function bindMobileControls(){
     for(const t of track){
       if(t.identifier === joy.id && joy.active){
         handled = true;
-        const dx = t.clientX - joy.sx, dy = t.clientY - joy.sy;
-        const joySize = Number(options.joySizePx)||110;
-        const MAX = Math.max(32, joySize * 0.35);
-        const d = Math.sqrt(dx*dx+dy*dy);
-        joy.dist = Math.min(d, MAX) / MAX;
-        const dead = Number(options.touchDeadzonePx)||8;
-        if(d < dead){ joy.ang = 0; joy.x = 0; joy.y = 0; joy.dist = 0; }
-        else { joy.ang = Math.atan2(dx, -dy); joy.x = Math.sin(joy.ang)*joy.dist; joy.y = Math.cos(joy.ang)*joy.dist; }
-        updateJoyDot(joy.x, joy.y);
+        applyJoyFromClient(t.clientX, t.clientY);
       }
       if(t.identifier === tzone.id && tzone.active){
         handled = true;
@@ -1004,7 +1062,7 @@ function bindMobileControls(){
 
   document.addEventListener('touchend', e=>{
     for(const t of e.changedTouches){
-      if(t.identifier === joy.id){ joy.active=false; joy.x=0; joy.y=0; joy.id=null; updateJoyDot(0,0); }
+      if(t.identifier === joy.id){ endJoy(); }
       if(t.identifier === tzone.id){ tzone.active=false; tzone.id=null; }
       if(t.identifier === lookTouch.id){
         lookTouch.id = null; lookTouch.lastX = 0;
@@ -1183,10 +1241,10 @@ function drawMobileMenu(){
     const showFs = mobileMode && state===STATE.PLAY && !paused && !isFullscreen() && !isMobilePortrait();
     fsbtn.classList.toggle('show', showFs);
   }
-  const playControls = mobileMode && state===STATE.PLAY && !paused;
+  const playControls = mobileInputActive() && state===STATE.PLAY && !paused;
   const portraitPlay = playControls && isMobilePortrait();
   const optionsTunePreview = mobileMode && state===STATE.OPTIONS;
-  const pauseTunePreview = mobileMode && paused && state===STATE.PLAY;
+  const pauseTunePreview = mobileInputActive() && paused && state===STATE.PLAY;
   const showPortraitControls = portraitPlay || (optionsTunePreview && isMobilePortrait()) || (pauseTunePreview && isMobilePortrait());
   const showLandscapeControlsPreview = optionsTunePreview && !isMobilePortrait();
   const mob = document.getElementById('mob');
@@ -1201,7 +1259,7 @@ function drawMobileMenu(){
     mpEl.style.pointerEvents = 'none';
   }
   const viewEl = document.getElementById('view');
-  if(viewEl) viewEl.classList.toggle('mob-touch-through', !!(mobileMode && (playControls || pauseTunePreview)));
+  if(viewEl) viewEl.classList.toggle('mob-touch-through', !!((mobileInputActive()) && (playControls || pauseTunePreview)));
   if(showPortraitControls || showLandscapeControlsPreview || playControls || pauseTunePreview) applyMobileControlSettings();
   const menuEl = document.getElementById('mportmenu');
   if(menuEl){
@@ -3119,8 +3177,8 @@ function update(dt){
   }
   if(game.timeLeft<=0){ endRun(); return; }
 
-  // sync mobile joystick to inp abstraction
-  if(mobileMode) syncInpFromJoy();
+  // sync mobile joystick to inp abstraction (keyboard fallback)
+  if(joy.active) syncInpFromJoy();
 
   // edge-detect for one-shot mobile actions
   if(inp.map && !inp._lastMap){ showMinimap=!showMinimap; }
@@ -3151,8 +3209,9 @@ function update(dt){
   const fx=Math.cos(player.angle), fy=Math.sin(player.angle);
   const rx=Math.cos(player.angle+Math.PI/2), ry=Math.sin(player.angle+Math.PI/2);
   let dx=0, dy=0;
-  if(mobileMode && joy.active && joy.dist > 0.05){
-    const s = joy.dist;
+  const jstr = joyStrength();
+  if(joy.active && jstr > 0.02){
+    const s = Math.min(1, jstr);
     dx += fx * joy.y * s;
     dy += fy * joy.y * s;
     dx += rx * joy.x * s;
@@ -3164,8 +3223,10 @@ function update(dt){
     if(keys['KeyA']||keys['ArrowLeft'] ||inp.left) { dx-=rx; dy-=ry; }
   }
   const len=Math.hypot(dx,dy)||1; dx=dx/len*mv; dy=dy/len*mv;
+  const px0 = player.x, py0 = player.y;
   if(canStand(player.x+dx, player.y)) player.x+=dx;
   if(canStand(player.x, player.y+dy)) player.y+=dy;
+  window._moveDbg = { joy:jstr.toFixed(3), active:joy.active, paused, mobileMode, mm:mobileInputActive(), st:state, dpx:+(player.x-px0).toFixed(4), dpy:+(player.y-py0).toFixed(4) };
 
   const moving=(dx*dx+dy*dy)>0.0001;
   if(shiftHeld && sprinting && moving){ player.stamina=Math.max(0,player.stamina-cfg.staminaDrain*dt); }
