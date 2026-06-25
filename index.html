@@ -439,7 +439,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'lvl2';
+const BUILD_ID = 'dock1';
 let mobileMode = false; // true = show mobile overlay, hide desktop cursor
 let mobileOverride = null; // null=auto, 'on', 'off'
 let portHintShown = false;
@@ -525,8 +525,8 @@ function bumpControlHeight(){
   applyMobileControlSettings();
   _optionsMenuStamp++;
   const lbl = controlHeightMenuLabel(options.controlsYOffsetPx);
-  setMsg('CONTROL HEIGHT: ' + lbl);
-  showToast('CONTROL HEIGHT: ' + lbl, 2200);
+  setMsg('CONTROL DOCK HEIGHT: ' + lbl);
+  showToast('CONTROL DOCK HEIGHT: ' + lbl, 2200);
   try { beep(520, 0.06, 'square', 0.04); } catch(_e){}
   drawMobileMenu();
 }
@@ -1405,8 +1405,8 @@ function drawMobileMenu(){
       <div class="options-scroll-body">
       <div class="rpantit">OPTIONS</div>
       <div class="rdesc" style="margin-bottom:8px;color:#6a5a4a;">build ${BUILD_ID}</div>
-      <div class="rit ctrlheight-row" data-action="option-ctrlheight" style="margin:8px 0 10px;">CONTROL HEIGHT: ${controlHeightMenuLabel(options.controlsYOffsetPx)}</div>
-      <div class="rdesc" style="margin:0 0 6px;color:#7a6a50;">Tap row — whole control + map band moves (see through panel)</div>
+      <div class="rit ctrlheight-row" data-action="option-ctrlheight" style="margin:8px 0 10px;">CONTROL DOCK HEIGHT: ${controlHeightMenuLabel(options.controlsYOffsetPx)}</div>
+      <div class="rdesc" style="margin:0 0 6px;color:#7a6a50;">Tap row — moves MOVE / GIVE / SPRINT / LOOK / MENU only</div>
         <div class="rit" data-action="option-name">NAME: ${profile.name||'RUNNER'}</div>
         <div class="rit" data-action="option-look">LOOK SPEED: ${lookSpeedLabel(options.lookSpeed)}</div>
         <div class="rit" data-action="option-joy">JOY SIZE: ${options.joySizePx}</div>
@@ -3576,7 +3576,7 @@ function drawOverlays(){
       {label:'JOYSTICK SIZE: '+options.joySizePx},
       {label:'BUTTON SIZE: '+options.buttonSizePx},
       {label:'LOOK PAD SIZE: '+options.lookSizePx},
-      {label:'CONTROL HEIGHT: '+controlHeightMenuLabel(options.controlsYOffsetPx)},
+      {label:'CONTROL DOCK HEIGHT: '+controlHeightMenuLabel(options.controlsYOffsetPx)},
       {label:'CONTROL OPACITY: '+percentLabel(options.controlOpacityValue)},
       {label:'MINIMAP SIZE: '+options.minimapSizePx},
       {label:'TOUCH DEADZONE: '+options.touchDeadzonePx},
@@ -3791,23 +3791,17 @@ function rectsOverlap(a,b){
   return !(a.left+a.width <= b.left || b.left+b.width <= a.left ||
            a.top+a.height <= b.top || b.top+b.height <= a.top);
 }
-/** Portrait layout — FPV → minimap → controls → stats (bottom bar). */
+/** Portrait layout — FPV → minimap (fixed) → controls dock → stats (fixed). */
 function portraitLayout(){
   const { cw, ch } = layoutCssSize();
   const fpvH = portraitPlayH();
   const miniH = Math.round(Math.max(150, ch * 0.265));
   const statsH = Math.round(Math.max(64, ch * 0.082));
   const statsY = ch - statsH;
-  const yOff = Number(options.controlsYOffsetPx) || 0;
-  const minControlsH = 88;
-  const maxDown = Math.max(0, statsY - fpvH - miniH - minControlsH);
-  const maxUp = Math.min(Math.round(fpvH * 0.42 + miniH * 0.5), 300);
-  const yClamp = Math.max(-maxUp, Math.min(maxDown, yOff));
-  const bandTop = fpvH + yClamp;
+  const bandTop = fpvH;
   const minimapRect = { x:0, y:bandTop, w:cw, h:miniH };
   const controlsY0 = bandTop + miniH;
-  const controlsH = Math.max(minControlsH, statsY - controlsY0);
-  const ctrlY0 = controlsY0;
+  const controlsH = Math.max(88, statsY - controlsY0);
   const fpvRect = { x:0, y:0, w:cw, h:fpvH };
   const controlsRect = { x:0, y:controlsY0, w:cw, h:controlsH };
   const statsRect = { x:0, y:statsY, w:cw, h:statsH };
@@ -3818,9 +3812,17 @@ function portraitLayout(){
   const sprintSize = Math.round(Math.max(48, btnSize * 0.68));
   const padL = 10, padR = 10;
   const menuH = 44;
-  let dockBot = ctrlY0 + Math.round(controlsH * 0.66);
+  const ctrlY0 = controlsY0;
+  const yOff = Number(options.controlsYOffsetPx) || 0;
+  const minDockH = 72;
+  const maxDown = Math.max(0, statsY - controlsY0 - minDockH);
+  const maxUp = Math.min(Math.round(controlsH * 0.58), 280);
+  const dockDy = Math.max(-maxUp, Math.min(maxDown, yOff));
+  let dockBot = ctrlY0 + Math.round(controlsH * 0.66) + dockDy;
   const minMoveTop = ctrlY0 + menuH + 10;
   if(dockBot - joySize < minMoveTop) dockBot = minMoveTop + joySize;
+  const maxDockBot = statsY - 6;
+  if(dockBot > maxDockBot) dockBot = maxDockBot;
   const moveRect = { left:padL, top:dockBot - joySize, width:joySize, height:joySize };
   const giveRect = {
     left: moveRect.left + Math.round((joySize - giveSize) * 0.5),
@@ -3838,10 +3840,10 @@ function portraitLayout(){
   const menuW = Math.round(Math.min(160, cw * 0.42));
   const menuRect = {
     left: Math.round((cw - menuW) / 2),
-    top: Math.round(ctrlY0 + 6),
+    top: Math.round(ctrlY0 + 6 + dockDy),
     width: menuW, height: menuH
   };
-  return { fpvRect, minimapRect, statsRect, controlsRect, moveRect, giveRect, sprintRect, lookRect, menuRect, controlsYOffsetApplied: yClamp };
+  return { fpvRect, minimapRect, statsRect, controlsRect, moveRect, giveRect, sprintRect, lookRect, menuRect, controlsYOffsetApplied: dockDy, dockDy };
 }
 function drawPortraitDashboardChrome(){
   if(!mobileMode || !isMobilePortrait()) return;
@@ -4064,7 +4066,7 @@ function getLayoutProof(){
     const el = document.getElementById(id);
     if(!el) return null;
     const b = el.getBoundingClientRect();
-    return { left:b.left|0, top:b.top|0, width:b.width|0, height:b.height|0 };
+    return { left:Math.round(b.left), top:Math.round(b.top), width:Math.round(b.width), height:Math.round(b.height) };
   };
   const move = domRect('ml'), give = domRect('mg'), sprint = domRect('ms'), look = domRect('mlookpad'), menu = domRect('mportmenu');
   return {
@@ -4082,8 +4084,31 @@ function getLayoutProof(){
     },
     controlsYOffsetPx: options.controlsYOffsetPx,
     controlsYOffsetApplied: L.controlsYOffsetApplied,
+    dockDy: L.dockDy,
     mapSize: { w: game.MAP_W, h: game.MAP_H, aspect: game.MAP_W && game.MAP_H ? (game.MAP_W / game.MAP_H).toFixed(2) : null },
   };
+}
+
+function getControlDockRectProof(){
+  const snap = y=>{
+    options.controlsYOffsetPx = y;
+    options.save();
+    applyMobileControlSettings();
+    const L = portraitLayout();
+    const r = id=>{
+      const el = document.getElementById(id);
+      if(!el) return null;
+      const b = el.getBoundingClientRect();
+      return { top: Math.round(b.top), left: Math.round(b.left) };
+    };
+    return {
+      controlsYOffsetPx: y,
+      dockDy: L.dockDy,
+      layout: { minimapY: L.minimapRect.y, statsY: L.statsRect.y, fpvH: L.fpvRect.h },
+      dom: { ml: r('ml'), mg: r('mg'), ms: r('ms'), mlookpad: r('mlookpad'), mportmenu: r('mportmenu') },
+    };
+  };
+  return { mid: snap(0), high: snap(-120) };
 }
 
 globalThis.CR = window.CR = {
@@ -4094,7 +4119,7 @@ globalThis.CR = window.CR = {
   set paused(v){ paused=!!v; },
   get mobileMode(){ return mobileMode; },
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
-  setMobileMode,isMobile,rmenuAction,getDebugState,portraitLayout,getLayoutProof,rectsOverlap,
+  setMobileMode,isMobile,rmenuAction,getDebugState,portraitLayout,getLayoutProof,getControlDockRectProof,rectsOverlap,
   editRunnerName,applyMobileControlSettings,mobileSprintCost,mobileSprintBurstSec,
   toggleFullscreen,isFullscreen,enterFullscreen,exitFullscreen,
 };

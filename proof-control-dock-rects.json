@@ -1,0 +1,18 @@
+{
+  "build": "dock1",
+  "note": "layout Y from portraitLayout(); minimap/stats must match across offsets",
+  "samples": [
+    {"controlsYOffsetPx": 0, "minimapY": 826, "statsY": 558, "fpvH": 826, "moveTop": 442, "menuTop": 997, "dockDy": 0},
+    {"controlsYOffsetPx": -120, "minimapY": 826, "statsY": 558, "fpvH": 826, "moveTop": 442, "menuTop": 946, "dockDy": -51},
+    {"controlsYOffsetPx": 120, "minimapY": 826, "statsY": 558, "fpvH": 826, "moveTop": 442, "menuTop": 997, "dockDy": 0}
+  ],
+  "minimapYUnchanged": true,
+  "statsYUnchanged": true,
+  "menuTopChangedMidToHigh": true,
+  "getControlDockRectProof": {
+    "mid_layout_minimapY": 826,
+    "high_layout_minimapY": 826,
+    "mid_dom_ml_top": 478,
+    "high_dom_ml_top": 358
+  }
+}
