@@ -419,7 +419,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'ctrlh2';
+const BUILD_ID = 'ctrlh3';
 let mobileMode = false; // true = show mobile overlay, hide desktop cursor
 let mobileOverride = null; // null=auto, 'on', 'off'
 let portHintShown = false;
@@ -1126,6 +1126,14 @@ function rmenuAction(action){
     case 'pause-resume': paused=false; rmenuHide(); break;
     case 'pause-restart': paused=false; rmenuHide(); SAVE.clear(); restartRun(false); break;
     case 'pause-title': paused=false; rmenuHide(); state=STATE.TITLE; _rmSel=0; break;
+    case 'pause-ctrlheight': {
+      options.controlsYOffsetPx=cycleStepValue(options.controlsYOffsetPx,CONTROL_Y_STEPS);
+      options.save();
+      applyMobileControlSettings();
+      setMsg('CONTROL HEIGHT: '+controlHeightMenuLabel(options.controlsYOffsetPx));
+      drawMobileMenu();
+      break;
+    }
     case 'upgrade-0': chooseUpgrade(0); break;
     case 'upgrade-1': chooseUpgrade(1); break;
     case 'upgrade-2': chooseUpgrade(2); break;
@@ -1143,21 +1151,22 @@ function drawMobileMenu(){
   const playControls = mobileMode && state===STATE.PLAY && !paused;
   const portraitPlay = playControls && isMobilePortrait();
   const optionsTunePreview = mobileMode && state===STATE.OPTIONS;
-  const showPortraitControls = portraitPlay || (optionsTunePreview && isMobilePortrait());
+  const pauseTunePreview = mobileMode && paused && state===STATE.PLAY;
+  const showPortraitControls = portraitPlay || (optionsTunePreview && isMobilePortrait()) || (pauseTunePreview && isMobilePortrait());
   const showLandscapeControlsPreview = optionsTunePreview && !isMobilePortrait();
   const mob = document.getElementById('mob');
-  if(mob) mob.style.pointerEvents = playControls ? 'auto' : 'none';
+  if(mob) mob.style.pointerEvents = (playControls || pauseTunePreview) ? 'auto' : 'none';
   ['ml','mlookpad','mg','ms'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.style.display = (showPortraitControls || showLandscapeControlsPreview) ? 'flex' : (playControls ? 'flex' : 'none');
   });
   const mpEl = document.getElementById('mp');
-  if(mpEl) mpEl.style.display = (playControls && !isMobilePortrait()) ? 'flex' : 'none';
-  if(showPortraitControls || showLandscapeControlsPreview || playControls) applyMobileControlSettings();
+  if(mpEl) mpEl.style.display = ((playControls || pauseTunePreview) && !isMobilePortrait()) ? 'flex' : 'none';
+  if(showPortraitControls || showLandscapeControlsPreview || playControls || pauseTunePreview) applyMobileControlSettings();
   const menuEl = document.getElementById('mportmenu');
   if(menuEl){
-    menuEl.style.display = (portraitPlay || (optionsTunePreview && isMobilePortrait())) ? 'flex' : 'none';
-    menuEl.classList.toggle('por-show', !!(portraitPlay || (optionsTunePreview && isMobilePortrait())));
+    menuEl.style.display = (portraitPlay || (optionsTunePreview && isMobilePortrait()) || (pauseTunePreview && isMobilePortrait())) ? 'flex' : 'none';
+    menuEl.classList.toggle('por-show', !!(portraitPlay || (optionsTunePreview && isMobilePortrait()) || (pauseTunePreview && isMobilePortrait())));
   }
   const mmEl = document.getElementById('mm');
   if(mmEl) mmEl.style.display = (playControls && !isMobilePortrait()) ? 'flex' : 'none';
@@ -1179,9 +1188,9 @@ function drawMobileMenu(){
     return;
   }
 
-  // Large desktop layouts use canvas menus for title/meta screens (mobile always uses rmenu HTML).
+  // Large desktop layouts use canvas menus for title/meta screens (phones always use rmenu HTML).
   const metaRmenu = state === STATE.TITLE || state === STATE.SEEDED || state === STATE.STATS || state === STATE.LB || state === STATE.OPTIONS;
-  if(!mobileMode && innerWidth >= 600 && innerHeight >= 400){
+  if(!mobileMode && !isMobile() && innerWidth >= 600 && innerHeight >= 400){
     if(metaRmenu){
       rmenuHide();
       syncLookHintUI();
@@ -1336,6 +1345,7 @@ function drawMobileMenu(){
     rmenuHTML(`
       <div class="rpantit">PAUSED</div>
       <div class="rit sel" data-action="pause-resume">RESUME</div>
+      <div class="rit" data-action="pause-ctrlheight" style="margin-top:6px;">CONTROL HEIGHT: ${controlHeightMenuLabel(options.controlsYOffsetPx)}</div>
       <div class="rit" data-action="pause-restart" style="margin-top:6px;">RESTART RUN</div>
       <div class="rit" data-action="pause-title" style="margin-top:6px;">MAIN MENU</div>
       <div class="rit" data-action="toggle-fs" style="margin-top:6px;">${isFullscreen()?'EXIT FULLSCREEN':'FULLSCREEN'}</div>
@@ -2728,7 +2738,7 @@ function activateOption(idx){
   else if(idx===2){ options.joySizePx=cycleStepValue(options.joySizePx,JOY_SIZE_STEPS); options.save(); applyMobileControlSettings(); }
   else if(idx===3){ options.buttonSizePx=cycleStepValue(options.buttonSizePx,BTN_SIZE_STEPS); options.save(); applyMobileControlSettings(); }
   else if(idx===4){ options.lookSizePx=cycleStepValue(options.lookSizePx,LOOK_PAD_SIZE_STEPS); options.save(); applyMobileControlSettings(); }
-  else if(idx===5){ options.controlsYOffsetPx=cycleStepValue(options.controlsYOffsetPx,CONTROL_Y_STEPS); options.save(); applyMobileControlSettings(); }
+  else if(idx===5){ options.controlsYOffsetPx=cycleStepValue(options.controlsYOffsetPx,CONTROL_Y_STEPS); options.save(); applyMobileControlSettings(); setMsg('CONTROL HEIGHT: '+controlHeightMenuLabel(options.controlsYOffsetPx)); }
   else if(idx===6){ options.controlOpacityValue=cycleStepValue(options.controlOpacityValue,OPACITY_STEPS); options.save(); applyMobileControlSettings(); }
   else if(idx===7){ options.minimapSizePx=cycleStepValue(options.minimapSizePx,MINIMAP_SIZE_STEPS); options.save(); }
   else if(idx===8){ options.touchDeadzonePx=cycleStepValue(options.touchDeadzonePx,DEADZONE_STEPS); options.save(); }
@@ -3334,12 +3344,17 @@ function portraitLayout(){
   const fpvH = portraitPlayH();
   const miniH = Math.round(Math.max(150, ch * 0.265));
   const statsH = Math.round(Math.max(64, ch * 0.082));
+  const cy0Base = fpvH + miniH;
   const controlsH = Math.max(118, ch - fpvH - miniH - statsH);
-  const cy0 = fpvH + miniH;
+  const yOff = Number(options.controlsYOffsetPx) || 0;
+  const maxUp = Math.min(Math.round(controlsH * 0.55), 200);
+  const maxDown = Math.round(Math.min(controlsH * 0.45, ch * 0.12));
+  const yClamp = Math.max(-maxUp, Math.min(maxDown, yOff));
+  const ctrlY0 = cy0Base + yClamp;
   const fpvRect = { x:0, y:0, w:cw, h:fpvH };
   const minimapRect = { x:0, y:fpvH, w:cw, h:miniH };
-  const controlsRect = { x:0, y:cy0, w:cw, h:controlsH };
-  const statsRect = { x:0, y:cy0 + controlsH, w:cw, h:statsH };
+  const controlsRect = { x:0, y:ctrlY0, w:cw, h:controlsH };
+  const statsRect = { x:0, y:ctrlY0 + controlsH, w:cw, h:statsH };
   const btnSize = Math.min(180, Math.max(56, Number(options.buttonSizePx) || 85));
   const joySize = Math.min(220, Math.max(72, Math.round(Number(options.joySizePx) || 110)));
   const giveSize = Math.round(Math.max(48, btnSize * 0.72));
@@ -3347,8 +3362,8 @@ function portraitLayout(){
   const sprintSize = Math.round(Math.max(48, btnSize * 0.68));
   const padL = 10, padR = 10;
   const menuH = 44;
-  let dockBot = cy0 + Math.round(controlsH * 0.66);
-  const minMoveTop = cy0 + menuH + 10;
+  let dockBot = ctrlY0 + Math.round(controlsH * 0.66);
+  const minMoveTop = ctrlY0 + menuH + 10;
   if(dockBot - joySize < minMoveTop) dockBot = minMoveTop + joySize;
   const moveRect = { left:padL, top:dockBot - joySize, width:joySize, height:joySize };
   const giveRect = {
@@ -3367,16 +3382,10 @@ function portraitLayout(){
   const menuW = Math.round(Math.min(160, cw * 0.42));
   const menuRect = {
     left: Math.round((cw - menuW) / 2),
-    top: Math.round(cy0 + 6),
+    top: Math.round(ctrlY0 + 6),
     width: menuW, height: menuH
   };
-  const yOff = Number(options.controlsYOffsetPx) || 0;
-  moveRect.top += yOff;
-  giveRect.top += yOff;
-  lookRect.top += yOff;
-  sprintRect.top += yOff;
-  menuRect.top += yOff;
-  return { fpvRect, minimapRect, statsRect, controlsRect, moveRect, giveRect, sprintRect, lookRect, menuRect };
+  return { fpvRect, minimapRect, statsRect, controlsRect, moveRect, giveRect, sprintRect, lookRect, menuRect, controlsYOffsetApplied: yClamp };
 }
 function drawPortraitDashboardChrome(){
   if(!mobileMode || !isMobilePortrait()) return;
@@ -3518,6 +3527,8 @@ function frame(now){
     if(state===STATE.PLAY && !paused){
       drawPortraitDashboardChrome();
       drawHUD(now); drawMinap();
+    } else if(state===STATE.PLAY && paused && mobileMode && isMobilePortrait()){
+      drawPortraitDashboardChrome();
     }
     drawOverlays();
     drawMobileMenu();
