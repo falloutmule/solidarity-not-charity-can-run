@@ -436,13 +436,13 @@ const BASE_MOBILE_TURN_SENS = 0.0062; // per-pixel rad; 1.0x ≈ prior MED. Port
 const LOOK_SPEED_STEPS = [0.75,1,1.25,1.5,2,2.5,3,4,5,6,8,10];
 const PORTRAIT_LOOK_BOOST = 1.72; // small LOOK circle needs more gain than landscape drag zone
 const LEGACY_LOOK_TO_SPEED = {low:0.75, med:1, high:1.5, fast:2.5};
-const JOY_SIZE_STEPS = [90,110,130,150];
-const BTN_SIZE_STEPS = [70,85,100,115];
+const JOY_SIZE_STEPS = [80, 90, 100, 110, 120, 130, 140, 150, 165, 180, 200, 220];
+const BTN_SIZE_STEPS = [60, 70, 80, 85, 95, 100, 110, 120, 130, 145, 160, 175];
 const OPACITY_STEPS = [0.30,0.45,0.60,0.75];
 const DEADZONE_STEPS = [4,8,12,16];
 const MINIMAP_SIZE_STEPS = [68,82,96];
-const LEGACY_SIZE_TO_JOY = {small:90, med:110, large:130};
-const LEGACY_SIZE_TO_BTN = {small:70, med:85, large:100};
+const LEGACY_SIZE_TO_JOY = {small:90, med:110, large:150};
+const LEGACY_SIZE_TO_BTN = {small:70, med:85, large:120};
 const LEGACY_OPACITY = {low:0.30, med:0.60, high:0.75};
 const LEGACY_DEADZONE = {low:4, med:8, high:12};
 const LEGACY_MAP_SIZE = {small:68, med:82, large:96};
@@ -1594,8 +1594,8 @@ const options = {
     this.touchDeadzonePx = nearestStep(this.touchDeadzonePx, DEADZONE_STEPS);
     this.mobileTurnSens = lookSensFromSpeed(this.lookSpeed);
     this.mobileLook = this.lookSpeed>=2.5?'fast':this.lookSpeed>=1.5?'high':this.lookSpeed<=0.75?'low':'med';
-    this.joySize = this.joySizePx>=130?'large':this.joySizePx<=90?'small':'med';
-    this.buttonSize = this.buttonSizePx>=100?'large':this.buttonSizePx<=70?'small':'med';
+    this.joySize = this.joySizePx>=165?'large':this.joySizePx<=95?'small':'med';
+    this.buttonSize = this.buttonSizePx>=120?'large':this.buttonSizePx<=75?'small':'med';
     this.controlOpacity = this.controlOpacityValue>=0.75?'high':this.controlOpacityValue<=0.30?'low':'med';
     this.minimapSize = this.minimapSizePx>=96?'large':this.minimapSizePx<=68?'small':'med';
     this.touchDeadzone = this.touchDeadzonePx>=12?'high':this.touchDeadzonePx<=4?'low':'med';
@@ -3265,11 +3265,11 @@ function portraitLayout(){
   const minimapRect = { x:0, y:fpvH, w:cw, h:miniH };
   const statsRect = { x:0, y:fpvH + miniH, w:cw, h:statsH };
   const controlsRect = { x:0, y:cy0, w:cw, h:controlsH };
-  const btnSize = Number(options.buttonSizePx) || 85;
-  const joySize = Math.round(Math.max(108, (Number(options.joySizePx) || 110) * 1.08));
-  const giveSize = Math.round(Math.max(58, btnSize * 0.72));
-  const lookSize = Math.round(Math.max(98, btnSize * 1.18));
-  const sprintSize = Math.round(Math.max(56, btnSize * 0.68));
+  const btnSize = Math.min(180, Math.max(56, Number(options.buttonSizePx) || 85));
+  const joySize = Math.min(220, Math.max(72, Math.round(Number(options.joySizePx) || 110)));
+  const giveSize = Math.round(Math.max(48, btnSize * 0.72));
+  const lookSize = Math.round(Math.max(72, btnSize * 1.18));
+  const sprintSize = Math.round(Math.max(48, btnSize * 0.68));
   const padL = 10, padR = 10;
   const dockBot = cy0 + controlsH - 6;
   const moveRect = { left:padL, top:dockBot - joySize, width:joySize, height:joySize };
@@ -3287,10 +3287,11 @@ function portraitLayout(){
     width: sprintSize, height: sprintSize
   };
   const menuW = Math.round(Math.min(160, cw * 0.42));
-  const menuH = 48;
+  const menuH = 44;
+  const statsBot = fpvH + miniH + statsH;
   const menuRect = {
     left: Math.round((cw - menuW) / 2),
-    top: Math.round(cy0 + controlsH * 0.56),
+    top: Math.round(statsBot + 4),
     width: menuW, height: menuH
   };
   return { fpvRect, minimapRect, statsRect, controlsRect, moveRect, giveRect, sprintRect, lookRect, menuRect };
