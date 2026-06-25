@@ -440,13 +440,18 @@ const JOY_SIZE_STEPS = [80, 90, 100, 110, 120, 130, 140, 150, 165, 180, 200, 220
 const BTN_SIZE_STEPS = [60, 70, 80, 85, 95, 100, 110, 120, 130, 145, 160, 175];
 const LOOK_PAD_SIZE_STEPS = [72, 88, 100, 112, 128, 144, 160, 176, 200, 220, 240];
 /** Positive = controls lower on screen; negative = higher. */
-const CONTROL_Y_STEPS = [60, 0, -30, -60];
+const CONTROL_Y_STEPS = [80, 0, -55, -110];
 function controlHeightLabel(px){
   const v = Number(px) || 0;
-  if(v >= 45) return 'LOW';
+  if(v >= 40) return 'LOW';
   if(v === 0) return 'MID';
-  if(v <= -45) return 'VERY HIGH';
+  if(v <= -85) return 'VERY HIGH';
   return 'HIGH';
+}
+function controlHeightMenuLabel(px){
+  const v = Number(px) || 0;
+  const sign = v > 0 ? `+${v}` : String(v);
+  return `${controlHeightLabel(v)} (${sign}px)`;
 }
 const OPACITY_STEPS = [0.30,0.45,0.60,0.75];
 const DEADZONE_STEPS = [4,8,12,16];
@@ -1118,19 +1123,24 @@ function drawMobileMenu(){
   }
   const playControls = mobileMode && state===STATE.PLAY && !paused;
   const portraitPlay = playControls && isMobilePortrait();
+  const portraitOptsPreview = mobileMode && state===STATE.OPTIONS && isMobilePortrait();
+  const showPortraitControls = portraitPlay || portraitOptsPreview;
   const mob = document.getElementById('mob');
   if(mob) mob.style.pointerEvents = playControls ? 'auto' : 'none';
-  ['ml','mlookpad','mg','ms','mp'].forEach(id=>{
+  ['ml','mlookpad','mg','ms'].forEach(id=>{
     const el=document.getElementById(id);
-    if(el) el.style.display = playControls ? 'flex' : 'none';
+    if(el) el.style.display = showPortraitControls ? 'flex' : (playControls ? 'flex' : 'none');
   });
-  const mmEl = document.getElementById('mm');
-  if(mmEl) mmEl.style.display = (playControls && !isMobilePortrait()) ? 'flex' : 'none';
+  const mpEl = document.getElementById('mp');
+  if(mpEl) mpEl.style.display = (playControls && !isMobilePortrait()) ? 'flex' : 'none';
+  if(showPortraitControls) applyMobileControlSettings();
   const menuEl = document.getElementById('mportmenu');
   if(menuEl){
-    menuEl.style.display = portraitPlay ? 'flex' : 'none';
-    menuEl.classList.toggle('por-show', !!portraitPlay);
+    menuEl.style.display = (portraitPlay || portraitOptsPreview) ? 'flex' : 'none';
+    menuEl.classList.toggle('por-show', !!(portraitPlay || portraitOptsPreview));
   }
+  const mmEl = document.getElementById('mm');
+  if(mmEl) mmEl.style.display = (playControls && !isMobilePortrait()) ? 'flex' : 'none';
   const mrEl = document.getElementById('mr');
   if(mrEl) mrEl.style.display = (playControls && !isMobilePortrait()) ? 'flex' : 'none';
 
@@ -1149,9 +1159,10 @@ function drawMobileMenu(){
     return;
   }
 
-  // Large mobile layouts use canvas menus for title/meta screens.
-  if(innerWidth >= 600 && innerHeight >= 400){
-    if(state === STATE.TITLE || state === STATE.SEEDED || state === STATE.STATS || state === STATE.LB || state === STATE.OPTIONS){
+  // Large desktop layouts use canvas menus for title/meta screens (mobile always uses rmenu HTML).
+  const metaRmenu = state === STATE.TITLE || state === STATE.SEEDED || state === STATE.STATS || state === STATE.LB || state === STATE.OPTIONS;
+  if(!mobileMode && innerWidth >= 600 && innerHeight >= 400){
+    if(metaRmenu){
       rmenuHide();
       syncLookHintUI();
       return;
@@ -1249,7 +1260,7 @@ function drawMobileMenu(){
         <div class="rit" data-action="option-joy">JOY SIZE: ${options.joySizePx}</div>
         <div class="rit" data-action="option-buttons">BUTTON SIZE: ${options.buttonSizePx}</div>
         <div class="rit" data-action="option-looksize">LOOK SIZE: ${options.lookSizePx}</div>
-        <div class="rit" data-action="option-ctrlheight">CONTROL HEIGHT: ${controlHeightLabel(options.controlsYOffsetPx)}</div>
+        <div class="rit" data-action="option-ctrlheight">CONTROL HEIGHT: ${controlHeightMenuLabel(options.controlsYOffsetPx)}</div>
         <div class="rit" data-action="option-opacity">OPACITY: ${percentLabel(options.controlOpacityValue)}</div>
         <div class="rit" data-action="option-mapsize">MAP SIZE: ${options.minimapSizePx}</div>
         <div class="rit" data-action="option-deadzone">DEADZONE: ${options.touchDeadzonePx}</div>
@@ -2721,6 +2732,18 @@ function isMenuState(s){
 addEventListener('keyup',e=>{ keys[e.code]=false; });
 
 let locked=false;
+function handleMenuPointer(clientY){
+  const menuState = isMenuState(state) || (paused && state===STATE.PLAY);
+  if(menuState && state!==STATE.LB){
+    const idx = Math.floor((clientY - menuHit.startY) / menuHit.itemH);
+    if(idx>=0 && idx<menuHit.count){
+      menuSel = idx;
+      menuActivate();
+      return true;
+    }
+  }
+  return false;
+}
 view.addEventListener('mousedown',e=>{
   // confirmation click
   if(confirmAction){
@@ -2733,15 +2756,7 @@ view.addEventListener('mousedown',e=>{
     }
     return;
   }
-  const menuState = isMenuState(state) || (paused && state===STATE.PLAY);
-  if(menuState && state!==STATE.LB){
-    const idx = Math.floor((e.clientY - menuHit.startY) / menuHit.itemH);
-    if(idx>=0 && idx<menuHit.count){
-      menuSel = idx;
-      menuActivate();
-      return;
-    }
-  }
+  if(handleMenuPointer(e.clientY)) return;
   if(state===STATE.TITLE){
     const items=titleMenuItems();
     if(menuSel>=0 && menuSel<items.length && items[menuSel].enabled!==false){
@@ -2756,6 +2771,11 @@ view.addEventListener('mousedown',e=>{
     else giveCan();
   }
 });
+view.addEventListener('touchstart', e=>{
+  if(confirmAction) return;
+  if(e.touches.length !== 1) return;
+  if(handleMenuPointer(e.touches[0].clientY)) e.preventDefault();
+},{passive:false});
 document.addEventListener('pointerlockchange',()=>{ locked = document.pointerLockElement===view; });
 addEventListener('mousemove',e=>{
   if(locked && state===STATE.PLAY && !paused) player.angle += e.movementX*options.mouseSens;
@@ -2793,10 +2813,12 @@ function startRun(useSeed){
   lookHintUsed = false; lookHintShownAt = performance.now();
   initRunTracking(seed);
   SAVE.save();
+  applyMobileControlSettings();
 }
 function continueRun(){
   if(SAVE.load()){
     setMsg('Run continued — District '+game.district);
+    applyMobileControlSettings();
   } else {
     setMsg('No valid save found');
   }
@@ -3091,7 +3113,7 @@ function drawOverlays(){
       {label:'JOYSTICK SIZE: '+options.joySizePx},
       {label:'BUTTON SIZE: '+options.buttonSizePx},
       {label:'LOOK PAD SIZE: '+options.lookSizePx},
-      {label:'CONTROL HEIGHT: '+controlHeightLabel(options.controlsYOffsetPx)},
+      {label:'CONTROL HEIGHT: '+controlHeightMenuLabel(options.controlsYOffsetPx)},
       {label:'CONTROL OPACITY: '+percentLabel(options.controlOpacityValue)},
       {label:'MINIMAP SIZE: '+options.minimapSizePx},
       {label:'TOUCH DEADZONE: '+options.touchDeadzonePx},
