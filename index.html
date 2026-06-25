@@ -98,9 +98,9 @@
     z-index:12; /* same level as buttons */
   }
   #mlookpadhint{
-    font:bold 10px monospace;letter-spacing:1px;color:rgba(200,180,120,0.30);
+    font:bold 9px monospace;letter-spacing:0.5px;color:rgba(230,210,150,0.85);
     pointer-events:none;user-select:none;text-shadow:0 1px 4px rgba(0,0,0,0.7);
-    text-align:center;
+    text-align:center;transform:rotate(-28deg);line-height:1.1;
   }
   /* ---- touch debug overlay ---- */
   #touchdebug{
@@ -519,8 +519,8 @@ function applyMobileControlSettings(){
     placeRect(mlookpad, L.lookRect);
     placeRect(mportmenu, L.menuRect);
     if(mg) mg.style.fontSize = Math.max(9, Math.round(L.giveRect.width * 0.15)) + 'px';
-    if(ms){ ms.style.fontSize = Math.max(8, Math.round(L.sprintRect.width * 0.11)) + 'px'; ms.style.zIndex = '14'; }
-    if(mlookpad){ mlookpad.style.zIndex = '18'; mlookpad.style.fontSize = '8px'; }
+    if(ms){ ms.style.fontSize = Math.max(8, Math.round(L.sprintRect.width * 0.14)) + 'px'; ms.style.zIndex = '19'; }
+    if(mlookpad){ mlookpad.style.zIndex = '16'; mlookpad.style.fontSize = '9px'; }
     if(mportmenu) mportmenu.classList.add('por-show');
     if(mob) mob.classList.add('portrait-hide-map');
     if(mm){ mm.style.display = 'none'; mm.style.pointerEvents = 'none'; }
@@ -2251,11 +2251,17 @@ function drawMinap(){
   if(mobileMode && portraitMini){
     const L = portraitLayout();
     const mr = L.minimapRect;
-    const inset = 8;
-    cell = Math.min((mr.w - inset * 2) / game.MAP_W, (mr.h - inset * 2) / game.MAP_H);
+    const inset = 6;
+    const availW = mr.w - inset * 2;
+    const availH = mr.h - inset * 2;
+    cell = availW / game.MAP_W;
+    H = game.MAP_H * cell;
+    if(H > availH){
+      cell = availH / game.MAP_H;
+    }
     W = game.MAP_W * cell;
     H = game.MAP_H * cell;
-    ox = Math.round(mr.x + (mr.w - W) / 2);
+    ox = Math.round(mr.x + inset);
     oy = Math.round(mr.y + (mr.h - H) / 2);
     ctx.fillStyle = '#050403';
     ctx.fillRect(mr.x, mr.y, mr.w, mr.h);
@@ -2265,8 +2271,10 @@ function drawMinap(){
     ox = mobileMode && portraitMini ? Math.round((innerWidth-W)/2) : innerWidth - W - pad - (mobileMode ? 4 : 0);
     oy = mobileMode && portraitMini ? Math.round(innerHeight - H - 22) : pad + (mobileMode ? 48 : 0);
   }
-  ctx.fillStyle='rgba(20,16,12,0.7)'; ctx.fillRect(ox-3,oy-3,W+6,H+6);
-  ctx.strokeStyle='rgba(180,150,100,0.4)'; ctx.lineWidth=1; ctx.strokeRect(ox-3,oy-3,W+6,H+6);
+  if(!(mobileMode && portraitMini)){
+    ctx.fillStyle='rgba(20,16,12,0.7)'; ctx.fillRect(ox-3,oy-3,W+6,H+6);
+    ctx.strokeStyle='rgba(180,150,100,0.4)'; ctx.lineWidth=1; ctx.strokeRect(ox-3,oy-3,W+6,H+6);
+  }
   for(let y=0;y<game.MAP_H;y++) for(let x=0;x<game.MAP_W;x++){
     const v=game.map[y][x];
     if(v!==0){
@@ -3249,8 +3257,8 @@ function rectsOverlap(a,b){
 function portraitLayout(){
   const { cw, ch } = layoutCssSize();
   const fpvH = portraitPlayH();
-  const miniH = Math.round(Math.max(132, ch * 0.195));
-  const statsH = Math.round(Math.max(68, ch * 0.088));
+  const miniH = Math.round(Math.max(150, ch * 0.265));
+  const statsH = Math.round(Math.max(64, ch * 0.082));
   const controlsH = Math.max(118, ch - fpvH - miniH - statsH);
   const cy0 = fpvH + miniH + statsH;
   const fpvRect = { x:0, y:0, w:cw, h:fpvH };
@@ -3258,27 +3266,31 @@ function portraitLayout(){
   const statsRect = { x:0, y:fpvH + miniH, w:cw, h:statsH };
   const controlsRect = { x:0, y:cy0, w:cw, h:controlsH };
   const btnSize = Number(options.buttonSizePx) || 85;
-  const joySize = Math.round(Math.max(102, (Number(options.joySizePx) || 110) * 1.02));
-  const giveSize = Math.round(Math.max(56, btnSize * 0.68));
-  const sprintSize = Math.round(Math.max(92, btnSize * 1.12));
-  const lookSize = Math.round(Math.max(64, sprintSize * 0.68));
-  const padL = 10, padR = 10, padT = 10;
+  const joySize = Math.round(Math.max(108, (Number(options.joySizePx) || 110) * 1.08));
+  const giveSize = Math.round(Math.max(58, btnSize * 0.72));
+  const lookSize = Math.round(Math.max(98, btnSize * 1.18));
+  const sprintSize = Math.round(Math.max(56, btnSize * 0.68));
+  const padL = 10, padR = 10;
   const dockBot = cy0 + controlsH - 6;
   const moveRect = { left:padL, top:dockBot - joySize, width:joySize, height:joySize };
-  const giveRect = { left:padL + 2, top:cy0 + padT + 4, width:giveSize, height:giveSize };
-  const sprintLeft = cw - padR - sprintSize;
-  const sprintTop = dockBot - sprintSize + 2;
-  const sprintRect = { left:sprintLeft, top:sprintTop, width:sprintSize, height:sprintSize };
-  const lookRect = {
-    left: sprintLeft - Math.round(lookSize * 0.38),
-    top: sprintTop - Math.round(lookSize * 0.52),
-    width: lookSize, height: lookSize
+  const giveRect = {
+    left: moveRect.left + Math.round((joySize - giveSize) * 0.5),
+    top: moveRect.top - giveSize - 12,
+    width: giveSize, height: giveSize
+  };
+  const lookLeft = cw - padR - lookSize;
+  const lookTop = dockBot - lookSize + 2;
+  const lookRect = { left:lookLeft, top:lookTop, width:lookSize, height:lookSize };
+  const sprintRect = {
+    left: lookLeft + Math.round(lookSize * 0.40),
+    top: lookTop - Math.round(sprintSize * 0.42),
+    width: sprintSize, height: sprintSize
   };
   const menuW = Math.round(Math.min(160, cw * 0.42));
   const menuH = 48;
   const menuRect = {
     left: Math.round((cw - menuW) / 2),
-    top: Math.round(cy0 + controlsH * 0.82),
+    top: Math.round(cy0 + controlsH * 0.56),
     width: menuW, height: menuH
   };
   return { fpvRect, minimapRect, statsRect, controlsRect, moveRect, giveRect, sprintRect, lookRect, menuRect };
