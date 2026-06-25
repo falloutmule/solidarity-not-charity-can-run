@@ -33,6 +33,7 @@
   }
   #fstoast.show{display:block;opacity:1;}
   #view{display:block;position:fixed;top:0;left:0;image-rendering:pixelated;touch-action:none;}
+  #view.mob-touch-through{pointer-events:none;}
   /* ---- mobile control overlay ---- */
   #mob{
     display:none;position:fixed;top:0;left:0;width:100%;height:100%;
@@ -88,6 +89,7 @@
   #mportmenu .mportmenu-b{font-size:10px;letter-spacing:1px;color:#8a6060;font-weight:bold;}
   #mob.show #mportmenu.por-show{display:flex;}
   #mob.portrait-hide-map #mm{display:none !important;pointer-events:none !important;}
+  #mob.show #mp{display:none !important;pointer-events:none !important;}
   #mp{top:16px;left:16px;width:52px;height:38px;font-size:10px;z-index:14;}
   .mhw{width:38px;height:38px;border-radius:6px;}
   /* Portrait LOOK pad: dedicated circular LOOK control on right side */
@@ -427,7 +429,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'hall1';
+const BUILD_ID = 'move1';
 let mobileMode = false; // true = show mobile overlay, hide desktop cursor
 let mobileOverride = null; // null=auto, 'on', 'off'
 let portHintShown = false;
@@ -574,14 +576,7 @@ function applyMobileControlSettings(){
     if(mportmenu) mportmenu.classList.add('por-show');
     if(mob) mob.classList.add('portrait-hide-map');
     if(mm){ mm.style.display = 'none'; mm.style.pointerEvents = 'none'; }
-    const fpv = L.fpvRect;
-    const mapBtnW = Math.round(btnSize * 0.78), mapBtnH = Math.round(btnSize * 0.55);
-    if(mp){
-      mp.style.width = mapBtnW + 'px'; mp.style.height = mapBtnH + 'px';
-      mp.style.left = '10px'; mp.style.top = (fpv.y + 8) + 'px';
-      mp.style.right = 'auto'; mp.style.bottom = 'auto';
-      mp.style.display = 'flex';
-    }
+    if(mp){ mp.style.display = 'none'; mp.style.pointerEvents = 'none'; }
   } else {
     const mob = document.getElementById('mob');
     const mportmenu = document.getElementById('mportmenu');
@@ -613,7 +608,7 @@ function applyMobileControlSettings(){
     if(mg){ mg.style.top='42%'; mg.style.bottom='auto'; mg.style.transform='translateY(calc(-50% + '+(-yOffL)+'px))'; }
     if(ms){ ms.style.top='68%'; ms.style.right='30px'; ms.style.transform='translateY(calc(-50% + '+(-yOffL)+'px))'; }
     if(mm){ mm.style.width=Math.round(btnSize*0.78)+'px'; mm.style.height=Math.round(btnSize*0.55)+'px'; mm.style.right='8px'; mm.style.top='12px'; mm.style.left='auto'; mm.style.bottom='auto'; mm.style.transform='none'; }
-    if(mp){ mp.style.width=Math.round(btnSize*0.78)+'px'; mp.style.height=Math.round(btnSize*0.55)+'px'; mp.style.left='10px'; mp.style.top='10px'; mp.style.right='auto'; mp.style.bottom='auto'; }
+    if(mp){ mp.style.display='none'; mp.style.pointerEvents='none'; }
   }
   if(mr){
     if(portrait){
@@ -921,28 +916,42 @@ function bindMobileControls(){
     inp.map = false; mmin.classList.remove('pr');
   },{passive:false});
 
-  // ---- PAUSE button ----
+  // ---- PAUSE button (desktop landscape only; hidden on all phone UI) ----
   mpa.addEventListener('touchstart', e=>{
+    if(mobileMode) return;
     e.preventDefault(); e.stopPropagation();
     inp.pause = true; mpa.classList.add('pr');
   },{passive:false});
   mpa.addEventListener('touchend', e=>{
+    if(mobileMode) return;
     e.preventDefault(); e.stopPropagation();
     inp.pause = false; mpa.classList.remove('pr');
   },{passive:false});
   if(mportmenu){
+    const openPauseFromMenu = ()=>{
+      if(state!==STATE.PLAY) return;
+      if(!paused){
+        paused=true; SAVE.save(); beep(440,0.06,'sine',0.03);
+        drawMobileMenu();
+      }
+    };
     mportmenu.addEventListener('touchstart', e=>{
       e.preventDefault(); e.stopPropagation();
-      inp.pause = true; mportmenu.classList.add('pr');
+      mportmenu.classList.add('pr');
     },{passive:false});
     mportmenu.addEventListener('touchend', e=>{
       e.preventDefault(); e.stopPropagation();
-      inp.pause = false; mportmenu.classList.remove('pr');
+      mportmenu.classList.remove('pr');
+      openPauseFromMenu();
     },{passive:false});
     mportmenu.addEventListener('touchcancel', e=>{
       e.preventDefault(); e.stopPropagation();
-      inp.pause = false; mportmenu.classList.remove('pr');
+      mportmenu.classList.remove('pr');
     },{passive:false});
+    mportmenu.addEventListener('click', e=>{
+      e.preventDefault(); e.stopPropagation();
+      openPauseFromMenu();
+    });
   }
   const clearHeldButtons=()=>{
     inp.give=false; inp.sprint=false; inp.map=false; inp.pause=false;
@@ -955,7 +964,8 @@ function bindMobileControls(){
   // ---- global touchmove: route joystick, landscape turn zone, LOOK circle (multi-touch) ----
   document.addEventListener('touchmove', e=>{
     let handled = false;
-    for(const t of e.changedTouches){
+    const track = e.touches && e.touches.length ? e.touches : e.changedTouches;
+    for(const t of track){
       if(t.identifier === joy.id && joy.active){
         handled = true;
         const dx = t.clientX - joy.sx, dy = t.clientY - joy.sy;
@@ -964,7 +974,7 @@ function bindMobileControls(){
         const d = Math.sqrt(dx*dx+dy*dy);
         joy.dist = Math.min(d, MAX) / MAX;
         const dead = Number(options.touchDeadzonePx)||8;
-        if(d < dead){ joy.ang = 0; joy.x = 0; joy.y = 0; }
+        if(d < dead){ joy.ang = 0; joy.x = 0; joy.y = 0; joy.dist = 0; }
         else { joy.ang = Math.atan2(dx, -dy); joy.x = Math.sin(joy.ang)*joy.dist; joy.y = Math.cos(joy.ang)*joy.dist; }
         updateJoyDot(joy.x, joy.y);
       }
@@ -1186,7 +1196,12 @@ function drawMobileMenu(){
     if(el) el.style.display = (showPortraitControls || showLandscapeControlsPreview) ? 'flex' : (playControls ? 'flex' : 'none');
   });
   const mpEl = document.getElementById('mp');
-  if(mpEl) mpEl.style.display = ((playControls || pauseTunePreview) && !isMobilePortrait()) ? 'flex' : 'none';
+  if(mpEl){
+    mpEl.style.display = 'none';
+    mpEl.style.pointerEvents = 'none';
+  }
+  const viewEl = document.getElementById('view');
+  if(viewEl) viewEl.classList.toggle('mob-touch-through', !!(mobileMode && (playControls || pauseTunePreview)));
   if(showPortraitControls || showLandscapeControlsPreview || playControls || pauseTunePreview) applyMobileControlSettings();
   const menuEl = document.getElementById('mportmenu');
   if(menuEl){
@@ -3136,10 +3151,18 @@ function update(dt){
   const fx=Math.cos(player.angle), fy=Math.sin(player.angle);
   const rx=Math.cos(player.angle+Math.PI/2), ry=Math.sin(player.angle+Math.PI/2);
   let dx=0, dy=0;
-  if(keys['KeyW']||keys['ArrowUp']   ||inp.fwd)  { dx+=fx; dy+=fy; }
-  if(keys['KeyS']||keys['ArrowDown'] ||inp.back) { dx-=fx; dy-=fy; }
-  if(keys['KeyD']||keys['ArrowRight']||inp.right){ dx+=rx; dy+=ry; }
-  if(keys['KeyA']||keys['ArrowLeft'] ||inp.left) { dx-=rx; dy-=ry; }
+  if(mobileMode && joy.active && joy.dist > 0.05){
+    const s = joy.dist;
+    dx += fx * joy.y * s;
+    dy += fy * joy.y * s;
+    dx += rx * joy.x * s;
+    dy += ry * joy.x * s;
+  } else {
+    if(keys['KeyW']||keys['ArrowUp']   ||inp.fwd)  { dx+=fx; dy+=fy; }
+    if(keys['KeyS']||keys['ArrowDown'] ||inp.back) { dx-=fx; dy-=fy; }
+    if(keys['KeyD']||keys['ArrowRight']||inp.right){ dx+=rx; dy+=ry; }
+    if(keys['KeyA']||keys['ArrowLeft'] ||inp.left) { dx-=rx; dy-=ry; }
+  }
   const len=Math.hypot(dx,dy)||1; dx=dx/len*mv; dy=dy/len*mv;
   if(canStand(player.x+dx, player.y)) player.x+=dx;
   if(canStand(player.x, player.y+dy)) player.y+=dy;
