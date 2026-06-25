@@ -129,7 +129,7 @@
   }
   .rpan.in{display:none;}
   .rpan.options-tune{
-    background:rgba(10,8,5,0.42);
+    background:rgba(10,8,5,0.72);
     justify-content:flex-start;
     padding-top:max(12px, env(safe-area-inset-top, 0px));
   }
@@ -427,7 +427,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'ctrlh5';
+const BUILD_ID = 'ctrlh6';
 let mobileMode = false; // true = show mobile overlay, hide desktop cursor
 let mobileOverride = null; // null=auto, 'on', 'off'
 let portHintShown = false;
@@ -3064,9 +3064,13 @@ function drawTitleArt(){
 }
 function drawOverlays(){
   const cx=innerWidth/2;
+  const canvasMenus = !mobileMode;
   // --- TITLE SCREEN ---
   if(state===STATE.TITLE){
     drawTitleArt();
+    if(!canvasMenus){
+      return;
+    }
     big('Solidarity Not Charity', cx, 130, '#ffd24a');
     big('Can Run', cx, 170, '#ffd24a');
     sub('A desert-city food run', cx, 210, '#ffe0a0');
@@ -3079,6 +3083,7 @@ function drawOverlays(){
   }
   // --- SEEDED RUN ---
   else if(state===STATE.SEEDED){
+    if(canvasMenus){
     dim();
     big('SEEDED RUN', cx, 120, '#ffd24a');
     sub('Enter a numeric seed to reproduce the exact same city layout', cx, 160, '#b8a878');
@@ -3089,9 +3094,11 @@ function drawOverlays(){
     ];
     menuSel=clampMenu(menuSel, 0, items.length-1);
     drawMenuList(items, cx, 220, 3);
+    }
   }
   // --- STATS ---
   else if(state===STATE.STATS){
+    if(canvasMenus){
     dim();
     big('STATISTICS', cx, 80, '#ffd24a');
     const s=stats.data;
@@ -3117,9 +3124,11 @@ function drawOverlays(){
     menuSel=clampMenu(menuSel, 0, items.length-1);
     if(menuSel===1){ items[1].action=()=>confirmAction={msg:'Reset all stats? This cannot be undone.', onYes:()=>stats.reset(), onNo:()=>{}}; }
     drawMenuList(items, cx, 120+L.length*22+20, items.length);
+    }
   }
   // --- LEADERBOARDS ---
   else if(state===STATE.LB){
+    if(canvasMenus){
     dim();
     big('LEADERBOARDS', cx, 80, '#ffd24a');
     const boards=[
@@ -3156,9 +3165,11 @@ function drawOverlays(){
       }
     }
     sub('[1] Best Scores  [2] Fastest  [3] District  · ENTER back', cx, innerHeight-30, '#8a7a5a');
+    }
   }
   // --- OPTIONS / HELP ---
   else if(state===STATE.OPTIONS){
+    if(canvasMenus){
     dim();
     big('OPTIONS & HELP', cx, 80, '#ffd24a');
     const optItems=[
@@ -3191,9 +3202,11 @@ function drawOverlays(){
     ];
     for(let i=0;i<help.length;i++) ctx.fillText(help[i], cx, innerHeight-90+i*16);
     ctx.textAlign='left';
+    }
   }
   // --- UPGRADE (existing, preserved) ---
   else if(state===STATE.UPGRADE){
+    if(canvasMenus){
     dim();
     big('DISTRICT '+game.district+' CLEARED', cx, 100, '#9cf09a');
     sub('Score so far: '+game.totalScore+'   (modifier x'+game.scoreMult+')', cx, 140);
@@ -3217,9 +3230,11 @@ function drawOverlays(){
       ctx.textAlign='left';
     }
     sub('pick an upgrade (1/2/3) to descend into the next district', cx, innerHeight/2+bh/2+40);
+    }
   }
   // --- RESULTS SCREEN ---
   else if(state===STATE.RESULTS){
+    if(canvasMenus){
     dim();
     const passed=game.run.completed;
     big(passed?'RUN COMPLETE!':'RUN OVER', cx, 90, passed?'#9cf09a':'#ff7a6a');
@@ -3241,9 +3256,11 @@ function drawOverlays(){
     const items=resultItems();
     menuSel=clampMenu(menuSel, 0, items.length-1);
     drawMenuList(items, cx, 130+L.length*22+20, items.length);
+    }
   }
   // --- PAUSE MENU ---
   if(paused && state===STATE.PLAY){
+    if(canvasMenus){
     dim();
     big('PAUSED', cx, innerHeight/2-130, '#ffd24a');
     const pi=pauseItems();
@@ -3254,6 +3271,7 @@ function drawOverlays(){
     ctx.fillText('District '+game.district+' · seed '+game.seed+' · ['+game.modifier+'] · score '+game.totalScore, cx, innerHeight/2+40);
     ctx.fillText('Save: '+(SAVE.hasValid()?'active':'none'), cx, innerHeight/2+60);
     ctx.textAlign='left';
+    }
   }
   // --- CONFIRMATION DIALOG (top-most) ---
   if(confirmAction){
