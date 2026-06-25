@@ -128,6 +128,12 @@
     padding: env(safe-area-inset-top,0) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0);
   }
   .rpan.in{display:none;}
+  .rpan.options-tune{
+    background:rgba(10,8,5,0.42);
+    justify-content:flex-start;
+    padding-top:max(12px, env(safe-area-inset-top, 0px));
+  }
+  .rpan.options-tune .rit{background:rgba(18,14,10,0.93);}
   .rpantit{
     font:bold 22px monospace;color:#e9d8b0;letter-spacing:2px;
     margin-bottom:18px;text-align:center;
@@ -421,7 +427,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'ctrlh4';
+const BUILD_ID = 'ctrlh5';
 let mobileMode = false; // true = show mobile overlay, hide desktop cursor
 let mobileOverride = null; // null=auto, 'on', 'off'
 let portHintShown = false;
@@ -482,7 +488,9 @@ function bumpControlHeight(){
   options.save();
   applyMobileControlSettings();
   _optionsMenuStamp++;
-  setMsg('CONTROL HEIGHT: '+controlHeightMenuLabel(options.controlsYOffsetPx));
+  const lbl = controlHeightMenuLabel(options.controlsYOffsetPx);
+  setMsg('CONTROL HEIGHT: ' + lbl);
+  showToast('CONTROL HEIGHT: ' + lbl, 2200);
   try { beep(520, 0.06, 'square', 0.04); } catch(_e){}
   drawMobileMenu();
 }
@@ -542,11 +550,8 @@ function applyMobileControlSettings(){
   const mlookpad=document.getElementById('mlookpad');
   function placeRect(el, rect){
     if(!el || !rect) return;
-    const vv = window.visualViewport;
-    const ox = (vv && vv.offsetLeft) ? Math.round(vv.offsetLeft) : 0;
-    const oy = (vv && vv.offsetTop) ? Math.round(vv.offsetTop) : 0;
-    el.style.left = (rect.left + ox) + 'px';
-    el.style.top = (rect.top + oy) + 'px';
+    el.style.left = rect.left + 'px';
+    el.style.top = rect.top + 'px';
     el.style.right = 'auto';
     el.style.bottom = 'auto';
     el.style.width = rect.width + 'px';
@@ -1148,7 +1153,6 @@ function rmenuAction(action){
     case 'pause-resume': paused=false; rmenuHide(); break;
     case 'pause-restart': paused=false; rmenuHide(); SAVE.clear(); restartRun(false); break;
     case 'pause-title': paused=false; rmenuHide(); state=STATE.TITLE; _rmSel=0; break;
-    case 'pause-ctrlheight': bumpControlHeight(); break;
     case 'upgrade-0': chooseUpgrade(0); break;
     case 'upgrade-1': chooseUpgrade(1); break;
     case 'upgrade-2': chooseUpgrade(2); break;
@@ -1214,6 +1218,7 @@ function drawMobileMenu(){
   }
 
   syncLookHintUI();
+  if(state !== STATE.OPTIONS) r.classList.remove('options-tune');
 
   // ── TITLE ──
   if(state === STATE.TITLE){
@@ -1296,12 +1301,13 @@ function drawMobileMenu(){
 
   // ── OPTIONS ──
   if(state === STATE.OPTIONS){
+    r.classList.toggle('options-tune', mobileMode && isMobilePortrait());
     rmenuShow();
     rmenuHTML(`
       <div class="rpantit">OPTIONS</div>
       <div class="rdesc" style="margin-bottom:8px;color:#6a5a4a;">build ${BUILD_ID}</div>
       <div class="rit ctrlheight-row" data-action="option-ctrlheight" style="margin:8px 18px 10px;">CONTROL HEIGHT: ${controlHeightMenuLabel(options.controlsYOffsetPx)}</div>
-      <div class="rdesc" style="margin:0 18px 6px;color:#7a6a50;">Tap row — watch sticks move behind this panel</div>
+      <div class="rdesc" style="margin:0 18px 6px;color:#7a6a50;">Tap row — whole control + map band moves (see through panel)</div>
       <div style="overflow-y:auto;max-height:58vh;width:100%;padding:0 18px;box-sizing:border-box;">
         <div class="rit" data-action="option-name">NAME: ${profile.name||'RUNNER'}</div>
         <div class="rit" data-action="option-look">LOOK SPEED: ${lookSpeedLabel(options.lookSpeed)}</div>
@@ -1362,7 +1368,6 @@ function drawMobileMenu(){
     rmenuHTML(`
       <div class="rpantit">PAUSED</div>
       <div class="rit sel" data-action="pause-resume">RESUME</div>
-      <div class="rit ctrlheight-row" data-action="pause-ctrlheight" style="margin-top:6px;">CONTROL HEIGHT: ${controlHeightMenuLabel(options.controlsYOffsetPx)}</div>
       <div class="rit" data-action="pause-restart" style="margin-top:6px;">RESTART RUN</div>
       <div class="rit" data-action="pause-title" style="margin-top:6px;">MAIN MENU</div>
       <div class="rit" data-action="toggle-fs" style="margin-top:6px;">${isFullscreen()?'EXIT FULLSCREEN':'FULLSCREEN'}</div>
@@ -3361,18 +3366,20 @@ function portraitLayout(){
   const fpvH = portraitPlayH();
   const miniH = Math.round(Math.max(150, ch * 0.265));
   const statsH = Math.round(Math.max(64, ch * 0.082));
-  const cy0Base = fpvH + miniH;
-  const roomBelowMini = Math.max(0, ch - cy0Base);
+  const statsY = ch - statsH;
   const yOff = Number(options.controlsYOffsetPx) || 0;
-  const maxUp = Math.min(Math.round(roomBelowMini * 0.38), 260);
-  const maxDown = Math.min(Math.round(roomBelowMini * 0.38), 260);
+  const minControlsH = 88;
+  const maxDown = Math.max(0, statsY - fpvH - miniH - minControlsH);
+  const maxUp = Math.min(Math.round(fpvH * 0.42 + miniH * 0.5), 300);
   const yClamp = Math.max(-maxUp, Math.min(maxDown, yOff));
-  const controlsH = Math.max(100, roomBelowMini - statsH - yClamp);
-  const ctrlY0 = cy0Base + yClamp;
+  const bandTop = fpvH + yClamp;
+  const minimapRect = { x:0, y:bandTop, w:cw, h:miniH };
+  const controlsY0 = bandTop + miniH;
+  const controlsH = Math.max(minControlsH, statsY - controlsY0);
+  const ctrlY0 = controlsY0;
   const fpvRect = { x:0, y:0, w:cw, h:fpvH };
-  const minimapRect = { x:0, y:fpvH, w:cw, h:miniH };
-  const controlsRect = { x:0, y:ctrlY0, w:cw, h:controlsH };
-  const statsRect = { x:0, y:ctrlY0 + controlsH, w:cw, h:statsH };
+  const controlsRect = { x:0, y:controlsY0, w:cw, h:controlsH };
+  const statsRect = { x:0, y:statsY, w:cw, h:statsH };
   const btnSize = Math.min(180, Math.max(56, Number(options.buttonSizePx) || 85));
   const joySize = Math.min(220, Math.max(72, Math.round(Number(options.joySizePx) || 110)));
   const giveSize = Math.round(Math.max(48, btnSize * 0.72));
@@ -3411,6 +3418,10 @@ function drawPortraitDashboardChrome(){
   const y0 = L.fpvRect.h;
   ctx.fillStyle = '#0c0a08';
   ctx.fillRect(0, y0, view.width, view.height - y0);
+  if(L.minimapRect.y > y0){
+    ctx.fillStyle = '#0c0a08';
+    ctx.fillRect(0, y0, view.width, L.minimapRect.y - y0);
+  }
   ctx.fillStyle = 'rgba(16,12,10,0.94)';
   ctx.fillRect(L.minimapRect.x, L.minimapRect.y, L.minimapRect.w, L.minimapRect.h);
   ctx.fillStyle = 'rgba(10,8,6,0.98)';
