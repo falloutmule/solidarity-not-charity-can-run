@@ -2263,10 +2263,6 @@ function drawMinap(){
     const availW = mr.w - inset * 2;
     const availH = mr.h - inset * 2;
     cell = availW / game.MAP_W;
-    H = game.MAP_H * cell;
-    if(H > availH){
-      cell = availH / game.MAP_H;
-    }
     W = game.MAP_W * cell;
     H = game.MAP_H * cell;
     ox = Math.round(mr.x + inset);
@@ -2275,6 +2271,10 @@ function drawMinap(){
     ctx.fillRect(mr.x, mr.y, mr.w, mr.h);
     ctx.strokeStyle = 'rgba(35,110,210,0.95)'; ctx.lineWidth = 3;
     ctx.strokeRect(mr.x + 3, mr.y + 3, mr.w - 6, mr.h - 6);
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(mr.x + inset, mr.y + inset, availW, availH);
+    ctx.clip();
   } else {
     ox = mobileMode && portraitMini ? Math.round((innerWidth-W)/2) : innerWidth - W - pad - (mobileMode ? 4 : 0);
     oy = mobileMode && portraitMini ? Math.round(innerHeight - H - 22) : pad + (mobileMode ? 48 : 0);
@@ -2290,6 +2290,7 @@ function drawMinap(){
       ctx.fillRect(ox+x*cell, oy+y*cell, cell, cell);
     }
   }
+  if(mobileMode && portraitMini) ctx.restore();
   const dot = Math.max(2, cell*1.25);
   const revealCans = player.minimapLevel>=2 || game.revealT>0 || (player.radar && player.radarPingT>0);
   if(revealCans){
@@ -3281,7 +3282,10 @@ function portraitLayout(){
   const lookSize = Math.min(240, Math.max(64, Math.round(Number(options.lookSizePx) || btnSize * 1.18)));
   const sprintSize = Math.round(Math.max(48, btnSize * 0.68));
   const padL = 10, padR = 10;
-  const dockBot = cy0 + controlsH - 6;
+  const menuH = 44;
+  let dockBot = cy0 + Math.round(controlsH * 0.66);
+  const minMoveTop = cy0 + menuH + 10;
+  if(dockBot - joySize < minMoveTop) dockBot = minMoveTop + joySize;
   const moveRect = { left:padL, top:dockBot - joySize, width:joySize, height:joySize };
   const giveRect = {
     left: moveRect.left + Math.round((joySize - giveSize) * 0.5),
@@ -3297,7 +3301,6 @@ function portraitLayout(){
     width: sprintSize, height: sprintSize
   };
   const menuW = Math.round(Math.min(160, cw * 0.42));
-  const menuH = 44;
   const menuRect = {
     left: Math.round((cw - menuW) / 2),
     top: Math.round(cy0 + 6),
