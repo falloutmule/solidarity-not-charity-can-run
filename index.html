@@ -439,6 +439,15 @@ const LEGACY_LOOK_TO_SPEED = {low:0.75, med:1, high:1.5, fast:2.5};
 const JOY_SIZE_STEPS = [80, 90, 100, 110, 120, 130, 140, 150, 165, 180, 200, 220];
 const BTN_SIZE_STEPS = [60, 70, 80, 85, 95, 100, 110, 120, 130, 145, 160, 175];
 const LOOK_PAD_SIZE_STEPS = [72, 88, 100, 112, 128, 144, 160, 176, 200, 220, 240];
+/** Positive = controls lower on screen; negative = higher. */
+const CONTROL_Y_STEPS = [60, 0, -30, -60];
+function controlHeightLabel(px){
+  const v = Number(px) || 0;
+  if(v >= 45) return 'LOW';
+  if(v === 0) return 'MID';
+  if(v <= -45) return 'VERY HIGH';
+  return 'HIGH';
+}
 const OPACITY_STEPS = [0.30,0.45,0.60,0.75];
 const DEADZONE_STEPS = [4,8,12,16];
 const MINIMAP_SIZE_STEPS = [68,82,96];
@@ -540,16 +549,19 @@ function applyMobileControlSettings(){
     if(mob) mob.classList.remove('portrait-hide-map');
     if(mm){ mm.style.display = ''; mm.style.pointerEvents = ''; }
     if(ml){
-      ml.style.width=joySize+'px'; ml.style.height=joySize+'px'; ml.style.left='20px'; ml.style.bottom='30px';
+      ml.style.width=joySize+'px'; ml.style.height=joySize+'px'; ml.style.left='20px';
+      const yOff = Number(options.controlsYOffsetPx) || 0;
+      ml.style.bottom = Math.max(8, 30 - yOff) + 'px';
       ml.style.top='auto'; ml.style.right='auto'; ml.style.transform='none';
     }
     const lookSize = Math.min(240, Math.max(64, Math.round(Number(options.lookSizePx) || joySize * 0.72)));
+    const yOffL = Number(options.controlsYOffsetPx) || 0;
     if(mlookpad){
       mlookpad.style.width = lookSize + 'px';
       mlookpad.style.height = lookSize + 'px';
       mlookpad.style.left = 'auto';
       mlookpad.style.right = '16px';
-      mlookpad.style.bottom = '24px';
+      mlookpad.style.bottom = Math.max(8, 24 - yOffL) + 'px';
       mlookpad.style.top = 'auto';
       mlookpad.style.transform = 'none';
       mlookpad.style.opacity = '1';
@@ -558,8 +570,8 @@ function applyMobileControlSettings(){
       mlookpad.style.color = '#e9d8b0';
     }
     [mg,ms].forEach(el=>{ if(el){ el.style.width=btnSize+'px'; el.style.height=btnSize+'px'; el.style.fontSize=Math.max(9,Math.round(btnSize*0.15))+'px'; el.style.left='auto'; el.style.right='20px'; }});
-    if(mg){ mg.style.top='42%'; mg.style.bottom='auto'; mg.style.transform='translateY(-50%)'; }
-    if(ms){ ms.style.top='68%'; ms.style.right='30px'; ms.style.transform='translateY(-50%)'; }
+    if(mg){ mg.style.top='42%'; mg.style.bottom='auto'; mg.style.transform='translateY(calc(-50% + '+(-yOffL)+'px))'; }
+    if(ms){ ms.style.top='68%'; ms.style.right='30px'; ms.style.transform='translateY(calc(-50% + '+(-yOffL)+'px))'; }
     if(mm){ mm.style.width=Math.round(btnSize*0.78)+'px'; mm.style.height=Math.round(btnSize*0.55)+'px'; mm.style.right='8px'; mm.style.top='12px'; mm.style.left='auto'; mm.style.bottom='auto'; mm.style.transform='none'; }
     if(mp){ mp.style.width=Math.round(btnSize*0.78)+'px'; mp.style.height=Math.round(btnSize*0.55)+'px'; mp.style.left='10px'; mp.style.top='10px'; mp.style.right='auto'; mp.style.bottom='auto'; }
   }
@@ -1076,6 +1088,7 @@ function rmenuAction(action){
     case 'option-joy': options.joySizePx=cycleStepValue(options.joySizePx,JOY_SIZE_STEPS); options.save(); applyMobileControlSettings(); drawMobileMenu(); break;
     case 'option-buttons': options.buttonSizePx=cycleStepValue(options.buttonSizePx,BTN_SIZE_STEPS); options.save(); applyMobileControlSettings(); drawMobileMenu(); break;
     case 'option-looksize': options.lookSizePx=cycleStepValue(options.lookSizePx,LOOK_PAD_SIZE_STEPS); options.save(); applyMobileControlSettings(); drawMobileMenu(); break;
+    case 'option-ctrlheight': options.controlsYOffsetPx=cycleStepValue(options.controlsYOffsetPx,CONTROL_Y_STEPS); options.save(); applyMobileControlSettings(); drawMobileMenu(); break;
     case 'option-opacity': options.controlOpacityValue=cycleStepValue(options.controlOpacityValue,OPACITY_STEPS); options.save(); applyMobileControlSettings(); drawMobileMenu(); break;
     case 'option-mapsize': options.minimapSizePx=cycleStepValue(options.minimapSizePx,MINIMAP_SIZE_STEPS); options.save(); drawMobileMenu(); break;
     case 'option-deadzone': options.touchDeadzonePx=cycleStepValue(options.touchDeadzonePx,DEADZONE_STEPS); options.save(); drawMobileMenu(); break;
@@ -1236,6 +1249,7 @@ function drawMobileMenu(){
         <div class="rit" data-action="option-joy">JOY SIZE: ${options.joySizePx}</div>
         <div class="rit" data-action="option-buttons">BUTTON SIZE: ${options.buttonSizePx}</div>
         <div class="rit" data-action="option-looksize">LOOK SIZE: ${options.lookSizePx}</div>
+        <div class="rit" data-action="option-ctrlheight">CONTROL HEIGHT: ${controlHeightLabel(options.controlsYOffsetPx)}</div>
         <div class="rit" data-action="option-opacity">OPACITY: ${percentLabel(options.controlOpacityValue)}</div>
         <div class="rit" data-action="option-mapsize">MAP SIZE: ${options.minimapSizePx}</div>
         <div class="rit" data-action="option-deadzone">DEADZONE: ${options.touchDeadzonePx}</div>
@@ -1321,7 +1335,7 @@ function genCity(seed, district, modifier){
   if(modifier==='maze'){  spacing = 5; fill = 0.80; }
   if(modifier==='shortage'){ canMult = 0.55; peoMult = 1.1; game.scoreMult = 1.5; }
 
-  const GW = 42, GH = 42;
+  const GW = 40, GH = 20;
   const map = [], shade = [];
   for(let y=0;y<GH;y++){ map.push(new Array(GW).fill(1)); shade.push(new Array(GW).fill(0)); }
 
@@ -1559,6 +1573,7 @@ const options = {
   joySizePx: 110,
   buttonSizePx: 85,
   lookSizePx: 112,
+  controlsYOffsetPx: 0,
   controlOpacityValue: 0.60,
   minimapSizePx: 68,
   touchDeadzonePx: 8,
@@ -1579,6 +1594,7 @@ const options = {
       else if(['small','med','large'].includes(o.buttonSize)) this.buttonSizePx = LEGACY_SIZE_TO_BTN[o.buttonSize] || 85;
       if(typeof o.lookSizePx==='number') this.lookSizePx = nearestStep(o.lookSizePx, LOOK_PAD_SIZE_STEPS);
       else this.lookSizePx = nearestStep(Math.round((this.buttonSizePx || 85) * 1.18), LOOK_PAD_SIZE_STEPS);
+      if(typeof o.controlsYOffsetPx==='number') this.controlsYOffsetPx = nearestStep(o.controlsYOffsetPx, CONTROL_Y_STEPS);
       if(typeof o.controlOpacityValue==='number') this.controlOpacityValue = nearestStep(o.controlOpacityValue, OPACITY_STEPS);
       else if(['low','med','high'].includes(o.controlOpacity)) this.controlOpacityValue = LEGACY_OPACITY[o.controlOpacity] || 0.60;
       if(typeof o.minimapSizePx==='number') this.minimapSizePx = nearestStep(o.minimapSizePx, MINIMAP_SIZE_STEPS);
@@ -1596,6 +1612,7 @@ const options = {
     this.joySizePx = nearestStep(this.joySizePx, JOY_SIZE_STEPS);
     this.buttonSizePx = nearestStep(this.buttonSizePx, BTN_SIZE_STEPS);
     this.lookSizePx = nearestStep(this.lookSizePx, LOOK_PAD_SIZE_STEPS);
+    this.controlsYOffsetPx = nearestStep(this.controlsYOffsetPx, CONTROL_Y_STEPS);
     this.controlOpacityValue = nearestStep(this.controlOpacityValue, OPACITY_STEPS);
     this.minimapSizePx = nearestStep(this.minimapSizePx, MINIMAP_SIZE_STEPS);
     this.touchDeadzonePx = nearestStep(this.touchDeadzonePx, DEADZONE_STEPS);
@@ -1608,7 +1625,7 @@ const options = {
     this.touchDeadzone = this.touchDeadzonePx>=12?'high':this.touchDeadzonePx<=4?'low':'med';
     const data = {
       mouseSens:this.mouseSens, lookSpeed:this.lookSpeed, mobileTurnSens:this.mobileTurnSens, mobileLook:this.mobileLook,
-      joySizePx:this.joySizePx, buttonSizePx:this.buttonSizePx, lookSizePx:this.lookSizePx, controlOpacityValue:this.controlOpacityValue,
+      joySizePx:this.joySizePx, buttonSizePx:this.buttonSizePx, lookSizePx:this.lookSizePx, controlsYOffsetPx:this.controlsYOffsetPx, controlOpacityValue:this.controlOpacityValue,
       minimapSizePx:this.minimapSizePx, touchDeadzonePx:this.touchDeadzonePx,
       joySize:this.joySize, buttonSize:this.buttonSize, controlOpacity:this.controlOpacity,
       minimapSize:this.minimapSize, touchDeadzone:this.touchDeadzone,
@@ -1636,6 +1653,7 @@ options.load();
     options.joySizePx = 110;
     options.buttonSizePx = 85;
     options.lookSizePx = 112;
+    options.controlsYOffsetPx = 0;
     options.controlOpacityValue = 0.60;
     options.minimapSizePx = 68;
     options.touchDeadzonePx = 8;
@@ -2677,10 +2695,11 @@ function activateOption(idx){
   else if(idx===2){ options.joySizePx=cycleStepValue(options.joySizePx,JOY_SIZE_STEPS); options.save(); applyMobileControlSettings(); }
   else if(idx===3){ options.buttonSizePx=cycleStepValue(options.buttonSizePx,BTN_SIZE_STEPS); options.save(); applyMobileControlSettings(); }
   else if(idx===4){ options.lookSizePx=cycleStepValue(options.lookSizePx,LOOK_PAD_SIZE_STEPS); options.save(); applyMobileControlSettings(); }
-  else if(idx===5){ options.controlOpacityValue=cycleStepValue(options.controlOpacityValue,OPACITY_STEPS); options.save(); applyMobileControlSettings(); }
-  else if(idx===6){ options.minimapSizePx=cycleStepValue(options.minimapSizePx,MINIMAP_SIZE_STEPS); options.save(); }
-  else if(idx===7){ options.touchDeadzonePx=cycleStepValue(options.touchDeadzonePx,DEADZONE_STEPS); options.save(); }
-  else if(idx===8){
+  else if(idx===5){ options.controlsYOffsetPx=cycleStepValue(options.controlsYOffsetPx,CONTROL_Y_STEPS); options.save(); applyMobileControlSettings(); }
+  else if(idx===6){ options.controlOpacityValue=cycleStepValue(options.controlOpacityValue,OPACITY_STEPS); options.save(); applyMobileControlSettings(); }
+  else if(idx===7){ options.minimapSizePx=cycleStepValue(options.minimapSizePx,MINIMAP_SIZE_STEPS); options.save(); }
+  else if(idx===8){ options.touchDeadzonePx=cycleStepValue(options.touchDeadzonePx,DEADZONE_STEPS); options.save(); }
+  else if(idx===9){
     const vals = ['auto','on','off'];
     const cur = vals.indexOf(options.mobileControls);
     options.mobileControls = vals[(cur+1)%vals.length];
@@ -2688,12 +2707,12 @@ function activateOption(idx){
     setMobileMode(isMobile());
     options.save(); applyMobileControlSettings();
   }
-  else if(idx===9){ options.minimapDefault=!options.minimapDefault; showMinimap=options.minimapDefault; options.save(); }
-  else if(idx===10){ options.reduceFx=!options.reduceFx; options.save(); }
-  else if(idx===11){ options.mouseSens = options.mouseSens > 0.003 ? 0.0015 : options.mouseSens + 0.0005; options.save(); }
-  else if(idx===12){ confirmAction={msg:'Clear active save? Stats will be kept.', onYes:()=>{ SAVE.clear(); }, onNo:()=>{}}; }
-  else if(idx===13){ confirmAction={msg:'Reset ALL local data? This cannot be undone.', onYes:()=>{ SAVE.clear(); stats.reset(); leaderboards.reset(); profile.name='RUNNER'; profile.save(); options.mouseSens=0.0022; options.lookSpeed=1; options.mobileLook='med'; options.mobileTurnSens=lookSensFromSpeed(1); options.joySizePx=110; options.buttonSizePx=85; options.lookSizePx=112; options.controlOpacityValue=0.60; options.minimapSizePx=68; options.touchDeadzonePx=8; options.minimapDefault=true; options.reduceFx=false; options.mobileControls='auto'; options.save(); applyMobileControlSettings(); }, onNo:()=>{}}; }
-  else if(idx===14){ state=STATE.TITLE; menuSel=5; }
+  else if(idx===10){ options.minimapDefault=!options.minimapDefault; showMinimap=options.minimapDefault; options.save(); }
+  else if(idx===11){ options.reduceFx=!options.reduceFx; options.save(); }
+  else if(idx===12){ options.mouseSens = options.mouseSens > 0.003 ? 0.0015 : options.mouseSens + 0.0005; options.save(); }
+  else if(idx===13){ confirmAction={msg:'Clear active save? Stats will be kept.', onYes:()=>{ SAVE.clear(); }, onNo:()=>{}}; }
+  else if(idx===14){ confirmAction={msg:'Reset ALL local data? This cannot be undone.', onYes:()=>{ SAVE.clear(); stats.reset(); leaderboards.reset(); profile.name='RUNNER'; profile.save(); options.mouseSens=0.0022; options.lookSpeed=1; options.mobileLook='med'; options.mobileTurnSens=lookSensFromSpeed(1); options.joySizePx=110; options.buttonSizePx=85; options.lookSizePx=112; options.controlsYOffsetPx=0; options.controlOpacityValue=0.60; options.minimapSizePx=68; options.touchDeadzonePx=8; options.minimapDefault=true; options.reduceFx=false; options.mobileControls='auto'; options.save(); applyMobileControlSettings(); }, onNo:()=>{}}; }
+  else if(idx===15){ state=STATE.TITLE; menuSel=5; }
 }
 function isMenuState(s){
   return s===STATE.TITLE || s===STATE.SEEDED || s===STATE.STATS || s===STATE.LB || s===STATE.OPTIONS || s===STATE.RESULTS;
@@ -3072,6 +3091,7 @@ function drawOverlays(){
       {label:'JOYSTICK SIZE: '+options.joySizePx},
       {label:'BUTTON SIZE: '+options.buttonSizePx},
       {label:'LOOK PAD SIZE: '+options.lookSizePx},
+      {label:'CONTROL HEIGHT: '+controlHeightLabel(options.controlsYOffsetPx)},
       {label:'CONTROL OPACITY: '+percentLabel(options.controlOpacityValue)},
       {label:'MINIMAP SIZE: '+options.minimapSizePx},
       {label:'TOUCH DEADZONE: '+options.touchDeadzonePx},
@@ -3306,6 +3326,12 @@ function portraitLayout(){
     top: Math.round(cy0 + 6),
     width: menuW, height: menuH
   };
+  const yOff = Number(options.controlsYOffsetPx) || 0;
+  moveRect.top += yOff;
+  giveRect.top += yOff;
+  lookRect.top += yOff;
+  sprintRect.top += yOff;
+  menuRect.top += yOff;
   return { fpvRect, minimapRect, statsRect, controlsRect, moveRect, giveRect, sprintRect, lookRect, menuRect };
 }
 function drawPortraitDashboardChrome(){
@@ -3524,6 +3550,8 @@ function getLayoutProof(){
       sprintMove: rectsOverlap(sprint, move),
       giveSprint: rectsOverlap(give, sprint),
     },
+    controlsYOffsetPx: options.controlsYOffsetPx,
+    mapSize: { w: game.MAP_W, h: game.MAP_H, aspect: game.MAP_W && game.MAP_H ? (game.MAP_W / game.MAP_H).toFixed(2) : null },
   };
 }
 
