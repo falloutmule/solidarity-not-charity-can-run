@@ -439,7 +439,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'dock1';
+const BUILD_ID = 'mini1';
 let mobileMode = false; // true = show mobile overlay, hide desktop cursor
 let mobileOverride = null; // null=auto, 'on', 'off'
 let portHintShown = false;
@@ -2621,6 +2621,20 @@ function drawScene(now){
 // 8. MINIMAP
 // ---------------------------------------------------------------------------
 // showMinimap declared earlier (before persistence module)
+let portraitMinimapDrawCache = null;
+function computePortraitMinimapDraw(mr){
+  const innerPad = 10;
+  const maxW = Math.max(40, mr.w - innerPad * 2);
+  const maxH = Math.max(40, mr.h - innerPad * 2);
+  const mSz = Number(options.minimapSizePx) || 68;
+  const szScale = Math.max(0.78, Math.min(1.15, mSz / 68));
+  const scale = Math.min(maxW / game.MAP_W, maxH / game.MAP_H) * szScale;
+  const W = game.MAP_W * scale;
+  const H = game.MAP_H * scale;
+  const ox = Math.round(mr.x + (mr.w - W) / 2);
+  const oy = Math.round(mr.y + (mr.h - H) / 2);
+  return { ox, oy, W, H, cell: scale, scale, szScale, innerPad };
+}
 function drawMinap(){
   const portraitAlways = mobileMode && isMobilePortrait();
   if(!showMinimap && !portraitAlways) return;
@@ -2645,21 +2659,27 @@ function drawMinap(){
   if(mobileMode && portraitMini){
     const L = portraitLayout();
     const mr = L.minimapRect;
-    const inset = 6;
-    const availW = mr.w - inset * 2;
-    const availH = mr.h - inset * 2;
-    cell = availW / game.MAP_W;
-    W = game.MAP_W * cell;
-    H = game.MAP_H * cell;
-    ox = Math.round(mr.x + inset);
-    oy = Math.round(mr.y + (mr.h - H) / 2);
+    const d = computePortraitMinimapDraw(mr);
+    cell = d.cell;
+    W = d.W;
+    H = d.H;
+    ox = d.ox;
+    oy = d.oy;
+    portraitMinimapDrawCache = {
+      panel: { x: mr.x, y: mr.y, w: mr.w, h: mr.h },
+      draw: { ox, oy, W, H, cell: d.cell, scale: d.scale },
+      map: { w: game.MAP_W, h: game.MAP_H, aspect: +(game.MAP_W / game.MAP_H).toFixed(3) },
+    };
     ctx.fillStyle = '#050403';
     ctx.fillRect(mr.x, mr.y, mr.w, mr.h);
-    ctx.strokeStyle = 'rgba(35,110,210,0.95)'; ctx.lineWidth = 3;
-    ctx.strokeRect(mr.x + 3, mr.y + 3, mr.w - 6, mr.h - 6);
+    const framePad = 2;
+    ctx.strokeStyle = 'rgba(35,110,210,0.95)'; ctx.lineWidth = 2;
+    ctx.strokeRect(ox - framePad, oy - framePad, W + framePad * 2, H + framePad * 2);
+    ctx.strokeStyle = 'rgba(190,158,104,0.65)'; ctx.lineWidth = 1;
+    ctx.strokeRect(ox - 1, oy - 1, W + 2, H + 2);
     ctx.save();
     ctx.beginPath();
-    ctx.rect(mr.x + inset, mr.y + inset, availW, availH);
+    ctx.rect(ox, oy, W, H);
     ctx.clip();
   } else {
     ox = mobileMode && portraitMini ? Math.round((innerWidth-W)/2) : innerWidth - W - pad - (mobileMode ? 4 : 0);
@@ -3795,11 +3815,13 @@ function rectsOverlap(a,b){
 function portraitLayout(){
   const { cw, ch } = layoutCssSize();
   const fpvH = portraitPlayH();
-  const miniH = Math.round(Math.max(150, ch * 0.265));
+  const miniH = Math.round(Math.max(128, ch * 0.238));
+  const miniW = Math.round(cw * 0.91);
+  const miniX = Math.round((cw - miniW) / 2);
   const statsH = Math.round(Math.max(64, ch * 0.082));
   const statsY = ch - statsH;
   const bandTop = fpvH;
-  const minimapRect = { x:0, y:bandTop, w:cw, h:miniH };
+  const minimapRect = { x:miniX, y:bandTop, w:miniW, h:miniH };
   const controlsY0 = bandTop + miniH;
   const controlsH = Math.max(88, statsY - controlsY0);
   const fpvRect = { x:0, y:0, w:cw, h:fpvH };
@@ -4089,6 +4111,20 @@ function getLayoutProof(){
   };
 }
 
+function getMinimapAlignProof(){
+  const L = portraitLayout();
+  const mr = L.minimapRect;
+  const d = computePortraitMinimapDraw(mr);
+  return {
+    panelRect: { x: mr.x, y: mr.y, w: mr.w, h: mr.h },
+    drawRect: { ox: d.ox, oy: d.oy, W: d.W, H: d.H, cell: d.cell, scale: d.scale },
+    map: { MAP_W: game.MAP_W, MAP_H: game.MAP_H, aspect: +(game.MAP_W / game.MAP_H).toFixed(3) },
+    drawAspect: +(d.W / d.H).toFixed(3),
+    cache: portraitMinimapDrawCache,
+    minimapSizePx: options.minimapSizePx,
+  };
+}
+
 function getControlDockRectProof(){
   const snap = y=>{
     options.controlsYOffsetPx = y;
@@ -4119,7 +4155,7 @@ globalThis.CR = window.CR = {
   set paused(v){ paused=!!v; },
   get mobileMode(){ return mobileMode; },
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
-  setMobileMode,isMobile,rmenuAction,getDebugState,portraitLayout,getLayoutProof,getControlDockRectProof,rectsOverlap,
+  setMobileMode,isMobile,rmenuAction,getDebugState,portraitLayout,getLayoutProof,getControlDockRectProof,getMinimapAlignProof,rectsOverlap,
   editRunnerName,applyMobileControlSettings,mobileSprintCost,mobileSprintBurstSec,
   toggleFullscreen,isFullscreen,enterFullscreen,exitFullscreen,
 };
