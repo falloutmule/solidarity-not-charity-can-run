@@ -394,7 +394,7 @@ const game = {
   flash: 0,
   handoffFx: 0,
   // --- run tracking (for stats / leaderboard / results) ---
-  run: { active:false, startedAt:0, seedUsed:12345, modifierUsed:'clear',
+  run: { active:false, startedAt:0, seedUsed:12345, modifierUsed:'clear', customLevel:null,
          cansCollected:0, cansDelivered:0, helpedByKind:{hungry:0,family:0,elder:0,volunteer:0},
          upgradesChosen:0, highestDistrict:1, runTime:0, completed:false, leaderboardRank:null },
 };
@@ -427,7 +427,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'ctrlh6';
+const BUILD_ID = 'hall1';
 let mobileMode = false; // true = show mobile overlay, hide desktop cursor
 let mobileOverride = null; // null=auto, 'on', 'off'
 let portHintShown = false;
@@ -1109,6 +1109,7 @@ function rmenuAction(action){
     case 'toggle-fs': toggleFullscreen(); break;
     case 'title-start': startRun(); break;
     case 'title-seeded': seedInput=''; state=STATE.SEEDED; _rmSel=0; break;
+    case 'title-hall-servants': startCustomLevel('hall_of_servants'); break;
     case 'title-continue': if(SAVE.hasValid()) continueRun(); else setMsg('No saved run'); break;
     case 'title-stats': state=STATE.STATS; _rmSel=0; break;
     case 'title-lb': state=STATE.LB; _rmSel=0; break;
@@ -1147,7 +1148,12 @@ function rmenuAction(action){
     case 'option-fx': options.reduceFx=!options.reduceFx; options.save(); drawMobileMenu(); break;
     case 'option-mouse': options.mouseSens=options.mouseSens>0.003?0.0015:parseFloat((options.mouseSens+0.0005).toFixed(4)); options.save(); drawMobileMenu(); break;
     case 'result-new': SAVE.clear(); startRun(); _rmSel=0; break;
-    case 'result-retry': SAVE.clear(); startRun(game.run.seedUsed); _rmSel=0; break;
+    case 'result-retry':
+      SAVE.clear();
+      if(game.run && game.run.customLevel) startCustomLevel(game.run.customLevel);
+      else startRun(game.run.seedUsed);
+      _rmSel=0;
+      break;
     case 'result-lb': state=STATE.LB; _rmSel=0; break;
     case 'result-title': state=STATE.TITLE; _rmSel=0; break;
     case 'pause-resume': paused=false; rmenuHide(); break;
@@ -1228,15 +1234,17 @@ function drawMobileMenu(){
       <div class="rdesc" style="margin-bottom:14px;">A desert-city food run</div>
       <div class="rit ${_rmSel===0?'sel':''}" data-action="title-start" style="margin-top:10px;">NEW RUN</div>
       <div class="rit ${_rmSel===1?'sel':''}" data-action="title-seeded">SEEDED RUN</div>
-      <div class="rit ${_rmSel===2?'sel':''}" data-action="title-continue">CONTINUE</div>
-      <div class="rit ${_rmSel===3?'sel':''}" data-action="title-stats">STATS</div>
-      <div class="rit ${_rmSel===4?'sel':''}" data-action="title-lb">LEADERBOARDS</div>
-      <div class="rit ${_rmSel===5?'sel':''}" data-action="title-options">OPTIONS / HELP</div>
-      <div class="rit ${_rmSel===6?'sel':''}" data-action="toggle-fs">${isFullscreen()?'EXIT FULLSCREEN':'FULLSCREEN'}</div>
+      <div class="rdesc" style="margin-top:10px;color:#8a7a5a;letter-spacing:2px;font-size:11px;">SPECIAL LEVELS</div>
+      <div class="rit ${_rmSel===2?'sel':''}" data-action="title-hall-servants" style="margin-top:4px;">SNC HALL OF SERVANTS</div>
+      <div class="rit ${_rmSel===3?'sel':''}" data-action="title-continue">CONTINUE</div>
+      <div class="rit ${_rmSel===4?'sel':''}" data-action="title-stats">STATS</div>
+      <div class="rit ${_rmSel===5?'sel':''}" data-action="title-lb">LEADERBOARDS</div>
+      <div class="rit ${_rmSel===6?'sel':''}" data-action="title-options">OPTIONS / HELP</div>
+      <div class="rit ${_rmSel===7?'sel':''}" data-action="toggle-fs">${isFullscreen()?'EXIT FULLSCREEN':'FULLSCREEN'}</div>
       <div class="rclose" style="margin-top:16px;">↑↓ navigate · tap to activate</div>
       <div class="rclose" style="margin-top:6px;color:#5a4a3a;">build ${BUILD_ID}</div>
     `);
-    rmenuSel(7); return;
+    rmenuSel(8); return;
   }
 
   // ── SEEDED RUN ──
@@ -1350,7 +1358,7 @@ function drawMobileMenu(){
     const hk = run.helpedByKind||{};
     rmenuHTML(`
       <div class="rpantit">RUN ENDED</div>
-      <div class="rdesc">${run.completed?'All districts cleared!':'Time ran out.'}</div>
+      <div class="rdesc">${run.completed?(run.customLevel?'Hall Of Servants cleared!':'All districts cleared!'):'Time ran out.'}</div>
       <div class="rdesc" style="margin-top:8px;">Score: <span style="color:#ffd24a;font-size:16px;">${game.totalScore||0}</span></div>
       <div class="rdesc">District: <span style="color:#e9d8b0">${Math.max(1,(game.district||1)-1)}</span></div>
       <div class="rdesc">Cans delivered: <span style="color:#e9d8b0">${run.cansDelivered||0}</span></div>
@@ -1549,6 +1557,160 @@ function genCity(seed, district, modifier){
   game.exit = {x:bestEx[0], y:bestEx[1], active:false};
 
   game.timeLeft = cfg.baseTime + (district-1)*8;
+}
+
+// ---------------------------------------------------------------------------
+// CUSTOM LEVELS — fixed rectangular maps (normal run rules; genCity unchanged)
+// ---------------------------------------------------------------------------
+const CUSTOM_LEVELS = {
+  hall_of_servants: {
+    id: 'hall_of_servants',
+    title: 'SNC Hall Of Servants',
+    shortTitle: 'Hall Of Servants',
+    generator: genHallOfServants,
+    thankLines: [
+      'Thank you. I can breathe for a minute.',
+      'That helps more than you know.',
+      "I'll pass it on.",
+      'You saw me. Thank you.',
+      'This gets me through today.',
+      'Solidarity, not charity.',
+      'I needed that.',
+      'You showed up.',
+    ],
+    spriteKinds: [
+      'hall_volunteer','hall_elder','hall_pantry','hall_street',
+      'hall_quiet','hall_kitchen','hall_servant',
+    ],
+  },
+};
+
+function hallFillMap(GW, GH){
+  const map = [], shade = [];
+  for(let y=0;y<GH;y++){
+    const row = new Array(GW);
+    const sh = new Array(GW);
+    for(let x=0;x<GW;x++){
+      if(y===0||y===GH-1||x===0||x===GW-1){ row[x]=WALL.CONCRETE; sh[x]=0.45; }
+      else { row[x]=0; sh[x]=0.35; }
+    }
+    map.push(row); shade.push(sh);
+  }
+  return {map, shade};
+}
+function hallBrickBox(map, x0,y0,x1,y1, doorX, doorY){
+  for(let y=y0;y<=y1;y++) for(let x=x0;x<=x1;x++){
+    const edge = (y===y0||y===y1||x===x0||x===x1);
+    if(!edge) continue;
+    if(doorX!==undefined && x===doorX && y===doorY) continue;
+    if(doorX!==undefined && y===doorY && x>=doorX-1 && x<=doorX+1) continue;
+    map[y][x]=WALL.BRICK;
+  }
+}
+
+function genHallOfServants(){
+  const GW = 30, GH = 14;
+  const {map, shade} = hallFillMap(GW, GH);
+  // Pantry (north-west)
+  hallBrickBox(map, 2, 2, 8, 5, 5, 5);
+  // Gathering room (north-east)
+  hallBrickBox(map, 20, 2, 26, 5, 23, 5);
+  // South alcove
+  hallBrickBox(map, 3, 9, 9, 12, 6, 9);
+  // Kitchen nook
+  hallBrickBox(map, 12, 9, 17, 12, 14, 9);
+  // Corridor dividers (readable hall spine)
+  for(let x=2;x<GW-2;x++){
+    if(x<10||x>18){ map[6][x]=WALL.BRICK; map[8][x]=WALL.BRICK; }
+  }
+  map[6][14]=0; map[6][15]=0; map[8][14]=0; map[8][15]=0;
+
+  game.map = map; game.MAP_W = GW; game.MAP_H = GH; game.wallShade = shade;
+  game.modifier = 'clear';
+  game.scoreMult = 1;
+
+  player.x = 2.5; player.y = 7.0; player.angle = 0;
+
+  game.pickups = [
+    {x:3.5,y:3.5,taken:false,amt:2,wob:0.2},
+    {x:5.5,y:3.5,taken:false,amt:2,wob:1.1},
+    {x:7.5,y:3.5,taken:false,amt:1,wob:2.0},
+    {x:4.5,y:4.5,taken:false,amt:2,wob:0.8},
+    {x:6.5,y:4.5,taken:false,amt:1,wob:1.7},
+    {x:22.5,y:3.5,taken:false,amt:2,wob:0.5},
+    {x:24.5,y:4.5,taken:false,amt:2,wob:1.3},
+  ];
+
+  const def = CUSTOM_LEVELS.hall_of_servants;
+  game.npcs = [
+    {x:11.5,y:7.0, kind:'hall_volunteer', need:1, helped:false, wob:0.0, thank:'You showed up.'},
+    {x:14.5,y:7.0, kind:'hall_elder', need:1, helped:false, wob:0.6, thank:'Thank you. I can breathe for a minute.'},
+    {x:16.5,y:7.0, kind:'hall_street', need:1, helped:false, wob:1.2, thank:'You saw me. Thank you.'},
+    {x:19.5,y:7.0, kind:'hall_quiet', need:1, helped:false, wob:1.8, thank:'That helps more than you know.'},
+    {x:5.5,y:10.5, kind:'hall_pantry', need:1, helped:false, wob:0.4, thank:"I'll pass it on."},
+    {x:14.5,y:10.5, kind:'hall_kitchen', need:1, helped:false, wob:1.0, thank:'This gets me through today.'},
+    {x:21.5,y:7.5, kind:'hall_servant', need:1, helped:false, wob:2.2, thank:'Solidarity, not charity.'},
+  ];
+
+  game.props = [
+    {x:4.5,y:2.8,kind:'crate',wob:0},
+    {x:7.2,y:2.8,kind:'crate',wob:0.5},
+    {x:23.5,y:3.2,kind:'cart',wob:0.2},
+    {x:13.5,y:6.2,kind:'sign',wob:0},
+    {x:18.5,y:6.2,kind:'sign',wob:0.7},
+    {x:8.5,y:11.2,kind:'crate',wob:0.3},
+    {x:15.5,y:11.2,kind:'crate',wob:0.9},
+  ];
+
+  game.quota = 5;
+  game.helped = 0; game.delivered = 0;
+  game.exit = {x:27.5, y:7.0, active:false};
+  game.timeLeft = 110;
+  dbg.reachableCells = 0;
+  dbg.cansSpawned = game.pickups.length;
+  dbg.npcsSpawned = game.npcs.length;
+  dbg.props = game.props.length;
+  setMsg('SNC Hall Of Servants — fill the hall with care.');
+}
+
+function startCustomLevel(id){
+  const def = CUSTOM_LEVELS[id];
+  if(!def) return;
+  SAVE.clear();
+  game.seed = 424242;
+  game.district = 1;
+  game.totalScore = 0;
+  resetPlayerUpgrades();
+  def.generator();
+  player.cans = 0;
+  player.stamina = player.maxStamina;
+  state = STATE.PLAY;
+  paused = false;
+  lookHintUsed = false;
+  lookHintShownAt = performance.now();
+  initRunTracking(game.seed);
+  game.run.customLevel = id;
+  game.run.modifierUsed = game.modifier;
+  SAVE.save();
+  applyMobileControlSettings();
+}
+
+function activeCustomLevel(){
+  return game.run && game.run.customLevel ? CUSTOM_LEVELS[game.run.customLevel] : null;
+}
+function npcMechanicKind(kind){
+  if(kind==='family'||kind==='hall_family') return 'family';
+  if(kind==='elder'||kind==='hall_elder') return 'elder';
+  if(kind==='volunteer'||kind==='hall_volunteer') return 'volunteer';
+  return 'hungry';
+}
+function npcSpriteTex(kind){
+  return TEX[kind] || TEX.hungry;
+}
+function pickHallThankLine(npc){
+  if(npc && npc.thank) return npc.thank;
+  const lines = CUSTOM_LEVELS.hall_of_servants.thankLines;
+  return lines[(Math.random()*lines.length)|0];
 }
 
 // ---------------------------------------------------------------------------
@@ -1868,7 +2030,7 @@ const SAVE = {
       // map + objects
       map: game.map, wallShade: game.wallShade, MAP_W: game.MAP_W, MAP_H: game.MAP_H,
       pickups: game.pickups.map(c=>({x:c.x,y:c.y,taken:c.taken,amt:c.amt,wob:c.wob})),
-      npcs: game.npcs.map(n=>({x:n.x,y:n.y,kind:n.kind,need:n.need,helped:n.helped,wob:n.wob})),
+      npcs: game.npcs.map(n=>({x:n.x,y:n.y,kind:n.kind,need:n.need,helped:n.helped,wob:n.wob,thank:n.thank||''})),
       props: game.props.map(p=>({x:p.x,y:p.y,kind:p.kind,wob:p.wob})),
       exit: game.exit ? {x:game.exit.x,y:game.exit.y,active:game.exit.active} : null,
       // run tracking
@@ -2059,6 +2221,8 @@ function makePerson(body, head, legs, opts){
   x.fillStyle=head; x.fillRect(3,27,4,3); x.fillRect(21,27,4,3);
   // accessory
   if(opts.vest){ x.fillStyle='#f0d24a'; x.fillRect(7,19,14,4); x.fillStyle='#3a3a3a'; x.fillRect(13,16,2,16); }
+  if(opts.apron){ x.fillStyle=opts.aproncol||'#e8e4dc'; x.fillRect(8,18,12,14); x.fillStyle='#8a8478'; x.fillRect(8,18,12,2); }
+  if(opts.backpack){ x.fillStyle='#5a4a3a'; x.fillRect(19,17,7,14); x.fillStyle='#3a3028'; x.fillRect(20,19,5,8); }
   if(opts.cane){ x.fillStyle='#b89058'; x.fillRect(22,14,2,30); x.fillStyle='#8a6a3a'; x.fillRect(20,14,6,3); }
   if(opts.hat){ x.fillStyle=opts.hatcol||'#6a4a3a'; x.fillRect(6,4,16,3); x.fillRect(9,1,10,4); }
   if(opts.coat){ x.fillStyle=opts.coatcol; x.fillRect(7,16,14,16); x.fillStyle=body; x.fillRect(7,16,14,4); }
@@ -2079,6 +2243,13 @@ const TEX = {
   family:   makePerson('#3a78b0','#e6b88c','#243044',{child:true}),
   elder:    makePerson('#8a7ab0','#d8c09a','#4a3a5a',{cane:true,coat:true,coatcol:'#6a5a8a',hat:true,hatcol:'#5a4a3a'}),
   volunteer:makePerson('#4ea872','#e6b88c','#2c5240',{vest:true,smile:true}),
+  hall_volunteer: makePerson('#3a9a68','#d8b890','#244838',{vest:true,smile:true}),
+  hall_elder:    makePerson('#7a6a9a','#d0b890','#3e3450',{cane:true,coat:true,coatcol:'#5a4a6a',hat:true,hatcol:'#4a3a2a'}),
+  hall_pantry:   makePerson('#c87840','#e0b888','#4a3828',{apron:true,aproncol:'#f0ece4'}),
+  hall_street:   makePerson('#4a6a9a','#c8a078','#2a3040',{backpack:true,hat:true,hatcol:'#3a4a5a'}),
+  hall_quiet:    makePerson('#5a5a6a','#c8b8a8','#2a2a32',{coat:true,coatcol:'#4a4a58'}),
+  hall_kitchen:  makePerson('#e8e0d0','#c8a888','#4a4038',{apron:true,aproncol:'#ffffff'}),
+  hall_servant:  makePerson('#6a8a5a','#e0c8a0','#3a4a32',{vest:true,apron:true,aproncol:'#d8e8d0'}),
   // can pickup — clean pantry-can look (no sprite glow; avoids phone-visible halo boxes)
   can: (()=>{ const c=newTex(20,22),x=c.getContext('2d');
     x.fillStyle='#d8d2c6'; x.fillRect(5,3,10,15);
@@ -2151,6 +2322,8 @@ const TEX = {
     return c; })(),
 };
 const HEIGHT = { hungry:0.86, family:1.0, elder:0.84, volunteer:0.92,
+                 hall_volunteer:0.92, hall_elder:0.84, hall_pantry:0.88, hall_street:0.90,
+                 hall_quiet:0.82, hall_kitchen:0.88, hall_servant:0.94,
                  can:0.42, crate:0.5, cart:0.62, grass:0.22, pole:1.1, sign:0.62, busstop:1.0, exit:1.25 };
 function propTex(kind){ return TEX[kind] || TEX.grass; }
 
@@ -2283,7 +2456,7 @@ function drawScene(now){
   // decor first (ground-level), then pickups, then npcs, then exit
   for(const p of game.props)   pushSp(p, propTex(p.kind), HEIGHT[p.kind]||0.5);
   for(const c of game.pickups) if(!c.taken) pushSp(c, TEX.can, HEIGHT.can);
-  for(const n of game.npcs)    if(!n.helped) pushSp(n, TEX[n.kind], HEIGHT[n.kind]);
+  for(const n of game.npcs)    if(!n.helped) pushSp(n, npcSpriteTex(n.kind), HEIGHT[n.kind]||HEIGHT.hungry);
   if(game.exit && game.exit.active) pushSp(game.exit, TEX.exit, HEIGHT.exit);
 
   sprites.sort((p,q)=>q.depth-p.depth);  // far first
@@ -2531,7 +2704,10 @@ function drawHUD(now){
 // ---------------------------------------------------------------------------
 // 10. GAMEPLAY ACTIONS  (logic unchanged; added flash/radar-ring effects)
 // ---------------------------------------------------------------------------
-function addPopup(text,color){ game.popups.push({x:innerWidth/2, y:innerHeight/2-40, vy:-26, life:1.0, text, color}); }
+function addPopup(text,color,life){
+  const t = (life===undefined||life===null) ? 1.0 : life;
+  game.popups.push({x:innerWidth/2, y:innerHeight/2-52, vy:-22, life:t, text, color:color||'#ffd24a'});
+}
 function tickPickups(){
   for(const c of game.pickups){
     if(c.taken) continue;
@@ -2561,17 +2737,21 @@ function giveCan(){
     beep(180,0.1,'sawtooth',0.04); return;
   }
   player.cans-=best.need; best.helped=true; game.helped++; game.delivered+=best.need;
-  game.run.helpedByKind[best.kind] = (game.run.helpedByKind[best.kind]||0)+1;
+  const mech = npcMechanicKind(best.kind);
+  game.run.helpedByKind[mech] = (game.run.helpedByKind[mech]||0)+1;
   game.run.cansDelivered += best.need;
   SAVE.save();
   player.giveCD = player.baseGiveCD / (1 + player.handoffBonus*0.5);
   beep(880,0.12,'triangle',0.05);
   game.handoffFx=0.8;
   const perGive = (best.need*25 + 100) * game.scoreMult;
-  if(best.kind==='elder'){ player.speedBoostT=5; setMsg('Elder blessed you — SPEED!'); }
-  else if(best.kind==='volunteer'){ game.revealT=8; setMsg('Volunteer — cans/people revealed!'); }
-  else setMsg('Helped! '+best.kind+' ('+best.need+')');
+  if(mech==='elder'){ player.speedBoostT=5; setMsg('Elder blessed you — SPEED!'); }
+  else if(mech==='volunteer'){ game.revealT=8; setMsg('Volunteer — cans/people revealed!'); }
+  else setMsg('Helped! ('+best.need+')');
   addPopup('+'+Math.round(perGive)+' pts','#9fffb6');
+  if(game.run.customLevel==='hall_of_servants'){
+    addPopup(pickHallThankLine(best), '#e8d4b0', 1.35);
+  }
   if(game.helped>game.quota){
     const bonus = Math.round(150*game.scoreMult);
     game.totalScore += bonus;
@@ -2588,6 +2768,14 @@ function tickExit(){
   if(dx*dx+dy*dy<0.6) completeDistrict();
 }
 function completeDistrict(){
+  if(game.run.customLevel){
+    const timeBonus=Math.floor(game.timeLeft)*5;
+    const leftover=player.cans*10;
+    game.totalScore += Math.round((game.helped*100 + game.delivered*25 + leftover + timeBonus + 250)*game.scoreMult);
+    setMsg('Hall Of Servants — mutual aid complete.');
+    completeRun();
+    return;
+  }
   const timeBonus=Math.floor(game.timeLeft)*5;
   const distBonus=game.district*200;
   const leftover=player.cans*10;
@@ -2646,6 +2834,7 @@ function titleMenuItems(){
     {label:'START NEW RUN',         action:()=>startRun()},
     {label: SAVE.hasValid()? 'CONTINUE SAVED RUN':'CONTINUE (no save)', action:()=>{ if(SAVE.hasValid()) continueRun(); }, enabled:SAVE.hasValid()},
     {label:'SEEDED RUN',            action:()=>{ seedInput=''; state=STATE.SEEDED; menuSel=0; }},
+    {label:'SNC HALL OF SERVANTS',  action:()=>startCustomLevel('hall_of_servants')},
     {label:'STATS',                 action:()=>{ state=STATE.STATS; menuSel=0; }},
     {label:'LEADERBOARDS',          action:()=>{ state=STATE.LB; menuSel=0; }},
     {label:'OPTIONS / HELP',        action:()=>{ nameInput=profile.name; state=STATE.OPTIONS; menuSel=0; }},
@@ -2845,7 +3034,7 @@ function resetPlayerUpgrades(){
   player.upgrades={pack:0, sprint:0, hand:0, map:0, radar:0};
 }
 function initRunTracking(useSeed){
-  game.run = { active:true, startedAt:Date.now(), seedUsed:useSeed, modifierUsed:game.modifier,
+  game.run = { active:true, startedAt:Date.now(), seedUsed:useSeed, modifierUsed:game.modifier, customLevel:null,
                cansCollected:0, cansDelivered:0,
                helpedByKind:{hungry:0,family:0,elder:0,volunteer:0},
                upgradesChosen:0, highestDistrict:1, runTime:0, completed:false, leaderboardRank:null };
@@ -3343,6 +3532,11 @@ function chooseUpgrade(idx){
     game.run.upgradesChosen++;
     stats.data.upgradeCounts[off[idx].id] = (stats.data.upgradeCounts[off[idx].id]||0)+1;
     stats.save();
+    if(game.run.customLevel){
+      setMsg('Special level complete — no further districts.');
+      completeRun();
+      return;
+    }
     game.district++;
     game.run.highestDistrict = game.district;
     game.modifier=pickModifier();
