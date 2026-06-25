@@ -80,9 +80,12 @@
   #mportmenu{
     display:none;position:absolute;z-index:17;border:none;background:transparent;
     color:#e82222;font:bold 21px monospace;letter-spacing:3px;
-    justify-content:center;align-items:flex-start;padding-top:2px;
+    justify-content:center;align-items:center;padding-top:0;
     pointer-events:auto;text-shadow:0 1px 6px rgba(0,0,0,0.85);
+    flex-direction:column;gap:0;line-height:1.05;
   }
+  #mportmenu .mportmenu-t{font-size:21px;letter-spacing:3px;}
+  #mportmenu .mportmenu-b{font-size:10px;letter-spacing:1px;color:#8a6060;font-weight:bold;}
   #mob.show #mportmenu.por-show{display:flex;}
   #mob.portrait-hide-map #mm{display:none !important;pointer-events:none !important;}
   #mp{top:16px;left:16px;width:52px;height:38px;font-size:10px;z-index:14;}
@@ -416,7 +419,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = '0f42df6';
+const BUILD_ID = 'ctrlh2';
 let mobileMode = false; // true = show mobile overlay, hide desktop cursor
 let mobileOverride = null; // null=auto, 'on', 'off'
 let portHintShown = false;
@@ -440,12 +443,12 @@ const JOY_SIZE_STEPS = [80, 90, 100, 110, 120, 130, 140, 150, 165, 180, 200, 220
 const BTN_SIZE_STEPS = [60, 70, 80, 85, 95, 100, 110, 120, 130, 145, 160, 175];
 const LOOK_PAD_SIZE_STEPS = [72, 88, 100, 112, 128, 144, 160, 176, 200, 220, 240];
 /** Positive = controls lower on screen; negative = higher. */
-const CONTROL_Y_STEPS = [80, 0, -55, -110];
+const CONTROL_Y_STEPS = [100, 0, -80, -160];
 function controlHeightLabel(px){
   const v = Number(px) || 0;
-  if(v >= 40) return 'LOW';
+  if(v >= 50) return 'LOW';
   if(v === 0) return 'MID';
-  if(v <= -85) return 'VERY HIGH';
+  if(v <= -120) return 'VERY HIGH';
   return 'HIGH';
 }
 function controlHeightMenuLabel(px){
@@ -478,11 +481,19 @@ function mobileLookSens(){
 function lookSpeedLabel(v){ const n=Number(v)||1; return (Number.isInteger(n)?n.toFixed(1):String(n)) + 'x'; }
 function percentLabel(v){ return Math.round((Number(v)||0)*100)+'%'; }
 function layoutCssSize(){
-  let cw = Math.round(view.width || 0), ch = Math.round(view.height || 0);
+  const vv = window.visualViewport;
+  let cw = Math.round((vv && vv.width) || innerWidth || view.width || 0);
+  let ch = Math.round((vv && vv.height) || innerHeight || view.height || 0);
   if(mobileMode && isOrientationPortrait() && cw > ch){
     const t = cw; cw = ch; ch = t;
   }
   return { cw, ch };
+}
+function syncPortraitMenuLabel(){
+  const mportmenu = document.getElementById('mportmenu');
+  if(!mportmenu) return;
+  const want = `<span class="mportmenu-t">MENU</span><span class="mportmenu-b">${BUILD_ID}</span>`;
+  if(mportmenu.innerHTML !== want) mportmenu.innerHTML = want;
 }
 function isMobilePortrait(){
   if(!mobileMode) return false;
@@ -533,6 +544,7 @@ function applyMobileControlSettings(){
     placeRect(ms, L.sprintRect);
     placeRect(mlookpad, L.lookRect);
     placeRect(mportmenu, L.menuRect);
+    syncPortraitMenuLabel();
     if(mg) mg.style.fontSize = Math.max(9, Math.round(L.giveRect.width * 0.15)) + 'px';
     if(ms){ ms.style.fontSize = Math.max(8, Math.round(L.sprintRect.width * 0.14)) + 'px'; ms.style.zIndex = '19'; }
     if(mlookpad){ mlookpad.style.zIndex = '16'; mlookpad.style.fontSize = Math.max(8, Math.round(L.lookRect.width * 0.09)) + 'px'; }
@@ -1093,7 +1105,14 @@ function rmenuAction(action){
     case 'option-joy': options.joySizePx=cycleStepValue(options.joySizePx,JOY_SIZE_STEPS); options.save(); applyMobileControlSettings(); drawMobileMenu(); break;
     case 'option-buttons': options.buttonSizePx=cycleStepValue(options.buttonSizePx,BTN_SIZE_STEPS); options.save(); applyMobileControlSettings(); drawMobileMenu(); break;
     case 'option-looksize': options.lookSizePx=cycleStepValue(options.lookSizePx,LOOK_PAD_SIZE_STEPS); options.save(); applyMobileControlSettings(); drawMobileMenu(); break;
-    case 'option-ctrlheight': options.controlsYOffsetPx=cycleStepValue(options.controlsYOffsetPx,CONTROL_Y_STEPS); options.save(); applyMobileControlSettings(); drawMobileMenu(); break;
+    case 'option-ctrlheight': {
+      options.controlsYOffsetPx=cycleStepValue(options.controlsYOffsetPx,CONTROL_Y_STEPS);
+      options.save();
+      applyMobileControlSettings();
+      setMsg('CONTROL HEIGHT: '+controlHeightMenuLabel(options.controlsYOffsetPx));
+      drawMobileMenu();
+      break;
+    }
     case 'option-opacity': options.controlOpacityValue=cycleStepValue(options.controlOpacityValue,OPACITY_STEPS); options.save(); applyMobileControlSettings(); drawMobileMenu(); break;
     case 'option-mapsize': options.minimapSizePx=cycleStepValue(options.minimapSizePx,MINIMAP_SIZE_STEPS); options.save(); drawMobileMenu(); break;
     case 'option-deadzone': options.touchDeadzonePx=cycleStepValue(options.touchDeadzonePx,DEADZONE_STEPS); options.save(); drawMobileMenu(); break;
@@ -1123,21 +1142,22 @@ function drawMobileMenu(){
   }
   const playControls = mobileMode && state===STATE.PLAY && !paused;
   const portraitPlay = playControls && isMobilePortrait();
-  const portraitOptsPreview = mobileMode && state===STATE.OPTIONS && isMobilePortrait();
-  const showPortraitControls = portraitPlay || portraitOptsPreview;
+  const optionsTunePreview = mobileMode && state===STATE.OPTIONS;
+  const showPortraitControls = portraitPlay || (optionsTunePreview && isMobilePortrait());
+  const showLandscapeControlsPreview = optionsTunePreview && !isMobilePortrait();
   const mob = document.getElementById('mob');
   if(mob) mob.style.pointerEvents = playControls ? 'auto' : 'none';
   ['ml','mlookpad','mg','ms'].forEach(id=>{
     const el=document.getElementById(id);
-    if(el) el.style.display = showPortraitControls ? 'flex' : (playControls ? 'flex' : 'none');
+    if(el) el.style.display = (showPortraitControls || showLandscapeControlsPreview) ? 'flex' : (playControls ? 'flex' : 'none');
   });
   const mpEl = document.getElementById('mp');
   if(mpEl) mpEl.style.display = (playControls && !isMobilePortrait()) ? 'flex' : 'none';
-  if(showPortraitControls) applyMobileControlSettings();
+  if(showPortraitControls || showLandscapeControlsPreview || playControls) applyMobileControlSettings();
   const menuEl = document.getElementById('mportmenu');
   if(menuEl){
-    menuEl.style.display = (portraitPlay || portraitOptsPreview) ? 'flex' : 'none';
-    menuEl.classList.toggle('por-show', !!(portraitPlay || portraitOptsPreview));
+    menuEl.style.display = (portraitPlay || (optionsTunePreview && isMobilePortrait())) ? 'flex' : 'none';
+    menuEl.classList.toggle('por-show', !!(portraitPlay || (optionsTunePreview && isMobilePortrait())));
   }
   const mmEl = document.getElementById('mm');
   if(mmEl) mmEl.style.display = (playControls && !isMobilePortrait()) ? 'flex' : 'none';
@@ -1185,6 +1205,7 @@ function drawMobileMenu(){
       <div class="rit ${_rmSel===5?'sel':''}" data-action="title-options">OPTIONS / HELP</div>
       <div class="rit ${_rmSel===6?'sel':''}" data-action="toggle-fs">${isFullscreen()?'EXIT FULLSCREEN':'FULLSCREEN'}</div>
       <div class="rclose" style="margin-top:16px;">↑↓ navigate · tap to activate</div>
+      <div class="rclose" style="margin-top:6px;color:#5a4a3a;">build ${BUILD_ID}</div>
     `);
     rmenuSel(7); return;
   }
@@ -1254,6 +1275,7 @@ function drawMobileMenu(){
     rmenuShow();
     rmenuHTML(`
       <div class="rpantit">OPTIONS</div>
+      <div class="rdesc" style="margin-bottom:8px;color:#6a5a4a;">build ${BUILD_ID}</div>
       <div style="overflow-y:auto;max-height:68vh;width:100%;padding:0 18px;box-sizing:border-box;">
         <div class="rit" data-action="option-name">NAME: ${profile.name||'RUNNER'}</div>
         <div class="rit" data-action="option-look">LOOK SPEED: ${lookSpeedLabel(options.lookSpeed)}</div>
@@ -3512,12 +3534,17 @@ function frame(now){
   }
   else {
     // menu states (TITLE/SEEDED/STATS/LB/OPTIONS): dark background + overlay only
-    ctx.fillStyle='#1a1410'; ctx.fillRect(0,0,innerWidth,innerHeight);
-    // subtle mesa silhouette behind menu
-    ctx.fillStyle='#2a2018';
-    ctx.beginPath(); ctx.moveTo(0,innerHeight);
-    for(let x=0;x<=innerWidth;x+=20){ ctx.lineTo(x, innerHeight-40-Math.sin(x*0.01+now*0.0003)*20); }
-    ctx.lineTo(innerWidth,innerHeight); ctx.fill();
+    if(mobileMode && isMobilePortrait() && state===STATE.OPTIONS){
+      ctx.fillStyle='#0c0a08'; ctx.fillRect(0,0,view.width,view.height);
+      drawPortraitDashboardChrome();
+    } else {
+      ctx.fillStyle='#1a1410'; ctx.fillRect(0,0,innerWidth,innerHeight);
+      // subtle mesa silhouette behind menu
+      ctx.fillStyle='#2a2018';
+      ctx.beginPath(); ctx.moveTo(0,innerHeight);
+      for(let x=0;x<=innerWidth;x+=20){ ctx.lineTo(x, innerHeight-40-Math.sin(x*0.01+now*0.0003)*20); }
+      ctx.lineTo(innerWidth,innerHeight); ctx.fill();
+    }
     drawOverlays();
     drawMobileMenu();
   }
