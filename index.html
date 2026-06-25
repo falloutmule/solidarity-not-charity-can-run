@@ -3263,18 +3263,18 @@ function rectsOverlap(a,b){
   return !(a.left+a.width <= b.left || b.left+b.width <= a.left ||
            a.top+a.height <= b.top || b.top+b.height <= a.top);
 }
-/** Portrait layout — mockup fidelity: FPV → wide minimap → stats → controls (overlap preserved). */
+/** Portrait layout — FPV → minimap → controls → stats (bottom bar). */
 function portraitLayout(){
   const { cw, ch } = layoutCssSize();
   const fpvH = portraitPlayH();
   const miniH = Math.round(Math.max(150, ch * 0.265));
   const statsH = Math.round(Math.max(64, ch * 0.082));
   const controlsH = Math.max(118, ch - fpvH - miniH - statsH);
-  const cy0 = fpvH + miniH + statsH;
+  const cy0 = fpvH + miniH;
   const fpvRect = { x:0, y:0, w:cw, h:fpvH };
   const minimapRect = { x:0, y:fpvH, w:cw, h:miniH };
-  const statsRect = { x:0, y:fpvH + miniH, w:cw, h:statsH };
   const controlsRect = { x:0, y:cy0, w:cw, h:controlsH };
+  const statsRect = { x:0, y:cy0 + controlsH, w:cw, h:statsH };
   const btnSize = Math.min(180, Math.max(56, Number(options.buttonSizePx) || 85));
   const joySize = Math.min(220, Math.max(72, Math.round(Number(options.joySizePx) || 110)));
   const giveSize = Math.round(Math.max(48, btnSize * 0.72));
@@ -3298,10 +3298,9 @@ function portraitLayout(){
   };
   const menuW = Math.round(Math.min(160, cw * 0.42));
   const menuH = 44;
-  const statsBot = fpvH + miniH + statsH;
   const menuRect = {
     left: Math.round((cw - menuW) / 2),
-    top: Math.round(statsBot + 4),
+    top: Math.round(cy0 + 6),
     width: menuW, height: menuH
   };
   return { fpvRect, minimapRect, statsRect, controlsRect, moveRect, giveRect, sprintRect, lookRect, menuRect };
@@ -3314,20 +3313,20 @@ function drawPortraitDashboardChrome(){
   ctx.fillRect(0, y0, view.width, view.height - y0);
   ctx.fillStyle = 'rgba(16,12,10,0.94)';
   ctx.fillRect(L.minimapRect.x, L.minimapRect.y, L.minimapRect.w, L.minimapRect.h);
-  ctx.fillStyle = 'rgba(14,11,9,0.96)';
-  ctx.fillRect(L.statsRect.x, L.statsRect.y, L.statsRect.w, L.statsRect.h);
   ctx.fillStyle = 'rgba(10,8,6,0.98)';
   ctx.fillRect(L.controlsRect.x, L.controlsRect.y, L.controlsRect.w, L.controlsRect.h);
+  ctx.fillStyle = 'rgba(14,11,9,0.96)';
+  ctx.fillRect(L.statsRect.x, L.statsRect.y, L.statsRect.w, L.statsRect.h);
   ctx.strokeStyle = 'rgba(190,158,104,0.22)'; ctx.lineWidth = 1;
-  [L.minimapRect.y, L.statsRect.y, L.controlsRect.y].forEach(yy=>{
+  [L.minimapRect.y, L.controlsRect.y, L.statsRect.y].forEach(yy=>{
     ctx.beginPath(); ctx.moveTo(0, yy); ctx.lineTo(view.width, yy); ctx.stroke();
   });
   if(_layoutDebugActive){
     const zones = [
       ['FPV', L.fpvRect, '#00ff66'],
       ['MINI', L.minimapRect, '#00e5ff'],
-      ['STATS', L.statsRect, '#ff66ff'],
       ['DOCK', L.controlsRect, '#ffee00'],
+      ['STATS', L.statsRect, '#ff66ff'],
     ];
     ctx.font = 'bold 10px monospace';
     zones.forEach(([lbl, r, col])=>{
