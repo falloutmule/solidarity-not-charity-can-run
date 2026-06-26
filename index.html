@@ -449,7 +449,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'contract1';
+const BUILD_ID = 'file1';
 const IS_FILE_ORIGIN = (typeof location !== 'undefined' && location.protocol === 'file:');
 const FILE_ORIGIN_SAVE_NOTE = 'Local file mode: saves may not persist. Use GitHub Pages for reliable saves.';
 function fileOriginMenuNoteHTML(){
@@ -901,33 +901,37 @@ function bindMobileControls(){
 
   // ---- dedicated LOOK circle (#mlookpad) — works in BOTH portrait and landscape ----
   const lpad = document.getElementById('mlookpad');
-  let lpadMousePtr = null; // mouse-only pointer look on #mlookpad
+  let lpadPtr = null; // pointer look on #mlookpad (touch + mouse)
+
+  const endLpadPtr = e=>{
+    if(!lpadPtr || e.pointerId !== lpadPtr.id) return;
+    e.preventDefault(); e.stopPropagation();
+    try{ lpad.releasePointerCapture(e.pointerId); }catch(_e){}
+    lpadPtr = null;
+    lpad.classList.remove('pr');
+  };
 
   lpad.addEventListener('pointerdown', e=>{
-    if(e.pointerType === 'touch') return;
     e.preventDefault(); e.stopPropagation();
-    lpadMousePtr = { id: e.pointerId, startX: e.clientX };
+    lookTouch.id = null;
+    lookTouch.lastX = 0;
+    lpadPtr = { id: e.pointerId, startX: e.clientX };
+    try{ lpad.setPointerCapture(e.pointerId); }catch(_e){}
     lpad.classList.add('pr');
     dismissLookHint();
   },{passive:false});
 
   lpad.addEventListener('pointermove', e=>{
-    if(e.pointerType === 'touch') return;
-    if(!lpadMousePtr || e.pointerId !== lpadMousePtr.id) return;
+    if(!lpadPtr || e.pointerId !== lpadPtr.id) return;
+    e.preventDefault(); e.stopPropagation();
     if(state!==STATE.PLAY || paused) return;
-    const dx = e.clientX - lpadMousePtr.startX;
-    if(Math.abs(dx) > 0.2){ lpadMousePtr.startX = e.clientX; player.angle += dx * mobileLookSens(); }
+    const dx = e.clientX - lpadPtr.startX;
+    if(Math.abs(dx) > 0.2){ lpadPtr.startX = e.clientX; player.angle += dx * mobileLookSens(); }
     touchDebug({type:'look_circle_move', orient:isMobilePortrait()?'port':'land', dx, angle:player.angle});
   },{passive:false});
 
-  lpad.addEventListener('pointerup', e=>{
-    if(e.pointerType === 'touch') return;
-    if(lpadMousePtr && e.pointerId===lpadMousePtr.id){ lpadMousePtr=null; lpad.classList.remove('pr'); }
-  },{passive:false});
-  lpad.addEventListener('pointercancel', e=>{
-    if(e.pointerType === 'touch') return;
-    if(lpadMousePtr && e.pointerId===lpadMousePtr.id){ lpadMousePtr=null; lpad.classList.remove('pr'); }
-  },{passive:false});
+  lpad.addEventListener('pointerup', endLpadPtr, {passive:false});
+  lpad.addEventListener('pointercancel', endLpadPtr, {passive:false});
 
   lpad.addEventListener('touchstart', e=>{
     e.preventDefault(); e.stopPropagation();
@@ -952,17 +956,24 @@ function bindMobileControls(){
   // ---- unified pointer look for landscape #mr ----
   // Use pointer events so both touch and mouse work on #mr in landscape.
   let mrPtr = null; // {id, startX}
+  const endMrPtr = e=>{
+    if(!mrPtr || e.pointerId !== mrPtr.id) return;
+    e.preventDefault(); e.stopPropagation();
+    try{ mr.releasePointerCapture(e.pointerId); }catch(_e){}
+    mrPtr = null;
+  };
   mr.addEventListener('pointerdown', e=>{
     if(isMobilePortrait()) return;
-    if(e.pointerType === 'touch') return;
     if(e.pointerType === 'mouse' && !mobileMode) return;
     e.preventDefault(); e.stopPropagation();
     mrPtr = { id: e.pointerId, startX: e.clientX };
+    try{ mr.setPointerCapture(e.pointerId); }catch(_e){}
     dismissLookHint();
   },{passive:false});
 
   mr.addEventListener('pointermove', e=>{
     if(!mrPtr || e.pointerId !== mrPtr.id) return;
+    e.preventDefault(); e.stopPropagation();
     if(state!==STATE.PLAY || paused) return;
     const dx = e.clientX - mrPtr.startX;
     if(Math.abs(dx) > 0.5){ mrPtr.startX = e.clientX; }
@@ -970,8 +981,8 @@ function bindMobileControls(){
     touchDebug({type:'land_look_move', dx, angle:player.angle});
   },{passive:false});
 
-  mr.addEventListener('pointerup', e=>{ if(mrPtr && e.pointerId===mrPtr.id){ mrPtr=null; } },{passive:false});
-  mr.addEventListener('pointercancel', e=>{ if(mrPtr && e.pointerId===mrPtr.id){ mrPtr=null; } },{passive:false});
+  mr.addEventListener('pointerup', endMrPtr, {passive:false});
+  mr.addEventListener('pointercancel', endMrPtr, {passive:false});
 
   // ---- GIVE button ----
   mg.addEventListener('touchstart', e=>{
