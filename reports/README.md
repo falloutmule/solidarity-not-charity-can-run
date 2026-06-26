@@ -1,7 +1,7 @@
 # Reports — SNC Can Run
 
 Main hub for guard cards, reference studies, history, proofs, and backups.  
-**Gameplay baseline:** `runprog1` / `1437b6f` — see **`../PROJECT_STATUS.md`**.
+**Gameplay baseline:** `onboard1` — see **`../PROJECT_STATUS.md`**.
 
 Reports were moved out of the repo root so GitHub shows only the game + core docs.
 
@@ -24,6 +24,7 @@ Reports were moved out of the repo root so GitHub shows only the game + core doc
 | 11 | Procedural multi-seed validation | [guards/PROCEDURAL_LEVEL_VALIDATION_REPORT.md](guards/PROCEDURAL_LEVEL_VALIDATION_REPORT.md) | `multiseed1` / `ec44e53` | 52 seeds reachable | Harness only |
 | 12 | Full-run progression / save-load | [guards/FULL_RUN_PROGRESSION_E2E_REPORT.md](guards/FULL_RUN_PROGRESSION_E2E_REPORT.md) | `runprog1` / `1437b6f` | Run loop + SAVE | Yes (save fields) |
 | 13 | GitHub Actions harness CI | [guards/GITHUB_ACTIONS_CI_REPORT.md](guards/GITHUB_ACTIONS_CI_REPORT.md) | CI card | Playwright on push/PR | CI only |
+| 14 | Onboarding / first-run help | [guards/ONBOARDING_FIRST_RUN_HELP_REPORT.md](guards/ONBOARDING_FIRST_RUN_HELP_REPORT.md) | `onboard1` | `CR.runOnboardingSelfCheck` | Yes (UI only) |
 
 ---
 

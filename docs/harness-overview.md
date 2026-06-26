@@ -4,7 +4,7 @@ SNC Can Run uses **in-browser self-checks** (`window.CR`) plus a **Playwright** 
 
 ## In-browser (`window.CR`)
 
-- Functions like `CR.runLayoutSelfCheck()`, `CR.runFullSelfCheck()`, `CR.runHallSelfCheck()`, etc.
+- Functions like `CR.runLayoutSelfCheck()`, `CR.runFullSelfCheck()`, `CR.runOnboardingSelfCheck()`, `CR.runHallSelfCheck()`, etc.
 - URL: `?selfcheck=1` runs full check and shows PASS/FAIL overlay.
 - **`crWithTemporaryState`** — snapshots public state + `localStorage`, runs harness, restores so benchmarks do not leak.
 - **`__crRuntimeErrors`** — uncaught errors fail runtime-clean checks.
@@ -26,6 +26,7 @@ SNC Can Run uses **in-browser self-checks** (`window.CR`) plus a **Playwright** 
 | `proof-reachability.json` | LOS / BFS |
 | `proof-procedural-level-validation.json` | Multi-seed maps |
 | `proof-full-run-progression.json` | Run + save/load E2E |
+| `proof-onboarding` (in `proof-full-selfcheck.json` → `onboarding`) | First-run help overlay |
 | `proof-harness-isolation.json` | State isolation |
 | `proof-release-artifact.json` | Single-file artifact |
 | `proof-no-external-requests.json` | No external fetches |

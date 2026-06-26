@@ -1,6 +1,6 @@
 # Project status — Solidarity Not Charity Can Run
 
-Last updated: GitHub Actions selfcheck CI added.
+Last updated: onboarding / first-run help (`onboard1`).
 
 Reports were moved into **`reports/`** to keep the GitHub root readable. Index: **`reports/README.md`**; guard write-ups: **`reports/guards/`**.
 
@@ -10,14 +10,16 @@ Reports were moved into **`reports/`** to keep the GitHub root readable. Index: 
 
 | | |
 |--|--|
-| **BUILD_ID** (root `index.html`, unchanged by docs task) | `runprog1` |
-| **Gameplay commit** | `1437b6f` |
+| **BUILD_ID** (root `index.html`) | `onboard1` |
+| **Prior gameplay baseline** | `runprog1` / `1437b6f` |
 | **Handoff reference baseline** | `multiseed1` / `ec44e53` |
 
 ## URLs
 
-- **Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=1437b6f&mobile=on&portraitlayout=1  
-- **Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=1437b6f&mobile=on&portraitlayout=1  
+- **Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=**COMMIT**&mobile=on&portraitlayout=1  
+- **Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=**COMMIT**&mobile=on&portraitlayout=1  
+
+(Replace **COMMIT** with latest `main` hash after push.)
 
 ## Completed cards (order)
 
@@ -30,6 +32,7 @@ Reports were moved into **`reports/`** to keep the GitHub root readable. Index: 
 7. **Procedural multi-seed validation guard** — `multiseed1`  
 8. **Full-run progression / save-load E2E guard** — `runprog1`  
 9. **GitHub Actions harness CI** — `.github/workflows/selfcheck.yml`, proof artifact upload  
+10. **Onboarding / first-run help** — `onboard1`, `CR.runOnboardingSelfCheck`
 
 ## Next likely work
 
@@ -38,23 +41,4 @@ Reports were moved into **`reports/`** to keep the GitHub root readable. Index: 
 
 ## Blockers
 
-- **None known** from harness and recent ships.
-
-## Rules (do not break casually)
-
-| Rule | Detail |
-|------|--------|
-| **Layout** | Frozen from **layoutguard2** unless a harness proves a bug or Travis requests a change |
-| **Controls** | Frozen from **controlrel1** unless explicitly requested |
-| **Hall** | Custom level; do not redesign without harness + request |
-| **Runtime** | **Single-file** root `index.html` for Pages |
-| **Generator** | Do not change procedural placement logic without multi-seed validation |
-| **Harness** | Do not ask Travis to manually confirm harness-proven tasks |
-
-## Quick links
-
-- Reports index: [reports/README.md](reports/README.md)  
-- Guard reports: [reports/guards/](reports/guards/)  
-- Docs index: [docs/README.md](docs/README.md)  
-- Contributing: `CONTRIBUTING.md`  
-- Release policy: `SOURCE_RELEASE_POLICY.md`
+- None known after local harness pass; confirm GitHub Actions after push.

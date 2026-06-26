@@ -10,15 +10,15 @@
   https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=1437b6f&mobile=on&portraitlayout=1
 - **Local:** open `index.html` in a browser (saves may differ from Pages origin).
 
-Cache-bust with `?v=<git-commit>` when verifying a specific ship. Mobile portrait layout: add `mobile=on&portraitlayout=1`. Reset control offsets: `resetcontrols=1`.
+Cache-bust with `?v=<git-commit>` when verifying a specific ship. Mobile portrait layout: add `mobile=on&portraitlayout=1`. Reset control offsets: `resetcontrols=1`. **First new run** shows a short **How to Play** overlay (dismiss with GOT IT; reopen from pause or OPTIONS).
 
 ## Current ship reference
 
 | Field | Value |
 |-------|--------|
-| **BUILD_ID** (in `index.html`) | `runprog1` |
-| **Gameplay commit** | `1437b6f` |
-| **Prior baseline** (handoff reference) | `multiseed1` / `ec44e53` |
+| **BUILD_ID** (in `index.html`) | `onboard1` |
+| **Gameplay commit** | (see latest `main` after push) |
+| **Prior baseline** | `runprog1` / `1437b6f` |
 
 See **`PROJECT_STATUS.md`** for completed guard cards and rules.
 
