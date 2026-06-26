@@ -2,57 +2,57 @@
 
 ## WHAT WAS DONE
 
-- Backup: `index.before-layout-usability-guard.html`
-- Prior baseline: **viewportfix1 / 4611b1e**
-- **Before clamp (VERY HIGH -240 raw):** total overlap **36.5%** (move 13.6%, look 14.2%, give 4.6%, sprint 4.1%) — would fail harness
-- **After clamp (all presets):** per-control ≤15%, total ≤25% (VERY HIGH clamped to **0%** overlap in proof run)
-- Commit: **cf88dc2**
-- Minimap/control **overlap metrics** (`crMinimapOverlapMetrics`, `crMinimapOverlapPass`)
-- **Runtime clamp** in `portraitLayout()` — `crApplyMinimapUsabilityClamp` keeps controls from covering the minimap beyond thresholds (without moving MENU/minimap)
-- **`crMigrateUnsafeControlsYOffset()`** — persists a safer `controlsYOffsetPx` when raw preset would exceed overlap limits on the current viewport
-- **`CR.runPortraitUsabilitySelfCheck()`** — LOW/MID/HIGH/VERY HIGH presets, FPV/minimap/MENU/stats/controls visibility, overlap thresholds
-- **`CR.runSettingsSafetySelfCheck()`** — migrate, MID safe, resetcontrols-style MID, harness restore
-- Playwright **`portraitUsabilitySection()`** + proof screenshots
-- Wired into **`CR.runFullSelfCheck()`** and Playwright summary gate
+- Backup: `index.before-portrait-usability-guard.html`
+- Prior baseline: **aipipeline1 / 48c3b21**
+- **`BUILD_ID` → `layoutguard2`** (cache bust; overlap guard unchanged from merged layoutguard work)
+- Screenshot diagnosis: viewport/safe-area proved on-screen visibility, not minimap **usability** — controls could cover ~36% of minimap at VERY HIGH (-240) without clamp
+- Overlap harness: **15% per control**, **25% total** of minimap area
+- **`crApplyMinimapUsabilityClamp()`** in `portraitLayout()` — dock Y clamp only; MENU / minimap / stats / FPV fixed
+- **`crMigrateUnsafeControlsYOffset()`** on boot, resize, after dock height changes — saves nearest safe step when raw offset fails (no-clamp test)
+- **VERY HIGH kept** in `CONTROL_Y_STEPS` with OPTIONS label **“clamps if overlap”**; runtime clamp makes preset usable
+- **`CR.runPortraitUsabilitySelfCheck()`** + **`CR.runSettingsSafetySelfCheck()`** in **`CR.runFullSelfCheck()`**
+- Playwright **`portraitUsabilitySection()`** — release artifact, presets, screenshots, `resetcontrols=1`, post-selfcheck boot leak check
+- Playwright summary requires **`portraitUsability.pass`** and **`settingsSafety.pass`**
 
 ## WHAT WAS VERIFIED
 
-- Overlap thresholds: **15% per control**, **25% total** minimap area
-- Screenshot-style overlap (VERY HIGH **-240** without clamp) recorded as **`overlapBeforeClamp`** in self-check
-- With clamp + migration, all four presets pass usability harness
-- **`?resetcontrols=1`** → `controlsYOffsetPx === 0` (MID) + safe overlap
-- Hall E2E, render guard, harness isolation, viewport safe-area — still pass (full Playwright green)
-- `proof-playwright-summary.json` **pass: true**
-- `proof-portrait-usability.json` **pass: true**
+- **Before clamp (VERY HIGH -240 raw):** total **36.5%** (move 13.6%, look 14.2%, give 4.6%, sprint 4.1%)
+- **After clamp (all presets in harness):** total **0%** overlap at every preset including VERY HIGH
+- `controlsYOffsetPx` **migrated** when saved -240 is unsafe without clamp; **not removed** from steps
+- **`resetcontrols=1`** → MID (`0`) + overlap pass + settings safety pass
+- Normal boot after selfcheck does not inherit unsafe Y (`afterHarness.overlapPass`)
+- Hall E2E, render guard, viewport safe-area, harness isolation, release artifact, AI-safe constitution — pass
+- `node tests/run_selfcheck_playwright.js` exit **0**
 
 ## WHAT FAILED
 
-- Nothing blocking ship on this lineage.
+- Nothing blocking ship.
 
 ## CURRENT EXACT STATE
 
-- **`BUILD_ID`:** `layoutguard1`
-- VERY HIGH label notes **“clamps if overlap”** in OPTIONS
-- Default boot: MID **0**; unsafe saved Y migrates on portrait resize/boot
+- Shipped artifact: root **`index.html`**
+- Adjuster: LOW / MID / HIGH / VERY HIGH all available; unsafe overlap **clamped at layout**, unsafe saves **migrated**
+- LOOK ↔ SPRINT overlap unchanged (allowed)
 
 ## REMAINING BLOCKERS
 
-- None for harness. Optional Travis device spot-check only.
+- None.
 
 ## NEXT ACTIONABLE STEP
 
-- Hard refresh Pages URL with new `v=` hash after push (below).
+- Travis optional device spot-check with `?v=<commit>&mobile=on&portraitlayout=1`; harness is completion gate.
 
 ## EVIDENCE
 
 - `proof-portrait-usability.json`
 - `proof-usability-low.png`, `proof-usability-mid.png`, `proof-usability-high.png`, `proof-usability-very-high.png`
 - `proof-resetcontrols-safe.png`
-- `proof-full-selfcheck.json`, `proof-playwright-summary.json`
+- `proof-playwright-summary.json`, `proof-release-artifact.json`, `proof-ai-safe-constitution.json`, `proof-full-selfcheck.json`
 
 ## GITHUB PAGES URL
 
-- Commit: **cf88dc2**
-- Normal: https://falloutmule.github.io/solidarity-not-charity-can-run/?v=cf88dc2&mobile=on&portraitlayout=1
-- Self-check: https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=cf88dc2&mobile=on&portraitlayout=1
-- Reset controls: https://falloutmule.github.io/solidarity-not-charity-can-run/?v=cf88dc2&mobile=on&portraitlayout=1&resetcontrols=1
+- **BUILD_ID:** `layoutguard2`
+- Commit: **PLACEHOLDER**
+- Play: https://falloutmule.github.io/solidarity-not-charity-can-run/?v=PLACEHOLDER&mobile=on&portraitlayout=1
+- Self-check: https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=PLACEHOLDER&mobile=on&portraitlayout=1
+- Reset controls: add `&resetcontrols=1` to play URL

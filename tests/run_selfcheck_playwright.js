@@ -660,20 +660,21 @@ async function portraitUsabilitySection(page) {
     settingsSafety.pass === true &&
     resetProof.controlsYOffsetPx === 0 &&
     resetProof.overlapPass === true &&
-    resetProof.settingsPass === true;
+    resetProof.settingsPass === true &&
+    afterHarness.overlapPass === true;
 
   const proof = {
     pass,
     build: usability.build,
     usability,
-    settingsSafety,
+    settingsSafety: { pass: settingsSafety.pass === true, ...settingsSafety },
     resetProof,
     afterHarness,
     screenshots: presetList.map((p) => p.shot).concat(['proof-resetcontrols-safe.png']),
     timestamp: new Date().toISOString(),
   };
   writeProof('proof-portrait-usability.json', proof);
-  return { pass, proof };
+  return { pass, proof, usability, settingsSafety: { pass: settingsSafety.pass === true, checks: settingsSafety.checks } };
 }
 
 function fpIsPublicSafe(fp) {
@@ -892,6 +893,8 @@ async function main() {
   const audio = await audioUnlock(page);
   const viewportSafeArea = await viewportSafeAreaSection(page);
   const portraitUsability = await portraitUsabilitySection(page);
+  const settingsSafetyPass = portraitUsability.settingsSafety?.pass === true;
+
   const harnessIsolation = await harnessIsolationSection(page);
   const renderFailure = await renderFailureSection(page);
   const hallE2E = await hallE2ESection(page);
@@ -926,6 +929,7 @@ async function main() {
     audio.pass &&
     viewportSafeArea.pass &&
     portraitUsability.pass &&
+    settingsSafetyPass &&
     harnessIsolation.pass &&
     renderFailure.pass &&
     hallE2E.pass &&
@@ -961,6 +965,7 @@ async function main() {
     audio,
     viewportSafeArea,
     portraitUsability,
+    settingsSafety: portraitUsability.settingsSafety || { pass: settingsSafetyPass },
     harnessIsolation,
     renderFailure,
     hallE2E,
