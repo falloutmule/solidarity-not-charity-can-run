@@ -270,6 +270,14 @@ const ctx  = view.getContext('2d');
 const RW = 320, RH = 200;                      // internal render resolution
 const buf = document.createElement('canvas'); buf.width = RW; buf.height = RH;
 const bctx = buf.getContext('2d');
+/* OCCLUSION REGRESSION GUARD (Kanban Card 3 / P1)
+ * - Wall DDA assigns zbuffer[col] = perpendicular wall distance for every column 0..RW-1.
+ * - Billboards (props, pickups, npcs, exit) use ONE draw path: per-column loop with depth vs zbuffer.
+ * - Rule: if (depth >= zbuffer[col]) skip column — sprites must not show through nearer walls.
+ * - Do NOT add post-loop sprite fog fillRect (bypasses zbuffer; causes through-wall leaks + halos).
+ * - depth = forward distance; hscr = horizontal screen factor — never swap in pushSp projection.
+ * After edits: CR.getOcclusionZbufferProof() and visual check NPC/can behind wall.
+ */
 const zbuffer = new Float32Array(RW);          // per-column wall distance (sprite occlusion)
 
 // ---------------------------------------------------------------------------
@@ -449,7 +457,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'file1';
+const BUILD_ID = 'zbuf1';
 const IS_FILE_ORIGIN = (typeof location !== 'undefined' && location.protocol === 'file:');
 const FILE_ORIGIN_SAVE_NOTE = 'Local file mode: saves may not persist. Use GitHub Pages for reliable saves.';
 function fileOriginMenuNoteHTML(){
