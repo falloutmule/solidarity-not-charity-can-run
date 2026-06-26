@@ -42,3 +42,9 @@ Every change must pass:
 - Full Playwright harness (`proof-playwright-summary.json`)
 
 No push if the harness tests dev-only files while Pages serves a different path.
+
+## Related documentation
+
+- **`docs/README.md`** — docs index (harness, Pages, mobile, handoff)
+- **`PROJECT_STATUS.md`** — current BUILD_ID, URLs, completed cards
+- **`reports/README.md`** — guard report index (files remain in repo root)

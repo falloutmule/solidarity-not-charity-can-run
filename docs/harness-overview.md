@@ -1,0 +1,41 @@
+# Harness overview
+
+SNC Can Run uses **in-browser self-checks** (`window.CR`) plus a **Playwright** driver that loads root **`index.html`** and collects proofs.
+
+## In-browser (`window.CR`)
+
+- Functions like `CR.runLayoutSelfCheck()`, `CR.runFullSelfCheck()`, `CR.runHallSelfCheck()`, etc.
+- URL: `?selfcheck=1` runs full check and shows PASS/FAIL overlay.
+- **`crWithTemporaryState`** — snapshots public state + `localStorage`, runs harness, restores so benchmarks do not leak.
+- **`__crRuntimeErrors`** — uncaught errors fail runtime-clean checks.
+
+## Playwright
+
+- **`tests/run_selfcheck_playwright.js`** — launches browser, runs section checks, writes JSON proofs to repo root.
+- Run: `node tests/run_selfcheck_playwright.js`
+- Summary: **`proof-playwright-summary.json`** (`pass: true` required for ship).
+
+## Proof JSON (examples)
+
+| File | Card |
+|------|------|
+| `proof-playwright-summary.json` | Full suite |
+| `proof-portrait-usability.json` | Portrait layout |
+| `proof-mobile-control-reliability.json` | Mobile controls |
+| `proof-movement-collision.json` | Collision |
+| `proof-reachability.json` | LOS / BFS |
+| `proof-procedural-level-validation.json` | Multi-seed maps |
+| `proof-full-run-progression.json` | Run + save/load E2E |
+| `proof-harness-isolation.json` | State isolation |
+| `proof-release-artifact.json` | Single-file artifact |
+| `proof-no-external-requests.json` | No external fetches |
+
+## Other gates
+
+- **No external request check** — game must not depend on network assets at runtime.
+- **Console / page errors** — captured during Playwright runs.
+- **Release artifact check** — validates root `index.html` structure policy.
+
+## Why Travis should not manually re-verify harness-green work
+
+If Playwright and self-check proofs pass on the **same commit** as the Pages `?v=` URL, manual confirmation adds little unless the task is **device-specific** (real phone GPU, touch quirks) or **deployment** (Pages cache). Report the proof paths instead.
