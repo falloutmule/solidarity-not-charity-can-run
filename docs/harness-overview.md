@@ -4,7 +4,7 @@ SNC Can Run uses **in-browser self-checks** (`window.CR`) plus a **Playwright** 
 
 ## In-browser (`window.CR`)
 
-- Functions like `CR.runLayoutSelfCheck()`, `CR.runFullSelfCheck()`, `CR.runOnboardingSelfCheck()`, `CR.runVisualReadabilitySelfCheck()`, `CR.runVisualRectangleRegressionSelfCheck()`, `CR.runHallSelfCheck()`, etc.
+- Functions like `CR.runLayoutSelfCheck()`, `CR.runFullSelfCheck()`, `CR.runOnboardingSelfCheck()`, `CR.runSoundFeedbackSelfCheck()`, `CR.runVisualReadabilitySelfCheck()`, `CR.runVisualRectangleRegressionSelfCheck()`, `CR.runHallSelfCheck()`, etc.
 - URL: `?selfcheck=1` runs full check and shows PASS/FAIL overlay.
 - **`crWithTemporaryState`** — snapshots public state + `localStorage`, runs harness, restores so benchmarks do not leak.
 - **`__crRuntimeErrors`** — uncaught errors fail runtime-clean checks.
@@ -29,6 +29,8 @@ SNC Can Run uses **in-browser self-checks** (`window.CR`) plus a **Playwright** 
 | `proof-onboarding` (in `proof-full-selfcheck.json` → `onboarding`) | First-run help overlay |
 | `proof-visual-readability-selfcheck.json` / `visualReadability` in full selfcheck | Visual readability polish |
 | `proof-visual-rectangle-regression-selfcheck.json` | Stuck lower-center rectangle guard |
+| `proof-sound-feedback-selfcheck.json` | Procedural sound/HUD feedback (harness-muted) |
+| `proof-feedback-can.png` … `proof-feedback-district-complete.png` | HUD feedback proof shots |
 | `proof-visualfix-normal.png` … `proof-visualfix-turn-right.png` | Rectangle fix heading proofs |
 | `proof-harness-isolation.json` | State isolation |
 | `proof-release-artifact.json` | Single-file artifact |

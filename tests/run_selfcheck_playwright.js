@@ -574,6 +574,38 @@ async function visualRectangleProofShots(page) {
   };
 }
 
+async function soundFeedbackProofShots(page) {
+  const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
+  await page.setViewportSize({ width: 390, height: 844 });
+  const shots = [];
+  const scenarios = [
+    { file: 'proof-feedback-can.png', fn: "CR.startRun(42);CR.crTriggerSoundCue('canCollect',{forceHud:true});" },
+    { file: 'proof-feedback-exit-ready.png', fn: "CR.startRun(42);CR.crTriggerSoundCue('quotaExitReady',{forceHud:true});" },
+    { file: 'proof-feedback-give-blocked.png', fn: "CR.startRun(42);CR.crTriggerSoundCue('giveBlocked',{forceHud:true});" },
+    { file: 'proof-feedback-district-complete.png', fn: "CR.startRun(42);CR.crTriggerSoundCue('districtComplete',{forceHud:true});" },
+  ];
+  for (const sc of scenarios) {
+    await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+    await waitGameReady(page);
+    await page.evaluate(sc.fn);
+    await page.waitForTimeout(450);
+    const blank = await canvasNonBlank(page);
+    await page.screenshot({ path: path.join(ROOT, sc.file) });
+    shots.push({ file: sc.file, blankOk: blank.ok });
+  }
+  const crSound = await page.evaluate(() => {
+    window.__crRuntimeErrors = window.__crRuntimeErrors || [];
+    return CR.runSoundFeedbackSelfCheck();
+  });
+  writeProof('proof-sound-feedback.json', crSound);
+  writeProof('proof-sound-feedback-selfcheck.json', crSound);
+  return {
+    pass: shots.every((s) => s.blankOk) && crSound.pass === true,
+    shots,
+    crSoundFeedback: crSound,
+  };
+}
+
 async function viewportSafeAreaSection(page) {
   const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
   const scenarios = [
@@ -1173,6 +1205,7 @@ async function main() {
   const hallE2E = await hallE2ESection(page);
   const visual = await visualRegressionShots(page);
   const visualRectangle = await visualRectangleProofShots(page);
+  const soundFeedback = await soundFeedbackProofShots(page);
 
   writeProof('proof-network.json', {
     pass: net.externalRequests.length === 0,
@@ -1214,6 +1247,7 @@ async function main() {
     hallE2E.pass &&
     visual.pass &&
     visualRectangle.pass &&
+    soundFeedback.pass &&
     networkPass &&
     consolePass &&
     pageErrPass &&
@@ -1256,6 +1290,7 @@ async function main() {
     hallE2E,
     visual,
     visualRectangle,
+    soundFeedback,
     network: { pass: networkPass, external: net.externalRequests.length },
     console: { pass: consolePass, errors: net.consoleErrors },
     pageErrors: { pass: pageErrPass, errors: net.pageErrors },

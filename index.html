@@ -553,7 +553,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'visualfix1';
+const BUILD_ID = 'sound1';
 /** Visual readability contract (render/HUD only; gameplay unchanged). */
 const CR_VISUAL_READABILITY = {
   style: 'visualfix1',
@@ -561,6 +561,16 @@ const CR_VISUAL_READABILITY = {
   entityOutlines: true,
   exitReadyCue: true,
   giveTargetHighlight: true,
+};
+/** Sound / HUD feedback contract (procedural Web Audio only; no external assets). */
+const CR_SOUND_FEEDBACK = {
+  style: 'sound1',
+  webAudio: true,
+  externalAssets: false,
+  requiredCues: [
+    'canCollect', 'giveSuccess', 'giveBlocked', 'giveUnavailable', 'quotaExitReady',
+    'districtComplete', 'upgradeChosen', 'menuHelp', 'sprintDenied',
+  ],
 };
 const IS_FILE_ORIGIN = (typeof location !== 'undefined' && location.protocol === 'file:');
 const FILE_ORIGIN_SAVE_NOTE = 'Local file mode: saves may not persist. Use GitHub Pages for reliable saves.';
@@ -604,6 +614,7 @@ let lookHintUsed = false;
 let lookHintShownAt = 0;
 const LOOK_HINT_TIMEOUT_MS = 5000;
 let sprintBurstUntil = 0; // mobile sprint burst end time (seconds, performance.now/1000)
+let _sprintDenyFeedbackT = 0;
 let ms_element = null; // reference to SPRINT button for visual state updates
 const BASE_MOBILE_TURN_SENS = 0.0062; // per-pixel rad; 1.0x ≈ prior MED. Portrait adds extra boost via mobileLookSens().
 const LOOK_SPEED_STEPS = [0.75,1,1.25,1.5,2,2.5,3,4,5,6,8,10];
@@ -1072,7 +1083,7 @@ function triggerMobileSprintBurst(){
     return { fired: true, stamBefore, stamAfter: player.stamina, until: sprintBurstUntil };
   }
   if(ms){ ms.classList.add('pr'); setTimeout(()=>ms.classList.remove('pr'), 120); }
-  beep(160,0.04,'sawtooth',0.025);
+  crTriggerSoundCue('sprintDenied');
   return { fired: false, reason: 'no-stamina' };
 }
 function bindMobileControls(){
@@ -1310,7 +1321,7 @@ function bindMobileControls(){
       }
       if(!paused){
         clearInputState();
-        paused=true; SAVE.save(); beep(440,0.06,'sine',0.03);
+        paused=true; SAVE.save(); crTriggerSoundCue('menuHelp');
         drawMobileMenu();
       }
     };
@@ -1513,7 +1524,7 @@ function rmenuAction(action){
     case 'title-continue': if(SAVE.hasValid()) continueRun(); else setMsg('No saved run'); break;
     case 'title-stats': state=STATE.STATS; _rmSel=0; break;
     case 'title-lb': state=STATE.LB; _rmSel=0; break;
-    case 'title-options': nameInput=profile.name||'RUNNER'; state=STATE.OPTIONS; _rmSel=0; break;
+    case 'title-options': nameInput=profile.name||'RUNNER'; state=STATE.OPTIONS; _rmSel=0; crTriggerSoundCue('menuHelp'); break;
     case 'seed-start': {
       const el=document.getElementById('rseedinp');
       const raw=(el?el.value:seedInput)||'';
@@ -1546,6 +1557,7 @@ function rmenuAction(action){
     case 'option-deadzone': options.touchDeadzonePx=cycleStepValue(options.touchDeadzonePx,DEADZONE_STEPS); options.save(); drawMobileMenu(); break;
     case 'option-minimap': options.minimapDefault=!options.minimapDefault; showMinimap=options.minimapDefault; options.save(); drawMobileMenu(); break;
     case 'option-fx': options.reduceFx=!options.reduceFx; options.save(); drawMobileMenu(); break;
+    case 'option-sound': options.soundOn = options.soundOn === false; options.save(); drawMobileMenu(); break;
     case 'option-mouse': options.mouseSens=options.mouseSens>0.003?0.0015:parseFloat((options.mouseSens+0.0005).toFixed(4)); options.save(); drawMobileMenu(); break;
     case 'result-new': SAVE.clear(); startRun(); _rmSel=0; break;
     case 'result-retry':
@@ -1733,6 +1745,7 @@ function drawMobileMenu(){
         <div class="rit" data-action="option-mobile">MOBILE: ${options.mobileControls.toUpperCase()}</div>
         <div class="rit" data-action="option-minimap">MINIMAP DEFAULT: ${options.minimapDefault?'ON':'OFF'}</div>
         <div class="rit" data-action="option-fx">REDUCE FX: ${options.reduceFx?'ON':'OFF'}</div>
+        <div class="rit" data-action="option-sound">SOUND: ${options.soundOn !== false?'ON':'OFF'}</div>
         <div class="rit" data-action="option-mouse">MOUSE: ${options.mouseSens.toFixed(4)}</div>
         <div class="rit" data-action="show-onboarding" style="margin-top:8px;">HOW TO PLAY</div>
       <div class="rdesc" style="margin-top:10px;">Tap rows to cycle. SPRINT is a burst: block charge → burst.</div>
@@ -2128,6 +2141,7 @@ function syncOnboardingPanel(){
 function showOnboardingHelp(opts){
   const o = opts || {};
   onboardingOpen = true;
+  crTriggerSoundCue('menuHelp');
   if(o.fromPause && state === STATE.PLAY){ paused = true; rmenuHide(); }
   syncOnboardingPanel();
   drawMobileMenu();
@@ -2404,6 +2418,7 @@ function _beepNow(ctx, freq, dur, type, gain){
 
 function beep(freq,dur,type='square',gain=0.04){
   try{
+    if(typeof crSoundEnabled === 'function' && !crSoundEnabled()) return;
     const ctx = getAudioContext();
     if(!ctx) return;
     if(ctx.state === 'suspended'){
@@ -2427,7 +2442,55 @@ function getAudioUnlockProof(){
     state: ctx ? ctx.state : 'none',
     gestureEvents: ['pointerdown','keydown','touchstart'],
     resumeEntry: 'resumeAudioContext',
+    soundOn: typeof options !== 'undefined' ? options.soundOn !== false : true,
+    harnessMuted: typeof _crHarnessDepth !== 'undefined' && _crHarnessDepth > 0,
   };
+}
+
+const _SOUND_CUE_DEFS = {
+  canCollect: { freq: 720, dur: 0.07, type: 'square', gain: 0.032, hud: '+CAN', color: '#ffd24a', life: 0.75 },
+  giveSuccess: { freq: 880, dur: 0.11, type: 'triangle', gain: 0.038, hud: 'HELPED', color: '#9fffb6', life: 0.85 },
+  giveBlocked: { freq: 200, dur: 0.07, type: 'sawtooth', gain: 0.026, hud: 'NO LINE OF SIGHT', color: '#ff9a8a', life: 0.9 },
+  giveUnavailable: { freq: 160, dur: 0.06, type: 'sawtooth', gain: 0.022, hud: null },
+  giveNeedCans: { freq: 180, dur: 0.08, type: 'sawtooth', gain: 0.028, hud: null },
+  quotaExitReady: { freq: 1100, dur: 0.2, type: 'square', gain: 0.036, hud: 'EXIT READY', color: '#7fd4ff', life: 1.1 },
+  districtComplete: { freq: 620, dur: 0.16, type: 'triangle', gain: 0.04, hud: 'DISTRICT COMPLETE', color: '#ffe066', life: 1.15 },
+  upgradeChosen: { freq: 740, dur: 0.11, type: 'triangle', gain: 0.038, hud: 'UPGRADE', color: '#c8b0ff', life: 0.9 },
+  menuHelp: { freq: 480, dur: 0.055, type: 'sine', gain: 0.022, hud: null },
+  sprintDenied: { freq: 150, dur: 0.045, type: 'sawtooth', gain: 0.02, hud: null },
+};
+
+function crSoundEnabled(){
+  if(typeof _crHarnessDepth !== 'undefined' && _crHarnessDepth > 0) return false;
+  if(typeof options !== 'undefined' && options.soundOn === false) return false;
+  return true;
+}
+
+function crTriggerSoundCue(id, opts){
+  opts = opts || {};
+  const def = _SOUND_CUE_DEFS[id];
+  if(!def) return { ok: false, id, error: 'unknown_cue' };
+  const testOnly = !!opts.testOnly;
+  let played = false;
+  if(!testOnly && def.freq && crSoundEnabled()){
+    try{
+      beep(def.freq, def.dur, def.type || 'square', def.gain || 0.03);
+      played = true;
+    }catch(e){
+      return { ok: false, id, error: String(e && e.message || e) };
+    }
+  }
+  if(def.hud && !testOnly && opts.showHud !== false){
+    addPopup(def.hud, def.color || '#ffd24a', def.life);
+  }
+  if(def.hud && opts.forceHud){
+    addPopup(def.hud, def.color || '#ffd24a', def.life);
+  }
+  return { ok: true, id, played, hud: def.hud || null };
+}
+
+function crSoundFeedbackCueIds(){
+  return CR_SOUND_FEEDBACK.requiredCues.slice();
 }
 
 bindAudioUnlockGate();
@@ -2487,6 +2550,7 @@ const options = {
   joySize: 'med', buttonSize: 'med', controlOpacity: 'med', minimapSize: 'small', touchDeadzone: 'med', // legacy fields
   minimapDefault: true,
   reduceFx: false,
+  soundOn: true,
   helpDismissed: false,
   mobileControls: 'auto', // 'auto' | 'on' | 'off'
   load(){
@@ -2511,6 +2575,7 @@ const options = {
       else if(['low','med','high'].includes(o.touchDeadzone)) this.touchDeadzonePx = LEGACY_DEADZONE[o.touchDeadzone] || 8;
       if(typeof o.minimapDefault==='boolean') this.minimapDefault=o.minimapDefault;
       if(typeof o.reduceFx==='boolean') this.reduceFx=o.reduceFx;
+      if(typeof o.soundOn==='boolean') this.soundOn=o.soundOn;
       if(typeof o.helpDismissed==='boolean') this.helpDismissed=o.helpDismissed;
       if(['auto','on','off'].includes(o.mobileControls)) this.mobileControls=o.mobileControls;
     }
@@ -2538,7 +2603,7 @@ const options = {
       minimapSizePx:this.minimapSizePx, touchDeadzonePx:this.touchDeadzonePx,
       joySize:this.joySize, buttonSize:this.buttonSize, controlOpacity:this.controlOpacity,
       minimapSize:this.minimapSize, touchDeadzone:this.touchDeadzone,
-      minimapDefault:this.minimapDefault, reduceFx:this.reduceFx, helpDismissed:!!this.helpDismissed, mobileControls:this.mobileControls, v:SAVE_VERSION
+      minimapDefault:this.minimapDefault, reduceFx:this.reduceFx, soundOn:this.soundOn !== false, helpDismissed:!!this.helpDismissed, mobileControls:this.mobileControls, v:SAVE_VERSION
     };
     lsSet(K.settings, data); // canonical
     lsSet(K.options, data);  // legacy compatibility
@@ -2568,6 +2633,7 @@ crMigrateUnsafeControlsYOffset({ quiet: true });
     options.minimapSizePx = 68;
     options.touchDeadzonePx = 8;
     options.minimapDefault = true;
+    options.soundOn = true;
     options.mobileTurnSens = lookSensFromSpeed(options.lookSpeed);
     options.save();
   }
@@ -3494,8 +3560,8 @@ function tickPickups(){
         const space=player.maxCans-player.cans;
         const take=Math.min(c.amt,space);
         player.cans+=take; c.amt-=take;
-        beep(660,0.08,'square',0.05);
-        addPopup('+'+take+' CAN'+(take>1?'S':''),'#ffd24a');
+        crTriggerSoundCue('canCollect');
+        if(take > 1) addPopup('+'+take+' CANS','#ffd24a', 0.65);
         game.flash=0.5;
         game.run.cansCollected += take;
         SAVE.save();
@@ -3507,15 +3573,15 @@ function tickPickups(){
 function giveCan(){
   if(player.giveCD>0){ return; }
   const best=game.aimNpc;
-  if(!best){ setMsg('no one nearby'); beep(160,0.06,'sawtooth',0.03); return; }
+  if(!best){ setMsg('no one nearby'); crTriggerSoundCue('giveUnavailable'); return; }
   const los = interactionLineClear(player.x, player.y, best.x, best.y);
   if(!los.clear){
-    setMsg('blocked'); beep(160,0.06,'sawtooth',0.03); return;
+    setMsg('blocked'); crTriggerSoundCue('giveBlocked'); return;
   }
   if(player.cans<best.need){
     setMsg('need '+best.need+' (have '+player.cans+')');
     addPopup('NOT ENOUGH CANS','#ff7a6a');
-    beep(180,0.1,'sawtooth',0.04); return;
+    crTriggerSoundCue('giveNeedCans'); return;
   }
   player.cans-=best.need; best.helped=true; game.helped++; game.delivered+=best.need;
   const mech = npcMechanicKind(best.kind);
@@ -3523,7 +3589,7 @@ function giveCan(){
   game.run.cansDelivered += best.need;
   SAVE.save();
   player.giveCD = player.baseGiveCD / (1 + player.handoffBonus*0.5);
-  beep(880,0.12,'triangle',0.05);
+  crTriggerSoundCue('giveSuccess');
   game.handoffFx=0.8;
   const perGive = (best.need*25 + 100) * game.scoreMult;
   if(mech==='elder'){ player.speedBoostT=5; setMsg('Elder blessed you — SPEED!'); }
@@ -3540,7 +3606,7 @@ function giveCan(){
   }
   if(game.helped>=game.quota && !game.exit.active){
     game.exit.active=true; setMsg('QUOTA MET — EXIT OPEN!');
-    beep(1200,0.25,'square',0.05);
+    crTriggerSoundCue('quotaExitReady');
   }
 }
 function tickExit(){
@@ -3554,6 +3620,7 @@ function completeDistrict(){
     const leftover=player.cans*10;
     game.totalScore += Math.round((game.helped*100 + game.delivered*25 + leftover + timeBonus + 250)*game.scoreMult);
     setMsg('Hall Of Servants — mutual aid complete.');
+    crTriggerSoundCue('districtComplete');
     completeRun();
     return;
   }
@@ -3561,6 +3628,7 @@ function completeDistrict(){
   const distBonus=game.district*200;
   const leftover=player.cans*10;
   game.totalScore += Math.round((game.helped*100 + game.delivered*25 + leftover + timeBonus + distBonus)*game.scoreMult);
+  crTriggerSoundCue('districtComplete');
   state=STATE.UPGRADE;
   window._offered = rollUpgrades();
 }
@@ -3716,7 +3784,7 @@ addEventListener('keydown',e=>{
   if(state===STATE.PLAY){
     if(e.code==='KeyM') showMinimap=!showMinimap;
     if(e.code==='KeyP' || e.code==='Escape'){
-      if(!paused){ paused=true; SAVE.save(); beep(440,0.06,'sine',0.03); }
+      if(!paused){ paused=true; SAVE.save(); crTriggerSoundCue('menuHelp'); }
       else { paused=false; }
     }
     if(!paused && e.code==='Space'){ giveCan(); e.preventDefault(); }
@@ -3966,7 +4034,7 @@ function update(dt){
   // edge-detect for one-shot mobile actions
   if(inp.map && !inp._lastMap){ showMinimap=!showMinimap; }
   if(inp.pause && !inp._lastPause){
-    if(!paused){ paused=true; SAVE.save(); beep(440,0.06,'sine',0.03); }
+    if(!paused){ paused=true; SAVE.save(); crTriggerSoundCue('menuHelp'); }
     else { paused=false; }
   }
   if(inp.give && !inp._lastGive && !paused){ giveCan(); }
@@ -4011,6 +4079,13 @@ function update(dt){
   window._moveDbg = { joy:jstr.toFixed(3), active:joy.active, paused, mobileMode, mm:mobileInputActive(), st:state, dpx:+(player.x-px0).toFixed(4), dpy:+(player.y-py0).toFixed(4), moveSteps: moveRes.steps };
 
   const moving=(dx*dx+dy*dy)>0.0001;
+  if(shiftHeld && !sprinting && moving && player.stamina <= 0.1){
+    const tNow = performance.now()/1000;
+    if(tNow - _sprintDenyFeedbackT > 0.75){
+      _sprintDenyFeedbackT = tNow;
+      crTriggerSoundCue('sprintDenied');
+    }
+  }
   if(shiftHeld && sprinting && moving){ player.stamina=Math.max(0,player.stamina-cfg.staminaDrain*dt); }
   else if(!burstActive){ player.stamina=Math.min(player.maxStamina, player.stamina+(cfg.staminaRegen+player.regenBonus)*dt); }
 
@@ -4420,7 +4495,7 @@ function chooseUpgrade(idx){
     genCity(game.seed, game.district, game.modifier);
     player.cans=0; player.stamina=player.maxStamina;
     state=STATE.PLAY; paused=false;
-    beep(740,0.12,'triangle',0.05);
+    crTriggerSoundCue('upgradeChosen');
     SAVE.save();
   }
 }
@@ -5830,13 +5905,14 @@ function runFullSelfCheckInner(){
   const proceduralLevelValidation = runProceduralLevelValidationSelfCheck();
   const fullRunProgression = runFullRunProgressionSelfCheck();
   const onboarding = runOnboardingSelfCheck();
+  const soundFeedback = runSoundFeedbackSelfCheck();
   const visualReadability = runVisualReadabilitySelfCheck();
   const visualRectangleRegression = runVisualRectangleRegressionSelfCheck();
   const input = runInputSelfCheck();
   const levels = runLevelSelfCheck();
   const renderFailure = runRenderFailureSelfCheck();
   const runtimeClean = window.__crRuntimeErrors.length === err0;
-  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && mobileControlReliability.pass && movementCollision.pass && reachability.pass && proceduralLevelValidation.pass && fullRunProgression.pass && onboarding.pass && visualReadability.pass && visualRectangleRegression.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
+  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && mobileControlReliability.pass && movementCollision.pass && reachability.pass && proceduralLevelValidation.pass && fullRunProgression.pass && onboarding.pass && soundFeedback.pass && visualReadability.pass && visualRectangleRegression.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
   return {
     pass,
     build: BUILD_ID,
@@ -5850,6 +5926,7 @@ function runFullSelfCheckInner(){
     proceduralLevelValidation,
     fullRunProgression,
     onboarding,
+    soundFeedback,
     visualReadability,
     visualRectangleRegression,
     input,
@@ -5978,6 +6055,74 @@ function runOnboardingSelfCheckBody(){
   }
 }
 
+function runSoundFeedbackSelfCheck(){
+  if(_crHarnessDepth > 0) return runSoundFeedbackSelfCheckBody();
+  return crWithTemporaryState('soundFeedback', () => runSoundFeedbackSelfCheckBody());
+}
+
+function runSoundFeedbackSelfCheckBody(){
+  const errors = [];
+  const warnings = [];
+  const checks = {};
+  const evidence = {};
+  const err0 = window.__crRuntimeErrors.length;
+  try {
+    checks.functionExists = typeof runSoundFeedbackSelfCheck === 'function';
+    checks.contract = !!(CR_SOUND_FEEDBACK && CR_SOUND_FEEDBACK.style === 'sound1' && CR_SOUND_FEEDBACK.webAudio === true);
+    checks.buildIdSound1 = BUILD_ID === 'sound1';
+    checks.crTriggerExists = typeof crTriggerSoundCue === 'function';
+    checks.crSoundEnabledFn = typeof crSoundEnabled === 'function';
+    checks.noExternalAudioTags = document.querySelectorAll('audio,source[src]').length === 0;
+    checks.harnessMuted = _crHarnessDepth > 0 && crSoundEnabled() === false;
+    if(!checks.contract) errors.push('CR_SOUND_FEEDBACK contract missing');
+    if(!checks.buildIdSound1) errors.push('BUILD_ID must be sound1');
+    if(!checks.crTriggerExists) errors.push('crTriggerSoundCue missing');
+    if(!checks.harnessMuted) errors.push('harness must mute gameplay sound');
+    if(!checks.noExternalAudioTags) errors.push('external audio tags present');
+
+    const ids = crSoundFeedbackCueIds();
+    checks.requiredCueCount = ids.length;
+    checks.allRequiredCues = CR_SOUND_FEEDBACK.requiredCues.every(id => ids.includes(id) && _SOUND_CUE_DEFS[id]);
+    if(!checks.allRequiredCues) errors.push('required sound cues missing');
+
+    const cueResults = {};
+    for(const id of CR_SOUND_FEEDBACK.requiredCues){
+      const r = crTriggerSoundCue(id, { testOnly: true });
+      cueResults[id] = r;
+      if(!r.ok) errors.push('cue failed: '+id);
+    }
+    checks.cueCallsNoThrow = Object.values(cueResults).every(r => r.ok);
+    evidence.cueResults = cueResults;
+
+    const prevSound = options.soundOn;
+    options.soundOn = false;
+    options.save();
+    options.load();
+    checks.soundOffPersist = options.soundOn === false;
+    options.soundOn = true;
+    options.save();
+    options.load();
+    checks.soundOnPersist = options.soundOn !== false;
+    if(!checks.soundOffPersist || !checks.soundOnPersist) errors.push('sound toggle persistence failed');
+    options.soundOn = prevSound;
+    options.save();
+
+    let resumeOk = true;
+    try { resumeOk = resumeAudioContext() !== false; } catch(e){ resumeOk = false; }
+    checks.resumeHookSafe = resumeOk;
+    const proof = getAudioUnlockProof();
+    checks.audioProof = !!(proof && proof.resumeEntry === 'resumeAudioContext');
+    evidence.audioProof = proof;
+
+    const pass = errors.length === 0 && window.__crRuntimeErrors.length === err0;
+    if(window.__crRuntimeErrors.length !== err0) errors.push('runtime errors during sound selfcheck');
+    return { pass, build: BUILD_ID, errors, warnings, checks, evidence };
+  } catch(e){
+    errors.push(String(e && e.message ? e.message : e));
+    return { pass: false, build: BUILD_ID, errors, warnings, checks: {}, evidence: {} };
+  }
+}
+
 function runVisualReadabilitySelfCheck(){
   if(_crHarnessDepth > 0) return runVisualReadabilitySelfCheckBody();
   return crWithTemporaryState('visualReadability', () => runVisualReadabilitySelfCheckBody());
@@ -5993,13 +6138,13 @@ function runVisualReadabilitySelfCheckBody(){
   mobileOverride = true;
   try {
     checks.functionExists = typeof runVisualReadabilitySelfCheck === 'function';
-    checks.buildIdVisualfix1 = BUILD_ID === 'visualfix1';
+    checks.buildIdSound1 = BUILD_ID === 'sound1';
     checks.visualContract = !!(CR_VISUAL_READABILITY && CR_VISUAL_READABILITY.style === 'visualfix1');
     checks.noScreenPathStripe = CR_VISUAL_READABILITY.floorPathStripe === false;
     checks.pickupTex = !!TEX.can;
     checks.npcTex = !!TEX.hungry;
     checks.exitTex = !!TEX.exit;
-    if(!checks.buildIdVisualfix1) errors.push('BUILD_ID must be visualfix1');
+    if(!checks.buildIdSound1) errors.push('BUILD_ID must be sound1');
     if(!checks.visualContract) errors.push('CR_VISUAL_READABILITY contract missing');
     if(!checks.noScreenPathStripe) errors.push('screen-space floor path stripe must stay disabled');
     if(!checks.pickupTex || !checks.npcTex || !checks.exitTex) errors.push('sprite textures missing');
@@ -6126,9 +6271,9 @@ function runVisualRectangleRegressionSelfCheckBody(){
   mobileOverride = true;
   try {
     checks.functionExists = typeof runVisualRectangleRegressionSelfCheck === 'function';
-    checks.buildIdVisualfix1 = BUILD_ID === 'visualfix1';
+    checks.buildIdSound1 = BUILD_ID === 'sound1';
     checks.noScreenPathStripe = !!(CR_VISUAL_READABILITY && CR_VISUAL_READABILITY.floorPathStripe === false);
-    if(!checks.buildIdVisualfix1) errors.push('BUILD_ID must be visualfix1');
+    if(!checks.buildIdSound1) errors.push('BUILD_ID must be sound1');
     if(!checks.noScreenPathStripe) errors.push('screen-space path stripe flag must be false');
 
     startRun(42);
@@ -8216,8 +8361,8 @@ globalThis.CR = window.CR = {
   set paused(v){ paused=!!v; },
   get mobileMode(){ return mobileMode; },
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
-  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runMobileControlReliabilitySelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
-  CR_VISUAL_READABILITY,
+  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runMobileControlReliabilitySelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
+  CR_VISUAL_READABILITY,CR_SOUND_FEEDBACK,crTriggerSoundCue,crSoundEnabled,crSoundFeedbackCueIds,
   getCrVisualHarnessSnapshot(){ return _crVisualHarnessSnapshot; },
   showOnboardingHelp,dismissOnboardingHelp,crOpenFirstRunHelpIfNeeded,
   get onboardingOpen(){ return onboardingOpen; },

@@ -1,6 +1,6 @@
 # Project status — Solidarity Not Charity Can Run
 
-Last updated: visual rectangle regression fix (`visualfix1`).
+Last updated: sound / feedback pass (`sound1`).
 
 Reports were moved into **`reports/`** to keep the GitHub root readable. Index: **`reports/README.md`**; guard write-ups: **`reports/guards/`**.
 
@@ -10,16 +10,16 @@ Reports were moved into **`reports/`** to keep the GitHub root readable. Index: 
 
 | | |
 |--|--|
-| **BUILD_ID** (root `index.html`) | `visualfix1` |
-| **Prior gameplay baseline** | `visual1` / `4c85289` |
+| **BUILD_ID** (root `index.html`) | `sound1` |
+| **Prior gameplay baseline** | `visualfix1` / `fd487c2` |
 | **Handoff reference baseline** | `onboard1` / `aaaf901` |
 
 ## URLs
 
-- **Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=fd487c2&mobile=on&portraitlayout=1  
-- **Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=fd487c2&mobile=on&portraitlayout=1  
+- **Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=<COMMIT>&mobile=on&portraitlayout=1  
+- **Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=<COMMIT>&mobile=on&portraitlayout=1  
 
-*(Cache-bust with `fd487c2` — see guard report.)*
+*(Cache-bust with gameplay commit short SHA — see `reports/guards/SOUND_FEEDBACK_PASS_REPORT.md`.)*
 
 ## Completed cards (order)
 
@@ -34,7 +34,8 @@ Reports were moved into **`reports/`** to keep the GitHub root readable. Index: 
 9. **GitHub Actions harness CI** — `.github/workflows/selfcheck.yml`, proof artifact upload  
 10. **Onboarding / first-run help** — `onboard1`, `CR.runOnboardingSelfCheck`  
 11. **Visual readability polish** — `visual1`, `CR.runVisualReadabilitySelfCheck`  
-12. **Visual rectangle regression fix** — `visualfix1`, `CR.runVisualRectangleRegressionSelfCheck`
+12. **Visual rectangle regression fix** — `visualfix1`, `CR.runVisualRectangleRegressionSelfCheck`  
+13. **Sound / feedback pass** — `sound1`, `CR.runSoundFeedbackSelfCheck`
 
 ## Next likely work
 
@@ -43,4 +44,4 @@ Reports were moved into **`reports/`** to keep the GitHub root readable. Index: 
 
 ## Blockers
 
-- None known after local harness and GitHub Actions CI pass.
+- None known after local harness pass; confirm GitHub Actions on latest push.
