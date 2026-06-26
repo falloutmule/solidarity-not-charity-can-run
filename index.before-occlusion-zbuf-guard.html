@@ -457,7 +457,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'halo1';
+const BUILD_ID = 'zbuf1';
 const IS_FILE_ORIGIN = (typeof location !== 'undefined' && location.protocol === 'file:');
 const FILE_ORIGIN_SAVE_NOTE = 'Local file mode: saves may not persist. Use GitHub Pages for reliable saves.';
 function fileOriginMenuNoteHTML(){
@@ -2707,9 +2707,8 @@ function drawScene(now){
     const top=bottom-screenH;
     const startCol=Math.floor(screenX-screenW/2);
     const endCol=Math.ceil(screenX+screenW/2);
-    // SPRITE HALO REGRESSION GUARD — no full-rect sprite fog overlay.
-    // Per-column or bbox fillRect fog draws through transparent sprite pixels and
-    // creates phone-visible rectangular halos. Walls own distance fog; sprites stay clean.
+    // No sprite fog overlay: even per-column full-height fog draws through transparent
+    // sprite pixels and creates phone-visible rectangular halos. Clean sprites > haze.
     for(let col=startCol; col<endCol; col++){
       if(col<0||col>=RW) continue;
       if(depth >= zbuffer[col]) continue;   // OCCLUSION GUARD: per-column zbuffer vs sprite depth
