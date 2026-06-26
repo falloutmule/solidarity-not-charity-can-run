@@ -17,7 +17,7 @@ Cache-bust with `?v=<git-commit>` when verifying a specific ship. Mobile portrai
 | Field | Value |
 |-------|--------|
 | **BUILD_ID** (in `index.html`) | `onboard1` |
-| **Gameplay commit** | (see latest `main` after push) |
+| **Gameplay commit** | `aaaf901` |
 | **Prior baseline** | `runprog1` / `1437b6f` |
 
 See **`PROJECT_STATUS.md`** for completed guard cards and rules.

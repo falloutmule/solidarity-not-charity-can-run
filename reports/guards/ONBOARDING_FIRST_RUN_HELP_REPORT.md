@@ -27,16 +27,17 @@
 |-------|-------|
 | BUILD_ID | `onboard1` |
 | Baseline | `runprog1` / `1437b6f` |
+| Gameplay commit | `aaaf901` |
 | Save format | **Unchanged** (`SAVE_VERSION` 2); options JSON gains optional `helpDismissed` |
 | Backup | `index.before-onboarding-first-run.html` |
 
 ## REMAINING BLOCKERS
 
-- GitHub Actions run pending until push completes
+- None
 
 ## NEXT ACTIONABLE STEP
 
-- Confirm CI green after push; play URL cache-bust with new commit
+- None for this card
 
 ## EVIDENCE
 
@@ -46,10 +47,13 @@
 
 ## GITHUB PAGES URL
 
-- **Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=**COMMIT**&mobile=on&portraitlayout=1
-- **Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=**COMMIT**&mobile=on&portraitlayout=1
+- **Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=aaaf901&mobile=on&portraitlayout=1
+- **Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=aaaf901&mobile=on&portraitlayout=1
 
-(Update **COMMIT** after push.)
+## CI
+
+- **Run:** https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28257318045 — **success**
+- **Artifact:** `snc-can-run-proof-artifacts`
 
 ## Player-facing behavior
 
@@ -57,8 +61,3 @@
 - **Dismiss:** GOT IT (sets `helpDismissed`, saves options)
 - **Again:** MENU (paused) or OPTIONS → **HOW TO PLAY**
 - Harness runs do not auto-show overlay (`_crHarnessDepth > 0`)
-
-## CI
-
-- Workflow: `.github/workflows/selfcheck.yml`
-- Artifact: `snc-can-run-proof-artifacts`
