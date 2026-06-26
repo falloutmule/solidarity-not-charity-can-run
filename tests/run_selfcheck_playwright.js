@@ -755,6 +755,31 @@ async function reachabilitySection(page) {
   return { pass, proof, reachability: reach };
 }
 
+async function proceduralLevelValidationSection(page) {
+  const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await waitGameReady(page);
+
+  const proc = await page.evaluate(() => CR.runProceduralLevelValidationSelfCheck());
+  const isoOk = await page.evaluate(() => CR.crFingerprintPublicSafe(CR.crPublicStateFingerprint()));
+
+  if (proc.failures && proc.failures.length) {
+    writeProof('proof-procedural-failures.json', { failures: proc.failures, timestamp: new Date().toISOString() });
+  }
+
+  const pass = proc.pass === true && isoOk !== false;
+  const proof = {
+    pass,
+    build: proc.build,
+    proceduralLevelValidation: proc,
+    harnessStateOk: isoOk,
+    timestamp: new Date().toISOString(),
+  };
+  writeProof('proof-procedural-level-validation.json', proof);
+  return { pass, proof, proceduralLevelValidation: proc };
+}
+
 async function portraitUsabilitySection(page) {
   const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
   const presetList = [
@@ -1055,6 +1080,7 @@ async function main() {
   const mobileControlReliability = await mobileControlReliabilitySection(page);
   const movementCollision = await movementCollisionSection(page);
   const reachability = await reachabilitySection(page);
+  const proceduralLevelValidation = await proceduralLevelValidationSection(page);
 
   const harnessIsolation = await harnessIsolationSection(page);
   const renderFailure = await renderFailureSection(page);
@@ -1094,6 +1120,7 @@ async function main() {
     mobileControlReliability.pass &&
     movementCollision.pass &&
     reachability.pass &&
+    proceduralLevelValidation.pass &&
     harnessIsolation.pass &&
     renderFailure.pass &&
     hallE2E.pass &&
@@ -1133,6 +1160,7 @@ async function main() {
     mobileControlReliability,
     movementCollision,
     reachability,
+    proceduralLevelValidation,
     harnessIsolation,
     renderFailure,
     hallE2E,

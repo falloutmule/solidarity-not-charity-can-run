@@ -514,7 +514,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'multiseed1';
+const BUILD_ID = 'reachlos1';
 const IS_FILE_ORIGIN = (typeof location !== 'undefined' && location.protocol === 'file:');
 const FILE_ORIGIN_SAVE_NOTE = 'Local file mode: saves may not persist. Use GitHub Pages for reliable saves.';
 function fileOriginMenuNoteHTML(){
@@ -5629,12 +5629,11 @@ function runFullSelfCheckInner(){
   const mobileControlReliability = runMobileControlReliabilitySelfCheck();
   const movementCollision = runMovementCollisionSelfCheck();
   const reachability = runReachabilitySelfCheck();
-  const proceduralLevelValidation = runProceduralLevelValidationSelfCheck();
   const input = runInputSelfCheck();
   const levels = runLevelSelfCheck();
   const renderFailure = runRenderFailureSelfCheck();
   const runtimeClean = window.__crRuntimeErrors.length === err0;
-  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && mobileControlReliability.pass && movementCollision.pass && reachability.pass && proceduralLevelValidation.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
+  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && mobileControlReliability.pass && movementCollision.pass && reachability.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
   return {
     pass,
     build: BUILD_ID,
@@ -5645,7 +5644,6 @@ function runFullSelfCheckInner(){
     mobileControlReliability,
     movementCollision,
     reachability,
-    proceduralLevelValidation,
     input,
     levels,
     renderFailure,
@@ -6258,208 +6256,6 @@ function runReachabilitySelfCheckBody(){
   } catch(e){
     errors.push(String(e && e.message ? e.message : e));
     return { pass: false, build: BUILD_ID, errors, warnings, checks, measurements };
-  } finally {
-    _selfCheckForcePortrait = false;
-    mobileOverride = savedOverride;
-    applyMobileControlSettings();
-    clearInputState();
-    game.npcs = game.npcs || [];
-  }
-}
-
-function crHarnessMapShapeErrors(){
-  const e = [];
-  const W = game.MAP_W, H = game.MAP_H;
-  if(!W || !H || W < 8 || H < 8) e.push('bad dimensions');
-  if(!(W > H)) e.push('not rectangular wide');
-  if(!Array.isArray(game.map) || game.map.length !== H) e.push('map height');
-  for(let y = 0; y < H; y++){
-    if(!game.map[y] || game.map[y].length !== W) e.push('row '+y+' width');
-    for(let x = 0; x < W; x++){
-      const v = game.map[y][x];
-      if(v === undefined || v === null || !Number.isFinite(v)) e.push('bad cell '+x+','+y);
-    }
-  }
-  return e;
-}
-
-function crHarnessReachablePickupStats(px, py){
-  let sum = 0, unreachable = 0;
-  for(const p of game.pickups || []){
-    if(p.taken) continue;
-    if(crHarnessEssentialConnected(p.x, p.y, px, py)) sum += (p.amt | 0) || 1;
-    else unreachable++;
-  }
-  return { sum, unreachable };
-}
-
-function crHarnessReachableNpcStats(px, py){
-  let reach = 0, unreachable = 0;
-  for(const n of game.npcs || []){
-    if(n.helped) continue;
-    if(crHarnessEssentialConnected(n.x, n.y, px, py)) reach++;
-    else unreachable++;
-  }
-  return { reach, unreachable };
-}
-
-function crHarnessBuildProceduralValidationCases(){
-  const cases = [];
-  for(let s = 1; s <= 25; s++) cases.push({ seed: s, district: 1, modifier: '' });
-  [0, 42, 12345, 99999].forEach(s => cases.push({ seed: s, district: 1, modifier: '' }));
-  for(let s = 1; s <= 10; s++) cases.push({ seed: s, district: 2, modifier: '' });
-  for(let s = 1; s <= 10; s++) cases.push({ seed: s, district: 3, modifier: '' });
-  ['clear', 'maze', 'shortage'].forEach(m => cases.push({ seed: 42, district: 1, modifier: m }));
-  return cases;
-}
-
-function crHarnessValidateProceduralCase(c){
-  const details = { seed: c.seed, district: c.district, modifier: c.modifier || 'default' };
-  game.run = game.run || { active: false, harnessOnly: false, customLevel: null };
-  game.run.active = true;
-  game.run.harnessOnly = true;
-  game.run.customLevel = null;
-  game.seed = c.seed;
-  game.district = c.district;
-  game.modifier = c.modifier || 'normal';
-  player.cans = 0;
-  player.giveCD = 0;
-  player.stamina = player.maxStamina;
-  clearInputState();
-  state = STATE.PLAY;
-  paused = false;
-  genCity(c.seed, c.district, c.modifier || '');
-  details.MAP_W = game.MAP_W;
-  details.MAP_H = game.MAP_H;
-  details.quota = game.quota;
-  const mapErrs = crHarnessMapShapeErrors();
-  if(mapErrs.length) return { ok: false, reason: 'malformed map', details: { ...details, mapErrs } };
-  if(!canStand(player.x, player.y)) return { ok: false, reason: 'invalid spawn', details };
-  const bfs = gridReachableFrom(player.x, player.y);
-  details.reachableCells = bfs.count;
-  const MIN_CELLS = 48;
-  if(!bfs.pass || bfs.count < MIN_CELLS) return { ok: false, reason: 'reachable area too small', details };
-  const spawnKey = (Math.floor(player.y)) + ',' + (Math.floor(player.x));
-  if(!bfs.reachable[spawnKey]) return { ok: false, reason: 'spawn not in reachable set', details };
-  const px = player.x, py = player.y;
-  const cans = crHarnessReachablePickupStats(px, py);
-  const npcs = crHarnessReachableNpcStats(px, py);
-  details.reachableCans = cans.sum;
-  details.unreachablePickups = cans.unreachable;
-  details.reachableNpcs = npcs.reach;
-  details.unreachableNpcs = npcs.unreachable;
-  if(!game.exit) return { ok: false, reason: 'missing exit', details };
-  if(!crHarnessEssentialConnected(game.exit.x, game.exit.y, px, py)){
-    return { ok: false, reason: 'exit unreachable', details };
-  }
-  if(npcs.reach < game.quota) return { ok: false, reason: 'reachable NPCs below quota', details };
-  if(cans.sum < game.quota) return { ok: false, reason: 'reachable cans below quota', details };
-  return { ok: true, details };
-}
-
-function runProceduralLevelValidationSelfCheck(){
-  if(_crHarnessDepth > 0) return runProceduralLevelValidationSelfCheckBody();
-  return crWithTemporaryState('proceduralLevelValidation', () => runProceduralLevelValidationSelfCheckBody());
-}
-
-function runProceduralLevelValidationSelfCheckBody(){
-  const errors = [];
-  const warnings = [];
-  const failures = [];
-  const err0 = window.__crRuntimeErrors.length;
-  const cases = crHarnessBuildProceduralValidationCases();
-  const districtsSeen = {};
-  let levelsPassed = 0;
-  let levelsFailed = 0;
-  let minReach = Infinity, maxReach = 0;
-  let totalUnreachablePickups = 0, totalUnreachableNpcs = 0;
-  const savedOverride = mobileOverride;
-  crPrepareSelfCheckPortrait();
-  try {
-    for(const c of cases){
-      districtsSeen[c.district] = true;
-      let result;
-      try {
-        result = crHarnessValidateProceduralCase(c);
-      } catch(ex){
-        result = { ok: false, reason: 'exception', details: { seed: c.seed, district: c.district, message: String(ex && ex.message || ex) } };
-      }
-      if(result.ok){
-        levelsPassed++;
-        const rc = result.details.reachableCells || 0;
-        if(rc < minReach) minReach = rc;
-        if(rc > maxReach) maxReach = rc;
-        totalUnreachablePickups += result.details.unreachablePickups || 0;
-        totalUnreachableNpcs += result.details.unreachableNpcs || 0;
-      } else {
-        levelsFailed++;
-        failures.push({
-          seed: c.seed,
-          district: c.district,
-          modifier: c.modifier || 'default',
-          reason: result.reason,
-          details: result.details || {},
-        });
-        errors.push('seed '+c.seed+' d'+c.district+' '+ (c.modifier||'default') +': '+result.reason);
-      }
-    }
-    if(minReach === Infinity) minReach = 0;
-    const checks = {
-      allMapsRectangular: failures.filter(f => f.reason === 'malformed map').length === 0,
-      allSpawnsValid: failures.filter(f => f.reason === 'invalid spawn' || f.reason === 'spawn not in reachable set').length === 0,
-      allReachableAreasLargeEnough: failures.filter(f => f.reason === 'reachable area too small').length === 0,
-      allQuotasReachable: failures.filter(f => f.reason.indexOf('quota') >= 0 || f.reason.indexOf('cans') >= 0).length === 0,
-      allExitsReachable: failures.filter(f => f.reason === 'exit unreachable' || f.reason === 'missing exit').length === 0,
-      requiredNpcsReachable: failures.filter(f => f.reason.indexOf('NPC') >= 0).length === 0,
-      noRuntimeErrors: window.__crRuntimeErrors.length === err0,
-      harnessStateRestored: true,
-    };
-    if(levelsFailed > 0){
-      checks.allMapsRectangular = levelsFailed === 0 || checks.allMapsRectangular;
-      checks.allSpawnsValid = levelsFailed === 0;
-      checks.allReachableAreasLargeEnough = levelsFailed === 0;
-      checks.allQuotasReachable = levelsFailed === 0;
-      checks.allExitsReachable = levelsFailed === 0;
-      checks.requiredNpcsReachable = levelsFailed === 0;
-    }
-    if(!checks.noRuntimeErrors) errors.push('runtime errors during procedural validation');
-    const pass = levelsFailed === 0 && checks.noRuntimeErrors;
-    if(totalUnreachablePickups > 0) warnings.push('nonessential unreachable pickups across seeds: '+totalUnreachablePickups);
-    if(totalUnreachableNpcs > 0) warnings.push('unreachable NPCs across seeds (decorative): '+totalUnreachableNpcs);
-    return {
-      pass,
-      build: BUILD_ID,
-      seedCount: cases.length,
-      districtCount: Object.keys(districtsSeen).length,
-      errors,
-      warnings,
-      summary: {
-        levelsChecked: cases.length,
-        levelsPassed,
-        levelsFailed,
-        minReachableCells: minReach,
-        maxReachableCells: maxReach,
-        totalUnreachablePickups,
-        totalUnreachableNpcs,
-      },
-      failures,
-      checks,
-      cases: cases.length,
-      timestamp: new Date().toISOString(),
-    };
-  } catch(e){
-    errors.push(String(e && e.message ? e.message : e));
-    return {
-      pass: false,
-      build: BUILD_ID,
-      seedCount: cases.length,
-      districtCount: 0,
-      errors,
-      warnings,
-      summary: { levelsChecked: cases.length, levelsPassed, levelsFailed, minReachableCells: 0, maxReachableCells: 0, totalUnreachablePickups: 0, totalUnreachableNpcs: 0 },
-      failures,
-      checks: { harnessStateRestored: false },
-    };
   } finally {
     _selfCheckForcePortrait = false;
     mobileOverride = savedOverride;
@@ -7397,7 +7193,7 @@ globalThis.CR = window.CR = {
   set paused(v){ paused=!!v; },
   get mobileMode(){ return mobileMode; },
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
-  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runMobileControlReliabilitySelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runProceduralLevelValidationSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
+  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runMobileControlReliabilitySelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
   editRunnerName,applyMobileControlSettings,mobileSprintCost,mobileSprintBurstSec,triggerMobileSprintBurst,crDispatchPointer,crDispatchTouch,
   toggleFullscreen,isFullscreen,enterFullscreen,exitFullscreen,
   getAudioContext,resumeAudioContext,bindAudioUnlockGate,getAudioUnlockProof,
