@@ -14,15 +14,14 @@
   /* TOUCH-ACTION POLICY: gameplay canvas + #mob controls = none (no page scroll/zoom hijack).
      OPTIONS panel (.rpan.options-tune) = pan-y so tuning rows scroll on phone. */
   :root{
-    --safe-top:env(safe-area-inset-top,0px);
-    --safe-right:env(safe-area-inset-right,0px);
-    --safe-bottom:env(safe-area-inset-bottom,0px);
-    --safe-left:env(safe-area-inset-left,0px);
+    --app-vw:100dvw; --app-vh:100dvh;
+    --app-vw-px:100vw; --app-vh-px:100dvh;
+    --vv-off-x:0px; --vv-off-y:0px;
   }
-  html,body{margin:0;min-height:100dvh;height:100%;background:#000;overflow:hidden;cursor:crosshair;touch-action:none;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;overscroll-behavior:none;}
+  html,body{margin:0;height:100%;min-height:100%;height:var(--app-vh);min-height:var(--app-vh);background:#000;overflow:hidden;cursor:crosshair;touch-action:none;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;overscroll-behavior:none;}
   /* small in-game fullscreen toggle */
   #fsbtn{
-    display:none;position:fixed;top:calc(8px + var(--safe-top));left:50%;transform:translateX(-50%);
+    display:none;position:fixed;top:8px;left:50%;transform:translateX(-50%);
     z-index:15;width:auto;min-width:54px;height:30px;padding:0 8px;
     background:rgba(30,22,14,0.85);border:1px solid rgba(200,170,100,0.45);
     border-radius:5px;color:#e9d8b0;font:bold 9px monospace;letter-spacing:0.5px;
@@ -40,11 +39,12 @@
     opacity:0;transition:opacity 0.3s ease;
   }
   #fstoast.show{display:block;opacity:1;}
-  #view{display:block;position:fixed;top:0;left:0;image-rendering:pixelated;touch-action:none;}
+  #view{display:block;position:fixed;top:var(--vv-off-y);left:var(--vv-off-x);image-rendering:pixelated;touch-action:none;}
   #view.mob-touch-through{pointer-events:none;}
   /* ---- mobile control overlay ---- */
   #mob{
-    display:none;position:fixed;top:0;left:0;width:100%;height:100%;
+    display:none;position:fixed;top:var(--vv-off-y);left:var(--vv-off-x);
+    width:var(--app-vw-px);height:var(--app-vh-px);
     pointer-events:none;z-index:9;touch-action:none;
   }
   #mob.show{display:block;pointer-events:auto;}
@@ -60,7 +60,7 @@
   #ml{bottom:30px;left:20px;width:110px;height:110px;border-radius:50%;z-index:22;flex-direction:column;gap:2px;background:rgba(20,15,10,0.15);touch-action:none;}
   /* Right-half LOOK zone — transparent touch overlay; gameplay shows through */
   #mr{
-    top:0;right:0;width:50vw;height:100%;border-radius:0;z-index:10;
+    top:0;right:0;width:50vw;height:var(--app-vh-px);border-radius:0;z-index:10;
     background:transparent;
     border:0;
     color:#c8b888;flex-direction:column;justify-content:center;align-items:center;
@@ -117,7 +117,7 @@
   }
   /* ---- touch debug overlay ---- */
   #touchdebug{
-    display:none;position:fixed;top:calc(4px + var(--safe-top));left:calc(4px + var(--safe-left));
+    display:none;position:fixed;top:4px;left:4px;
     background:rgba(0,0,0,0.82);border:1px solid rgba(255,200,80,0.5);
     color:#ffd24a;font:10px monospace;line-height:1.55;
     padding:5px 7px;z-index:9999;pointer-events:none;
@@ -132,7 +132,7 @@
   }
   /* ---- responsive menu panels ---- */
   .rpan{
-    position:fixed;top:0;left:0;width:100%;height:100%;
+    position:fixed;top:var(--vv-off-y);left:var(--vv-off-x);width:var(--app-vw-px);height:var(--app-vh-px);
     display:flex;flex-direction:column;align-items:center;justify-content:center;
     background:rgba(10,8,5,0.97);z-index:20;touch-action:none;overflow-y:auto;
     padding: env(safe-area-inset-top,0) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0);
@@ -179,11 +179,10 @@
   .rclose{font:11px monospace;color:#5a4a2a;margin-top:12px;letter-spacing:1px;}
   /* portrait hint */
   #porthint{
-    display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:99;
+    display:none;position:fixed;top:var(--vv-off-y);left:var(--vv-off-x);width:var(--app-vw-px);height:var(--app-vh-px);z-index:99;
     background:rgba(10,8,5,0.98);flex-direction:column;align-items:center;justify-content:center;
     font:14px monospace;color:#8a7a5a;letter-spacing:1px;text-align:center;
-    padding:calc(40px + var(--safe-top)) calc(40px + var(--safe-right)) calc(40px + var(--safe-bottom)) calc(40px + var(--safe-left));
-    gap:14px;touch-action:none;box-sizing:border-box;
+    padding:40px;gap:14px;touch-action:none;
   }
   #porthint.show{display:flex;}
   #porthint button{background:rgba(40,30,20,0.9);border:1px solid rgba(180,150,80,0.4);color:#d8c8a0;padding:10px 24px;font:13px monospace;border-radius:4px;cursor:pointer;}
@@ -270,14 +269,6 @@ const ctx  = view.getContext('2d');
 const RW = 320, RH = 200;                      // internal render resolution
 const buf = document.createElement('canvas'); buf.width = RW; buf.height = RH;
 const bctx = buf.getContext('2d');
-/* OCCLUSION REGRESSION GUARD (Kanban Card 3 / P1)
- * - Wall DDA assigns zbuffer[col] = perpendicular wall distance for every column 0..RW-1.
- * - Billboards (props, pickups, npcs, exit) use ONE draw path: per-column loop with depth vs zbuffer.
- * - Rule: if (depth >= zbuffer[col]) skip column — sprites must not show through nearer walls.
- * - Do NOT add post-loop sprite fog fillRect (bypasses zbuffer; causes through-wall leaks + halos).
- * - depth = forward distance; hscr = horizontal screen factor — never swap in pushSp projection.
- * After edits: CR.getOcclusionZbufferProof() and visual check NPC/can behind wall.
- */
 const zbuffer = new Float32Array(RW);          // per-column wall distance (sprite occlusion)
 
 // ---------------------------------------------------------------------------
@@ -345,6 +336,28 @@ function showToast(msg, ms){
 // Resize on orientation change with debounce
 addEventListener('orientationchange', ()=>{ _debouncedResize(); });
 
+function syncVisualViewportShell(){
+  const vv = window.visualViewport;
+  const root = document.documentElement;
+  let w, h, ox, oy;
+  if(vv){
+    w = Math.max(1, Math.round(vv.width));
+    h = Math.max(1, Math.round(vv.height));
+    ox = Math.round(vv.offsetLeft || 0);
+    oy = Math.round(vv.offsetTop || 0);
+  } else {
+    w = Math.max(1, Math.round(innerWidth));
+    h = Math.max(1, Math.round(innerHeight));
+    ox = oy = 0;
+  }
+  root.style.setProperty('--app-vw-px', w + 'px');
+  root.style.setProperty('--app-vh-px', h + 'px');
+  root.style.setProperty('--vv-off-x', ox + 'px');
+  root.style.setProperty('--vv-off-y', oy + 'px');
+  if(oy || ox){
+    try { window.scrollTo(ox, oy); } catch(_e){}
+  }
+}
 function isOrientationPortrait(){
   if(typeof matchMedia === 'function' && matchMedia('(orientation: portrait)').matches) return true;
   try {
@@ -356,6 +369,7 @@ function isOrientationPortrait(){
   return innerHeight > innerWidth;
 }
 function resize(){
+  syncVisualViewportShell();
   // Use visualViewport for accurate mobile dimensions (accounts for address bar).
   // Do NOT multiply by devicePixelRatio — all drawing code uses CSS pixel coordinates,
   // so DPR scaling would leave the right/bottom of the backing store undrawn (black).
@@ -377,8 +391,8 @@ function updateFsBtnLabel(){
 addEventListener('resize', _debouncedResize);
 // Also handle visual viewport resize (mobile address bar) — update immediately for responsiveness
 if(window.visualViewport){
-  window.visualViewport.addEventListener('resize', ()=>{ _debouncedResize(); });
-  window.visualViewport.addEventListener('scroll', ()=>{ _debouncedResize(); });
+  window.visualViewport.addEventListener('resize', ()=>{ syncVisualViewportShell(); _debouncedResize(); }, { passive: true });
+  window.visualViewport.addEventListener('scroll', ()=>{ syncVisualViewportShell(); _debouncedResize(); }, { passive: true });
 }
 resize();
 
@@ -457,7 +471,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'halo1';
+const BUILD_ID = 'dvh1';
 const IS_FILE_ORIGIN = (typeof location !== 'undefined' && location.protocol === 'file:');
 const FILE_ORIGIN_SAVE_NOTE = 'Local file mode: saves may not persist. Use GitHub Pages for reliable saves.';
 function fileOriginMenuNoteHTML(){
@@ -909,37 +923,33 @@ function bindMobileControls(){
 
   // ---- dedicated LOOK circle (#mlookpad) — works in BOTH portrait and landscape ----
   const lpad = document.getElementById('mlookpad');
-  let lpadPtr = null; // pointer look on #mlookpad (touch + mouse)
-
-  const endLpadPtr = e=>{
-    if(!lpadPtr || e.pointerId !== lpadPtr.id) return;
-    e.preventDefault(); e.stopPropagation();
-    try{ lpad.releasePointerCapture(e.pointerId); }catch(_e){}
-    lpadPtr = null;
-    lpad.classList.remove('pr');
-  };
+  let lpadMousePtr = null; // mouse-only pointer look on #mlookpad
 
   lpad.addEventListener('pointerdown', e=>{
+    if(e.pointerType === 'touch') return;
     e.preventDefault(); e.stopPropagation();
-    lookTouch.id = null;
-    lookTouch.lastX = 0;
-    lpadPtr = { id: e.pointerId, startX: e.clientX };
-    try{ lpad.setPointerCapture(e.pointerId); }catch(_e){}
+    lpadMousePtr = { id: e.pointerId, startX: e.clientX };
     lpad.classList.add('pr');
     dismissLookHint();
   },{passive:false});
 
   lpad.addEventListener('pointermove', e=>{
-    if(!lpadPtr || e.pointerId !== lpadPtr.id) return;
-    e.preventDefault(); e.stopPropagation();
+    if(e.pointerType === 'touch') return;
+    if(!lpadMousePtr || e.pointerId !== lpadMousePtr.id) return;
     if(state!==STATE.PLAY || paused) return;
-    const dx = e.clientX - lpadPtr.startX;
-    if(Math.abs(dx) > 0.2){ lpadPtr.startX = e.clientX; player.angle += dx * mobileLookSens(); }
+    const dx = e.clientX - lpadMousePtr.startX;
+    if(Math.abs(dx) > 0.2){ lpadMousePtr.startX = e.clientX; player.angle += dx * mobileLookSens(); }
     touchDebug({type:'look_circle_move', orient:isMobilePortrait()?'port':'land', dx, angle:player.angle});
   },{passive:false});
 
-  lpad.addEventListener('pointerup', endLpadPtr, {passive:false});
-  lpad.addEventListener('pointercancel', endLpadPtr, {passive:false});
+  lpad.addEventListener('pointerup', e=>{
+    if(e.pointerType === 'touch') return;
+    if(lpadMousePtr && e.pointerId===lpadMousePtr.id){ lpadMousePtr=null; lpad.classList.remove('pr'); }
+  },{passive:false});
+  lpad.addEventListener('pointercancel', e=>{
+    if(e.pointerType === 'touch') return;
+    if(lpadMousePtr && e.pointerId===lpadMousePtr.id){ lpadMousePtr=null; lpad.classList.remove('pr'); }
+  },{passive:false});
 
   lpad.addEventListener('touchstart', e=>{
     e.preventDefault(); e.stopPropagation();
@@ -964,24 +974,17 @@ function bindMobileControls(){
   // ---- unified pointer look for landscape #mr ----
   // Use pointer events so both touch and mouse work on #mr in landscape.
   let mrPtr = null; // {id, startX}
-  const endMrPtr = e=>{
-    if(!mrPtr || e.pointerId !== mrPtr.id) return;
-    e.preventDefault(); e.stopPropagation();
-    try{ mr.releasePointerCapture(e.pointerId); }catch(_e){}
-    mrPtr = null;
-  };
   mr.addEventListener('pointerdown', e=>{
     if(isMobilePortrait()) return;
+    if(e.pointerType === 'touch') return;
     if(e.pointerType === 'mouse' && !mobileMode) return;
     e.preventDefault(); e.stopPropagation();
     mrPtr = { id: e.pointerId, startX: e.clientX };
-    try{ mr.setPointerCapture(e.pointerId); }catch(_e){}
     dismissLookHint();
   },{passive:false});
 
   mr.addEventListener('pointermove', e=>{
     if(!mrPtr || e.pointerId !== mrPtr.id) return;
-    e.preventDefault(); e.stopPropagation();
     if(state!==STATE.PLAY || paused) return;
     const dx = e.clientX - mrPtr.startX;
     if(Math.abs(dx) > 0.5){ mrPtr.startX = e.clientX; }
@@ -989,8 +992,8 @@ function bindMobileControls(){
     touchDebug({type:'land_look_move', dx, angle:player.angle});
   },{passive:false});
 
-  mr.addEventListener('pointerup', endMrPtr, {passive:false});
-  mr.addEventListener('pointercancel', endMrPtr, {passive:false});
+  mr.addEventListener('pointerup', e=>{ if(mrPtr && e.pointerId===mrPtr.id){ mrPtr=null; } },{passive:false});
+  mr.addEventListener('pointercancel', e=>{ if(mrPtr && e.pointerId===mrPtr.id){ mrPtr=null; } },{passive:false});
 
   // ---- GIVE button ----
   mg.addEventListener('touchstart', e=>{
@@ -1908,85 +1911,19 @@ function canStand(x,y){
 }
 
 // ---------------------------------------------------------------------------
-// 5. AUDIO — centralized AudioContext + user-gesture unlock (CARD 10)
+// 5. AUDIO  (UNCHANGED)
 // ---------------------------------------------------------------------------
 let AC=null;
-let _audioUnlockBound=false;
-let _audioUnlockAttempted=false;
-let _audioUnlockPromise=null;
-
-function getAudioContext(){
-  if(AC) return AC;
-  const Ctx = window.AudioContext || window.webkitAudioContext;
-  if(!Ctx) return null;
-  AC = new Ctx();
-  return AC;
-}
-
-function resumeAudioContext(){
-  const ctx = getAudioContext();
-  if(!ctx) return Promise.resolve({ ok:false, state:'unsupported' });
-  if(ctx.state === 'running') return Promise.resolve({ ok:true, state:'running' });
-  if(_audioUnlockPromise) return _audioUnlockPromise;
-  _audioUnlockAttempted = true;
-  _audioUnlockPromise = ctx.resume().then(()=>({
-    ok: ctx.state === 'running',
-    state: ctx.state,
-  })).catch(err=>({
-    ok:false,
-    state: ctx.state,
-    error: String(err && err.message || err),
-  })).finally(()=>{ _audioUnlockPromise = null; });
-  return _audioUnlockPromise;
-}
-
-function bindAudioUnlockGate(){
-  if(_audioUnlockBound) return;
-  _audioUnlockBound = true;
-  const unlockFromGesture = ()=>{ resumeAudioContext(); };
-  const opts = { capture:true, passive:true };
-  document.addEventListener('pointerdown', unlockFromGesture, opts);
-  document.addEventListener('keydown', unlockFromGesture, opts);
-  document.addEventListener('touchstart', unlockFromGesture, opts);
-}
-
-function _beepNow(ctx, freq, dur, type, gain){
-  const o=ctx.createOscillator(), g=ctx.createGain();
-  o.type=type; o.frequency.value=freq; g.gain.value=gain;
-  o.connect(g); g.connect(ctx.destination); o.start();
-  g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime+dur);
-  o.stop(ctx.currentTime+dur);
-}
-
 function beep(freq,dur,type='square',gain=0.04){
   try{
-    const ctx = getAudioContext();
-    if(!ctx) return;
-    if(ctx.state === 'suspended'){
-      resumeAudioContext().then(()=>{
-        if(ctx.state === 'running') _beepNow(ctx, freq, dur, type, gain);
-      });
-      return;
-    }
-    if(ctx.state !== 'running') return;
-    _beepNow(ctx, freq, dur, type, gain);
+    if(!AC) AC = new (window.AudioContext||window.webkitAudioContext)();
+    const o=AC.createOscillator(), g=AC.createGain();
+    o.type=type; o.frequency.value=freq; g.gain.value=gain;
+    o.connect(g); g.connect(AC.destination); o.start();
+    g.gain.exponentialRampToValueAtTime(0.0001, AC.currentTime+dur);
+    o.stop(AC.currentTime+dur);
   }catch(e){}
 }
-
-function getAudioUnlockProof(){
-  const ctx = AC;
-  return {
-    BUILD_ID,
-    gateBound: _audioUnlockBound,
-    unlockAttempted: _audioUnlockAttempted,
-    hasContext: !!ctx,
-    state: ctx ? ctx.state : 'none',
-    gestureEvents: ['pointerdown','keydown','touchstart'],
-    resumeEntry: 'resumeAudioContext',
-  };
-}
-
-bindAudioUnlockGate();
 
 // ---------------------------------------------------------------------------
 // 5b. LOCAL PERSISTENCE (localStorage with schema/version, safe parse)
@@ -2707,9 +2644,8 @@ function drawScene(now){
     const top=bottom-screenH;
     const startCol=Math.floor(screenX-screenW/2);
     const endCol=Math.ceil(screenX+screenW/2);
-    // SPRITE HALO REGRESSION GUARD — no full-rect sprite fog overlay.
-    // Per-column or bbox fillRect fog draws through transparent sprite pixels and
-    // creates phone-visible rectangular halos. Walls own distance fog; sprites stay clean.
+    // No sprite fog overlay: even per-column full-height fog draws through transparent
+    // sprite pixels and creates phone-visible rectangular halos. Clean sprites > haze.
     for(let col=startCol; col<endCol; col++){
       if(col<0||col>=RW) continue;
       if(depth >= zbuffer[col]) continue;   // OCCLUSION GUARD: per-column zbuffer vs sprite depth
@@ -4212,7 +4148,7 @@ function getDebugState(){
     runActive:!!game.run.active,
     saveValid:!!SAVE.hasValid(),
     canvas:{cssW:view.style.width,cssH:view.style.height,w:view.width,h:view.height,dpr:devicePixelRatio||1},
-    viewport:{w:innerWidth,h:innerHeight,visualW:vv?vv.width:null,visualH:vv?vv.height:null},
+    viewport:{w:innerWidth,h:innerHeight,visualW:vv?vv.width:null,visualH:vv?vv.height:null,offsetX:vv?vv.offsetLeft:null,offsetY:vv?vv.offsetTop:null,appVhPx:getComputedStyle(document.documentElement).getPropertyValue('--app-vh-px').trim()},
     mobileSettings:{lookSpeed:options.lookSpeed,lookSpeedLabel:lookSpeedLabel(options.lookSpeed),turnSens:options.mobileTurnSens,joySizePx:options.joySizePx,buttonSizePx:options.buttonSizePx,opacity:options.controlOpacityValue,minimapSizePx:options.minimapSizePx,deadzonePx:options.touchDeadzonePx,portrait:isMobilePortrait()},
     sprint:{cost:mobileSprintCost(),burstSec:mobileSprintBurstSec(),burstUntil:sprintBurstUntil,blocks:Math.round(player.maxStamina/mobileSprintCost())},
     storageKeys:Object.assign({}, K),
@@ -4353,6 +4289,26 @@ function getOcclusionZbufferProof(){
   };
 }
 
+function getViewportProof(){
+  const vv = window.visualViewport;
+  const root = document.documentElement;
+  const cs = getComputedStyle(root);
+  return {
+    BUILD_ID,
+    inner: { w: innerWidth, h: innerHeight },
+    visual: vv ? { w: vv.width, h: vv.height, offsetX: vv.offsetLeft, offsetY: vv.offsetTop, scale: vv.scale } : null,
+    cssVars: {
+      appVwPx: cs.getPropertyValue('--app-vw-px').trim(),
+      appVhPx: cs.getPropertyValue('--app-vh-px').trim(),
+      vvOffX: cs.getPropertyValue('--vv-off-x').trim(),
+      vvOffY: cs.getPropertyValue('--vv-off-y').trim(),
+      appVh: cs.getPropertyValue('--app-vh').trim(),
+    },
+    canvas: { w: view.width, h: view.height, cssW: view.style.width, cssH: view.style.height },
+    mob: (()=>{ const m=document.getElementById('mob'); return m?{w:m.style.width,h:m.style.height,top:m.style.top,left:m.style.left}:null; })(),
+  };
+}
+
 globalThis.CR = window.CR = {
   game,player,STATE,cfg,SAVE,stats,leaderboards,profile,options,dbg,
   get state(){ return state; },
@@ -4361,10 +4317,9 @@ globalThis.CR = window.CR = {
   set paused(v){ paused=!!v; },
   get mobileMode(){ return mobileMode; },
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
-  setMobileMode,isMobile,rmenuAction,getDebugState,portraitLayout,getLayoutProof,getControlDockRectProof,getMinimapAlignProof,getOcclusionZbufferProof,rectsOverlap,
+  setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,getMinimapAlignProof,getOcclusionZbufferProof,rectsOverlap,
   editRunnerName,applyMobileControlSettings,mobileSprintCost,mobileSprintBurstSec,
   toggleFullscreen,isFullscreen,enterFullscreen,exitFullscreen,
-  getAudioContext,resumeAudioContext,bindAudioUnlockGate,getAudioUnlockProof,
 };
 </script>
 </body>
