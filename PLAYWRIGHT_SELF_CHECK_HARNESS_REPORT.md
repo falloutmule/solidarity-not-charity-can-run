@@ -75,10 +75,10 @@
 
 **Full self-check excerpt:** `proof-full-selfcheck.json` → `"pass": true`, `"build": "selfharness1"`
 
-**Commit:** (filled after push)
+**Commit:** `4184196` (includes `3db16a0` harness code + proof JSON)
 
 ## GITHUB PAGES URL
 
 - Normal: https://falloutmule.github.io/solidarity-not-charity-can-run/
-- Cache-busted: https://falloutmule.github.io/solidarity-not-charity-can-run/?v=COMMIT&mobile=on&portraitlayout=1
-- Self-check: https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=COMMIT&mobile=on&portraitlayout=1
+- Cache-busted: https://falloutmule.github.io/solidarity-not-charity-can-run/?v=4184196&mobile=on&portraitlayout=1
+- Self-check: https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=4184196&mobile=on&portraitlayout=1
