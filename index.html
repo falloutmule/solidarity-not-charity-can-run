@@ -708,10 +708,10 @@ function applyMobileControlSettings(){
       mlookpad.style.border = '2px solid rgba(220,190,100,0.80)';
       mlookpad.style.color = '#e9d8b0';
     }
-    [mg,ms].forEach(el=>{ if(el){ el.style.width=btnSize+'px'; el.style.height=btnSize+'px'; el.style.fontSize=Math.max(9,Math.round(btnSize*0.15))+'px'; el.style.left='auto'; el.style.right='20px'; }});
+    [mg,ms].forEach(el=>{ if(el){ el.style.width=btnSize+'px'; el.style.height=btnSize+'px'; el.style.fontSize=Math.max(9,Math.round(btnSize*0.15))+'px'; el.style.left='auto'; el.style.right=(20+sa.right)+'px'; }});
     if(mg){ mg.style.top='42%'; mg.style.bottom='auto'; mg.style.transform='translateY(calc(-50% + '+(-yOffL)+'px))'; }
-    if(ms){ ms.style.top='68%'; ms.style.right='30px'; ms.style.transform='translateY(calc(-50% + '+(-yOffL)+'px))'; }
-    if(mm){ mm.style.width=Math.round(btnSize*0.78)+'px'; mm.style.height=Math.round(btnSize*0.55)+'px'; mm.style.right='8px'; mm.style.top='12px'; mm.style.left='auto'; mm.style.bottom='auto'; mm.style.transform='none'; }
+    if(ms){ ms.style.top='68%'; ms.style.right=(30+sa.right)+'px'; ms.style.transform='translateY(calc(-50% + '+(-yOffL)+'px))'; }
+    if(mm){ mm.style.width=Math.round(btnSize*0.78)+'px'; mm.style.height=Math.round(btnSize*0.55)+'px'; mm.style.right=(8+sa.right)+'px'; mm.style.top=(12+sa.top)+'px'; mm.style.left='auto'; mm.style.bottom='auto'; mm.style.transform='none'; }
     if(mp){ mp.style.display='none'; mp.style.pointerEvents='none'; }
   }
   if(mr){
