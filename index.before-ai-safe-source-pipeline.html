@@ -239,28 +239,17 @@
 /* ============================================================================
    AI-SAFE SINGLE-FILE CONSTITUTION (Kanban CARD 11 — P1 comment block headers)
    ============================================================================
-   HERMES / AI EDIT RULES (mandatory):
-   1) Named section edits only — change code only inside labeled SECTION blocks.
-   2) Save schema changes require SAVE_VERSION bump and migration.
-   3) One-way data flow: INPUT → ACTIONS → SIMULATION → RENDER.
-   4) Render code must not mutate gameplay state.
-   5) Scene transitions own setup/teardown (timers, listeners, overlays).
-   6) Feature flags live only in CONFIG / DEBUG / options / URL query params.
-   7) No runtime external dependencies (no CDN scripts, fonts, or APIs).
-   8) No eval().
-   9) No inline event handlers (no onclick= in HTML).
-  10) No hidden globals — export public API via window.CR only.
-  11) One Kanban card at a time.
-  12) Every edit must pass the Playwright harness (tests/run_selfcheck_playwright.js).
-  13) Harness scenes must be temporary and state-isolated (no benchmark leak).
-  14) Public release artifact must remain a single-file HTML game.
-  15) Do not ask Travis to discover bugs the harness can test.
-
-   Portrait dock (Card 5): controlsYOffsetPx moves MOVE/GIVE/SPRINT/LOOK only; MENU fixed.
+   1) Edit only within named SECTION blocks (search "// SECTION").
+   2) Do not change save schema without bumping SAVE_VERSION + migration.
+   3) Input → actions → simulation → render is one-way flow.
+   4) World state is plain data; render code must not mutate gameplay state.
+   5) Scene transitions own setup/teardown of timers, listeners, overlays.
+   6) Feature flags live in cfg, DEBUG, options, or URL query params only.
+   7) No external deps, eval, inline onclick, or undeclared globals.
+   8) Portrait dock: controlsYOffsetPx moves MOVE/GIVE/SPRINT/LOOK only (Card 5).
+   9) Smoke: boot, CR.* proofs, save/load, resize, no external network.
 
    FILE: Solidarity Not Charity Can Run — single-file raycaster roguelike (no deps).
-   SOURCE POLICY: see SOURCE_RELEASE_POLICY.md; optional src/ scaffold; ship index.html.
-
    SECTION INDEX:
      0   CANVAS / RESOLUTION (+ zbuffer occlusion guard)
      0b  FULLSCREEN API
@@ -514,7 +503,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'aipipeline1';
+const BUILD_ID = 'layoutguard1';
 const IS_FILE_ORIGIN = (typeof location !== 'undefined' && location.protocol === 'file:');
 const FILE_ORIGIN_SAVE_NOTE = 'Local file mode: saves may not persist. Use GitHub Pages for reliable saves.';
 function fileOriginMenuNoteHTML(){

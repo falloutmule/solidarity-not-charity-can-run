@@ -1,17 +1,36 @@
 /**
- * Playwright + Node observer for SNC Can Run (single-file index.html).
+ * Playwright + Node observer for SNC Can Run.
+ * Tests the RELEASE ARTIFACT (root index.html by default; CR_RELEASE_ARTIFACT=dist for dist/index.html).
  * Run from repo root: node tests/run_selfcheck_playwright.js
  */
 const fs = require('fs');
 const path = require('path');
 const http = require('http');
-const { spawn } = require('child_process');
+const { spawn, execSync } = require('child_process');
 const { chromium, devices } = require('playwright');
 
 const ROOT = path.resolve(__dirname, '..');
-const INDEX_PATH = path.join(ROOT, 'index.html');
 const PORT = 4173;
 const BASE = `http://127.0.0.1:${PORT}`;
+
+/**
+ * Release artifact under test — must match what GitHub Pages serves.
+ * Set CR_RELEASE_ARTIFACT=dist to test dist/index.html when a build pipeline exists.
+ */
+function resolveReleaseArtifactPath() {
+  const rootIndex = path.join(ROOT, 'index.html');
+  const distIndex = path.join(ROOT, 'dist', 'index.html');
+  if (process.env.CR_RELEASE_ARTIFACT === 'dist' && fs.existsSync(distIndex)) return distIndex;
+  return rootIndex;
+}
+
+function getGitCommitShort() {
+  try {
+    return execSync('git rev-parse --short HEAD', { cwd: ROOT, encoding: 'utf8' }).trim();
+  } catch (_e) {
+    return null;
+  }
+}
 
 function writeProof(name, data) {
   const p = path.join(ROOT, name);
@@ -19,11 +38,24 @@ function writeProof(name, data) {
   return p;
 }
 
-function runConstitutionCheck() {
-  const src = fs.readFileSync(INDEX_PATH, 'utf8');
+function artifactSourceForStaticChecks(src) {
+  const start = src.indexOf('AI-SAFE SINGLE-FILE CONSTITUTION');
+  const end = src.indexOf('========================================================================== */', start);
+  if (start >= 0 && end > start) {
+    return src.slice(0, start) + src.slice(end + '========================================================================== */'.length);
+  }
+  return src;
+}
+
+function runAiSafeConstitutionCheck(artifactPath) {
+  const srcRaw = fs.readFileSync(artifactPath, 'utf8');
+  const src = artifactSourceForStaticChecks(srcRaw);
   const errors = [];
   const checks = {};
-  checks.hasConstitution = src.includes('AI-SAFE SINGLE-FILE CONSTITUTION');
+  const policyPath = path.join(ROOT, 'SOURCE_RELEASE_POLICY.md');
+  const srcReadme = path.join(ROOT, 'src', 'README.md');
+
+  checks.hasConstitution = srcRaw.includes('AI-SAFE SINGLE-FILE CONSTITUTION');
   checks.BUILD_ID = /const\s+BUILD_ID\s*=\s*['"][^'"]+['"]/.test(src);
   checks.SAVE_VERSION = /const\s+SAVE_VERSION\s*=/.test(src);
   checks.windowCR = /globalThis\.CR\s*=\s*window\.CR\s*=/.test(src);
@@ -32,6 +64,28 @@ function runConstitutionCheck() {
   checks.noExternalStylesheet = !/<link[^>]+rel\s*=\s*["']stylesheet["'][^>]+href\s*=\s*["']https?:/i.test(src);
   const onclickHits = (src.match(/\bonclick\s*=/gi) || []).length;
   checks.noInlineOnclick = onclickHits === 0;
+  checks.titleSolidarity = /<title>\s*Solidarity Not Charity Can Run\s*<\/title>/i.test(srcRaw);
+  checks.sourceReleasePolicy = fs.existsSync(policyPath);
+  checks.srcScaffoldReadme = fs.existsSync(srcReadme);
+
+  const rulePhrases = {
+    namedSections: 'Named section edits only',
+    saveVersionRule: 'SAVE_VERSION bump',
+    oneWayFlow: 'INPUT → ACTIONS → SIMULATION → RENDER',
+    noRenderMutation: 'Render code must not mutate gameplay state',
+    kanbanOneCard: 'One Kanban card at a time',
+    playwrightHarness: 'Playwright harness',
+    harnessIsolated: 'state-isolated',
+    singleFileArtifact: 'single-file HTML',
+    noTravisHarnessBugs: 'harness can test',
+  };
+  checks.constitutionRules = {};
+  for (const [k, phrase] of Object.entries(rulePhrases)) {
+    const ok = srcRaw.includes(phrase);
+    checks.constitutionRules[k] = ok;
+    if (!ok) errors.push('constitution rule phrase missing: ' + k);
+  }
+
   if (!checks.hasConstitution) errors.push('missing AI-SAFE SINGLE-FILE CONSTITUTION');
   if (!checks.BUILD_ID) errors.push('missing BUILD_ID');
   if (!checks.SAVE_VERSION) errors.push('missing SAVE_VERSION');
@@ -40,6 +94,10 @@ function runConstitutionCheck() {
   if (!checks.noExternalScript) errors.push('external script src');
   if (!checks.noExternalStylesheet) errors.push('external stylesheet');
   if (!checks.noInlineOnclick) errors.push('inline onclick count ' + onclickHits);
+  if (!checks.titleSolidarity) errors.push('title must be Solidarity Not Charity Can Run');
+  if (!checks.sourceReleasePolicy) errors.push('missing SOURCE_RELEASE_POLICY.md');
+  if (!checks.srcScaffoldReadme) errors.push('missing src/README.md scaffold');
+
   const markers = [
     'CANVAS / RESOLUTION',
     'GAME STATE',
@@ -64,18 +122,92 @@ function runConstitutionCheck() {
     sectionHits[m] = ok;
     if (!ok) errors.push('section marker missing: ' + m);
   }
+
+  const distDir = path.join(ROOT, 'dist');
+  checks.distExists = fs.existsSync(distDir);
+  checks.distSingleFile = true;
+  if (checks.distExists) {
+    const distFiles = fs.readdirSync(distDir).filter((f) => !f.startsWith('.'));
+    checks.distFileCount = distFiles.length;
+    checks.distSingleFile = distFiles.length === 1 && distFiles[0] === 'index.html';
+    if (!checks.distSingleFile) errors.push('dist/ must contain only index.html when present');
+  }
+
   const pass = errors.length === 0;
-  const result = { pass, checks, sectionHits, errors, file: INDEX_PATH };
-  writeProof('proof-constitution-check.json', result);
+  const result = {
+    pass,
+    checks,
+    sectionHits,
+    constitutionRules: checks.constitutionRules,
+    errors,
+    artifactPath,
+    policyPath: checks.sourceReleasePolicy ? policyPath : null,
+    timestamp: new Date().toISOString(),
+  };
+  writeProof('proof-ai-safe-constitution.json', result);
+  writeProof('proof-constitution-check.json', { pass, checks, sectionHits, errors, file: artifactPath });
   return result;
 }
 
-function startStaticServer() {
+/** @deprecated name — use runAiSafeConstitutionCheck */
+function runConstitutionCheck(artifactPath) {
+  return runAiSafeConstitutionCheck(artifactPath);
+}
+
+function runReleaseArtifactCheck(artifactPath, opts) {
+  const src = fs.readFileSync(artifactPath, 'utf8');
+  const errors = [];
+  const rel = path.relative(ROOT, artifactPath).replace(/\\/g, '/');
+  const isSingleHtml = rel === 'index.html' || rel === 'dist/index.html';
+  const externalScript = /<script[^>]+src\s*=\s*["']https?:/i.test(src);
+  const externalCss = /<link[^>]+rel\s*=\s*["']stylesheet["'][^>]+href\s*=\s*["']https?:/i.test(src);
+  const buildMatch = src.match(/const\s+BUILD_ID\s*=\s*['"]([^'"]+)['"]/);
+  const buildId = buildMatch ? buildMatch[1] : null;
+
+  if (!isSingleHtml) errors.push('artifact must be root index.html or dist/index.html');
+  if (externalScript) errors.push('release artifact has external script');
+  if (externalCss) errors.push('release artifact has external stylesheet');
+
+  const pass =
+    errors.length === 0 &&
+    opts.playwrightPass === true &&
+    opts.fullSelfCheckPass === true &&
+    opts.externalRequestCount === 0 &&
+    opts.consoleErrorCount === 0 &&
+    opts.pageErrorCount === 0;
+
+  const result = {
+    pass,
+    artifactPath: rel,
+    artifactAbsolute: artifactPath,
+    githubPagesServes: rel === 'index.html' ? 'root index.html' : rel,
+    singleFile: isSingleHtml && !externalScript && !externalCss,
+    runtimeDependencyCheck: { externalScript, externalCss },
+    externalRequestCount: opts.externalRequestCount,
+    consoleErrorCount: opts.consoleErrorCount,
+    pageErrorCount: opts.pageErrorCount,
+    fullSelfCheck: opts.fullSelfCheck,
+    playwrightSummaryPass: opts.playwrightPass,
+    buildId,
+    commitHash: opts.commitHash,
+    errors,
+    timestamp: new Date().toISOString(),
+  };
+  writeProof('proof-release-artifact.json', result);
+  return result;
+}
+
+function startStaticServer(releaseArtifactPath) {
   return new Promise((resolve, reject) => {
     const srv = http.createServer((req, res) => {
       const urlPath = decodeURIComponent((req.url || '/').split('?')[0]);
-      let filePath = path.join(ROOT, urlPath === '/' ? 'index.html' : urlPath.replace(/^\//, ''));
-      if (!filePath.startsWith(ROOT)) {
+      let filePath;
+      if (urlPath === '/' || urlPath === '/index.html') {
+        filePath = releaseArtifactPath;
+      } else {
+        filePath = path.join(ROOT, urlPath.replace(/^\//, ''));
+      }
+      if (!filePath.startsWith(ROOT) && filePath !== releaseArtifactPath) {
         res.writeHead(403); res.end(); return;
       }
       fs.readFile(filePath, (err, data) => {
@@ -722,8 +854,9 @@ async function renderFailureSection(page) {
 }
 
 async function main() {
-  const constitution = runConstitutionCheck();
-  const srv = await startStaticServer();
+  const releaseArtifactPath = resolveReleaseArtifactPath();
+  const constitution = runAiSafeConstitutionCheck(releaseArtifactPath);
+  const srv = await startStaticServer(releaseArtifactPath);
   const browser = await chromium.launch();
   const context = await browser.newContext();
   const page = await context.newPage();
@@ -783,27 +916,43 @@ async function main() {
   const pageErrPass = net.pageErrors.length === 0;
   const networkPass = net.externalRequests.length === 0;
 
+  const corePass =
+    constitution.pass &&
+    full.pass &&
+    dock.pass &&
+    pointer.pass &&
+    resilience.pass &&
+    (saveLoad.pass !== false) &&
+    audio.pass &&
+    viewportSafeArea.pass &&
+    portraitUsability.pass &&
+    harnessIsolation.pass &&
+    renderFailure.pass &&
+    hallE2E.pass &&
+    visual.pass &&
+    networkPass &&
+    consolePass &&
+    pageErrPass &&
+    canvas.ok &&
+    viewportResults.every((v) => v.layoutPass);
+
+  const releaseArtifact = runReleaseArtifactCheck(releaseArtifactPath, {
+    playwrightPass: corePass,
+    fullSelfCheckPass: full.pass === true,
+    fullSelfCheck: { pass: full.pass, build: full.build },
+    externalRequestCount: net.externalRequests.length,
+    consoleErrorCount: net.consoleErrors.length,
+    pageErrorCount: net.pageErrors.length,
+    commitHash: getGitCommitShort(),
+  });
+
   const summary = {
-    pass:
-      constitution.pass &&
-      full.pass &&
-      dock.pass &&
-      pointer.pass &&
-      resilience.pass &&
-      (saveLoad.pass !== false) &&
-      audio.pass &&
-      viewportSafeArea.pass &&
-      portraitUsability.pass &&
-      harnessIsolation.pass &&
-      renderFailure.pass &&
-      hallE2E.pass &&
-      visual.pass &&
-      networkPass &&
-      consolePass &&
-      pageErrPass &&
-      canvas.ok &&
-      viewportResults.every(v => v.layoutPass),
+    pass: corePass && releaseArtifact.pass === true,
+    releaseArtifactPath: path.relative(ROOT, releaseArtifactPath).replace(/\\/g, '/'),
+    githubPagesArtifact: 'index.html (repo root)',
     constitution,
+    aiSafeConstitution: { pass: constitution.pass, proof: 'proof-ai-safe-constitution.json' },
+    releaseArtifact,
     fullSelfCheck: { pass: full.pass, build: full.build },
     dock,
     pointer,
