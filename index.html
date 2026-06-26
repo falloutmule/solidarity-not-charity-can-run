@@ -207,9 +207,9 @@
   #cronboard.show{display:flex;pointer-events:auto;}
   #cronboard .cronboard-panel{
     width:min(340px,92vw);max-height:100%;overflow-y:auto;
-    background:rgba(12,10,8,0.94);border:1px solid rgba(200,160,80,0.45);
+    background:rgba(8,6,5,0.96);border:2px solid rgba(220,180,100,0.55);
     padding:14px 16px 12px;border-radius:6px;pointer-events:auto;touch-action:pan-y;
-    font:12px monospace;color:#c8b890;line-height:1.45;
+    font:12px monospace;color:#e0d0b0;line-height:1.5;
   }
   #cronboard .cronboard-tit{font-size:15px;color:#ffd24a;letter-spacing:2px;margin-bottom:10px;text-align:center;}
   #cronboard .cronboard-ul{margin:0 0 10px;padding-left:18px;color:#d8c8a8;}
@@ -481,6 +481,7 @@ const _forcePortraitLayout = new URLSearchParams(location.search).get('portraitl
 /** Set true during CR.runControlDockSelfCheck() to force portrait layout math on desktop. */
 let _selfCheckForcePortrait = false;
 let _crHarnessDepth = 0;
+let _crVisualHarnessSnapshot = null;
 let _crBlockHarnessSave = false;
 const dbg = { cansSpawned:0, npcsSpawned:0, invalidPlacements:0,
               spritesSkipped:0, reachableCells:0, rejectedSpawns:0, props:0 };
@@ -552,7 +553,15 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'onboard1';
+const BUILD_ID = 'visual1';
+/** Visual readability contract (render/HUD only; gameplay unchanged). */
+const CR_VISUAL_READABILITY = {
+  style: 'visual1',
+  floorPathStripe: true,
+  entityOutlines: true,
+  exitReadyCue: true,
+  giveTargetHighlight: true,
+};
 const IS_FILE_ORIGIN = (typeof location !== 'undefined' && location.protocol === 'file:');
 const FILE_ORIGIN_SAVE_NOTE = 'Local file mode: saves may not persist. Use GitHub Pages for reliable saves.';
 function fileOriginMenuNoteHTML(){
@@ -2882,10 +2891,11 @@ WALL_TEX[0] = WALL_TEX[WALL.CONCRETE];
 
 // minimap representative colors per wall type
 const WALL_MINI = {
-  [WALL.BUILDING]:'#b39e78', [WALL.BRICK]:'#9a4a3a', [WALL.FENCE]:'#5a6e50',
-  [WALL.MURAL]:'#a98a6a', [WALL.VAN]:'#9a9488', [WALL.GLASS]:'#2f3a44',
-  [WALL.GARAGE]:'#6e6a5e', [WALL.CONCRETE]:'#7a7468', [WALL.SIGNAGE]:'#b08a6a',
+  [WALL.BUILDING]:'#8a7a62', [WALL.BRICK]:'#7a3a32', [WALL.FENCE]:'#4a5e42',
+  [WALL.MURAL]:'#8a6a52', [WALL.VAN]:'#6a6458', [WALL.GLASS]:'#1f2830',
+  [WALL.GARAGE]:'#5a564e', [WALL.CONCRETE]:'#5a5448', [WALL.SIGNAGE]:'#906a4a',
 };
+const MINIMAP_FLOOR = '#343840';
 
 // --- SPRITE TEXTURES (billboards) ---
 function makePerson(body, head, legs, opts){
@@ -2921,6 +2931,12 @@ function makePerson(body, head, legs, opts){
     x.fillStyle='#3a5a7a'; x.fillRect(0,30,5,10);
     x.fillStyle=head; x.beginPath(); x.arc(2,28,3,0,7); x.fill();
   }
+  if(CR_VISUAL_READABILITY.entityOutlines){
+    x.strokeStyle='rgba(0,0,0,0.62)'; x.lineWidth=1;
+    x.strokeRect(7,16,14,16);
+    x.beginPath(); x.arc(14,10,5,0,7); x.stroke();
+    x.strokeRect(9,30,4,13); x.strokeRect(15,30,4,13);
+  }
   return c;
 }
 const TEX = {
@@ -2937,11 +2953,14 @@ const TEX = {
   hall_servant:  makePerson('#6a8a5a','#e0c8a0','#3a4a32',{vest:true,apron:true,aproncol:'#d8e8d0'}),
   // can pickup — clean pantry-can look (no sprite glow; avoids phone-visible halo boxes)
   can: (()=>{ const c=newTex(20,22),x=c.getContext('2d');
-    x.fillStyle='#d8d2c6'; x.fillRect(5,3,10,15);
-    x.fillStyle='#8a8478'; x.fillRect(5,3,10,2); x.fillRect(5,16,10,2);
-    x.fillStyle='#3a78c8'; x.fillRect(5,8,10,5);          // blue label
-    x.fillStyle='#ffffff'; x.fillRect(6,9,8,3);
-    x.fillStyle='#b8b2a4'; x.fillRect(8,2,4,2);           // pull tab
+    x.fillStyle='rgba(0,0,0,0.25)'; x.beginPath(); x.ellipse(10,20,8,2,0,0,7); x.fill();
+    x.fillStyle='#e8c84a'; x.fillRect(4,4,12,14);
+    x.fillStyle='#8a8478'; x.fillRect(4,4,12,2); x.fillRect(4,16,12,2);
+    x.fillStyle='#2a68b8'; x.fillRect(5,9,10,5);
+    x.fillStyle='#ffffff'; x.fillRect(6,10,8,3);
+    x.fillStyle='#ffd86a'; x.fillRect(8,2,4,3);
+    x.strokeStyle='#fff8d0'; x.lineWidth=1;
+    x.strokeRect(4.5,4.5,11,13);
     return c; })(),
   // pantry crate / food box (decor + alt pickup visual flavor)
   crate:(()=>{ const c=newTex(28,22),x=c.getContext('2d');
@@ -3063,11 +3082,16 @@ function drawScene(now){
   if(skyBuilt!==game.modifier) buildSky(game.modifier);
   bctx.drawImage(skyCanvas,0,0);
 
-  // --- FLOOR (asphalt gradient) ---
+  // --- FLOOR (asphalt gradient; higher contrast vs walls) ---
   const gfloor=bctx.createLinearGradient(0,RH/2,0,RH);
-  if(game.modifier==='rainy'){ gfloor.addColorStop(0,'#2a2e36'); gfloor.addColorStop(1,'#181a20'); }
-  else { gfloor.addColorStop(0,'#3a3a3e'); gfloor.addColorStop(0.5,'#2c2c30'); gfloor.addColorStop(1,'#1c1c1e'); }
+  if(game.modifier==='rainy'){ gfloor.addColorStop(0,'#32363e'); gfloor.addColorStop(1,'#14161c'); }
+  else { gfloor.addColorStop(0,'#4a4a52'); gfloor.addColorStop(0.45,'#36363c'); gfloor.addColorStop(1,'#1a1a1e'); }
   bctx.fillStyle=gfloor; bctx.fillRect(0,RH/2,RW,RH/2);
+  if(CR_VISUAL_READABILITY.floorPathStripe){
+    bctx.fillStyle='rgba(120,118,130,0.28)';
+    const pathW = (RW * 0.32)|0;
+    bctx.fillRect(((RW - pathW) / 2)|0, (RH / 2)|0, pathW, (RH / 2)|0);
+  }
   // faint road center-line flecks near horizon for asphalt feel
   bctx.fillStyle='rgba(200,190,120,0.10)';
   for(let i=0;i<10;i++){ bctx.fillRect((RW/2)-1+(i-5)*4, RH/2+2+i*2, 2, 1); }
@@ -3169,6 +3193,43 @@ function drawScene(now){
       if(s.obj===game.exit){ yoff=Math.sin(now/180)*2.5; }
       bctx.drawImage(s.tex, srcX,0,1,s.tex.height, col, top+yoff, 1, screenH);
     }
+    const isCan = s.tex === TEX.can;
+    const isNpc = s.obj && game.npcs.indexOf(s.obj) >= 0;
+    const isExit = s.obj === game.exit;
+    const exitReady = isExit && game.exit && game.exit.active && game.helped >= game.quota;
+    const midCol = Math.min(RW - 1, Math.max(0, ((startCol + endCol) / 2) | 0));
+    const spriteFront = midCol >= 0 && midCol < RW && depth < zbuffer[midCol];
+    if(spriteFront && isCan && depth < 14 && CR_VISUAL_READABILITY.entityOutlines){
+      bctx.fillStyle = 'rgba(255,230,100,0.9)';
+      const lc = Math.max(0, startCol), rc = Math.min(RW - 1, endCol - 1);
+      if(lc < RW) bctx.fillRect(lc, top, 1, screenH);
+      if(rc >= 0) bctx.fillRect(rc, top, 1, screenH);
+    }
+    if(spriteFront && isNpc && depth < 18 && CR_VISUAL_READABILITY.entityOutlines){
+      bctx.strokeStyle = 'rgba(120,220,255,0.75)'; bctx.lineWidth = 1;
+      const lc = Math.max(0, startCol), rc = Math.min(RW - 1, endCol - 1);
+      if(lc < RW){ bctx.beginPath(); bctx.moveTo(lc, top); bctx.lineTo(lc, top + screenH); bctx.stroke(); }
+      if(rc >= 0){ bctx.beginPath(); bctx.moveTo(rc, top); bctx.lineTo(rc, top + screenH); bctx.stroke(); }
+    }
+    if(spriteFront && exitReady && CR_VISUAL_READABILITY.exitReadyCue){
+      const pulse = 0.5 + 0.5 * Math.sin((now || 0) / 200);
+      bctx.strokeStyle = 'rgba(255,230,120,' + pulse.toFixed(2) + ')';
+      bctx.lineWidth = 1;
+      const lc = Math.max(0, startCol), rc = Math.min(RW - 1, endCol - 1);
+      if(lc < RW){ bctx.beginPath(); bctx.moveTo(lc, top); bctx.lineTo(rc, top); bctx.stroke(); }
+      if(rc >= 0){ bctx.beginPath(); bctx.moveTo(lc, top + screenH); bctx.lineTo(rc, top + screenH); bctx.stroke(); }
+    }
+  }
+
+  if(_crHarnessDepth > 0){
+    _crVisualHarnessSnapshot = {
+      hasLivePickup: game.pickups.some(c => !c.taken),
+      hasLiveNpc: game.npcs.some(n => !n.helped),
+      hasExit: !!game.exit,
+      exitReady: !!(game.exit && game.exit.active && game.helped >= game.quota),
+      aimNpc: !!game.aimNpc,
+      giveReady: !!(game.aimNpc && player.cans >= game.aimNpc.need),
+    };
   }
 
 }
@@ -3245,6 +3306,8 @@ function drawMinap(){
     ctx.fillStyle='rgba(20,16,12,0.7)'; ctx.fillRect(ox-3,oy-3,W+6,H+6);
     ctx.strokeStyle='rgba(180,150,100,0.4)'; ctx.lineWidth=1; ctx.strokeRect(ox-3,oy-3,W+6,H+6);
   }
+  ctx.fillStyle = MINIMAP_FLOOR;
+  ctx.fillRect(ox, oy, W, H);
   for(let y=0;y<game.MAP_H;y++) for(let x=0;x<game.MAP_W;x++){
     const v=game.map[y][x];
     if(v!==0){
@@ -3267,8 +3330,14 @@ function drawMinap(){
   }
   if(game.exit){
     const exDot = Math.max(3, dot*1.5);
-    ctx.fillStyle = game.exit.active?'#ffe066':'#666';
+    const exitReady = game.exit.active && game.helped >= game.quota;
+    ctx.fillStyle = exitReady ? '#ffe880' : '#5a5a62';
     ctx.fillRect(ox+game.exit.x*cell-exDot/2, oy+game.exit.y*cell-exDot/2, exDot,exDot);
+    if(exitReady){
+      ctx.strokeStyle = '#fff4b0';
+      ctx.lineWidth = Math.max(1, cell * 0.35);
+      ctx.strokeRect(ox+game.exit.x*cell-exDot/2 - 1, oy+game.exit.y*cell-exDot/2 - 1, exDot + 2, exDot + 2);
+    }
   }
   // radar pulse ring on minimap
   if(player.radar && player.radarRingT>0){
@@ -3354,7 +3423,14 @@ function drawHUD(now){
   if(aim){
     const ok=player.cans>=aim.need;
     ctx.strokeStyle = ok?'rgba(140,255,170,0.95)':'rgba(255,140,90,0.95)';
-    ctx.lineWidth=2; ctx.beginPath(); ctx.arc(cx,cy,11,0,7); ctx.stroke();
+    ctx.lineWidth=2; ctx.beginPath(); ctx.arc(cx,cy,14,0,7); ctx.stroke();
+    if(ok && CR_VISUAL_READABILITY.giveTargetHighlight){
+      ctx.strokeStyle='rgba(90,255,150,0.55)'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.arc(cx,cy,19,0,7); ctx.stroke();
+      ctx.font='bold 11px monospace'; ctx.fillStyle='#8dffb8'; ctx.textAlign='center';
+      ctx.fillText('GIVE', cx, cy - 20);
+      ctx.textAlign='left';
+    }
     // tick marks
     ctx.beginPath();
     ctx.moveTo(cx-15,cy); ctx.lineTo(cx-7,cy);
@@ -4530,6 +4606,11 @@ function drawPortraitStatsPanel(){
   ctx.font = '13px monospace';
   ctx.fillStyle = '#9fffb6';
   ctx.fillText('PEOPLE ' + game.helped + '/' + game.quota + ' helped · ' + game.delivered + ' delivered', r.x + 10, r.y + 36);
+  if(game.helped >= game.quota && game.exit && game.exit.active){
+    ctx.font = 'bold 12px monospace';
+    ctx.fillStyle = '#ffe566';
+    ctx.fillText('EXIT READY — find the glowing gate', r.x + 10, r.y + 50);
+  }
   ctx.fillStyle = '#c8b888';
   const meta = 'D' + game.district + ' [' + game.modifier.toUpperCase() + '] x' + game.scoreMult +
     '   SEED ' + game.seed + '   SCORE ' + game.totalScore;
@@ -4545,7 +4626,12 @@ function drawPortraitFpvOverlay(now){
   if(aim){
     const ok = player.cans >= aim.need;
     ctx.strokeStyle = ok ? 'rgba(140,255,170,0.95)' : 'rgba(255,140,90,0.95)';
-    ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(cx, cy, 11, 0, 7); ctx.stroke();
+    ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(cx, cy, 13, 0, 7); ctx.stroke();
+    if(ok && CR_VISUAL_READABILITY.giveTargetHighlight){
+      ctx.font = 'bold 10px monospace'; ctx.textAlign = 'center';
+      ctx.fillStyle = '#8dffb8'; ctx.fillText('GIVE', cx, cy - 16);
+      ctx.textAlign = 'left';
+    }
     ctx.font = '12px monospace'; ctx.textAlign = 'center';
     const lbl = aim.kind.toUpperCase() + ' · needs ' + aim.need + ' · you ' + player.cans;
     ctx.fillStyle = 'rgba(0,0,0,0.55)'; const lw = ctx.measureText(lbl).width;
@@ -5749,11 +5835,12 @@ function runFullSelfCheckInner(){
   const proceduralLevelValidation = runProceduralLevelValidationSelfCheck();
   const fullRunProgression = runFullRunProgressionSelfCheck();
   const onboarding = runOnboardingSelfCheck();
+  const visualReadability = runVisualReadabilitySelfCheck();
   const input = runInputSelfCheck();
   const levels = runLevelSelfCheck();
   const renderFailure = runRenderFailureSelfCheck();
   const runtimeClean = window.__crRuntimeErrors.length === err0;
-  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && mobileControlReliability.pass && movementCollision.pass && reachability.pass && proceduralLevelValidation.pass && fullRunProgression.pass && onboarding.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
+  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && mobileControlReliability.pass && movementCollision.pass && reachability.pass && proceduralLevelValidation.pass && fullRunProgression.pass && onboarding.pass && visualReadability.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
   return {
     pass,
     build: BUILD_ID,
@@ -5767,6 +5854,7 @@ function runFullSelfCheckInner(){
     proceduralLevelValidation,
     fullRunProgression,
     onboarding,
+    visualReadability,
     input,
     levels,
     renderFailure,
@@ -5887,6 +5975,115 @@ function runOnboardingSelfCheckBody(){
     state = savedState;
     paused = savedPaused;
     clearInputState();
+    _selfCheckForcePortrait = false;
+    applyMobileControlSettings();
+    drawMobileMenu();
+  }
+}
+
+function runVisualReadabilitySelfCheck(){
+  if(_crHarnessDepth > 0) return runVisualReadabilitySelfCheckBody();
+  return crWithTemporaryState('visualReadability', () => runVisualReadabilitySelfCheckBody());
+}
+function runVisualReadabilitySelfCheckBody(){
+  const errors = [];
+  const warnings = [];
+  const checks = {};
+  const evidence = {};
+  const err0 = window.__crRuntimeErrors.length;
+  crPrepareSelfCheckPortrait();
+  const savedOverride = mobileOverride;
+  mobileOverride = true;
+  try {
+    checks.functionExists = typeof runVisualReadabilitySelfCheck === 'function';
+    checks.buildIdVisual1 = BUILD_ID === 'visual1';
+    checks.visualContract = !!(CR_VISUAL_READABILITY && CR_VISUAL_READABILITY.style === 'visual1');
+    checks.pickupTex = !!TEX.can;
+    checks.npcTex = !!TEX.hungry;
+    checks.exitTex = !!TEX.exit;
+    if(!checks.buildIdVisual1) errors.push('BUILD_ID must be visual1');
+    if(!checks.visualContract) errors.push('CR_VISUAL_READABILITY contract missing');
+    if(!checks.pickupTex || !checks.npcTex || !checks.exitTex) errors.push('sprite textures missing');
+
+    startRun(42);
+    state = STATE.PLAY;
+    paused = false;
+    crRenderFailureDrawFrame(1200);
+    const normalCanvas = crRenderCanvasSanity();
+    checks.normalRunRendered = !!normalCanvas.pass;
+    if(!checks.normalRunRendered) errors.push('normal run render blank');
+    checks.pickupMarkerPresent = game.pickups.some(c => !c.taken);
+    if(!checks.pickupMarkerPresent) errors.push('no live pickup in normal run');
+    checks.npcMarkerPresent = game.npcs.some(n => !n.helped);
+    if(!checks.npcMarkerPresent) errors.push('no live NPC in normal run');
+    checks.exitMarkerPresent = !!game.exit;
+    if(!checks.exitMarkerPresent) errors.push('exit missing in normal run');
+    evidence.normalSnapshot = _crVisualHarnessSnapshot;
+
+    startCustomLevel('hall_of_servants');
+    state = STATE.PLAY;
+    paused = false;
+    crRenderFailureDrawFrame(1300);
+    const hallCanvas = crRenderCanvasSanity();
+    checks.hallRendered = !!hallCanvas.pass;
+    if(!checks.hallRendered) errors.push('hall render failed');
+    evidence.hallStats = hallCanvas.stats;
+
+    showOnboardingHelp();
+    const panel = document.getElementById('cronboard');
+    checks.onboardingOverlayRenders = !!(panel && panel.classList.contains('show'));
+    if(!checks.onboardingOverlayRenders) errors.push('onboarding overlay not visible');
+    dismissOnboardingHelp(true);
+
+    startRun(42);
+    state = STATE.PLAY;
+    paused = false;
+    if(game.exit){
+      game.helped = game.quota;
+      game.exit.active = true;
+    }
+    crRenderFailureDrawFrame(1400);
+    checks.exitReadyVisualState = !!(_crVisualHarnessSnapshot && _crVisualHarnessSnapshot.exitReady);
+    if(!checks.exitReadyVisualState) errors.push('exit-ready visual state not observed');
+    evidence.exitReadySnapshot = _crVisualHarnessSnapshot;
+
+    const npc = game.npcs.find(n => !n.helped);
+    if(!npc) errors.push('no NPC for give-target test');
+    else {
+      player.x = npc.x - 0.55;
+      player.y = npc.y;
+      player.cans = Math.max(npc.need + 2, 8);
+      player.dir = Math.atan2(npc.y - player.y, npc.x - player.x);
+      game.aimNpc = npc;
+      crRenderFailureDrawFrame(1500);
+      checks.giveTargetVisualState = !!(_crVisualHarnessSnapshot && _crVisualHarnessSnapshot.giveReady && _crVisualHarnessSnapshot.aimNpc);
+      if(!checks.giveTargetVisualState) errors.push('GIVE-ready visual state not observed');
+      evidence.giveSnapshot = _crVisualHarnessSnapshot;
+    }
+
+    const layout = getLayoutProof();
+    checks.minimapPresent = !!(layout && layout.minimapRect && layout.minimapRect.w > 8);
+    if(!checks.minimapPresent) errors.push('minimap layout missing');
+    evidence.layoutMinimap = layout && layout.minimapRect;
+
+    const saveBefore = options.helpDismissed;
+    if(!crHarnessWriteSaveToStorage()) errors.push('visual check save write failed');
+    const loaded = SAVE.load();
+    checks.saveLoadUnchanged = loaded && options.helpDismissed === saveBefore;
+    if(!checks.saveLoadUnchanged) errors.push('save/load regression during visual check');
+
+    checks.runtimeClean = window.__crRuntimeErrors.length === err0;
+    if(!checks.runtimeClean) errors.push('runtime errors during visual readability check');
+
+    const pass = errors.length === 0;
+    return { pass, build: BUILD_ID, errors, warnings, checks, evidence, visualStyle: CR_VISUAL_READABILITY };
+  } catch(e){
+    errors.push(String(e && e.message ? e.message : e));
+    return { pass: false, build: BUILD_ID, errors, warnings, checks, evidence: {}, visualStyle: CR_VISUAL_READABILITY };
+  } finally {
+    onboardingOpen = false;
+    syncOnboardingPanel();
+    mobileOverride = savedOverride;
     _selfCheckForcePortrait = false;
     applyMobileControlSettings();
     drawMobileMenu();
@@ -7916,7 +8113,9 @@ globalThis.CR = window.CR = {
   set paused(v){ paused=!!v; },
   get mobileMode(){ return mobileMode; },
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
-  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runMobileControlReliabilitySelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
+  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runMobileControlReliabilitySelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runVisualReadabilitySelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
+  CR_VISUAL_READABILITY,
+  getCrVisualHarnessSnapshot(){ return _crVisualHarnessSnapshot; },
   showOnboardingHelp,dismissOnboardingHelp,crOpenFirstRunHelpIfNeeded,
   get onboardingOpen(){ return onboardingOpen; },
   editRunnerName,applyMobileControlSettings,mobileSprintCost,mobileSprintBurstSec,triggerMobileSprintBurst,crDispatchPointer,crDispatchTouch,

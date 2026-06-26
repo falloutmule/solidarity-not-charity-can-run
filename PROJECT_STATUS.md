@@ -1,6 +1,6 @@
 # Project status — Solidarity Not Charity Can Run
 
-Last updated: onboarding / first-run help (`onboard1`).
+Last updated: visual readability polish (`visual1`).
 
 Reports were moved into **`reports/`** to keep the GitHub root readable. Index: **`reports/README.md`**; guard write-ups: **`reports/guards/`**.
 
@@ -10,14 +10,16 @@ Reports were moved into **`reports/`** to keep the GitHub root readable. Index: 
 
 | | |
 |--|--|
-| **BUILD_ID** (root `index.html`) | `onboard1` |
-| **Prior gameplay baseline** | `runprog1` / `1437b6f` |
-| **Handoff reference baseline** | `multiseed1` / `ec44e53` |
+| **BUILD_ID** (root `index.html`) | `visual1` |
+| **Prior gameplay baseline** | `onboard1` / `aaaf901` |
+| **Handoff reference baseline** | `runprog1` / `1437b6f` |
 
 ## URLs
 
-- **Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=aaaf901&mobile=on&portraitlayout=1  
-- **Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=aaaf901&mobile=on&portraitlayout=1  
+- **Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=COMMIT&mobile=on&portraitlayout=1  
+- **Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=COMMIT&mobile=on&portraitlayout=1  
+
+*(Replace `COMMIT` with short hash after push — see latest guard report.)*
 
 ## Completed cards (order)
 
@@ -30,7 +32,8 @@ Reports were moved into **`reports/`** to keep the GitHub root readable. Index: 
 7. **Procedural multi-seed validation guard** — `multiseed1`  
 8. **Full-run progression / save-load E2E guard** — `runprog1`  
 9. **GitHub Actions harness CI** — `.github/workflows/selfcheck.yml`, proof artifact upload  
-10. **Onboarding / first-run help** — `onboard1`, `CR.runOnboardingSelfCheck`
+10. **Onboarding / first-run help** — `onboard1`, `CR.runOnboardingSelfCheck`  
+11. **Visual readability polish** — `visual1`, `CR.runVisualReadabilitySelfCheck`
 
 ## Next likely work
 
@@ -39,4 +42,4 @@ Reports were moved into **`reports/`** to keep the GitHub root readable. Index: 
 
 ## Blockers
 
-- None known after local harness pass; confirm GitHub Actions after push.
+- None known after local harness and GitHub Actions CI pass.

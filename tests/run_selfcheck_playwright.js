@@ -496,26 +496,51 @@ async function audioUnlock(page) {
 
 async function visualRegressionShots(page) {
   const shots = [];
+  const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
   const scenarios = [
-    { name: 'normal-seed42', url: `${BASE}/index.html?mobile=on&portraitlayout=1`, setup: 'CR.startRun(42)' },
-    { name: 'snc-hall', url: `${BASE}/index.html?mobile=on&portraitlayout=1`, setup: "CR.startCustomLevel('hall_of_servants')" },
-    { name: 'options', url: `${BASE}/index.html?mobile=on&portraitlayout=1`, setup: "CR.state='options'" },
-    { name: 'dock-mid', url: `${BASE}/index.html?mobile=on&portraitlayout=1`, setup: 'CR.options.controlsYOffsetPx=0;CR.applyMobileControlSettings();CR.startRun(42)' },
-    { name: 'dock-high', url: `${BASE}/index.html?mobile=on&portraitlayout=1`, setup: 'CR.options.controlsYOffsetPx=-120;CR.applyMobileControlSettings();CR.startRun(42)' },
+    { name: 'normal', file: 'proof-visual-normal.png', setup: 'CR.startRun(42)' },
+    { name: 'hall', file: 'proof-visual-hall.png', setup: "CR.startCustomLevel('hall_of_servants')" },
+    {
+      name: 'exit-ready',
+      file: 'proof-visual-exit-ready.png',
+      setup: "CR.startRun(42);CR.game.helped=CR.game.quota;if(CR.game.exit)CR.game.exit.active=true;",
+    },
+    {
+      name: 'give-target',
+      file: 'proof-visual-give-target.png',
+      setup: "CR.startRun(42);var n=CR.game.npcs.find(function(x){return !x.helped;});if(n){CR.player.x=n.x-0.55;CR.player.y=n.y;CR.player.cans=Math.max(n.need+2,8);CR.player.dir=Math.atan2(n.y-CR.player.y,n.x-CR.player.x);CR.game.aimNpc=n;}",
+    },
+    { name: 'onboarding', file: 'proof-visual-onboarding.png', setup: 'CR.showOnboardingHelp()' },
+    { name: 'normal-seed42', url: baseUrl, setup: 'CR.startRun(42)' },
+    { name: 'snc-hall', url: baseUrl, setup: "CR.startCustomLevel('hall_of_servants')" },
+    { name: 'options', url: baseUrl, setup: "CR.state='options'" },
+    { name: 'dock-mid', url: baseUrl, setup: 'CR.options.controlsYOffsetPx=0;CR.applyMobileControlSettings();CR.startRun(42)' },
+    { name: 'dock-high', url: baseUrl, setup: 'CR.options.controlsYOffsetPx=-120;CR.applyMobileControlSettings();CR.startRun(42)' },
   ];
   await page.setViewportSize({ width: 390, height: 844 });
   for (const sc of scenarios) {
-    await page.goto(sc.url, { waitUntil: 'domcontentloaded' });
+    const url = sc.url || baseUrl;
+    await page.goto(url, { waitUntil: 'domcontentloaded' });
     await waitGameReady(page);
     await page.evaluate(sc.setup);
     await page.waitForTimeout(500);
     const blank = await canvasNonBlank(page);
-    const file = `proof-visual-${sc.name}.png`;
+    const file = sc.file || `proof-visual-${sc.name}.png`;
     await page.screenshot({ path: path.join(ROOT, file) });
     shots.push({ scenario: sc.name, file, blankOk: blank.ok, canvas: blank });
   }
-  const index = { pass: shots.every(s => s.blankOk), shots, timestamp: new Date().toISOString() };
+  const crVisual = await page.evaluate(() => {
+    window.__crRuntimeErrors = window.__crRuntimeErrors || [];
+    return CR.runVisualReadabilitySelfCheck();
+  });
+  const index = {
+    pass: shots.every((s) => s.blankOk) && crVisual.pass === true,
+    shots,
+    visualReadabilitySelfCheck: crVisual,
+    timestamp: new Date().toISOString(),
+  };
   writeProof('proof-visual-regression-index.json', index);
+  writeProof('proof-visual-readability-selfcheck.json', crVisual);
   return index;
 }
 
