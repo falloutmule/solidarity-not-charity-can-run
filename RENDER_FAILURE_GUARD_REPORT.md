@@ -58,5 +58,6 @@
 
 ## GITHUB PAGES URL
 
-- https://falloutmule.github.io/solidarity-not-charity-can-run/?v=COMMIT&mobile=on&portraitlayout=1
-- Self-check: https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=COMMIT&mobile=on&portraitlayout=1
+- Commit: **21c0632**
+- https://falloutmule.github.io/solidarity-not-charity-can-run/?v=21c0632&mobile=on&portraitlayout=1
+- Self-check: https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=21c0632&mobile=on&portraitlayout=1
