@@ -598,6 +598,83 @@ async function viewportSafeAreaSection(page) {
   return { pass, proof, results };
 }
 
+async function mobileControlReliabilitySection(page) {
+  const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await waitGameReady(page);
+  await page.evaluate(() => {
+    CR.setMobileMode(true);
+    CR.startRun(88);
+    CR.state = CR.STATE.PLAY;
+    CR.paused = false;
+    CR.applyMobileControlSettings();
+  });
+
+  const rel = await page.evaluate(() => CR.runMobileControlReliabilitySelfCheck());
+
+  await page.evaluate(() => {
+    CR.startRun(88);
+    CR.state = CR.STATE.PLAY;
+    CR.paused = false;
+    const ml = document.getElementById('ml');
+    const lpad = document.getElementById('mlookpad');
+    const mbr = ml.getBoundingClientRect();
+    const cx = mbr.left + mbr.width * 0.5;
+    const cy = mbr.top + mbr.height * 0.5;
+    CR.crDispatchPointer(ml, 'pointerdown', cx, cy, 42, 'touch');
+    CR.crDispatchPointer(ml, 'pointermove', cx, cy - 35, 42, 'touch');
+  });
+  await page.waitForTimeout(120);
+  await page.screenshot({ path: path.join(ROOT, 'proof-control-move-drag.png') });
+
+  await page.evaluate(() => {
+    const ml = document.getElementById('ml');
+    const mbr = ml.getBoundingClientRect();
+    const cx = mbr.left + mbr.width * 0.5;
+    const cy = mbr.top + mbr.height * 0.5;
+    CR.crDispatchPointer(ml, 'pointerup', cx, cy - 35, 42, 'touch');
+    const lpad = document.getElementById('mlookpad');
+    const lbr = lpad.getBoundingClientRect();
+    const lx = lbr.left + lbr.width * 0.5;
+    const ly = lbr.top + lbr.height * 0.5;
+    CR.crDispatchPointer(lpad, 'pointerdown', lx, ly, 44, 'touch');
+    CR.crDispatchPointer(lpad, 'pointermove', lx + 40, ly, 44, 'touch');
+    CR.crDispatchPointer(lpad, 'pointerup', lx + 40, ly, 44, 'touch');
+  });
+  await page.waitForTimeout(120);
+  await page.screenshot({ path: path.join(ROOT, 'proof-control-look-drag.png') });
+
+  await page.evaluate(() => {
+    const mportmenu = document.getElementById('mportmenu');
+    if (mportmenu) {
+      const r = mportmenu.getBoundingClientRect();
+      CR.crDispatchTouch(mportmenu, 'touchstart', r.left + r.width / 2, r.top + 8, 66);
+      CR.crDispatchTouch(mportmenu, 'touchend', r.left + r.width / 2, r.top + 8, 66);
+    }
+  });
+  await page.waitForTimeout(200);
+  await page.screenshot({ path: path.join(ROOT, 'proof-control-menu-open.png') });
+
+  const stuck = await page.evaluate(() => ({
+    joyActive: CR.getDebugState().joy.active,
+  }));
+
+  const pass = rel.pass === true && !stuck.joyActive;
+
+  const proof = {
+    pass,
+    build: rel.build,
+    reliability: rel,
+    stuckAfterTorture: stuck,
+    screenshots: ['proof-control-move-drag.png', 'proof-control-look-drag.png', 'proof-control-menu-open.png'],
+    timestamp: new Date().toISOString(),
+  };
+  writeProof('proof-mobile-control-reliability.json', proof);
+  writeProof('proof-pointer-events-log.json', { checks: rel.checks, evidence: rel.evidence, stuck });
+  return { pass, proof, reliability: rel };
+}
+
 async function portraitUsabilitySection(page) {
   const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
   const presetList = [
@@ -895,6 +972,8 @@ async function main() {
   const portraitUsability = await portraitUsabilitySection(page);
   const settingsSafetyPass = portraitUsability.settingsSafety?.pass === true;
 
+  const mobileControlReliability = await mobileControlReliabilitySection(page);
+
   const harnessIsolation = await harnessIsolationSection(page);
   const renderFailure = await renderFailureSection(page);
   const hallE2E = await hallE2ESection(page);
@@ -930,6 +1009,7 @@ async function main() {
     viewportSafeArea.pass &&
     portraitUsability.pass &&
     settingsSafetyPass &&
+    mobileControlReliability.pass &&
     harnessIsolation.pass &&
     renderFailure.pass &&
     hallE2E.pass &&
@@ -966,6 +1046,7 @@ async function main() {
     viewportSafeArea,
     portraitUsability,
     settingsSafety: portraitUsability.settingsSafety || { pass: settingsSafetyPass },
+    mobileControlReliability,
     harnessIsolation,
     renderFailure,
     hallE2E,

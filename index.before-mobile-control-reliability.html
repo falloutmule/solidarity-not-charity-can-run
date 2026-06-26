@@ -514,7 +514,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'controlrel1';
+const BUILD_ID = 'layoutguard2';
 const IS_FILE_ORIGIN = (typeof location !== 'undefined' && location.protocol === 'file:');
 const FILE_ORIGIN_SAVE_NOTE = 'Local file mode: saves may not persist. Use GitHub Pages for reliable saves.';
 function fileOriginMenuNoteHTML(){
@@ -1012,22 +1012,6 @@ function setMobileMode(on){
   const ph = document.getElementById('porthint');
   if(ph) ph.classList.remove('show');
 }
-function triggerMobileSprintBurst(){
-  const ms = ms_element || document.getElementById('ms');
-  const nowSec = performance.now()/1000;
-  const cost = mobileSprintCost();
-  if(nowSec < sprintBurstUntil) return { fired: false, reason: 'cooldown' };
-  if(player.stamina >= cost){
-    const stamBefore = player.stamina;
-    player.stamina = Math.max(0, player.stamina - cost);
-    sprintBurstUntil = nowSec + mobileSprintBurstSec();
-    if(ms) ms.classList.add('pr');
-    return { fired: true, stamBefore, stamAfter: player.stamina, until: sprintBurstUntil };
-  }
-  if(ms){ ms.classList.add('pr'); setTimeout(()=>ms.classList.remove('pr'), 120); }
-  beep(160,0.04,'sawtooth',0.025);
-  return { fired: false, reason: 'no-stamina' };
-}
 function bindMobileControls(){
   const ml = document.getElementById('ml');
   const mr = document.getElementById('mr');
@@ -1105,61 +1089,32 @@ function bindMobileControls(){
 
   // ---- dedicated LOOK circle (#mlookpad) — works in BOTH portrait and landscape ----
   const lpad = document.getElementById('mlookpad');
-  let lpadMousePtr = null;
-  let lpadTouchPtr = null;
-  const clearLpadPtr = (pid)=>{
-    if(lpadMousePtr && lpadMousePtr.id === pid) lpadMousePtr = null;
-    if(lpadTouchPtr && lpadTouchPtr.id === pid){
-      lpadTouchPtr = null;
-      lookTouch.id = null;
-      lookTouch.lastX = 0;
-    }
-    if(!lpadMousePtr && !lpadTouchPtr) lpad.classList.remove('pr');
-  };
+  let lpadMousePtr = null; // mouse-only pointer look on #mlookpad
 
   lpad.addEventListener('pointerdown', e=>{
+    if(e.pointerType === 'touch') return;
     e.preventDefault(); e.stopPropagation();
-    if(e.pointerType === 'touch' || e.pointerType === 'pen'){
-      try{ lpad.setPointerCapture(e.pointerId); }catch(_e){}
-      lpadTouchPtr = { id: e.pointerId, lastX: e.clientX };
-      lookTouch.id = e.pointerId;
-      lookTouch.lastX = e.clientX;
-      lpad.classList.add('pr');
-      dismissLookHint();
-      return;
-    }
-    if(e.pointerType === 'mouse'){
-      lpadMousePtr = { id: e.pointerId, startX: e.clientX };
-      lpad.classList.add('pr');
-      dismissLookHint();
-    }
+    lpadMousePtr = { id: e.pointerId, startX: e.clientX };
+    lpad.classList.add('pr');
+    dismissLookHint();
   },{passive:false});
 
   lpad.addEventListener('pointermove', e=>{
-    if(state!==STATE.PLAY || paused) return;
-    if(lpadTouchPtr && e.pointerId === lpadTouchPtr.id){
-      e.preventDefault(); e.stopPropagation();
-      const dx = e.clientX - lpadTouchPtr.lastX;
-      if(Math.abs(dx) > 0.2){ lpadTouchPtr.lastX = e.clientX; lookTouch.lastX = e.clientX; player.angle += dx * mobileLookSens(); }
-      return;
-    }
     if(e.pointerType === 'touch') return;
     if(!lpadMousePtr || e.pointerId !== lpadMousePtr.id) return;
-    e.preventDefault(); e.stopPropagation();
+    if(state!==STATE.PLAY || paused) return;
     const dx = e.clientX - lpadMousePtr.startX;
     if(Math.abs(dx) > 0.2){ lpadMousePtr.startX = e.clientX; player.angle += dx * mobileLookSens(); }
     touchDebug({type:'look_circle_move', orient:isMobilePortrait()?'port':'land', dx, angle:player.angle});
   },{passive:false});
 
   lpad.addEventListener('pointerup', e=>{
-    e.preventDefault(); e.stopPropagation();
-    try{ lpad.releasePointerCapture(e.pointerId); }catch(_e){}
-    clearLpadPtr(e.pointerId);
+    if(e.pointerType === 'touch') return;
+    if(lpadMousePtr && e.pointerId===lpadMousePtr.id){ lpadMousePtr=null; lpad.classList.remove('pr'); }
   },{passive:false});
   lpad.addEventListener('pointercancel', e=>{
-    e.preventDefault(); e.stopPropagation();
-    try{ lpad.releasePointerCapture(e.pointerId); }catch(_e){}
-    clearLpadPtr(e.pointerId);
+    if(e.pointerType === 'touch') return;
+    if(lpadMousePtr && e.pointerId===lpadMousePtr.id){ lpadMousePtr=null; lpad.classList.remove('pr'); }
   },{passive:false});
 
   lpad.addEventListener('touchstart', e=>{
@@ -1215,19 +1170,23 @@ function bindMobileControls(){
     e.preventDefault(); e.stopPropagation();
     inp.give = false; mg.classList.remove('pr');
   },{passive:false});
-  const givePtrDown = e=>{ e.preventDefault(); e.stopPropagation(); inp.give = true; mg.classList.add('pr'); };
-  const givePtrUp = e=>{ e.preventDefault(); e.stopPropagation(); inp.give = false; mg.classList.remove('pr'); };
-  mg.addEventListener('pointerdown', givePtrDown, {passive:false});
-  mg.addEventListener('pointerup', givePtrUp, {passive:false});
-  mg.addEventListener('pointercancel', givePtrUp, {passive:false});
 
   // ---- SPRINT button (mobile: burst tap; desktop: Shift still works as hold) ----
-  const sprintTap = e=>{
+  ms.addEventListener('touchstart', e=>{
     e.preventDefault(); e.stopPropagation();
-    triggerMobileSprintBurst();
-  };
-  ms.addEventListener('touchstart', sprintTap,{passive:false});
-  ms.addEventListener('pointerdown', sprintTap,{passive:false});
+    // Tap triggers a short sprint burst if stamina available
+    const nowSec = performance.now()/1000;
+    const cost = mobileSprintCost();
+    if(nowSec < sprintBurstUntil) return;
+    if(player.stamina >= cost){
+      player.stamina = Math.max(0, player.stamina - cost);
+      sprintBurstUntil = nowSec + mobileSprintBurstSec();
+      ms.classList.add('pr');
+    } else {
+      ms.classList.add('pr'); setTimeout(()=>ms.classList.remove('pr'), 120);
+      beep(160,0.04,'sawtooth',0.025);
+    }
+  },{passive:false});
   ms.addEventListener('touchend', e=>{
     e.preventDefault(); e.stopPropagation();
     // Do NOT cancel burst on touchend — it runs its course
@@ -1258,7 +1217,6 @@ function bindMobileControls(){
     const openPauseFromMenu = ()=>{
       if(state!==STATE.PLAY) return;
       if(!paused){
-        clearInputState();
         paused=true; SAVE.save(); beep(440,0.06,'sine',0.03);
         drawMobileMenu();
       }
@@ -1505,7 +1463,7 @@ function rmenuAction(action){
       break;
     case 'result-lb': state=STATE.LB; _rmSel=0; break;
     case 'result-title': state=STATE.TITLE; _rmSel=0; break;
-    case 'pause-resume': paused=false; rmenuHide(); clearInputState(); break;
+    case 'pause-resume': paused=false; rmenuHide(); break;
     case 'pause-restart': paused=false; rmenuHide(); SAVE.clear(); restartRun(false); break;
     case 'pause-title': paused=false; rmenuHide(); state=STATE.TITLE; _rmSel=0; break;
     case 'upgrade-0': chooseUpgrade(0); break;
@@ -3666,10 +3624,10 @@ function update(dt){
     if(!paused){ paused=true; SAVE.save(); beep(440,0.06,'sine',0.03); }
     else { paused=false; }
   }
-  if(inp.give && !inp._lastGive && !paused){ giveCan(); }
+  if(inp.give && !paused){ giveCan(); }
   inp._lastMap = inp.map;
   inp._lastPause = inp.pause;
-  inp._lastGive = inp.give;
+  // inp.give is edge-triggered via giveCD internally
 
   const turn=2.4*dt;
   if(keys['KeyQ']||inp.turnLeft)  player.angle-=turn;
@@ -5364,160 +5322,17 @@ function runSettingsSafetySelfCheckBody(){
   }
 }
 
-function crTouchActionGameplayAudit(){
-  const gameplayIds = ['view','mob','ml','mlookpad','mg','ms','mm','mportmenu'];
-  const bad = [];
-  gameplayIds.forEach(id=>{
-    const el = document.getElementById(id);
-    if(!el) return;
-    const ta = getComputedStyle(el).touchAction;
-    if(ta !== 'none' && ta !== 'manipulation') bad.push(id+':'+ta);
-  });
-  const savedState = state;
-  const savedPaused = paused;
-  state = STATE.OPTIONS;
-  paused = false;
-  drawMobileMenu();
-  const rmenu = document.getElementById('rmenu');
-  const optsTa = rmenu ? getComputedStyle(rmenu).touchAction : '';
-  const optionsPanY = optsTa.indexOf('pan-y') >= 0 || optsTa === 'auto';
-  state = savedState;
-  paused = savedPaused;
-  drawMobileMenu();
-  return { gameplayTouchNone: bad.length === 0, bad, optionsPanY };
-}
-
-function runMobileControlReliabilitySelfCheck(){
-  if(_crHarnessDepth > 0) return runMobileControlReliabilitySelfCheckBody();
-  return crWithTemporaryState('mobileControlRel', () => runMobileControlReliabilitySelfCheckBody());
-}
-
-function runMobileControlReliabilitySelfCheckBody(){
-  const errors = [];
-  const warnings = [];
-  const evidence = {};
-  const checks = {};
-  const savedOverride = mobileOverride;
-  const savedState = state;
-  const savedPaused = paused;
-  const err0 = window.__crRuntimeErrors.length;
-  crPrepareSelfCheckPortrait();
-  try {
-    startRun(88);
-    state = STATE.PLAY;
-    paused = false;
-    applyMobileControlSettings();
-    player.stamina = player.maxStamina;
-    sprintBurstUntil = 0;
-
-    const ml = document.getElementById('ml');
-    const lpad = document.getElementById('mlookpad');
-    const mg = document.getElementById('mg');
-    const ms = document.getElementById('ms');
-    const mportmenu = document.getElementById('mportmenu');
-    const mbr = ml.getBoundingClientRect();
-    const cx = mbr.left + mbr.width * 0.5;
-    const cy = mbr.top + mbr.height * 0.5;
-    const px0 = player.x, py0 = player.y;
-    const angle0 = player.angle;
-
-    crDispatchPointer(ml, 'pointerdown', cx, cy, 42, 'touch');
-    checks.moveStarts = joy.active === true;
-    if(!checks.moveStarts) errors.push('MOVE did not start');
-
-    crDispatchPointer(ml, 'pointermove', cx, cy - 40, 42, 'touch');
-    for(let i = 0; i < 8; i++){ update(0.05); }
-    checks.moveChangesPosition = Math.hypot(player.x - px0, player.y - py0) > 0.02 || joyStrength() > 0.2;
-    if(!checks.moveChangesPosition) errors.push('MOVE drag did not move player or joy');
-
-    const pxMid = player.x, pyMid = player.y;
-    crDispatchPointer(ml, 'pointermove', cx + 150, cy + 180, 42, 'touch');
-    crDispatchPointer(ml, 'pointerup', cx + 150, cy + 180, 42, 'touch');
-    checks.moveDriftReleaseClears = !joy.active && !inp.fwd && !inp.back && !inp.left && !inp.right;
-    for(let i = 0; i < 10; i++){ update(0.05); }
-    const driftDist = Math.hypot(player.x - pxMid, player.y - pyMid);
-    checks.moveStopsOnRelease = checks.moveDriftReleaseClears && driftDist < 0.05;
-    evidence.moveRelease = { driftDist, joyActive: joy.active };
-    if(!checks.moveDriftReleaseClears) errors.push('MOVE thumb drift release left joy/inp stuck');
-    if(!checks.moveStopsOnRelease) errors.push('player kept moving after MOVE release');
-
-    const lbr = lpad.getBoundingClientRect();
-    const lx = lbr.left + lbr.width * 0.5;
-    const ly = lbr.top + lbr.height * 0.5;
-    crDispatchPointer(lpad, 'pointerdown', lx, ly, 44, 'touch');
-    crDispatchPointer(lpad, 'pointermove', lx + 55, ly, 44, 'touch');
-    checks.lookChangesAngle = Math.abs(player.angle - angle0) > 0.01;
-    crDispatchPointer(lpad, 'pointermove', lx + 200, ly + 50, 44, 'touch');
-    crDispatchPointer(lpad, 'pointerup', lx + 200, ly + 50, 44, 'touch');
-    checks.lookReleaseClears = lookTouch.id === null;
-    if(!checks.lookChangesAngle) errors.push('LOOK did not change angle');
-    if(!checks.lookReleaseClears) errors.push('LOOK stuck after release');
-
-    crDispatchPointer(ml, 'pointerdown', cx, cy, 101, 'touch');
-    crDispatchPointer(ml, 'pointermove', cx, cy - 25, 101, 'touch');
-    crDispatchPointer(ml, 'pointercancel', cx, cy, 101, 'touch');
-    checks.pointerCancelClears = !joy.active && !inp.fwd && !inp.back;
-    if(!checks.pointerCancelClears) errors.push('pointercancel left MOVE stuck');
-
-    const stam0 = player.stamina;
-    const msr = ms.getBoundingClientRect();
-    crDispatchPointer(ms, 'pointerdown', msr.left + 10, msr.top + 10, 88, 'touch');
-    checks.sprintBurstWorks = sprintBurstUntil > performance.now()/1000 || player.stamina < stam0;
-    evidence.sprint = { burstUntil: sprintBurstUntil, stamBefore: stam0, stamAfter: player.stamina };
-    if(!checks.sprintBurstWorks) errors.push('SPRINT burst did not fire');
-
-    try { giveCan(); checks.giveSafe = true; } catch(e){ checks.giveSafe = false; errors.push('giveCan threw: '+e.message); }
-    const gbr = mg.getBoundingClientRect();
-    crDispatchPointer(mg, 'pointerdown', gbr.left + 10, gbr.top + 10, 77, 'touch');
-    update(0.02);
-    crDispatchPointer(mg, 'pointerup', gbr.left + 10, gbr.top + 10, 77, 'touch');
-    update(0.02);
-    checks.giveSafe = checks.giveSafe && window.__crRuntimeErrors.length === err0;
-    if(!checks.giveSafe) errors.push('GIVE tap unsafe');
-
-    if(mportmenu){
-      const mmr = mportmenu.getBoundingClientRect();
-      crDispatchTouch(mportmenu, 'touchstart', mmr.left + mmr.width/2, mmr.top + 10, 66);
-      crDispatchTouch(mportmenu, 'touchend', mmr.left + mmr.width/2, mmr.top + 10, 66);
-      const opened = paused === true;
-      rmenuAction('pause-resume');
-      checks.menuSafe = opened && paused === false && state === STATE.PLAY && !joy.active && lookTouch.id === null;
-      if(!checks.menuSafe) errors.push('MENU open/resume control state bad');
-    } else checks.menuSafe = true;
-
-    const ta = crTouchActionGameplayAudit();
-    checks.touchActionSafe = ta.gameplayTouchNone && ta.optionsPanY;
-    evidence.touchAction = ta;
-    if(!ta.gameplayTouchNone) errors.push('gameplay touch-action: '+ta.bad.join(','));
-
-    const pass = errors.length === 0;
-    return { pass, build: BUILD_ID, errors, warnings, checks, evidence };
-  } catch(e){
-    errors.push(String(e && e.message ? e.message : e));
-    return { pass: false, build: BUILD_ID, errors, warnings, checks: {}, evidence: {} };
-  } finally {
-    _selfCheckForcePortrait = false;
-    mobileOverride = savedOverride;
-    state = savedState;
-    paused = savedPaused;
-    clearInputState();
-    applyMobileControlSettings();
-    drawMobileMenu();
-  }
-}
-
 function runFullSelfCheckInner(){
   const err0 = window.__crRuntimeErrors.length;
   const layout = runLayoutSelfCheck();
   const viewportSafeArea = runViewportSafeAreaSelfCheck();
   const portraitUsability = runPortraitUsabilitySelfCheck();
   const settingsSafety = runSettingsSafetySelfCheck();
-  const mobileControlReliability = runMobileControlReliabilitySelfCheck();
   const input = runInputSelfCheck();
   const levels = runLevelSelfCheck();
   const renderFailure = runRenderFailureSelfCheck();
   const runtimeClean = window.__crRuntimeErrors.length === err0;
-  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && mobileControlReliability.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
+  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
   return {
     pass,
     build: BUILD_ID,
@@ -5525,7 +5340,6 @@ function runFullSelfCheckInner(){
     viewportSafeArea,
     portraitUsability,
     settingsSafety,
-    mobileControlReliability,
     input,
     levels,
     renderFailure,
@@ -6700,8 +6514,8 @@ globalThis.CR = window.CR = {
   set paused(v){ paused=!!v; },
   get mobileMode(){ return mobileMode; },
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
-  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runMobileControlReliabilitySelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
-  editRunnerName,applyMobileControlSettings,mobileSprintCost,mobileSprintBurstSec,triggerMobileSprintBurst,crDispatchPointer,crDispatchTouch,
+  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
+  editRunnerName,applyMobileControlSettings,mobileSprintCost,mobileSprintBurstSec,
   toggleFullscreen,isFullscreen,enterFullscreen,exitFullscreen,
   getAudioContext,resumeAudioContext,bindAudioUnlockGate,getAudioUnlockProof,
 };
