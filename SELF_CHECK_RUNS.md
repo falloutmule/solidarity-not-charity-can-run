@@ -17,3 +17,6 @@
 | selfharness1 | 4184196 | Chromium local | audio unlock | beep + no lastError | pass | PASS | proof-audio-unlock.json |
 | selfharness1 | 4184196 | Chromium local | visual regression index | canvas non-blank | pass | PASS | proof-visual-regression-index.json |
 | selfharness1 | 4184196 | Chromium local | selfcheck URL | overlay + __crSelfCheckResult | pass overlay | PASS | proof-playwright-summary.json selfcheckUrl |
+| hallharness1 | (push) | Chromium local 390x844 | CR.runHallSelfCheck | pass true | pass true | PASS | proof-hall-e2e.json |
+| hallharness1 | (push) | Chromium local | Hall E2E Playwright | proof-hall-e2e pass + 3 PNGs | pass | PASS | proof-hall-start.png, proof-hall-helped.png, proof-hall-exit.png |
+| hallharness1 | (push) | Chromium local | full harness | summary pass true | pass true | PASS | proof-playwright-summary.json |

@@ -387,6 +387,80 @@ async function visualRegressionShots(page) {
   return index;
 }
 
+async function hallE2ESection(page) {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const url = `${BASE}/index.html?mobile=on&portraitlayout=1&v=hall`;
+  await page.goto(url, { waitUntil: 'domcontentloaded' });
+  await waitGameReady(page);
+  await page.evaluate(() => {
+    CR.setMobileMode(true);
+    CR.applyMobileControlSettings();
+    CR.startCustomLevel('hall_of_servants');
+  });
+  await page.waitForTimeout(500);
+  await page.screenshot({ path: path.join(ROOT, 'proof-hall-start.png') });
+
+  const helpedSnap = await page.evaluate(() => {
+    const n = game.npcs.find(x => !x.helped);
+    player.cans = 10;
+    player.giveCD = 0;
+    player.x = n.x + 0.35;
+    player.y = n.y;
+    updateAim();
+    giveCan();
+    return {
+      helped: game.helped,
+      thankPopup: game.popups.filter(p => p.color === '#e8d4b0').map(p => p.text),
+    };
+  });
+  await page.waitForTimeout(700);
+  await page.screenshot({ path: path.join(ROOT, 'proof-hall-helped.png') });
+
+  const exitSnap = await page.evaluate(() => {
+    let steps = 0;
+    while (game.helped < game.quota && steps < 12) {
+      const n = game.npcs.find(x => !x.helped);
+      if (!n) break;
+      player.cans = 10;
+      player.giveCD = 0;
+      player.x = n.x + 0.3;
+      player.y = n.y;
+      updateAim();
+      giveCan();
+      steps++;
+    }
+    if (game.exit && game.exit.active) {
+      player.x = game.exit.x;
+      player.y = game.exit.y;
+      tickExit();
+    }
+    return {
+      helped: game.helped,
+      quota: game.quota,
+      exitActive: !!(game.exit && game.exit.active),
+      state: CR.state,
+      completed: game.run.completed,
+    };
+  });
+  await page.waitForTimeout(500);
+  await page.screenshot({ path: path.join(ROOT, 'proof-hall-exit.png') });
+
+  await page.goto(url, { waitUntil: 'domcontentloaded' });
+  await waitGameReady(page);
+  const crHall = await page.evaluate(() => CR.runHallSelfCheck());
+
+  const proof = {
+    pass: crHall.pass === true,
+    build: crHall.build,
+    crHallSelfCheck: crHall,
+    playwright: { helpedSnap, exitSnap },
+    screenshots: ['proof-hall-start.png', 'proof-hall-helped.png', 'proof-hall-exit.png'],
+    timestamp: new Date().toISOString(),
+  };
+  writeProof('proof-hall-e2e.json', proof);
+  return proof;
+}
+
 async function main() {
   const constitution = runConstitutionCheck();
   const srv = await startStaticServer();
@@ -423,6 +497,7 @@ async function main() {
   const resilience = await viewportResilience(page);
   const saveLoad = await saveLoadRoundtrip(page);
   const audio = await audioUnlock(page);
+  const hallE2E = await hallE2ESection(page);
   const visual = await visualRegressionShots(page);
 
   writeProof('proof-network.json', {
@@ -453,6 +528,7 @@ async function main() {
       resilience.pass &&
       (saveLoad.pass !== false) &&
       audio.pass &&
+      hallE2E.pass &&
       visual.pass &&
       networkPass &&
       consolePass &&
@@ -466,6 +542,7 @@ async function main() {
     resilience,
     saveLoad,
     audio,
+    hallE2E,
     visual,
     network: { pass: networkPass, external: net.externalRequests.length },
     console: { pass: consolePass, errors: net.consoleErrors },

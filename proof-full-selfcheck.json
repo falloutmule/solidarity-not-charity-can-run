@@ -1,9 +1,9 @@
 {
   "pass": true,
-  "build": "selfharness1",
+  "build": "hallharness1",
   "layout": {
     "pass": true,
-    "build": "selfharness1",
+    "build": "hallharness1",
     "errors": [],
     "warnings": [
       "intentional SPRINT/LOOK overlap"
@@ -184,7 +184,7 @@
       "runtimeClean": true
     },
     "halo": {
-      "BUILD_ID": "selfharness1",
+      "BUILD_ID": "hallharness1",
       "policy": "walls own distance fog; billboards drawImage only — no post-loop sprite fog fillRect",
       "forbiddenPatternsAbsent": true,
       "forbiddenHits": [],
@@ -194,7 +194,7 @@
       "regressionCommentMarker": "SPRITE HALO REGRESSION GUARD"
     },
     "occlusion": {
-      "BUILD_ID": "selfharness1",
+      "BUILD_ID": "hallharness1",
       "renderWidth": 320,
       "zbufferLength": 320,
       "zbufferMatchesRenderWidth": true,
@@ -236,5 +236,5 @@
   },
   "runtimeErrors": [],
   "runtimeClean": true,
-  "timestamp": "2026-06-26T12:12:34.986Z"
+  "timestamp": "2026-06-26T12:33:31.011Z"
 }

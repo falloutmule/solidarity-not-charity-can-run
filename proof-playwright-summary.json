@@ -35,7 +35,7 @@
   },
   "fullSelfCheck": {
     "pass": true,
-    "build": "selfharness1"
+    "build": "hallharness1"
   },
   "dock": {
     "pass": true,
@@ -48,27 +48,27 @@
       "ml": {
         "top": 557,
         "left": 10,
-        "menuText": "MENUselfharness1"
+        "menuText": "MENUhallharness1"
       },
       "mg": {
         "top": 484,
         "left": 35,
-        "menuText": "MENUselfharness1"
+        "menuText": "MENUhallharness1"
       },
       "ms": {
         "top": 533,
         "left": 313,
-        "menuText": "MENUselfharness1"
+        "menuText": "MENUhallharness1"
       },
       "mlookpad": {
         "top": 557,
         "left": 268,
-        "menuText": "MENUselfharness1"
+        "menuText": "MENUhallharness1"
       },
       "mportmenu": {
         "top": 463,
         "left": 115,
-        "menuText": "MENUselfharness1"
+        "menuText": "MENUhallharness1"
       },
       "canvas": {
         "top": 0,
@@ -144,27 +144,27 @@
       "ml": {
         "top": 437,
         "left": 10,
-        "menuText": "MENUselfharness1"
+        "menuText": "MENUhallharness1"
       },
       "mg": {
         "top": 364,
         "left": 35,
-        "menuText": "MENUselfharness1"
+        "menuText": "MENUhallharness1"
       },
       "ms": {
         "top": 413,
         "left": 313,
-        "menuText": "MENUselfharness1"
+        "menuText": "MENUhallharness1"
       },
       "mlookpad": {
         "top": 437,
         "left": 268,
-        "menuText": "MENUselfharness1"
+        "menuText": "MENUhallharness1"
       },
       "mportmenu": {
         "top": 463,
         "left": 115,
-        "menuText": "MENUselfharness1"
+        "menuText": "MENUhallharness1"
       },
       "canvas": {
         "top": 0,
@@ -240,27 +240,27 @@
       "ml": {
         "top": 317,
         "left": 10,
-        "menuText": "MENUselfharness1"
+        "menuText": "MENUhallharness1"
       },
       "mg": {
         "top": 244,
         "left": 35,
-        "menuText": "MENUselfharness1"
+        "menuText": "MENUhallharness1"
       },
       "ms": {
         "top": 293,
         "left": 313,
-        "menuText": "MENUselfharness1"
+        "menuText": "MENUhallharness1"
       },
       "mlookpad": {
         "top": 317,
         "left": 268,
-        "menuText": "MENUselfharness1"
+        "menuText": "MENUhallharness1"
       },
       "mportmenu": {
         "top": 463,
         "left": 115,
-        "menuText": "MENUselfharness1"
+        "menuText": "MENUhallharness1"
       },
       "canvas": {
         "top": 0,
@@ -378,7 +378,7 @@
   "audio": {
     "pass": true,
     "before": {
-      "BUILD_ID": "selfharness1",
+      "BUILD_ID": "hallharness1",
       "gateBound": true,
       "unlockAttempted": false,
       "hasContext": false,
@@ -391,7 +391,7 @@
       "resumeEntry": "resumeAudioContext"
     },
     "after": {
-      "BUILD_ID": "selfharness1",
+      "BUILD_ID": "hallharness1",
       "gateBound": true,
       "unlockAttempted": false,
       "hasContext": true,
@@ -404,6 +404,71 @@
       "resumeEntry": "resumeAudioContext"
     },
     "beepOk": true
+  },
+  "hallE2E": {
+    "pass": true,
+    "build": "hallharness1",
+    "crHallSelfCheck": {
+      "pass": true,
+      "build": "hallharness1",
+      "errors": [],
+      "warnings": [],
+      "hall": {
+        "started": true,
+        "map": {
+          "MAP_W": 30,
+          "MAP_H": 14,
+          "rectangular": true
+        },
+        "spawnCanStand": true,
+        "movementStarted": true,
+        "movementStopped": true,
+        "pickupCollected": true,
+        "npcHelped": true,
+        "thankShown": true,
+        "quotaReached": true,
+        "exitActivated": true,
+        "completed": true,
+        "customLevel": "hall_of_servants",
+        "helpedByKind": {
+          "hungry": 0,
+          "family": 0,
+          "elder": 0,
+          "volunteer": 1
+        }
+      },
+      "normalRegression": {
+        "started": true,
+        "wideMap": true,
+        "movementStarted": true,
+        "movementStopped": true,
+        "customLevelCleared": true
+      },
+      "runtimeErrors": [],
+      "runtimeClean": true,
+      "timestamp": "2026-06-26T12:33:37.493Z"
+    },
+    "playwright": {
+      "helpedSnap": {
+        "helped": 1,
+        "thankPopup": [
+          "You showed up."
+        ]
+      },
+      "exitSnap": {
+        "helped": 5,
+        "quota": 5,
+        "exitActive": true,
+        "state": "results",
+        "completed": true
+      }
+    },
+    "screenshots": [
+      "proof-hall-start.png",
+      "proof-hall-helped.png",
+      "proof-hall-exit.png"
+    ],
+    "timestamp": "2026-06-26T12:33:37.493Z"
   },
   "visual": {
     "pass": true,
@@ -464,7 +529,7 @@
         }
       }
     ],
-    "timestamp": "2026-06-26T12:12:43.779Z"
+    "timestamp": "2026-06-26T12:33:42.621Z"
   },
   "network": {
     "pass": true,
@@ -499,7 +564,7 @@
       "layoutPass": true,
       "layout": {
         "pass": true,
-        "build": "selfharness1",
+        "build": "hallharness1",
         "errors": [],
         "warnings": [],
         "rects": {
@@ -660,7 +725,7 @@
       "layoutPass": true,
       "layout": {
         "pass": true,
-        "build": "selfharness1",
+        "build": "hallharness1",
         "errors": [],
         "warnings": [],
         "rects": {
@@ -821,7 +886,7 @@
       "layoutPass": true,
       "layout": {
         "pass": true,
-        "build": "selfharness1",
+        "build": "hallharness1",
         "errors": [],
         "warnings": [],
         "rects": {
@@ -982,7 +1047,7 @@
       "layoutPass": true,
       "layout": {
         "pass": true,
-        "build": "selfharness1",
+        "build": "hallharness1",
         "errors": [],
         "warnings": [],
         "rects": {
@@ -1138,10 +1203,10 @@
   "selfcheckUrl": {
     "result": {
       "pass": true,
-      "build": "selfharness1",
+      "build": "hallharness1",
       "layout": {
         "pass": true,
-        "build": "selfharness1",
+        "build": "hallharness1",
         "errors": [],
         "warnings": [],
         "rects": {
@@ -1320,7 +1385,7 @@
           "runtimeClean": true
         },
         "halo": {
-          "BUILD_ID": "selfharness1",
+          "BUILD_ID": "hallharness1",
           "policy": "walls own distance fog; billboards drawImage only — no post-loop sprite fog fillRect",
           "forbiddenPatternsAbsent": true,
           "forbiddenHits": [],
@@ -1330,7 +1395,7 @@
           "regressionCommentMarker": "SPRITE HALO REGRESSION GUARD"
         },
         "occlusion": {
-          "BUILD_ID": "selfharness1",
+          "BUILD_ID": "hallharness1",
           "renderWidth": 320,
           "zbufferLength": 320,
           "zbufferMatchesRenderWidth": true,
@@ -1372,10 +1437,10 @@
       },
       "runtimeErrors": [],
       "runtimeClean": true,
-      "timestamp": "2026-06-26T12:12:44.735Z"
+      "timestamp": "2026-06-26T12:33:43.564Z"
     },
-    "overlayText": "SELF-CHECK PASS\nbuild selfharness1",
+    "overlayText": "SELF-CHECK PASS\nbuild hallharness1",
     "overlayVisible": true
   },
-  "timestamp": "2026-06-26T12:12:45.803Z"
+  "timestamp": "2026-06-26T12:33:44.655Z"
 }
