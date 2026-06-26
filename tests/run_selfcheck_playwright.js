@@ -387,6 +387,53 @@ async function visualRegressionShots(page) {
   return index;
 }
 
+function fpIsPublicSafe(fp) {
+  if (!fp) return false;
+  if (fp.benchmark) return false;
+  if (fp.harnessOnly) return false;
+  if (fp.customLevel === 'harness_render_benchmark') return false;
+  if (fp.lsHarness) return false;
+  if (fp.state === 'play' && fp.mapW > 0 && fp.mapW <= 20 && fp.mapH <= 20 && fp.timeLeft >= 990 && fp.seed === 12345) return false;
+  return true;
+}
+
+async function harnessIsolationSection(page) {
+  const normalUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(normalUrl, { waitUntil: 'domcontentloaded' });
+  await waitGameReady(page);
+
+  const bootFp = await page.evaluate(() => CR.crPublicStateFingerprint());
+  const bootOk = fpIsPublicSafe(bootFp) && bootFp.state === 'title';
+
+  const iso = await page.evaluate(() => {
+    window.__crRuntimeErrors = window.__crRuntimeErrors || [];
+    return CR.runHarnessIsolationSelfCheck();
+  });
+  writeProof('proof-harness-isolation.json', iso);
+
+  await page.goto(`${BASE}/index.html?selfcheck=1&mobile=on&portraitlayout=1`, { waitUntil: 'domcontentloaded' });
+  await page.waitForTimeout(2800);
+  await page.screenshot({ path: path.join(ROOT, 'proof-selfcheck-restored-state.png') });
+  const afterSelfcheck = await page.evaluate(() => CR.crPublicStateFingerprint());
+
+  await page.goto(normalUrl, { waitUntil: 'domcontentloaded' });
+  await waitGameReady(page);
+  await page.waitForTimeout(600);
+  await page.screenshot({ path: path.join(ROOT, 'proof-normal-boot-after-selfcheck.png') });
+  const afterReload = await page.evaluate(() => CR.crPublicStateFingerprint());
+
+  const pass =
+    bootOk &&
+    iso.pass === true &&
+    fpIsPublicSafe(afterSelfcheck) &&
+    afterSelfcheck.state === 'title' &&
+    fpIsPublicSafe(afterReload) &&
+    afterReload.state === 'title';
+
+  return { pass, bootOk, bootFp, iso, afterSelfcheck, afterReload };
+}
+
 async function hallE2ESection(page) {
   await page.setViewportSize({ width: 390, height: 844 });
   const url = `${BASE}/index.html?mobile=on&portraitlayout=1&v=hall`;
@@ -553,6 +600,7 @@ async function main() {
   const resilience = await viewportResilience(page);
   const saveLoad = await saveLoadRoundtrip(page);
   const audio = await audioUnlock(page);
+  const harnessIsolation = await harnessIsolationSection(page);
   const renderFailure = await renderFailureSection(page);
   const hallE2E = await hallE2ESection(page);
   const visual = await visualRegressionShots(page);
@@ -585,6 +633,7 @@ async function main() {
       resilience.pass &&
       (saveLoad.pass !== false) &&
       audio.pass &&
+      harnessIsolation.pass &&
       renderFailure.pass &&
       hallE2E.pass &&
       visual.pass &&
@@ -600,6 +649,7 @@ async function main() {
     resilience,
     saveLoad,
     audio,
+    harnessIsolation,
     renderFailure,
     hallE2E,
     visual,
