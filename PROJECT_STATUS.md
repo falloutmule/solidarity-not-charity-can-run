@@ -1,6 +1,6 @@
 # Project status — Solidarity Not Charity Can Run
 
-Last updated: visual readability polish (`visual1`).
+Last updated: visual rectangle regression fix (`visualfix1`).
 
 Reports were moved into **`reports/`** to keep the GitHub root readable. Index: **`reports/README.md`**; guard write-ups: **`reports/guards/`**.
 
@@ -10,14 +10,16 @@ Reports were moved into **`reports/`** to keep the GitHub root readable. Index: 
 
 | | |
 |--|--|
-| **BUILD_ID** (root `index.html`) | `visual1` |
-| **Prior gameplay baseline** | `onboard1` / `aaaf901` |
-| **Handoff reference baseline** | `runprog1` / `1437b6f` |
+| **BUILD_ID** (root `index.html`) | `visualfix1` |
+| **Prior gameplay baseline** | `visual1` / `4c85289` |
+| **Handoff reference baseline** | `onboard1` / `aaaf901` |
 
 ## URLs
 
-- **Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=4c85289&mobile=on&portraitlayout=1  
-- **Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=4c85289&mobile=on&portraitlayout=1  
+- **Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=COMMIT&mobile=on&portraitlayout=1  
+- **Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=COMMIT&mobile=on&portraitlayout=1  
+
+*(Replace `COMMIT` after push — see `reports/guards/VISUAL_RECTANGLE_REGRESSION_FIX_REPORT.md`.)*
 
 ## Completed cards (order)
 
@@ -31,7 +33,8 @@ Reports were moved into **`reports/`** to keep the GitHub root readable. Index: 
 8. **Full-run progression / save-load E2E guard** — `runprog1`  
 9. **GitHub Actions harness CI** — `.github/workflows/selfcheck.yml`, proof artifact upload  
 10. **Onboarding / first-run help** — `onboard1`, `CR.runOnboardingSelfCheck`  
-11. **Visual readability polish** — `visual1`, `CR.runVisualReadabilitySelfCheck`
+11. **Visual readability polish** — `visual1`, `CR.runVisualReadabilitySelfCheck`  
+12. **Visual rectangle regression fix** — `visualfix1`, `CR.runVisualRectangleRegressionSelfCheck`
 
 ## Next likely work
 

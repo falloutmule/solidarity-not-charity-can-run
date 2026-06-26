@@ -1,7 +1,7 @@
 # Reports — SNC Can Run
 
 Main hub for guard cards, reference studies, history, proofs, and backups.  
-**Gameplay baseline:** `visual1` — see **`../PROJECT_STATUS.md`**.
+**Gameplay baseline:** `visualfix1` — see **`../PROJECT_STATUS.md`**.
 
 Reports were moved out of the repo root so GitHub shows only the game + core docs.
 
@@ -26,6 +26,7 @@ Reports were moved out of the repo root so GitHub shows only the game + core doc
 | 13 | GitHub Actions harness CI | [guards/GITHUB_ACTIONS_CI_REPORT.md](guards/GITHUB_ACTIONS_CI_REPORT.md) | CI card | Playwright on push/PR | CI only |
 | 14 | Onboarding / first-run help | [guards/ONBOARDING_FIRST_RUN_HELP_REPORT.md](guards/ONBOARDING_FIRST_RUN_HELP_REPORT.md) | `onboard1` | `CR.runOnboardingSelfCheck` | Yes (UI only) |
 | 15 | Visual readability polish | [guards/VISUAL_READABILITY_POLISH_REPORT.md](guards/VISUAL_READABILITY_POLISH_REPORT.md) | `visual1` | `CR.runVisualReadabilitySelfCheck` + proof PNGs | Yes (render/HUD) |
+| 16 | Visual rectangle regression fix | [guards/VISUAL_RECTANGLE_REGRESSION_FIX_REPORT.md](guards/VISUAL_RECTANGLE_REGRESSION_FIX_REPORT.md) | `visualfix1` | `CR.runVisualRectangleRegressionSelfCheck` | Yes (render fix) |
 
 ---
 

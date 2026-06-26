@@ -553,11 +553,11 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'visual1';
+const BUILD_ID = 'visualfix1';
 /** Visual readability contract (render/HUD only; gameplay unchanged). */
 const CR_VISUAL_READABILITY = {
-  style: 'visual1',
-  floorPathStripe: true,
+  style: 'visualfix1',
+  floorPathStripe: false,
   entityOutlines: true,
   exitReadyCue: true,
   giveTargetHighlight: true,
@@ -3087,11 +3087,6 @@ function drawScene(now){
   if(game.modifier==='rainy'){ gfloor.addColorStop(0,'#32363e'); gfloor.addColorStop(1,'#14161c'); }
   else { gfloor.addColorStop(0,'#4a4a52'); gfloor.addColorStop(0.45,'#36363c'); gfloor.addColorStop(1,'#1a1a1e'); }
   bctx.fillStyle=gfloor; bctx.fillRect(0,RH/2,RW,RH/2);
-  if(CR_VISUAL_READABILITY.floorPathStripe){
-    bctx.fillStyle='rgba(120,118,130,0.28)';
-    const pathW = (RW * 0.32)|0;
-    bctx.fillRect(((RW - pathW) / 2)|0, (RH / 2)|0, pathW, (RH / 2)|0);
-  }
   // faint road center-line flecks near horizon for asphalt feel
   bctx.fillStyle='rgba(200,190,120,0.10)';
   for(let i=0;i<10;i++){ bctx.fillRect((RW/2)-1+(i-5)*4, RH/2+2+i*2, 2, 1); }
@@ -5836,11 +5831,12 @@ function runFullSelfCheckInner(){
   const fullRunProgression = runFullRunProgressionSelfCheck();
   const onboarding = runOnboardingSelfCheck();
   const visualReadability = runVisualReadabilitySelfCheck();
+  const visualRectangleRegression = runVisualRectangleRegressionSelfCheck();
   const input = runInputSelfCheck();
   const levels = runLevelSelfCheck();
   const renderFailure = runRenderFailureSelfCheck();
   const runtimeClean = window.__crRuntimeErrors.length === err0;
-  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && mobileControlReliability.pass && movementCollision.pass && reachability.pass && proceduralLevelValidation.pass && fullRunProgression.pass && onboarding.pass && visualReadability.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
+  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && mobileControlReliability.pass && movementCollision.pass && reachability.pass && proceduralLevelValidation.pass && fullRunProgression.pass && onboarding.pass && visualReadability.pass && visualRectangleRegression.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
   return {
     pass,
     build: BUILD_ID,
@@ -5855,6 +5851,7 @@ function runFullSelfCheckInner(){
     fullRunProgression,
     onboarding,
     visualReadability,
+    visualRectangleRegression,
     input,
     levels,
     renderFailure,
@@ -5996,13 +5993,15 @@ function runVisualReadabilitySelfCheckBody(){
   mobileOverride = true;
   try {
     checks.functionExists = typeof runVisualReadabilitySelfCheck === 'function';
-    checks.buildIdVisual1 = BUILD_ID === 'visual1';
-    checks.visualContract = !!(CR_VISUAL_READABILITY && CR_VISUAL_READABILITY.style === 'visual1');
+    checks.buildIdVisualfix1 = BUILD_ID === 'visualfix1';
+    checks.visualContract = !!(CR_VISUAL_READABILITY && CR_VISUAL_READABILITY.style === 'visualfix1');
+    checks.noScreenPathStripe = CR_VISUAL_READABILITY.floorPathStripe === false;
     checks.pickupTex = !!TEX.can;
     checks.npcTex = !!TEX.hungry;
     checks.exitTex = !!TEX.exit;
-    if(!checks.buildIdVisual1) errors.push('BUILD_ID must be visual1');
+    if(!checks.buildIdVisualfix1) errors.push('BUILD_ID must be visualfix1');
     if(!checks.visualContract) errors.push('CR_VISUAL_READABILITY contract missing');
+    if(!checks.noScreenPathStripe) errors.push('screen-space floor path stripe must stay disabled');
     if(!checks.pickupTex || !checks.npcTex || !checks.exitTex) errors.push('sprite textures missing');
 
     startRun(42);
@@ -6080,6 +6079,110 @@ function runVisualReadabilitySelfCheckBody(){
   } catch(e){
     errors.push(String(e && e.message ? e.message : e));
     return { pass: false, build: BUILD_ID, errors, warnings, checks, evidence: {}, visualStyle: CR_VISUAL_READABILITY };
+  } finally {
+    onboardingOpen = false;
+    syncOnboardingPanel();
+    mobileOverride = savedOverride;
+    _selfCheckForcePortrait = false;
+    applyMobileControlSettings();
+    drawMobileMenu();
+  }
+}
+
+function crVisualRectangleLowerCenterROI(){
+  return {
+    x0: (RW * 0.30)|0,
+    y0: (RH * 0.55)|0,
+    x1: (RW * 0.70)|0,
+    y1: (RH * 0.92)|0,
+  };
+}
+
+function crVisualRectangleProbeAtAngle(angleRad, now){
+  player.angle = angleRad;
+  player.dir = angleRad;
+  crRenderFailureDrawFrame(now || 2100);
+  const roi = crVisualRectangleLowerCenterROI();
+  const img = bctx.getImageData(0, 0, RW, RH);
+  const center = crRegionLumaStats(img, roi.x0, roi.y0, roi.x1, roi.y1);
+  const sideL = crRegionLumaStats(img, Math.max(0, roi.x0 - 36), roi.y0, roi.x0 + 4, roi.y1);
+  const sideR = crRegionLumaStats(img, roi.x1 - 4, roi.y0, Math.min(RW, roi.x1 + 36), roi.y1);
+  return { center, sideL, sideR, roi, angle: angleRad };
+}
+
+function runVisualRectangleRegressionSelfCheck(){
+  if(_crHarnessDepth > 0) return runVisualRectangleRegressionSelfCheckBody();
+  return crWithTemporaryState('visualRectangleRegression', () => runVisualRectangleRegressionSelfCheckBody());
+}
+
+function runVisualRectangleRegressionSelfCheckBody(){
+  const errors = [];
+  const warnings = [];
+  const checks = {};
+  const evidence = {};
+  const err0 = window.__crRuntimeErrors.length;
+  crPrepareSelfCheckPortrait();
+  const savedOverride = mobileOverride;
+  mobileOverride = true;
+  try {
+    checks.functionExists = typeof runVisualRectangleRegressionSelfCheck === 'function';
+    checks.buildIdVisualfix1 = BUILD_ID === 'visualfix1';
+    checks.noScreenPathStripe = !!(CR_VISUAL_READABILITY && CR_VISUAL_READABILITY.floorPathStripe === false);
+    if(!checks.buildIdVisualfix1) errors.push('BUILD_ID must be visualfix1');
+    if(!checks.noScreenPathStripe) errors.push('screen-space path stripe flag must be false');
+
+    startRun(42);
+    state = STATE.PLAY;
+    paused = false;
+    const a0 = player.angle;
+    const probe0 = crVisualRectangleProbeAtAngle(a0, 2200);
+    const probe1 = crVisualRectangleProbeAtAngle(a0 + Math.PI * 0.5, 2300);
+    const probe2 = crVisualRectangleProbeAtAngle(a0 + Math.PI, 2400);
+    checks.normalFpvRendered = !!(probe0.center && probe0.center.count > 100);
+    if(!checks.normalFpvRendered) errors.push('FPV render probe failed');
+    checks.twoAnglesSampled = true;
+    const mean0 = probe0.center.mean;
+    const mean1 = probe1.center.mean;
+    const mean2 = probe2.center.mean;
+    const meanSpread = Math.max(mean0, mean1, mean2) - Math.min(mean0, mean1, mean2);
+    const pairDiff01 = Math.abs(mean0 - mean1);
+    const pairDiff12 = Math.abs(mean1 - mean2);
+    const stuckBrightBlock =
+      mean0 > 56 && mean1 > 56 &&
+      pairDiff01 < 3.5 && pairDiff12 < 3.5 &&
+      probe0.center.brightRatio > 0.12 && probe1.center.brightRatio > 0.12;
+    checks.noStuckLowerCenterRectangle = !stuckBrightBlock;
+    checks.viewChangesWithHeading = pairDiff01 >= 4 || meanSpread >= 5 || probe0.center.variance > 80;
+    if(!checks.noStuckLowerCenterRectangle) errors.push('lower-center light rectangle appears stuck across headings');
+    if(!checks.viewChangesWithHeading) warnings.push('heading luma delta low; using structural stripe guard');
+    if(!checks.noStuckLowerCenterRectangle && !checks.viewChangesWithHeading) errors.push('suspicious lower-center block and no heading variation');
+    evidence.probes = { probe0, probe1, probe2, meanSpread, pairDiff01, stuckBrightBlock };
+
+    const vr = _crHarnessDepth > 0 ? runVisualReadabilitySelfCheckBody() : runVisualReadabilitySelfCheck();
+    checks.visualReadabilityStillPasses = !!vr.pass;
+    if(!checks.visualReadabilityStillPasses) errors.push('visual readability regressed: ' + (vr.errors || []).join('; '));
+
+    const ob = _crHarnessDepth > 0 ? runOnboardingSelfCheckBody() : runOnboardingSelfCheck();
+    checks.onboardingStillPasses = !!ob.pass;
+    if(!checks.onboardingStillPasses) errors.push('onboarding regressed');
+
+    const fr = _crHarnessDepth > 0 ? runFullRunProgressionSelfCheckBody() : runFullRunProgressionSelfCheck();
+    checks.fullRunStillPasses = !!fr.pass;
+    if(!checks.fullRunStillPasses) errors.push('full-run progression regressed');
+
+    if(!crHarnessWriteSaveToStorage()) errors.push('rectangle regression save write failed');
+    const loaded = SAVE.load();
+    checks.saveLoadUnchanged = !!loaded;
+    if(!checks.saveLoadUnchanged) errors.push('save/load regression');
+
+    checks.runtimeClean = window.__crRuntimeErrors.length === err0;
+    if(!checks.runtimeClean) errors.push('runtime errors during rectangle regression check');
+
+    const pass = errors.length === 0;
+    return { pass, build: BUILD_ID, errors, warnings, checks, evidence };
+  } catch(e){
+    errors.push(String(e && e.message ? e.message : e));
+    return { pass: false, build: BUILD_ID, errors, warnings, checks, evidence: {} };
   } finally {
     onboardingOpen = false;
     syncOnboardingPanel();
@@ -8113,7 +8216,7 @@ globalThis.CR = window.CR = {
   set paused(v){ paused=!!v; },
   get mobileMode(){ return mobileMode; },
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
-  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runMobileControlReliabilitySelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runVisualReadabilitySelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
+  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runMobileControlReliabilitySelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
   CR_VISUAL_READABILITY,
   getCrVisualHarnessSnapshot(){ return _crVisualHarnessSnapshot; },
   showOnboardingHelp,dismissOnboardingHelp,crOpenFirstRunHelpIfNeeded,

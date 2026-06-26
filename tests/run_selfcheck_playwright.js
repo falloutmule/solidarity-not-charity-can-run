@@ -544,6 +544,36 @@ async function visualRegressionShots(page) {
   return index;
 }
 
+async function visualRectangleProofShots(page) {
+  const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
+  const shots = [];
+  const scenarios = [
+    { file: 'proof-visualfix-normal.png', setup: 'CR.startRun(42)' },
+    { file: 'proof-visualfix-turn-left.png', setup: 'CR.startRun(42);CR.player.angle-=0.85;CR.player.dir=CR.player.angle;' },
+    { file: 'proof-visualfix-turn-right.png', setup: 'CR.startRun(42);CR.player.angle+=0.85;CR.player.dir=CR.player.angle;' },
+  ];
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const sc of scenarios) {
+    await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+    await waitGameReady(page);
+    await page.evaluate(sc.setup);
+    await page.waitForTimeout(500);
+    const blank = await canvasNonBlank(page);
+    await page.screenshot({ path: path.join(ROOT, sc.file) });
+    shots.push({ file: sc.file, blankOk: blank.ok });
+  }
+  const crRect = await page.evaluate(() => {
+    window.__crRuntimeErrors = window.__crRuntimeErrors || [];
+    return CR.runVisualRectangleRegressionSelfCheck();
+  });
+  writeProof('proof-visual-rectangle-regression-selfcheck.json', crRect);
+  return {
+    pass: shots.every((s) => s.blankOk) && crRect.pass === true,
+    shots,
+    crVisualRectangleRegression: crRect,
+  };
+}
+
 async function viewportSafeAreaSection(page) {
   const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
   const scenarios = [
@@ -1142,6 +1172,7 @@ async function main() {
   const renderFailure = await renderFailureSection(page);
   const hallE2E = await hallE2ESection(page);
   const visual = await visualRegressionShots(page);
+  const visualRectangle = await visualRectangleProofShots(page);
 
   writeProof('proof-network.json', {
     pass: net.externalRequests.length === 0,
@@ -1182,6 +1213,7 @@ async function main() {
     renderFailure.pass &&
     hallE2E.pass &&
     visual.pass &&
+    visualRectangle.pass &&
     networkPass &&
     consolePass &&
     pageErrPass &&
@@ -1223,6 +1255,7 @@ async function main() {
     renderFailure,
     hallE2E,
     visual,
+    visualRectangle,
     network: { pass: networkPass, external: net.externalRequests.length },
     console: { pass: consolePass, errors: net.consoleErrors },
     pageErrors: { pass: pageErrPass, errors: net.pageErrors },
