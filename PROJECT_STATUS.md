@@ -16,10 +16,10 @@ Reports were moved into **`reports/`** to keep the GitHub root readable. Index: 
 
 ## URLs
 
-- **Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=COMMIT&mobile=on&portraitlayout=1  
-- **Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=COMMIT&mobile=on&portraitlayout=1  
+- **Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=fd487c2&mobile=on&portraitlayout=1  
+- **Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=fd487c2&mobile=on&portraitlayout=1  
 
-*(Replace `COMMIT` after push — see `reports/guards/VISUAL_RECTANGLE_REGRESSION_FIX_REPORT.md`.)*
+*(Cache-bust with `fd487c2` — see guard report.)*
 
 ## Completed cards (order)
 

@@ -27,7 +27,9 @@
 | BUILD_ID | `visualfix1` |
 | Prior baseline | `visual1` / `4c85289` |
 | Backup | `index.before-visual-rectangle-regression-fix.html` |
-| Gameplay commit | *(after push)* |
+| Gameplay commit | `fd487c2` |
+| Local harness | PASS |
+| GitHub Actions | https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28267743764 |
 
 ## REMAINING BLOCKERS
 
@@ -55,8 +57,8 @@
 
 ## GITHUB PAGES URL
 
-- **Play:** `https://falloutmule.github.io/solidarity-not-charity-can-run/?v=<COMMIT>&mobile=on&portraitlayout=1`
-- **Self-check:** `https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=<COMMIT>&mobile=on&portraitlayout=1`
+- **Play:** `https://falloutmule.github.io/solidarity-not-charity-can-run/?v=fd487c2&mobile=on&portraitlayout=1`
+- **Self-check:** `https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=fd487c2&mobile=on&portraitlayout=1`
 
 ## CONFIRMATIONS
 
