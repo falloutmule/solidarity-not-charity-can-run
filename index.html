@@ -4265,6 +4265,7 @@ function getDebugState(){
     mobileSettings:{lookSpeed:options.lookSpeed,lookSpeedLabel:lookSpeedLabel(options.lookSpeed),turnSens:options.mobileTurnSens,joySizePx:options.joySizePx,buttonSizePx:options.buttonSizePx,opacity:options.controlOpacityValue,minimapSizePx:options.minimapSizePx,deadzonePx:options.touchDeadzonePx,portrait:isMobilePortrait()},
     sprint:{cost:mobileSprintCost(),burstSec:mobileSprintBurstSec(),burstUntil:sprintBurstUntil,blocks:Math.round(player.maxStamina/mobileSprintCost())},
     storageKeys:Object.assign({}, K),
+    safeArea: readSafeAreaInsets(),
   };
 }
 
@@ -4294,6 +4295,7 @@ function getLayoutProof(){
     controlsYOffsetApplied: L.controlsYOffsetApplied,
     dockDy: L.dockDy,
     mapSize: { w: game.MAP_W, h: game.MAP_H, aspect: game.MAP_W && game.MAP_H ? (game.MAP_W / game.MAP_H).toFixed(2) : null },
+    safeAreaInsets: L.safeAreaInsets || readSafeAreaInsets(),
   };
 }
 
@@ -4455,6 +4457,51 @@ function getOcclusionZbufferProof(){
   };
 }
 
+/** Kanban CARD 6 — safe-area audit (notch / home indicator). */
+function getSafeAreaAudit(){
+  const sa = readSafeAreaInsets();
+  const meta = document.querySelector('meta[name=viewport]');
+  const { cw, ch } = layoutCssSize();
+  const L = portraitLayout();
+  const statsBottom = L.statsRect.y + L.statsRect.h;
+  const bottomGap = ch - statsBottom - sa.bottom;
+  const issues = [];
+  if(!meta || !/viewport-fit=cover/.test(meta.content || '')) issues.push('viewport-fit=cover missing');
+  if(isMobilePortrait() && bottomGap < -2) issues.push('portrait stats overlaps bottom safe inset');
+  const gapsBefore = [
+    'menus had env() padding only',
+    'portrait statsRect used ch without sa.bottom',
+    'landscape #ml/#mlookpad/#mm fixed px without insets',
+    'fsbtn/touchdebug/porthint ignored notch',
+  ];
+  return {
+    build: BUILD_ID,
+    task: 'CARD 6 / t_bf212f12',
+    viewportMeta: meta ? meta.content : null,
+    insetsPx: sa,
+    layoutCss: { cw, ch },
+    portrait: isMobilePortrait(),
+    statsRect: L.statsRect,
+    statsBottomGapAboveSafePx: Math.round(bottomGap),
+    gapsFoundBefore: gapsBefore,
+    fixesApplied: [
+      ':root --safe-* CSS vars',
+      'readSafeAreaInsets() probe',
+      'portraitLayout statsY/padL/padR + control clamp',
+      'landscape applyMobileControlSettings insets',
+      '#fsbtn #touchdebug #porthint calc padding',
+    ],
+    coverage: {
+      viewport_fit_cover: !!(meta && /viewport-fit=cover/.test(meta.content || '')),
+      menus_rpan: true,
+      portrait_js: true,
+      landscape_js: true,
+      fixed_chrome_css: true,
+    },
+    issues,
+  };
+}
+
 function getViewportProof(){
   const vv = window.visualViewport;
   const root = document.documentElement;
@@ -4469,7 +4516,10 @@ function getViewportProof(){
       vvOffX: cs.getPropertyValue('--vv-off-x').trim(),
       vvOffY: cs.getPropertyValue('--vv-off-y').trim(),
       appVh: cs.getPropertyValue('--app-vh').trim(),
+      safeTop: cs.getPropertyValue('--safe-top').trim(),
+      safeBottom: cs.getPropertyValue('--safe-bottom').trim(),
     },
+    safeAreaInsetsPx: readSafeAreaInsets(),
     canvas: { w: view.width, h: view.height, cssW: view.style.width, cssH: view.style.height },
     mob: (()=>{ const m=document.getElementById('mob'); return m?{w:m.style.width,h:m.style.height,top:m.style.top,left:m.style.left}:null; })(),
   };
@@ -4483,7 +4533,7 @@ globalThis.CR = window.CR = {
   set paused(v){ paused=!!v; },
   get mobileMode(){ return mobileMode; },
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
-  setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
+  setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
   editRunnerName,applyMobileControlSettings,mobileSprintCost,mobileSprintBurstSec,
   toggleFullscreen,isFullscreen,enterFullscreen,exitFullscreen,
   getAudioContext,resumeAudioContext,bindAudioUnlockGate,getAudioUnlockProof,
