@@ -21,7 +21,15 @@
 
 ## WHAT FAILED
 
-- (Fill after first GitHub Actions run if any failure.)
+- Nothing (first GitHub Actions run **success**).
+
+## GitHub Actions
+
+- **Workflow file:** `.github/workflows/selfcheck.yml`
+- **Triggers:** `push` / `pull_request` to **`main`**, **`workflow_dispatch`**
+- **First run URL:** https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28255388712  
+- **Conclusion:** **success** (head **`9488cee`**)
+- **Uploaded artifact:** **`snc-can-run-proof-artifacts`**
 
 ## CURRENT EXACT STATE
 
@@ -29,17 +37,13 @@
 |------|--------|
 | **BUILD_ID** | `runprog1` |
 | **Gameplay commit** | `1437b6f` |
-| **CI commit** | (see git after push) |
+| **CI commit** | **`9488cee`** |
 | **Workflow** | `.github/workflows/selfcheck.yml` |
 | **Artifact upload** | `snc-can-run-proof-artifacts` |
 
 ## REMAINING BLOCKERS
 
-- None unless first Actions run fails (see below).
-
-## NEXT ACTIONABLE STEP
-
-- Watch first **push** workflow on `main`; download artifact **`snc-can-run-proof-artifacts`** if needed.
+- None.
 
 ## EVIDENCE
 
@@ -52,11 +56,10 @@
 - **Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=1437b6f&mobile=on&portraitlayout=1  
 - **Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=1437b6f&mobile=on&portraitlayout=1  
 
-## GitHub Actions
 
-- **Workflow file:** `.github/workflows/selfcheck.yml`
-- **Triggers:** `push` / `pull_request` to **`main`**, **`workflow_dispatch`**
-- **Run URL:** (updated after push — `https://github.com/falloutmule/solidarity-not-charity-can-run/actions`)
+## NEXT ACTIONABLE STEP
+
+- None for CI; new gameplay cards only when requested.
 
 ## Package files
 
