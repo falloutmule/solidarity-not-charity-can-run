@@ -514,7 +514,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'reachlos1';
+const BUILD_ID = 'movcoll1';
 const IS_FILE_ORIGIN = (typeof location !== 'undefined' && location.protocol === 'file:');
 const FILE_ORIGIN_SAVE_NOTE = 'Local file mode: saves may not persist. Use GitHub Pages for reliable saves.';
 function fileOriginMenuNoteHTML(){
@@ -1976,10 +1976,6 @@ function genHallOfServants(){
     if(x<10||x>18){ map[6][x]=WALL.BRICK; map[8][x]=WALL.BRICK; }
   }
   map[6][14]=0; map[6][15]=0; map[8][14]=0; map[8][15]=0;
-  // Reachability: connect north rooms to main spine (row 6 dividers blocked west/east doors)
-  map[6][4]=0; map[6][5]=0; map[6][6]=0;
-  map[6][22]=0; map[6][23]=0; map[6][24]=0;
-  map[8][5]=0; map[8][6]=0; map[8][7]=0;
 
   game.map = map; game.MAP_W = GW; game.MAP_H = GH; game.wallShade = shade;
   game.modifier = 'clear';
@@ -2132,87 +2128,6 @@ function isWall(x,y){ return !isWalkableAt(x,y); }
 function canStand(x,y){
   const r=0.22;
   return !isWall(x-r,y-r)&&!isWall(x+r,y-r)&&!isWall(x-r,y+r)&&!isWall(x+r,y+r);
-}
-
-/** Grid line-of-sight: true if straight segment does not cross a blocking cell. */
-function gridTraceClear(x1, y1, x2, y2, options){
-  options = options || {};
-  const step = options.step != null ? options.step : 0.2;
-  let samples = 0;
-  let outOfBounds = false;
-  try {
-    const dist = Math.hypot(x2 - x1, y2 - y1);
-    if(!Number.isFinite(dist) || dist < 1e-9){
-      const tx = Math.floor(x1), ty = Math.floor(y1);
-      samples = 1;
-      if(ty < 0 || ty >= game.MAP_H || tx < 0 || tx >= game.MAP_W){
-        return { clear: false, blocked: true, blockedAt: { x: x1, y: y1, tx, ty, cell: null }, samples, outOfBounds: true };
-      }
-      const walk = isWalkableCell(tx, ty);
-      return { clear: walk, blocked: !walk, blockedAt: walk ? null : { x: x1, y: y1, tx, ty, cell: game.map[ty][tx] }, samples, outOfBounds: false };
-    }
-    const n = Math.max(2, Math.ceil(dist / step));
-    for(let i = 1; i <= n; i++){
-      const t = i / n;
-      const x = x1 + (x2 - x1) * t;
-      const y = y1 + (y2 - y1) * t;
-      const tx = Math.floor(x), ty = Math.floor(y);
-      samples++;
-      if(ty < 0 || ty >= game.MAP_H || tx < 0 || tx >= game.MAP_W){
-        outOfBounds = true;
-        return { clear: false, blocked: true, blockedAt: { x, y, tx, ty, cell: null }, samples, outOfBounds: true };
-      }
-      if(!isWalkableCell(tx, ty)){
-        return { clear: false, blocked: true, blockedAt: { x, y, tx, ty, cell: game.map[ty][tx] }, samples, outOfBounds: false };
-      }
-    }
-    return { clear: true, blocked: false, blockedAt: null, samples, outOfBounds: false };
-  } catch(e){
-    return { clear: false, blocked: true, blockedAt: null, samples, outOfBounds: outOfBounds, error: String(e && e.message || e) };
-  }
-}
-
-function gridReachableFrom(startX, startY, options){
-  options = options || {};
-  const errors = [];
-  const maxCells = options.maxCells != null ? options.maxCells : (game.MAP_W * game.MAP_H + 8);
-  const stx = Math.floor(startX), sty = Math.floor(startY);
-  const key = (tx, ty) => ty + ',' + tx;
-  if(!isWalkableCell(stx, sty)){
-    return { pass: false, count: 0, reachable: {}, startCell: { tx: stx, ty: sty }, errors: ['start not walkable'] };
-  }
-  const reachable = {};
-  const q = [[stx, sty]];
-  reachable[key(stx, sty)] = true;
-  let qi = 0;
-  const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
-  while(qi < q.length){
-    if(Object.keys(reachable).length >= maxCells){
-      errors.push('maxCells cap');
-      break;
-    }
-    const cell = q[qi++];
-    const tx = cell[0], ty = cell[1];
-    for(let d = 0; d < dirs.length; d++){
-      const nx = tx + dirs[d][0], ny = ty + dirs[d][1];
-      if(!isWalkableCell(nx, ny)) continue;
-      const k = key(nx, ny);
-      if(reachable[k]) continue;
-      reachable[k] = true;
-      q.push([nx, ny]);
-    }
-  }
-  const count = Object.keys(reachable).length;
-  return { pass: errors.length === 0, count, reachable, startCell: { tx: stx, ty: sty }, errors };
-}
-
-function isReachableCell(tx, ty, reachable){
-  if(!reachable) return false;
-  return !!reachable[ty + ',' + tx];
-}
-
-function interactionLineClear(playerX, playerY, targetX, targetY){
-  return gridTraceClear(playerX, playerY, targetX, targetY, { step: 0.18 });
 }
 
 /** 2D movement with axis-separated substeps (q1k3-inspired tunnel guard). */
@@ -3323,10 +3238,6 @@ function giveCan(){
   if(player.giveCD>0){ return; }
   const best=game.aimNpc;
   if(!best){ setMsg('no one nearby'); beep(160,0.06,'sawtooth',0.03); return; }
-  const los = interactionLineClear(player.x, player.y, best.x, best.y);
-  if(!los.clear){
-    setMsg('blocked'); beep(160,0.06,'sawtooth',0.03); return;
-  }
   if(player.cans<best.need){
     setMsg('need '+best.need+' (have '+player.cans+')');
     addPopup('NOT ENOUGH CANS','#ff7a6a');
@@ -3405,10 +3316,7 @@ function updateAim(){
   for(const n of game.npcs){
     if(n.helped) continue;
     const dx=n.x-player.x, dy=n.y-player.y, d=dx*dx+dy*dy;
-    if(d<bd){
-      if(!interactionLineClear(player.x, player.y, n.x, n.y).clear) continue;
-      bd=d; best=n;
-    }
+    if(d<bd){ bd=d; best=n; }
   }
   game.aimNpc=best;
 }
@@ -5628,12 +5536,11 @@ function runFullSelfCheckInner(){
   const settingsSafety = runSettingsSafetySelfCheck();
   const mobileControlReliability = runMobileControlReliabilitySelfCheck();
   const movementCollision = runMovementCollisionSelfCheck();
-  const reachability = runReachabilitySelfCheck();
   const input = runInputSelfCheck();
   const levels = runLevelSelfCheck();
   const renderFailure = runRenderFailureSelfCheck();
   const runtimeClean = window.__crRuntimeErrors.length === err0;
-  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && mobileControlReliability.pass && movementCollision.pass && reachability.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
+  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && mobileControlReliability.pass && movementCollision.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
   return {
     pass,
     build: BUILD_ID,
@@ -5643,7 +5550,6 @@ function runFullSelfCheckInner(){
     settingsSafety,
     mobileControlReliability,
     movementCollision,
-    reachability,
     input,
     levels,
     renderFailure,
@@ -6069,199 +5975,6 @@ function runMovementCollisionSelfCheckBody(){
     mobileOverride = savedOverride;
     applyMobileControlSettings();
     clearInputState();
-  }
-}
-
-function crHarnessEssentialConnected(ex, ey, px, py){
-  const fromItem = gridReachableFrom(ex, ey);
-  const ptx = Math.floor(px), pty = Math.floor(py);
-  return fromItem.count > 0 && isReachableCell(ptx, pty, fromItem.reachable);
-}
-
-function crHarnessCountUnreachablePickups(reachable){
-  let n = 0;
-  for(const c of game.pickups){
-    if(c.taken) continue;
-    const tx = Math.floor(c.x), ty = Math.floor(c.y);
-    if(!isReachableCell(tx, ty, reachable)) n++;
-  }
-  return n;
-}
-
-function crHarnessCountUnreachableNpcs(reachable){
-  let n = 0;
-  for(const npc of game.npcs){
-    if(npc.helped) continue;
-    const tx = Math.floor(npc.x), ty = Math.floor(npc.y);
-    if(!isReachableCell(tx, ty, reachable)) n++;
-  }
-  return n;
-}
-
-function runReachabilitySelfCheck(){
-  if(_crHarnessDepth > 0) return runReachabilitySelfCheckBody();
-  return crWithTemporaryState('reachability', () => runReachabilitySelfCheckBody());
-}
-
-function runReachabilitySelfCheckBody(){
-  const errors = [];
-  const warnings = [];
-  const measurements = {
-    normalReachableCells: 0,
-    hallReachableCells: 0,
-    unreachableNormalPickups: 0,
-    unreachableNormalNpcs: 0,
-    traceSamples: 0,
-  };
-  const checks = {
-    clearTracePasses: false,
-    wallTraceBlocks: false,
-    diagonalWallBlocks: false,
-    outOfBoundsSafe: false,
-    normalSpawnReachable: false,
-    normalPickupsReachabilityMeasured: false,
-    normalNpcsReachabilityMeasured: false,
-    normalExitReachabilityMeasured: false,
-    hallAllPickupsReachable: false,
-    hallAllNpcsReachable: false,
-    hallExitReachable: false,
-    giveDoesNotPassThroughWalls: false,
-    harnessStateRestored: true,
-  };
-  const savedOverride = mobileOverride;
-  const err0 = window.__crRuntimeErrors.length;
-  crPrepareSelfCheckPortrait();
-  try {
-    crHarnessInstallMicroMap([
-      '#######',
-      '#.....#',
-      '#.....#',
-      '#.....#',
-      '#######',
-    ]);
-    const clearTrace = gridTraceClear(1.5, 2.0, 4.5, 2.0);
-    measurements.traceSamples += clearTrace.samples;
-    checks.clearTracePasses = clearTrace.clear === true && !clearTrace.blocked;
-
-    crHarnessInstallMicroMap([
-      '#######',
-      '#..#..#',
-      '#..#..#',
-      '#..#..#',
-      '#######',
-    ]);
-    const wallTrace = gridTraceClear(1.5, 2.0, 5.5, 2.0);
-    measurements.traceSamples += wallTrace.samples;
-    checks.wallTraceBlocks = wallTrace.blocked === true && wallTrace.clear === false;
-
-    crHarnessInstallMicroMap([
-      '#######',
-      '#.#...#',
-      '#.#...#',
-      '#.....#',
-      '#######',
-    ]);
-    const diagTrace = gridTraceClear(1.2, 1.2, 5.2, 3.2);
-    measurements.traceSamples += diagTrace.samples;
-    checks.diagonalWallBlocks = diagTrace.blocked === true;
-
-    let oobThrew = false;
-    try {
-      crHarnessInstallMicroMap([
-        '#####',
-        '#...#',
-        '#...#',
-        '#...#',
-        '#####',
-      ]);
-      const oob = gridTraceClear(2.5, 2.5, 22, 22);
-      measurements.traceSamples += oob.samples;
-      checks.outOfBoundsSafe = oob.clear !== true && oob.blocked === true && (oob.outOfBounds === true || oob.blockedAt != null);
-    } catch(e){
-      oobThrew = true;
-      errors.push('out-of-bounds trace threw');
-    }
-    if(oobThrew) checks.outOfBoundsSafe = false;
-
-    startRun(88);
-    paused = false;
-    state = STATE.PLAY;
-    clearInputState();
-    checks.normalSpawnReachable = canStand(player.x, player.y);
-    const normalBfs = gridReachableFrom(player.x, player.y);
-    measurements.normalReachableCells = normalBfs.count;
-    checks.normalSpawnReachable = checks.normalSpawnReachable && normalBfs.count > 40 && normalBfs.pass;
-    measurements.unreachableNormalPickups = crHarnessCountUnreachablePickups(normalBfs.reachable);
-    measurements.unreachableNormalNpcs = crHarnessCountUnreachableNpcs(normalBfs.reachable);
-    checks.normalPickupsReachabilityMeasured = true;
-    checks.normalNpcsReachabilityMeasured = true;
-    if(game.exit){
-      const exTx = Math.floor(game.exit.x), exTy = Math.floor(game.exit.y);
-      const exitReach = isReachableCell(exTx, exTy, normalBfs.reachable) || game.exit.active === false;
-      checks.normalExitReachabilityMeasured = true;
-      if(!exitReach && game.exit.active) warnings.push('normal exit not reachable from spawn (measured)');
-    } else {
-      checks.normalExitReachabilityMeasured = true;
-    }
-    if(measurements.unreachableNormalPickups > 0) warnings.push('normal unreachable pickups: '+measurements.unreachableNormalPickups);
-    if(measurements.unreachableNormalNpcs > 0) warnings.push('normal unreachable npcs: '+measurements.unreachableNormalNpcs);
-
-    startCustomLevel('hall_of_servants');
-    paused = false;
-    state = STATE.PLAY;
-    clearInputState();
-    checks.normalSpawnReachable = checks.normalSpawnReachable && canStand(player.x, player.y);
-    const hallBfs = gridReachableFrom(player.x, player.y);
-    measurements.hallReachableCells = hallBfs.count;
-    const hallPickBad = (game.pickups || []).filter(p => !p.taken && !crHarnessEssentialConnected(p.x, p.y, player.x, player.y)).length;
-    const hallNpcBad = (game.npcs || []).filter(n => !n.helped && !crHarnessEssentialConnected(n.x, n.y, player.x, player.y)).length;
-    checks.hallAllPickupsReachable = hallPickBad === 0;
-    checks.hallAllNpcsReachable = hallNpcBad === 0;
-    if(game.exit){
-      const hx = game.exit.x, hy = game.exit.y;
-      checks.hallExitReachable = crHarnessEssentialConnected(hx, hy, player.x, player.y);
-    } else {
-      checks.hallExitReachable = false;
-    }
-    if(!checks.hallAllPickupsReachable) errors.push('hall unreachable pickups: '+hallPickBad);
-    if(!checks.hallAllNpcsReachable) errors.push('hall unreachable npcs: '+hallNpcBad);
-    if(!checks.hallExitReachable) errors.push('hall exit not reachable');
-
-    crHarnessInstallMicroMap([
-      '#######',
-      '#.....#',
-      '#.#.#.#',
-      '#.....#',
-      '#.....#',
-      '#######',
-    ]);
-    player.x = 1.5; player.y = 2.5;
-    player.cans = 10;
-    game.npcs = [{ x: 5.5, y: 2.5, need: 1, helped: false, kind: 'hungry' }];
-    game.pickups = [];
-    updateAim();
-    const losWall = interactionLineClear(player.x, player.y, game.npcs[0].x, game.npcs[0].y);
-    const aimBlocked = game.aimNpc === null;
-    const helpedBefore = game.npcs[0].helped;
-    game.aimNpc = game.npcs[0];
-    giveCan();
-    const giveBlocked = game.npcs[0].helped === helpedBefore;
-    checks.giveDoesNotPassThroughWalls = !losWall.clear && aimBlocked && giveBlocked;
-    if(!checks.giveDoesNotPassThroughWalls) errors.push('GIVE can pass through wall');
-
-    if(window.__crRuntimeErrors.length !== err0) errors.push('runtime errors during reachability check');
-
-    const pass = errors.length === 0 && Object.values(checks).every(Boolean);
-    return { pass, build: BUILD_ID, errors, warnings, checks, measurements };
-  } catch(e){
-    errors.push(String(e && e.message ? e.message : e));
-    return { pass: false, build: BUILD_ID, errors, warnings, checks, measurements };
-  } finally {
-    _selfCheckForcePortrait = false;
-    mobileOverride = savedOverride;
-    applyMobileControlSettings();
-    clearInputState();
-    game.npcs = game.npcs || [];
   }
 }
 
@@ -7193,7 +6906,7 @@ globalThis.CR = window.CR = {
   set paused(v){ paused=!!v; },
   get mobileMode(){ return mobileMode; },
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
-  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runMobileControlReliabilitySelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
+  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runMobileControlReliabilitySelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
   editRunnerName,applyMobileControlSettings,mobileSprintCost,mobileSprintBurstSec,triggerMobileSprintBurst,crDispatchPointer,crDispatchTouch,
   toggleFullscreen,isFullscreen,enterFullscreen,exitFullscreen,
   getAudioContext,resumeAudioContext,bindAudioUnlockGate,getAudioUnlockProof,

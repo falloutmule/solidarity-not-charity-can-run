@@ -709,6 +709,52 @@ async function movementCollisionSection(page) {
   return { pass, proof, movementCollision: mov };
 }
 
+async function reachabilitySection(page) {
+  const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await waitGameReady(page);
+
+  const reach = await page.evaluate(() => CR.runReachabilitySelfCheck());
+
+  await page.evaluate(() => {
+    CR.startCustomLevel('hall_of_servants');
+    CR.state = CR.STATE.PLAY;
+    CR.paused = false;
+  });
+  await page.waitForTimeout(100);
+  await page.screenshot({ path: path.join(ROOT, 'proof-reachability-hall.png') });
+
+  await page.evaluate(() => {
+    CR.crHarnessInstallMicroMap([
+      '#######',
+      '#.....#',
+      '#.#.#.#',
+      '#.....#',
+      '#.....#',
+      '#######',
+    ]);
+    CR.player.x = 1.5;
+    CR.player.y = 2.5;
+  });
+  await page.waitForTimeout(80);
+  await page.screenshot({ path: path.join(ROOT, 'proof-reachability-wallblocked.png') });
+
+  const isoOk = await page.evaluate(() => CR.crFingerprintPublicSafe(CR.crPublicStateFingerprint()));
+  const pass = reach.pass === true && isoOk !== false;
+
+  const proof = {
+    pass,
+    build: reach.build,
+    reachability: reach,
+    harnessStateOk: isoOk,
+    screenshots: ['proof-reachability-hall.png', 'proof-reachability-wallblocked.png'],
+    timestamp: new Date().toISOString(),
+  };
+  writeProof('proof-reachability.json', proof);
+  return { pass, proof, reachability: reach };
+}
+
 async function portraitUsabilitySection(page) {
   const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
   const presetList = [
@@ -1008,6 +1054,7 @@ async function main() {
 
   const mobileControlReliability = await mobileControlReliabilitySection(page);
   const movementCollision = await movementCollisionSection(page);
+  const reachability = await reachabilitySection(page);
 
   const harnessIsolation = await harnessIsolationSection(page);
   const renderFailure = await renderFailureSection(page);
@@ -1046,6 +1093,7 @@ async function main() {
     settingsSafetyPass &&
     mobileControlReliability.pass &&
     movementCollision.pass &&
+    reachability.pass &&
     harnessIsolation.pass &&
     renderFailure.pass &&
     hallE2E.pass &&
@@ -1084,6 +1132,7 @@ async function main() {
     settingsSafety: portraitUsability.settingsSafety || { pass: settingsSafetyPass },
     mobileControlReliability,
     movementCollision,
+    reachability,
     harnessIsolation,
     renderFailure,
     hallE2E,
