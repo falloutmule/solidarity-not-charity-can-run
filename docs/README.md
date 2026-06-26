@@ -11,6 +11,10 @@ Navigation for maintainers and Hermes handoffs.
 | [q1k3-lessons.md](q1k3-lessons.md) | q1k3 reference; what we borrowed |
 | [handoff-rules.md](handoff-rules.md) | Travis / Hermes working contract |
 
+## Reusable Hermes skill (standalone repo)
+
+- **[hermes-skill-single-file-html-game](https://github.com/falloutmule/hermes-skill-single-file-html-game)** — published workflow distilled from SNC (constitution, harness, mobile, CI patterns). Not required to play this game; for new single-file HTML projects.
+
 ## Reports
 
 - **[reports/README.md](../reports/README.md)** — guard cards, history, proofs  
