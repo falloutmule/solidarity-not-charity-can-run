@@ -1,0 +1,2652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a1410">
+<title>Canned Run</title>
+<style>
+  html,body{margin:0;height:100%;background:#000;overflow:hidden;cursor:crosshair;touch-action:none;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;overscroll-behavior:none;}
+  /* small in-game fullscreen toggle */
+  #fsbtn{
+    display:none;position:fixed;top:8px;left:50%;transform:translateX(-50%);
+    z-index:15;width:auto;min-width:54px;height:30px;padding:0 8px;
+    background:rgba(30,22,14,0.85);border:1px solid rgba(200,170,100,0.45);
+    border-radius:5px;color:#e9d8b0;font:bold 9px monospace;letter-spacing:0.5px;
+    touch-action:none;user-select:none;-webkit-user-select:none;cursor:pointer;
+    transition:background 0.1s;
+  }
+  #fsbtn.show{display:flex;align-items:center;justify-content:center;}
+  #fsbtn:active{background:rgba(200,170,100,0.55);}
+  /* fullscreen hint toast */
+  #fstoast{
+    display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+    z-index:40;background:rgba(20,15,10,0.95);border:1px solid rgba(200,170,100,0.4);
+    color:#e9d8b0;font:13px monospace;padding:16px 24px;border-radius:8px;
+    text-align:center;max-width:80%;line-height:1.5;touch-action:none;
+    opacity:0;transition:opacity 0.3s ease;
+  }
+  #fstoast.show{display:block;opacity:1;}
+  #view{display:block;position:fixed;top:0;left:0;image-rendering:pixelated;touch-action:none;}
+  /* ---- mobile control overlay ---- */
+  #mob{
+    display:none;position:fixed;top:0;left:0;width:100%;height:100%;
+    pointer-events:none;z-index:9;touch-action:none;
+  }
+  #mob.show{display:block;pointer-events:auto;}
+  .mbtn{
+    position:absolute;border-radius:8px;background:rgba(180,150,80,0.25);
+    border:2px solid rgba(200,170,100,0.45);color:#e9d8b0;
+    display:flex;align-items:center;justify-content:center;
+    font:bold 13px monospace;letter-spacing:1px;
+    touch-action:none;user-select:none;-webkit-user-select:none;
+    transition:background 0.08s;
+  }
+  .mbtn.pr{background:rgba(200,170,100,0.55);border-color:rgba(220,200,130,0.8);}
+  #ml{bottom:30px;left:20px;width:110px;height:110px;border-radius:50%;z-index:12;flex-direction:column;gap:2px;background:rgba(20,15,10,0.15);}
+  /* Right-half LOOK zone — transparent touch overlay; gameplay shows through */
+  #mr{
+    top:0;right:0;width:50vw;height:100%;border-radius:0;z-index:10;
+    background:transparent;
+    border:0;
+    color:#c8b888;flex-direction:column;justify-content:center;align-items:center;
+    pointer-events:auto;
+  }
+  #mr .mlook-arrows{font:bold 22px monospace;letter-spacing:10px;opacity:0.35;pointer-events:none;user-select:none;}
+  #mlookhint{
+    position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);
+    font:bold 12px monospace;letter-spacing:1.5px;color:rgba(233,216,176,0.82);
+    text-align:center;line-height:1.45;pointer-events:none;user-select:none;
+    text-shadow:0 1px 6px rgba(0,0,0,0.85);padding:8px 12px;border-radius:8px;
+    background:rgba(20,15,10,0.35);border:1px solid rgba(200,170,100,0.25);
+    transition:opacity 0.6s ease;
+    z-index:11;max-width:80%;
+  }
+  #mlookhint.hide{opacity:0;}
+  #mlookhint.subtle{opacity:0.38;}
+  .mcap{
+    position:absolute;bottom:6px;left:0;right:0;text-align:center;
+    font:bold 10px monospace;letter-spacing:1.2px;color:rgba(233,216,176,0.75);
+    pointer-events:none;user-select:none;text-shadow:0 1px 4px rgba(0,0,0,0.8);
+  }
+  #mg{top:50%;right:20px;width:70px;height:70px;transform:translateY(-50%);border-radius:50%;background:rgba(200,150,60,0.3);border-color:rgba(220,180,80,0.6);z-index:14;font-size:11px;}
+  #ms{top:50%;left:20px;width:65px;height:65px;transform:translateY(-50%);border-radius:50%;z-index:14;font-size:10px;}
+  #mm{top:16px;right:20px;width:52px;height:38px;font-size:10px;z-index:14;}
+  #mp{top:16px;left:16px;width:52px;height:38px;font-size:10px;z-index:14;}
+  .mhw{width:38px;height:38px;border-radius:6px;}
+  .mjl{
+    position:absolute;width:44px;height:44px;border-radius:50%;
+    background:rgba(160,130,60,0.3);border:2px solid rgba(200,170,100,0.5);
+    top:50%;left:50%;transform:translate(-50%,-50%);
+    touch-action:none;pointer-events:none;
+  }
+  /* ---- responsive menu panels ---- */
+  .rpan{
+    position:fixed;top:0;left:0;width:100%;height:100%;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    background:rgba(10,8,5,0.97);z-index:20;touch-action:none;overflow-y:auto;
+    padding: env(safe-area-inset-top,0) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0);
+  }
+  .rpan.in{display:none;}
+  .rpantit{
+    font:bold 22px monospace;color:#e9d8b0;letter-spacing:2px;
+    margin-bottom:18px;text-align:center;
+  }
+  .rit{
+    padding:11px 28px;margin:5px;min-width:220px;max-width:90vw;
+    background:rgba(30,22,14,0.9);border:1px solid rgba(180,150,80,0.3);
+    border-radius:4px;color:#d8c8a0;font:14px monospace;letter-spacing:1px;
+    text-align:center;cursor:pointer;touch-action:none;user-select:none;
+    transition:background 0.1s,border-color 0.1s;
+  }
+  .rit:hover,.rit.hi{background:rgba(60,44,24,0.95);border-color:rgba(220,180,100,0.7);color:#ffd24a;}
+  .rit.sel{background:rgba(50,38,20,0.98);border-color:rgba(255,210,74,0.8);color:#ffd24a;}
+  .rdesc{font:12px monospace;color:#8a7a5a;margin:3px 0;letter-spacing:0.5px;}
+  .rinp{
+    background:rgba(20,15,10,0.95);border:1px solid rgba(180,150,80,0.4);
+    color:#ffd24a;font:18px monospace;padding:10px 16px;margin:10px;
+    min-width:200px;text-align:center;letter-spacing:2px;border-radius:4px;
+  }
+  .rpg{padding:10px;font:12px monospace;color:#6a5a3a;text-align:center;max-width:300px;line-height:1.5;}
+  .rclose{font:11px monospace;color:#5a4a2a;margin-top:12px;letter-spacing:1px;}
+  /* portrait hint */
+  #porthint{
+    display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:99;
+    background:rgba(10,8,5,0.98);flex-direction:column;align-items:center;justify-content:center;
+    font:14px monospace;color:#8a7a5a;letter-spacing:1px;text-align:center;
+    padding:40px;gap:14px;touch-action:none;
+  }
+  #porthint.show{display:flex;}
+  #porthint button{background:rgba(40,30,20,0.9);border:1px solid rgba(180,150,80,0.4);color:#d8c8a0;padding:10px 24px;font:13px monospace;border-radius:4px;cursor:pointer;}
+</style>
+</head>
+<body>
+<canvas id="view"></canvas>
+<!-- mobile control overlay -->
+<div id="mob">
+  <div id="ml" class="mbtn"><div class="mjl" id="mjdot"></div><span class="mcap">MOVE</span></div>
+  <div id="mr" class="mbtn">
+    <div id="mlookhint">LOOK<br>DRAG TO TURN</div>
+    <span class="mlook-arrows" aria-hidden="true">&#8592; &#8594;</span>
+  </div>
+  <div id="mg" class="mbtn">GIVE</div>
+  <div id="ms" class="mbtn">SPRINT</div>
+  <div id="mm" class="mbtn">MAP</div>
+  <div id="mp" class="mbtn">PAUSE</div>
+</div>
+<!-- portrait orientation hint -->
+<div id="porthint">
+  <div>CANNED RUN</div>
+  <div style="color:#6a5a3a;font-size:12px;">Landscape is recommended for gameplay.</div>
+  <div style="color:#4a3a2a;font-size:11px;">Portrait works for menus and stats.</div>
+  <button id="portplay" type="button">PLAY ANYWAY</button>
+</div>
+<!-- responsive mobile menu panels (injected by JS, shown via class toggle) -->
+<div id="rmenu" class="rpan in"></div>
+<!-- small fullscreen toggle for mobile in-game -->
+<div id="fsbtn">FULLSCREEN</div>
+<!-- fullscreen unavailable toast -->
+<div id="fstoast"></div>
+<script>
+"use strict";
+/* ============================================================================
+   CANNED RUN  —  flat raycaster speedrun roguelike (single file, no deps)
+
+   GRAPHICS PASS — Grand Junction / Western Colorado cityscape flavor.
+   All gameplay, collision, and sprite-projection logic from the verified
+   base is preserved. Only rendering + procedural assets changed.
+
+   Major systems:
+     0. Canvas / low-res pixelated buffer
+     1. Seeded RNG (mulberry32)
+     2. Game state machine (start / play / upgrade / over / paused)
+     3. Procedural city generator + flood-fill reachability + spawn validation
+     4. Collision helpers (unchanged from verified base)
+     5. Audio (WebAudio blips)
+     6. PROCEDURAL ASSETS: wall textures + sprite textures + sky/mesa horizon
+        (all Canvas-generated pixel art, no external files)
+     7. Renderer: DDA raycast walls with PER-COLUMN TEXTURE SAMPLING + z-buffer
+                  + billboard sprites projected from WORLD coords only
+     8. Minimap (toggle M)
+     9. HUD + reticle + popups + pickup flash + exit glow
+    10. Gameplay: pickups, handoff w/ cooldown + reticle + needs feedback,
+        quota -> exit -> upgrade choice -> next district
+    11. Update loop
+    12. Overlays (start / pause-help / upgrade / game over)
+    13. Main loop
+
+   DEBUG: append ?debug to the URL for a diagnostic overlay.
+   ========================================================================== */
+
+// Lightweight runtime error capture for verification/debugging; empty in normal play.
+window.__crRuntimeErrors = [];
+window.addEventListener('error', e=>{
+  window.__crRuntimeErrors.push({message:e.message||'', line:e.lineno||0, col:e.colno||0, source:e.filename||'', stack:e.error&&e.error.stack?String(e.error.stack):''});
+});
+window.addEventListener('unhandledrejection', e=>{
+  window.__crRuntimeErrors.push({message:'unhandledrejection', reason:String(e.reason||'')});
+});
+
+// ---------------------------------------------------------------------------
+// 0. CANVAS / RESOLUTION
+// ---------------------------------------------------------------------------
+const view = document.getElementById('view');
+const ctx  = view.getContext('2d');
+const RW = 320, RH = 200;                      // internal render resolution
+const buf = document.createElement('canvas'); buf.width = RW; buf.height = RH;
+const bctx = buf.getContext('2d');
+const zbuffer = new Float32Array(RW);          // per-column wall distance (sprite occlusion)
+
+// ---------------------------------------------------------------------------
+// FULLSCREEN API HELPERS
+// ---------------------------------------------------------------------------
+let _resizeTimer = null;
+function _debouncedResize(){
+  if(_resizeTimer) clearTimeout(_resizeTimer);
+  _resizeTimer = setTimeout(()=>{ resize(); }, 80);
+}
+function isFullscreen(){
+  return !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
+}
+function enterFullscreen(){
+  const el = document.documentElement;
+  const req = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+  if(!req){
+    showToast('FULLSCREEN NOT AVAILABLE IN THIS BROWSER MODE');
+    return false;
+  }
+  try{
+    const p = req.call(el);
+    if(p && p.catch) p.catch(()=>{ showToast('FULLSCREEN NOT AVAILABLE IN THIS BROWSER MODE'); });
+  }catch(e){
+    showToast('FULLSCREEN NOT AVAILABLE IN THIS BROWSER MODE');
+    return false;
+  }
+  return true;
+}
+function exitFullscreen(){
+  const ex = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
+  if(!ex) return false;
+  try{
+    const p = ex.call(document);
+    if(p && p.catch) p.catch(()=>{});
+  }catch(e){ return false; }
+  return true;
+}
+function toggleFullscreen(){
+  if(isFullscreen()) exitFullscreen();
+  else enterFullscreen();
+}
+function showToast(msg, ms){
+  const t = document.getElementById('fstoast');
+  if(!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>{ t.classList.remove('show'); }, ms||3000);
+}
+// Resize canvas on fullscreen transitions
+['fullscreenchange','webkitfullscreenchange','msfullscreenchange'].forEach(ev=>{
+  document.addEventListener(ev, ()=>{ _debouncedResize(); updateFsBtnLabel(); });
+});
+// Resize on orientation change with debounce
+addEventListener('orientationchange', ()=>{ _debouncedResize(); });
+
+function resize(){
+  // Use visualViewport for accurate mobile dimensions (accounts for address bar).
+  // Do NOT multiply by devicePixelRatio — all drawing code uses CSS pixel coordinates,
+  // so DPR scaling would leave the right/bottom of the backing store undrawn (black).
+  // This game upscales a 320x200 buffer with pixelated rendering; DPR adds no benefit.
+  const vw = Math.round((window.visualViewport && window.visualViewport.width) || innerWidth);
+  const vh = Math.round((window.visualViewport && window.visualViewport.height) || innerHeight);
+  view.width  = vw;
+  view.height = vh;
+  view.style.width  = vw + 'px';
+  view.style.height = vh + 'px';
+}
+function updateFsBtnLabel(){
+  const b = document.getElementById('fsbtn');
+  if(b) b.textContent = isFullscreen() ? 'EXIT FS' : 'FULLSCREEN';
+}
+addEventListener('resize', _debouncedResize);
+// Also handle visual viewport resize (mobile address bar) — update immediately for responsiveness
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize', ()=>{ _debouncedResize(); });
+  window.visualViewport.addEventListener('scroll', ()=>{ _debouncedResize(); });
+}
+resize();
+
+// ---------------------------------------------------------------------------
+// DEBUG FLAG
+// ---------------------------------------------------------------------------
+const DEBUG = new URLSearchParams(location.search).has('debug');
+const dbg = { cansSpawned:0, npcsSpawned:0, invalidPlacements:0,
+              spritesSkipped:0, reachableCells:0, rejectedSpawns:0, props:0 };
+
+// ---------------------------------------------------------------------------
+// 1. SEEDED RNG (mulberry32)
+// ---------------------------------------------------------------------------
+function mulberry32(a){
+  return function(){
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a>>>15, 1 | a);
+    t = t + Math.imul(t ^ t>>>7, 61 | t) ^ t;
+    return ((t ^ t>>>14) >>> 0) / 4294967296;
+  };
+}
+let RNG = mulberry32(12345);
+
+// ---------------------------------------------------------------------------
+// 2. GAME STATE
+// ---------------------------------------------------------------------------
+const STATE = { TITLE:'title', SEEDED:'seeded', STATS:'stats', LB:'lb', OPTIONS:'options',
+                PLAY:'play', UPGRADE:'upgrade', RESULTS:'results' };
+let state = STATE.TITLE;
+let paused = false;
+
+const game = {
+  seed: 12345, district: 1, totalScore: 0,
+  map: null, MAP_W: 0, MAP_H: 0, wallShade: null,
+  pickups: [], npcs: [], exit: null, props: [],
+  quota: 0, helped: 0, delivered: 0, timeLeft: 0,
+  modifier: 'clear', scoreMult: 1,
+  msg: '', msgT: 0,
+  radarT: 0, revealT: 0,
+  aimNpc: null,
+  popups: [],
+  flash: 0,
+  handoffFx: 0,
+  // --- run tracking (for stats / leaderboard / results) ---
+  run: { active:false, startedAt:0, seedUsed:12345, modifierUsed:'clear',
+         cansCollected:0, cansDelivered:0, helpedByKind:{hungry:0,family:0,elder:0,volunteer:0},
+         upgradesChosen:0, highestDistrict:1, runTime:0, completed:false, leaderboardRank:null },
+};
+
+const player = {
+  x:0, y:0, angle:0,
+  cans:0, maxCans:10,
+  stamina:60, maxStamina:60,
+  giveRange:1.4, giveCD:0, baseGiveCD:0.45,
+  speedBoostT:0,
+  minimapLevel:1, radar:false, radarPingT:0, radarRingT:0,
+  handoffBonus:0, regenBonus:0,
+  upgrades:{pack:0, sprint:0, hand:0, map:0, radar:0},
+};
+
+const cfg = {
+  walkSpeed:3.0, sprintSpeed:5.2,
+  staminaDrain:26, staminaRegen:16,
+  fov:0.66,
+  baseTime:95,
+};
+
+// -----------------------------------------------------------------------
+// MOBILE / TOUCH INPUT
+// -----------------------------------------------------------------------
+// input abstraction: readable by game code, populated by kbd+mouse+touch
+const inp = {
+  fwd:false, back:false, left:false, right:false,
+  turnLeft:false, turnRight:false,
+  sprint:false, give:false, map:false, pause:false,
+  _active:false, // true when any touch is on screen
+};
+let mobileMode = false; // true = show mobile overlay, hide desktop cursor
+let mobileOverride = null; // null=auto, 'on', 'off'
+let portHintShown = false;
+
+// Joystick state
+const joy = { x:0, y:0, active:false, id:null, sx:0, sy:0, ang:0, dist:0 };
+// Turn zone state
+const tzone = { active:false, id:null, lastX:0 };
+let lookHintUsed = false;
+
+function dismissLookHint(mode){
+  lookHintUsed = true;
+  const h = document.getElementById('mlookhint');
+  if(!h) return;
+  h.classList.remove('subtle','hide');
+  if(mode==='hide') h.classList.add('hide');
+  else h.classList.add('subtle');
+}
+function syncLookHintUI(){
+  const h = document.getElementById('mlookhint');
+  if(!h) return;
+  const show = mobileMode && state===STATE.PLAY && !paused;
+  h.style.display = show ? 'block' : 'none';
+}
+
+function isMobile(){
+  if(mobileOverride==='on') return true;
+  if(mobileOverride==='off') return false;
+  return matchMedia('(pointer: coarse)').matches && innerWidth < 1100;
+}
+function setMobileMode(on){
+  if(on===mobileMode) return;
+  mobileMode = on;
+  const mob = document.getElementById('mob');
+  if(mob){ mob.classList.toggle('show', on); }
+  // portrait hint on first mobile play
+  if(on && !portHintShown && mobileOverride!=='on'){
+    portHintShown = true;
+    const ph = document.getElementById('porthint');
+    if(ph) ph.classList.add('show');
+  }
+}
+function bindMobileControls(){
+  const ml = document.getElementById('ml');
+  const mr = document.getElementById('mr');
+  const mg = document.getElementById('mg');
+  const ms = document.getElementById('ms');
+  const mmin = document.getElementById('mm');
+  const mpa = document.getElementById('mp');
+  const rmenu = document.getElementById('rmenu');
+
+  // ---- left joystick zone ----
+  ml.addEventListener('touchstart', e=>{
+    e.preventDefault(); e.stopPropagation();
+    const t = e.changedTouches[0];
+    joy.id = t.identifier; joy.active = true;
+    joy.sx = t.clientX; joy.sy = t.clientY; joy.x=0; joy.y=0;
+    updateJoyDot(0,0);
+  },{passive:false});
+
+  // ---- right turn zone ----
+  mr.addEventListener('touchstart', e=>{
+    e.preventDefault(); e.stopPropagation();
+    const t = e.changedTouches[0];
+    tzone.id = t.identifier; tzone.active = true; tzone.lastX = t.clientX;
+  },{passive:false});
+
+  // ---- GIVE button ----
+  mg.addEventListener('touchstart', e=>{
+    e.preventDefault(); e.stopPropagation();
+    inp.give = true; mg.classList.add('pr');
+  },{passive:false});
+  mg.addEventListener('touchend', e=>{
+    e.preventDefault(); e.stopPropagation();
+    inp.give = false; mg.classList.remove('pr');
+  },{passive:false});
+
+  // ---- SPRINT button ----
+  ms.addEventListener('touchstart', e=>{
+    e.preventDefault(); e.stopPropagation();
+    inp.sprint = true; ms.classList.add('pr');
+  },{passive:false});
+  ms.addEventListener('touchend', e=>{
+    e.preventDefault(); e.stopPropagation();
+    inp.sprint = false; ms.classList.remove('pr');
+  },{passive:false});
+
+  // ---- MAP button ----
+  mmin.addEventListener('touchstart', e=>{
+    e.preventDefault(); e.stopPropagation();
+    inp.map = true; mmin.classList.add('pr');
+  },{passive:false});
+  mmin.addEventListener('touchend', e=>{
+    e.preventDefault(); e.stopPropagation();
+    inp.map = false; mmin.classList.remove('pr');
+  },{passive:false});
+
+  // ---- PAUSE button ----
+  mpa.addEventListener('touchstart', e=>{
+    e.preventDefault(); e.stopPropagation();
+    inp.pause = true; mpa.classList.add('pr');
+  },{passive:false});
+  mpa.addEventListener('touchend', e=>{
+    e.preventDefault(); e.stopPropagation();
+    inp.pause = false; mpa.classList.remove('pr');
+  },{passive:false});
+  const clearHeldButtons=()=>{
+    inp.give=false; inp.sprint=false; inp.map=false; inp.pause=false;
+    [mg,ms,mmin,mpa].forEach(el=>el.classList.remove('pr'));
+  };
+  [mg,ms,mmin,mpa].forEach(el=>el.addEventListener('touchcancel', e=>{
+    e.preventDefault(); e.stopPropagation(); clearHeldButtons();
+  },{passive:false}));
+
+  // ---- global touchmove: route to joystick or turn ----
+  document.addEventListener('touchmove', e=>{
+    e.preventDefault();
+    for(const t of e.changedTouches){
+      if(t.identifier === joy.id && joy.active){
+        const dx = t.clientX - joy.sx, dy = t.clientY - joy.sy;
+        const MAX = 38;
+        const d = Math.sqrt(dx*dx+dy*dy);
+        joy.dist = Math.min(d, MAX) / MAX;
+        if(d < 4){ joy.ang = 0; joy.x = 0; joy.y = 0; }
+        else { joy.ang = Math.atan2(dx, -dy); joy.x = Math.sin(joy.ang)*joy.dist; joy.y = Math.cos(joy.ang)*joy.dist; }
+        updateJoyDot(joy.x, joy.y);
+      }
+      if(t.identifier === tzone.id && tzone.active){
+        const dx = t.clientX - tzone.lastX;
+        tzone.lastX = t.clientX;
+        if(state===STATE.PLAY && !paused){
+          if(Math.abs(dx) > 2) dismissLookHint('subtle');
+          player.angle += dx * options.mobileTurnSens;
+        }
+      }
+    }
+  },{passive:false});
+
+  document.addEventListener('touchend', e=>{
+    for(const t of e.changedTouches){
+      if(t.identifier === joy.id){ joy.active=false; joy.x=0; joy.y=0; joy.id=null; updateJoyDot(0,0); }
+      if(t.identifier === tzone.id){ tzone.active=false; tzone.id=null; }
+    }
+  },{passive:false});
+
+  const portplay = document.getElementById('portplay');
+  if(portplay){
+    portplay.addEventListener('click', e=>{
+      e.preventDefault();
+      document.getElementById('porthint').classList.remove('show');
+    });
+  }
+
+  // ---- in-game fullscreen toggle button ----
+  const fsbtn = document.getElementById('fsbtn');
+  if(fsbtn){
+    const fsAction = e=>{ e.preventDefault(); e.stopPropagation(); toggleFullscreen(); };
+    fsbtn.addEventListener('touchstart', fsAction, {passive:false});
+    fsbtn.addEventListener('click', fsAction);
+  }
+
+  // ---- responsive menu: touch-to-select on rmenu items ----
+  // Mobile frame loop may redraw rmenu between touchstart and touchend.
+  // Store the selected action at touchstart so the tap survives DOM rebuilds.
+  rmenu._touchAction = '';
+  rmenu.addEventListener('touchstart', e=>{
+    const el = e.target.closest('.rit');
+    if(!el) return;
+    e.preventDefault();
+    rmenu._touchAction = el.dataset.action || '';
+    rmenu.querySelectorAll('.rit').forEach(r=>r.classList.remove('sel'));
+    el.classList.add('sel');
+  },{passive:false});
+  rmenu.addEventListener('touchend', e=>{
+    if(!rmenu._touchAction) return;
+    e.preventDefault();
+    const action = rmenu._touchAction;
+    rmenu._touchAction = '';
+    rmenu.querySelectorAll('.rit').forEach(r=>r.classList.remove('sel'));
+    rmenuAction(action);
+  },{passive:false});
+  rmenu.addEventListener('touchcancel', e=>{
+    rmenu._touchAction = '';
+    rmenu.querySelectorAll('.rit').forEach(r=>r.classList.remove('sel'));
+  },{passive:false});
+  rmenu.addEventListener('click', e=>{
+    const el = e.target.closest('.rit');
+    if(!el || !el.dataset.action) return;
+    e.preventDefault();
+    rmenuAction(el.dataset.action);
+  });
+}
+function updateJoyDot(nx, ny){
+  const dot = document.getElementById('mjdot');
+  if(dot) dot.style.transform = `translate(calc(-50% + ${nx*28}px), calc(-50% + ${ny*28}px))`;
+}
+function syncInpFromJoy(){
+  // joy.x/joy.y are already normalized signed axes: y=forward, x=right.
+  // Reading axes directly is clearer and avoids atan2 quadrant mistakes.
+  inp.fwd = joy.y > 0.25;
+  inp.back = joy.y < -0.25;
+  inp.left = joy.x < -0.25;
+  inp.right = joy.x > 0.25;
+}
+
+// -----------------------------------------------------------------------
+// RESPONSIVE MOBILE MENU (HTML overlay for small/coarse screens)
+// -----------------------------------------------------------------------
+let _rmSel = 0;
+function rmenuShow(){ document.getElementById('rmenu').classList.remove('in'); }
+function rmenuHide(){ document.getElementById('rmenu').classList.add('in'); }
+function rmenuClearForGameplay(){
+  const r = document.getElementById('rmenu');
+  if(!r) return;
+  r._touchAction = '';
+  if(r.innerHTML !== '') r.innerHTML = '';
+  rmenuHide();
+}
+function rmenuHTML(html){
+  const r = document.getElementById('rmenu');
+  // Avoid rebuilding the menu every animation frame. On mobile, continuous
+  // innerHTML replacement can swallow taps and reset focused text/number inputs.
+  if(!r) return false;
+  // If a mobile tap is in progress, keep the touched DOM node alive until touchend.
+  // This preserves the real-phone menu-tap fix even if a frame redraw happens mid-tap.
+  if(r._touchAction) return false;
+  if(r.innerHTML !== html){ r.innerHTML = html; return true; }
+  return false;
+}
+function rmenuSel(len){ _rmSel = Math.max(0, Math.min(len-1, _rmSel||0)); return _rmSel; }
+
+function rmenuAction(action){
+  switch(action){
+    case 'noop': break;
+    case 'toggle-fs': toggleFullscreen(); break;
+    case 'title-start': startRun(); break;
+    case 'title-seeded': seedInput=''; state=STATE.SEEDED; _rmSel=0; break;
+    case 'title-continue': if(SAVE.hasValid()) continueRun(); else setMsg('No saved run'); break;
+    case 'title-stats': state=STATE.STATS; _rmSel=0; break;
+    case 'title-lb': state=STATE.LB; _rmSel=0; break;
+    case 'title-options': nameInput=profile.name||'RUNNER'; state=STATE.OPTIONS; _rmSel=0; break;
+    case 'seed-start': {
+      const el=document.getElementById('rseedinp');
+      const raw=(el?el.value:seedInput)||'';
+      seedInput=raw;
+      const v=parseInt(raw,10);
+      if(!Number.isNaN(v)) startRun(v); else startRun();
+      break;
+    }
+    case 'seed-random': startRun(); _rmSel=0; break;
+    case 'back-title-seeded': state=STATE.TITLE; _rmSel=2; break;
+    case 'back-title-stats': state=STATE.TITLE; _rmSel=3; break;
+    case 'back-title-lb': state=STATE.TITLE; _rmSel=4; break;
+    case 'back-title-options': state=STATE.TITLE; _rmSel=5; break;
+    case 'option-mobile': {
+      const vals=['auto','on','off'];
+      const c=vals.indexOf(options.mobileControls);
+      options.mobileControls=vals[(c+1)%vals.length];
+      mobileOverride=options.mobileControls==='auto'?null:options.mobileControls;
+      setMobileMode(isMobile()); options.save(); drawMobileMenu();
+      break;
+    }
+    case 'option-minimap': options.minimapDefault=!options.minimapDefault; showMinimap=options.minimapDefault; options.save(); drawMobileMenu(); break;
+    case 'option-fx': options.reduceFx=!options.reduceFx; options.save(); drawMobileMenu(); break;
+    case 'option-mouse': options.mouseSens=options.mouseSens>0.003?0.0015:parseFloat((options.mouseSens+0.0005).toFixed(4)); options.save(); drawMobileMenu(); break;
+    case 'result-new': SAVE.clear(); startRun(); _rmSel=0; break;
+    case 'result-retry': SAVE.clear(); startRun(game.run.seedUsed); _rmSel=0; break;
+    case 'result-lb': state=STATE.LB; _rmSel=0; break;
+    case 'result-title': state=STATE.TITLE; _rmSel=0; break;
+    case 'pause-resume': paused=false; rmenuHide(); break;
+    case 'pause-restart': paused=false; rmenuHide(); SAVE.clear(); restartRun(false); break;
+    case 'pause-title': paused=false; rmenuHide(); state=STATE.TITLE; _rmSel=0; break;
+    case 'upgrade-0': chooseUpgrade(0); break;
+    case 'upgrade-1': chooseUpgrade(1); break;
+    case 'upgrade-2': chooseUpgrade(2); break;
+  }
+}
+window._rmenuAction = rmenuAction;
+
+function drawMobileMenu(){
+  // Sync in-game fullscreen button visibility each frame.
+  const fsbtn = document.getElementById('fsbtn');
+  if(fsbtn){
+    const showFs = mobileMode && state===STATE.PLAY && !paused && !isFullscreen();
+    fsbtn.classList.toggle('show', showFs);
+  }
+
+  if(!mobileMode){
+    if(fsbtn) fsbtn.classList.remove('show');
+    syncLookHintUI();
+    return;
+  }
+  const r = document.getElementById('rmenu');
+  if(!r) return;
+
+  // During active gameplay, never keep title/menu HTML over the world.
+  if(state === STATE.PLAY && !paused){
+    rmenuClearForGameplay();
+    syncLookHintUI();
+    return;
+  }
+
+  // Large mobile layouts use canvas menus for title/meta screens.
+  if(innerWidth >= 600 && innerHeight >= 400){
+    if(state === STATE.TITLE || state === STATE.SEEDED || state === STATE.STATS || state === STATE.LB || state === STATE.OPTIONS){
+      rmenuHide();
+      syncLookHintUI();
+      return;
+    }
+  }
+
+  syncLookHintUI();
+
+  // ── TITLE ──
+  if(state === STATE.TITLE){
+    rmenuShow();
+    rmenuHTML(`
+      <div class="rpantit" style="font-size:18px;margin-bottom:14px;">CANNED RUN</div>
+      <div class="rdesc" style="margin-bottom:14px;">A desert-city food run</div>
+      <div class="rit ${_rmSel===0?'sel':''}" data-action="title-start" style="margin-top:10px;">NEW RUN</div>
+      <div class="rit ${_rmSel===1?'sel':''}" data-action="title-seeded">SEEDED RUN</div>
+      <div class="rit ${_rmSel===2?'sel':''}" data-action="title-continue">CONTINUE</div>
+      <div class="rit ${_rmSel===3?'sel':''}" data-action="title-stats">STATS</div>
+      <div class="rit ${_rmSel===4?'sel':''}" data-action="title-lb">LEADERBOARDS</div>
+      <div class="rit ${_rmSel===5?'sel':''}" data-action="title-options">OPTIONS / HELP</div>
+      <div class="rit ${_rmSel===6?'sel':''}" data-action="toggle-fs">${isFullscreen()?'EXIT FULLSCREEN':'FULLSCREEN'}</div>
+      <div class="rclose" style="margin-top:16px;">↑↓ navigate · tap to activate</div>
+    `);
+    rmenuSel(7); return;
+  }
+
+  // ── SEEDED RUN ──
+  if(state === STATE.SEEDED){
+    rmenuShow();
+    const changed = rmenuHTML(`
+      <div class="rpantit">SEEDED RUN</div>
+      <div class="rdesc">Enter a seed number to replay</div>
+      <input type="number" id="rseedinp" value="${seedInput||''}" placeholder="seed"
+        style="background:rgba(20,15,10,0.95);border:1px solid rgba(180,150,80,0.4);color:#ffd24a;font:18px monospace;padding:10px 16px;margin:10px;min-width:200px;text-align:center;letter-spacing:2px;border-radius:4px;outline:none;width:220px;"/>
+      <div class="rit sel" data-action="seed-start" style="margin-top:8px;">START THIS SEED</div>
+      <div class="rit" data-action="seed-random" style="margin-top:4px;">RANDOM SEED</div>
+      <div class="rit" data-action="back-title-seeded" style="margin-top:4px;">← BACK</div>
+    `);
+    if(changed){
+      setTimeout(()=>{
+        const inp2=document.getElementById('rseedinp');
+        if(inp2){ inp2.focus(); inp2.addEventListener('input', e=>{ seedInput=e.target.value; }, {once:false}); }
+      }, 50);
+    }
+    return;
+  }
+
+  // ── STATS ──
+  if(state === STATE.STATS){
+    rmenuShow();
+    const s = stats.data;
+    rmenuHTML(`
+      <div class="rpantit">LIFETIME STATS</div>
+      <div style="overflow-y:auto;max-height:62vh;width:100%;padding:0 24px;box-sizing:border-box;">
+        <div class="rdesc">Runs completed: <span style="color:#e9d8b0">${s.totalRunsCompleted||0}</span></div>
+        <div class="rdesc">Runs failed: <span style="color:#e9d8b0">${s.totalRunsFailed||0}</span></div>
+        <div class="rdesc">Best score: <span style="color:#ffd24a">${s.bestScore||0}</span></div>
+        <div class="rdesc">Highest district: <span style="color:#e9d8b0">${s.highestDistrict||1}</span></div>
+        <div class="rdesc">Cans collected: <span style="color:#e9d8b0">${s.totalCansCollected||0}</span></div>
+        <div class="rdesc">Cans delivered: <span style="color:#e9d8b0">${s.totalCansDelivered||0}</span></div>
+        <div class="rdesc">People helped: <span style="color:#e9d8b0">${s.totalPeopleHelped||0}</span></div>
+        <div class="rdesc" style="margin-top:8px;">By kind:</div>
+        <div class="rdesc" style="padding-left:12px;">Hungry: ${s.helpedByKind?.hungry||0}</div>
+        <div class="rdesc" style="padding-left:12px;">Family: ${s.helpedByKind?.family||0}</div>
+        <div class="rdesc" style="padding-left:12px;">Elder: ${s.helpedByKind?.elder||0}</div>
+        <div class="rdesc" style="padding-left:12px;">Volunteer: ${s.helpedByKind?.volunteer||0}</div>
+        <div class="rdesc" style="margin-top:8px;">Time played: <span style="color:#e9d8b0">${fmtTime(s.totalTimePlayedSec||0)}</span></div>
+      </div>
+      <div class="rit" data-action="back-title-stats" style="margin-top:14px;">← BACK</div>
+    `); return;
+  }
+
+  // ── LEADERBOARDS ──
+  if(state === STATE.LB){
+    rmenuShow();
+    const lb = leaderboards.data.highestDistrict||[];
+    const rows = lb.slice(0,10).map((e,i)=>`<div class="rdesc" style="color:${i<3?'#ffd24a':'#b8a878'};">#${i+1} ${e.name||'???'} · D${e.district||1} · ${e.score||0}pts</div>`).join('');
+    rmenuHTML(`
+      <div class="rpantit">TOP DISTRICT RUNS</div>
+      <div style="overflow-y:auto;max-height:55vh;width:100%;padding:0 24px;box-sizing:border-box;">
+        ${rows||'<div class="rdesc">No runs yet.</div>'}
+      </div>
+      <div class="rit" data-action="back-title-lb" style="margin-top:14px;">← BACK</div>
+    `); return;
+  }
+
+  // ── OPTIONS ──
+  if(state === STATE.OPTIONS){
+    rmenuShow();
+    rmenuHTML(`
+      <div class="rpantit">OPTIONS</div>
+      <div class="rit" data-action="noop">NAME: ${profile.name||'RUNNER'}</div>
+      <div class="rit" data-action="option-mobile">MOBILE: ${options.mobileControls.toUpperCase()}</div>
+      <div class="rit" data-action="option-minimap">MINIMAP DEFAULT: ${options.minimapDefault?'ON':'OFF'}</div>
+      <div class="rit" data-action="option-fx">REDUCE FX: ${options.reduceFx?'ON':'OFF'}</div>
+      <div class="rit" data-action="option-mouse">MOUSE: ${options.mouseSens.toFixed(4)}</div>
+      <div class="rdesc" style="margin-top:14px;">WASD/arrows move · Q/E turn · SHIFT sprint</div>
+      <div class="rdesc">SPACE/click give can · M minimap · P/ESC pause</div>
+      <div class="rdesc" style="margin-top:8px;">MOBILE: left stick=MOVE · right zone=LOOK / DRAG</div>
+      <div class="rit" data-action="toggle-fs" style="margin-top:10px;">${isFullscreen()?'EXIT FULLSCREEN':'FULLSCREEN'}</div>
+      <div class="rit" data-action="back-title-options" style="margin-top:6px;">← BACK</div>
+    `); return;
+  }
+
+  // ── UPGRADE CHOICE ──
+  if(state === STATE.UPGRADE){
+    rmenuShow();
+    const off = window._offered || [];
+    const buttons = off.map((u,i)=>`<div class="rit ${i===0?'sel':''}" data-action="upgrade-${i}" style="margin-top:6px;">${u.name}<br><span style="font-size:11px;color:#8a7a5a;">${u.desc}</span></div>`).join('');
+    rmenuHTML(`
+      <div class="rpantit">CHOOSE UPGRADE</div>
+      <div class="rdesc">District cleared — pick one</div>
+      ${buttons || '<div class="rdesc">No upgrades available.</div>'}
+    `);
+    return;
+  }
+
+  // ── RESULTS ──
+  if(state === STATE.RESULTS){
+    rmenuShow();
+    const run = game.run||{};
+    const hk = run.helpedByKind||{};
+    rmenuHTML(`
+      <div class="rpantit">RUN ENDED</div>
+      <div class="rdesc">${run.completed?'All districts cleared!':'Time ran out.'}</div>
+      <div class="rdesc" style="margin-top:8px;">Score: <span style="color:#ffd24a;font-size:16px;">${game.totalScore||0}</span></div>
+      <div class="rdesc">District: <span style="color:#e9d8b0">${Math.max(1,(game.district||1)-1)}</span></div>
+      <div class="rdesc">Cans delivered: <span style="color:#e9d8b0">${run.cansDelivered||0}</span></div>
+      <div class="rdesc">People helped: <span style="color:#e9d8b0">${Object.values(hk).reduce((a,b)=>a+b,0)}</span></div>
+      <div class="rit sel" data-action="result-new" style="margin-top:14px;">NEW RUN</div>
+      <div class="rit" data-action="result-retry" style="margin-top:4px;">RETRY SAME SEED</div>
+      <div class="rit" data-action="result-lb" style="margin-top:4px;">LEADERBOARDS</div>
+      <div class="rit" data-action="result-title" style="margin-top:4px;">MAIN MENU</div>
+    `); return;
+  }
+
+  // ── PAUSED ──
+  if(paused && state===STATE.PLAY){
+    rmenuShow();
+    rmenuHTML(`
+      <div class="rpantit">PAUSED</div>
+      <div class="rit sel" data-action="pause-resume">RESUME</div>
+      <div class="rit" data-action="pause-restart" style="margin-top:6px;">RESTART RUN</div>
+      <div class="rit" data-action="pause-title" style="margin-top:6px;">MAIN MENU</div>
+      <div class="rit" data-action="toggle-fs" style="margin-top:6px;">${isFullscreen()?'EXIT FULLSCREEN':'FULLSCREEN'}</div>
+      <div class="rdesc" style="margin-top:14px;">Run will be saved.</div>
+    `); return;
+  }
+
+  rmenuHide();
+}
+
+// -----------------------------------------------------------------------
+// MOBILE INIT (called once; mode sync happens after saved options load)
+// -----------------------------------------------------------------------
+bindMobileControls();
+
+// -----------------------------------------------------------------------
+// 3. CITY GENERATION  (logic preserved; wall-type variety expanded for GJ feel)
+// -----------------------------------------------------------------------
+// Wall type constants. BUILDING=tan stucco, GLASS=storefront glass.
+const WALL = { BUILDING:1, BRICK:2, FENCE:3, MURAL:4, VAN:5, GLASS:6,
+               GARAGE:7, CONCRETE:8, SIGNAGE:9 };
+
+function genCity(seed, district, modifier){
+  RNG = mulberry32((seed ^ 0x9e3779b9) + district*2654435761);
+  const r = RNG;
+
+  let spacing = 7, fill = 0.55, canMult = 1.0, peoMult = 1.0;
+  game.scoreMult = 1;
+  if(modifier==='clear'){ spacing = 9; fill = 0.24; }
+  if(modifier==='maze'){  spacing = 5; fill = 0.80; }
+  if(modifier==='shortage'){ canMult = 0.55; peoMult = 1.1; game.scoreMult = 1.5; }
+
+  const GW = 42, GH = 42;
+  const map = [], shade = [];
+  for(let y=0;y<GH;y++){ map.push(new Array(GW).fill(1)); shade.push(new Array(GW).fill(0)); }
+
+  const isRoad = (v)=> (v % spacing) < 2;
+  for(let y=0;y<GH;y++) for(let x=0;x<GW;x++){
+    if(isRoad(x) || isRoad(y)) map[y][x]=0;
+  }
+  for(let i=0;i<GW;i++){ map[0][i]=1; map[GH-1][i]=1; }
+  for(let i=0;i<GH;i++){ map[i][0]=1; map[i][GW-1]=1; }
+
+  // process block regions — weighted toward stucco/brick (Grand Junction look)
+  for(let by=2; by<GH-2; by+=spacing){
+    for(let bx=2; bx<GW-2; bx+=spacing){
+      const x0=bx+2, y0=by+2;
+      const x1=Math.min(bx+spacing-1, GW-2), y1=Math.min(by+spacing-1, GH-2);
+      if(x1<=x0||y1<=y0) continue;
+      const roll = r();
+      if(roll < fill){
+        // weighted wall-type pool: lots of stucco + brick, some glass/mural/garage
+        const pool=[WALL.BUILDING,WALL.BUILDING,WALL.BUILDING,WALL.BRICK,WALL.BRICK,
+                    WALL.GLASS,WALL.MURAL,WALL.GARAGE,WALL.CONCRETE,WALL.SIGNAGE];
+        const wt = pool[(r()*pool.length)|0];
+        for(let y=y0;y<y1;y++) for(let x=x0;x<x1;x++){ map[y][x]=wt; shade[y][x]=r(); }
+        // sometimes a strip-mall divider alley
+        const alleys = 1 + ((r()*2)|0);
+        for(let k=0;k<alleys;k++){
+          if(r()<0.5){ const ay=y0+((r()*(y1-y0))|0); for(let x=x0;x<x1;x++) map[ay][x]=0; }
+          else       { const ax=x0+((r()*(x1-x0))|0); for(let y=y0;y<y1;y++) map[y][ax]=0; }
+        }
+      } else {
+        // open lot / parking lot: floor + a few fence/van/dumpster-as-wall decor
+        for(let y=y0;y<y1;y++) for(let x=x0;x<x1;x++){ map[y][x]=0; shade[y][x]=r(); }
+        if(r()<0.7){
+          const posts=1+((r()*3)|0);
+          for(let k=0;k<posts;k++){
+            const px=x0+((r()*(x1-x0))|0), py=y0+((r()*(y1-y0))|0);
+            // parking-lot decor: fence, van, or concrete bumper
+            const pick=r();
+            map[py][px] = pick<0.5?WALL.FENCE : pick<0.8?WALL.VAN : WALL.CONCRETE;
+          }
+        }
+      }
+    }
+  }
+
+  game.map = map; game.MAP_W = GW; game.MAP_H = GH; game.wallShade = shade;
+
+  // player start: first floor cell from top-left
+  let sx=2.5, sy=2.5, found=false;
+  for(let y=1;y<GH-1 && !found;y++) for(let x=1;x<GW-1 && !found;x++){
+    if(map[y][x]===0){ sx=x+0.5; sy=y+0.5; found=true; }
+  }
+  player.x=sx; player.y=sy; player.angle=Math.PI/4;
+
+  // ---- FLOOD-FILL REACHABILITY from player start cell ----
+  const reach = new Array(GH);
+  for(let y=0;y<GH;y++) reach[y]=new Array(GW).fill(false);
+  const stack=[[sx|0, sy|0]];
+  reach[sy|0][sx|0]=true;
+  let reachCount=0;
+  while(stack.length){
+    const [cx,cy]=stack.pop(); reachCount++;
+    const nb=[[cx+1,cy],[cx-1,cy],[cx,cy+1],[cx,cy-1]];
+    for(const [nx,ny] of nb){
+      if(nx<0||ny<0||nx>=GW||ny>=GH) continue;
+      if(reach[ny][nx]) continue;
+      if(map[ny][nx]!==0) continue;
+      reach[ny][nx]=true; stack.push([nx,ny]);
+    }
+  }
+  dbg.reachableCells = reachCount;
+
+  // ---- candidate floor cells (reachable) ----
+  const candidates=[];
+  for(let y=1;y<GH-1;y++) for(let x=1;x<GW-1;x++){
+    if(!reach[y][x]) continue;
+    candidates.push([x+0.5, y+0.5]);
+  }
+
+  function takeCandidate(radius, minDistFromStart, used){
+    for(let tries=0; tries<300; tries++){
+      if(!candidates.length) return null;
+      const idx=(r()*candidates.length)|0;
+      const [cx,cy]=candidates[idx];
+      if(!hasClearance(cx,cy,radius)){ dbg.rejectedSpawns++; continue; }
+      if(Math.hypot(cx-sx, cy-sy) < minDistFromStart) continue;
+      let overlap=false;
+      if(used) for(const u of used){ if(Math.hypot(cx-u[0],cy-u[1])<0.9){ overlap=true; break; } }
+      if(overlap) continue;
+      candidates.splice(idx,1);
+      return [cx,cy];
+    }
+    return null;
+  }
+
+  // place CANS
+  game.pickups=[];
+  const canCount = Math.max(8, Math.floor((14 + district*2)*canMult));
+  const used=[];
+  for(let i=0;i<canCount;i++){
+    const spot=takeCandidate(0.30, 1.5, used);
+    if(!spot){ dbg.invalidPlacements++; break; }
+    used.push(spot);
+    game.pickups.push({x:spot[0], y:spot[1], taken:false, amt: r()<0.3?2:1, wob:r()*6.28});
+  }
+  dbg.cansSpawned = game.pickups.length;
+
+  // place PEOPLE (static)
+  game.npcs=[];
+  const KINDS=['hungry','hungry','hungry','family','family','elder','volunteer'];
+  const peoCount = Math.max(5, Math.floor((7+district)*peoMult));
+  for(let i=0;i<peoCount;i++){
+    const spot=takeCandidate(0.42, 2.0, used);
+    if(!spot){ dbg.invalidPlacements++; break; }
+    used.push(spot);
+    const kind=KINDS[(r()*KINDS.length)|0];
+    const need = kind==='family'?3:1;
+    game.npcs.push({x:spot[0], y:spot[1], kind, need, helped:false, wob:r()*6.28});
+  }
+  dbg.npcsSpawned = game.npcs.length;
+
+  // place NON-BLOCKING DECOR PROPS (GJ flavor: grass, poles, signs, carts, crates, bus stops)
+  // These are billboard sprites with NO collision. Spawn-validated for clearance
+  // so they don't visually sit inside walls, but they never block movement.
+  game.props=[];
+  const PROP_KINDS=['grass','grass','grass','pole','sign','cart','crate','busstop'];
+  const propCount = 8 + district + ((r()*6)|0);
+  for(let i=0;i<propCount;i++){
+    const spot=takeCandidate(0.30, 1.0, used);
+    if(!spot) break;
+    used.push(spot);
+    game.props.push({x:spot[0], y:spot[1], kind: PROP_KINDS[(r()*PROP_KINDS.length)|0], wob:r()*6.28});
+  }
+  dbg.props = game.props.length;
+
+  game.quota = Math.max(3, Math.ceil(game.npcs.length*0.6));
+  game.helped=0; game.delivered=0;
+
+  // EXIT: farthest reachable candidate from start
+  let bestEx=[GW-2.5,GH-2.5], bestD=-1;
+  for(const [cx,cy] of candidates){
+    const d=Math.hypot(cx-sx,cy-sy);
+    if(d>bestD && hasClearance(cx,cy,0.5)){ bestD=d; bestEx=[cx,cy]; }
+  }
+  game.exit = {x:bestEx[0], y:bestEx[1], active:false};
+
+  game.timeLeft = cfg.baseTime + (district-1)*8;
+}
+
+// ---------------------------------------------------------------------------
+// 4. COLLISION / WALK HELPERS  (UNCHANGED from verified base)
+// ---------------------------------------------------------------------------
+function isWalkableCell(tx, ty){
+  if(ty<0||ty>=game.MAP_H||tx<0||tx>=game.MAP_W) return false;
+  return game.map[ty][tx] === 0;
+}
+function isWalkableAt(x, y){
+  return isWalkableCell(Math.floor(x), Math.floor(y));
+}
+function hasClearance(x, y, radius){
+  const pts=[
+    [0,0],
+    [-radius,0],[radius,0],[0,-radius],[0,radius],
+    [-radius,-radius],[radius,-radius],[-radius,radius],[radius,radius]
+  ];
+  for(const [ox,oy] of pts){ if(!isWalkableAt(x+ox, y+oy)) return false; }
+  return true;
+}
+function isWall(x,y){ return !isWalkableAt(x,y); }
+function canStand(x,y){
+  const r=0.22;
+  return !isWall(x-r,y-r)&&!isWall(x+r,y-r)&&!isWall(x-r,y+r)&&!isWall(x+r,y+r);
+}
+
+// ---------------------------------------------------------------------------
+// 5. AUDIO  (UNCHANGED)
+// ---------------------------------------------------------------------------
+let AC=null;
+function beep(freq,dur,type='square',gain=0.04){
+  try{
+    if(!AC) AC = new (window.AudioContext||window.webkitAudioContext)();
+    const o=AC.createOscillator(), g=AC.createGain();
+    o.type=type; o.frequency.value=freq; g.gain.value=gain;
+    o.connect(g); g.connect(AC.destination); o.start();
+    g.gain.exponentialRampToValueAtTime(0.0001, AC.currentTime+dur);
+    o.stop(AC.currentTime+dur);
+  }catch(e){}
+}
+
+// ---------------------------------------------------------------------------
+// 5b. LOCAL PERSISTENCE (localStorage with schema/version, safe parse)
+// ---------------------------------------------------------------------------
+const SAVE_VERSION = 1;
+const K = {
+  save:        'cannedRun.save.v1',
+  stats:       'cannedRun.stats.v1',
+  leaderboards:'cannedRun.leaderboards.v1',
+  // Current canonical keys. Legacy aliases are kept below for compatibility.
+  settings:    'cannedRun.settings.v1',
+  profile:     'cannedRun.profile.v1',
+  options:     'cannedRun.options.v1',
+  player:      'cannedRun.player.v1',
+};
+function lsGet(key){
+  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : null; } catch(e){ return null; }
+}
+function lsSet(key, val){
+  try { localStorage.setItem(key, JSON.stringify(val)); return true; } catch(e){ return false; }
+}
+function lsDel(key){ try { localStorage.removeItem(key); } catch(e){} }
+
+// --- PLAYER PROFILE ---
+const profile = {
+  name: 'RUNNER',
+  load(){
+    const p = lsGet(K.profile) || lsGet(K.player);
+    if(p && typeof p.name==='string') this.name = p.name.trim().slice(0,12)||'RUNNER';
+  },
+  save(){
+    const data = {name:this.name, v:SAVE_VERSION};
+    lsSet(K.profile, data); // canonical
+    lsSet(K.player, data);  // legacy compatibility
+  },
+};
+profile.load();
+
+// --- OPTIONS ---
+const options = {
+  mouseSens: 0.0022,
+  mobileTurnSens: 0.0045,
+  minimapDefault: true,
+  reduceFx: false,
+  mobileControls: 'auto', // 'auto' | 'on' | 'off'
+  load(){
+    const o = lsGet(K.settings) || lsGet(K.options);
+    if(o && typeof o==='object'){
+      if(typeof o.mouseSens==='number') this.mouseSens=o.mouseSens;
+      if(typeof o.mobileTurnSens==='number') this.mobileTurnSens=o.mobileTurnSens;
+      if(typeof o.minimapDefault==='boolean') this.minimapDefault=o.minimapDefault;
+      if(typeof o.reduceFx==='boolean') this.reduceFx=o.reduceFx;
+      if(['auto','on','off'].includes(o.mobileControls)) this.mobileControls=o.mobileControls;
+    }
+  },
+  save(){
+    const data = {mouseSens:this.mouseSens, mobileTurnSens:this.mobileTurnSens, minimapDefault:this.minimapDefault, reduceFx:this.reduceFx, mobileControls:this.mobileControls, v:SAVE_VERSION};
+    lsSet(K.settings, data); // canonical
+    lsSet(K.options, data);  // legacy compatibility
+  },
+};
+options.load();
+let showMinimap = options.minimapDefault;
+mobileOverride = options.mobileControls==='auto' ? null : options.mobileControls;
+setMobileMode(isMobile());
+
+// --- STATS ---
+const DEFAULT_STATS = {
+  totalRunsStarted:0, totalRunsCompleted:0, totalRunsFailed:0,
+  bestScore:0, fastestCompletedSec:null, highestDistrict:0,
+  totalCansCollected:0, totalCansDelivered:0, totalPeopleHelped:0,
+  helpedByKind:{hungry:0,family:0,elder:0,volunteer:0},
+  totalUpgradesChosen:0, totalTimePlayedSec:0,
+  upgradeCounts:{pack:0,sprint:0,hand:0,map:0,radar:0},
+};
+const stats = {
+  data: null,
+  load(){
+    const raw = lsGet(K.stats);
+    const d = JSON.parse(JSON.stringify(DEFAULT_STATS));
+    if(raw && typeof raw==='object'){
+      Object.assign(d, raw);
+      d.helpedByKind = Object.assign({}, DEFAULT_STATS.helpedByKind,
+        raw.helpedByKind && typeof raw.helpedByKind==='object' ? raw.helpedByKind : {});
+      d.upgradeCounts = Object.assign({}, DEFAULT_STATS.upgradeCounts,
+        raw.upgradeCounts && typeof raw.upgradeCounts==='object' ? raw.upgradeCounts : {});
+      for(const k of ['totalRunsStarted','totalRunsCompleted','totalRunsFailed','bestScore','highestDistrict','totalCansCollected','totalCansDelivered','totalPeopleHelped','totalUpgradesChosen','totalTimePlayedSec']){
+        if(typeof d[k] !== 'number' || !Number.isFinite(d[k])) d[k] = DEFAULT_STATS[k];
+      }
+      if(d.fastestCompletedSec!==null && (typeof d.fastestCompletedSec!=='number' || !Number.isFinite(d.fastestCompletedSec))) d.fastestCompletedSec=null;
+    }
+    this.data = d;
+  },
+  save(){ lsSet(K.stats, Object.assign({}, this.data, {v:SAVE_VERSION})); },
+  reset(){ this.data = JSON.parse(JSON.stringify(DEFAULT_STATS)); this.save(); },
+};
+stats.load();
+
+// --- LEADERBOARDS ---
+const DEFAULT_LB = { bestScores:[], fastestRuns:[], highestDistrict:[] };
+const leaderboards = {
+  data: null,
+  load(){
+    const raw = lsGet(K.leaderboards);
+    const d = JSON.parse(JSON.stringify(DEFAULT_LB));
+    if(raw && typeof raw==='object'){
+      for(const board of ['bestScores','fastestRuns','highestDistrict']){
+        d[board] = Array.isArray(raw[board]) ? raw[board].filter(e=>e && typeof e==='object').slice(0,20) : [];
+      }
+    }
+    this.data = d;
+  },
+  save(){ lsSet(K.leaderboards, Object.assign({}, this.data, {v:SAVE_VERSION})); },
+  add(entry){
+    // entry: {name,score,durationSec,district,seed,modifier,completed,date}
+    // dedupe by date+seed+score to prevent double-processing
+    const d = this.data;
+    const isDup = (arr) => arr.some(e => e.date===entry.date && e.seed===entry.seed && e.score===entry.score);
+    if(entry.completed){
+      if(!isDup(d.bestScores)){
+        d.bestScores.push(entry); d.bestScores.sort((a,b)=>b.score-a.score); d.bestScores=d.bestScores.slice(0,20);
+      }
+      if(!isDup(d.fastestRuns)){
+        d.fastestRuns.push(entry); d.fastestRuns.sort((a,b)=>a.durationSec-b.durationSec); d.fastestRuns=d.fastestRuns.slice(0,20);
+      }
+    }
+    if(!isDup(d.highestDistrict)){
+      d.highestDistrict.push(entry);
+      d.highestDistrict.sort((a,b)=> b.district-a.district || b.score-a.score || a.durationSec-b.durationSec);
+      d.highestDistrict=d.highestDistrict.slice(0,20);
+    }
+    this.save();
+  },
+  getRank(board, entry){
+    const arr = this.data[board]||[];
+    for(let i=0;i<arr.length;i++){
+      if(arr[i].date===entry.date && arr[i].seed===entry.seed && arr[i].score===entry.score) return i+1;
+    }
+    return null;
+  },
+  reset(){ this.data = JSON.parse(JSON.stringify(DEFAULT_LB)); this.save(); },
+};
+leaderboards.load();
+
+// --- ACTIVE RUN SAVE (serialize/deserialize/autosave/clear) ---
+const SAVE = {
+  hasValid(){ const s = lsGet(K.save); return s && typeof s==='object' && s.v===SAVE_VERSION && s.runActive===true; },
+  serialize(){
+    return {
+      v: SAVE_VERSION, runActive: true,
+      savedAt: Date.now(),
+      playerName: profile.name,
+      seed: game.seed, district: game.district, totalScore: game.totalScore,
+      modifier: game.modifier, scoreMult: game.scoreMult,
+      timeLeft: game.timeLeft, quota: game.quota, helped: game.helped, delivered: game.delivered,
+      // player state
+      px: player.x, py: player.y, pangle: player.angle,
+      cans: player.cans, stamina: player.stamina,
+      maxCans: player.maxCans, maxStamina: player.maxStamina,
+      giveRange: player.giveRange, regenBonus: player.regenBonus,
+      minimapLevel: player.minimapLevel, radar: player.radar, handoffBonus: player.handoffBonus,
+      upgrades: Object.assign({}, player.upgrades),
+      // map + objects
+      map: game.map, wallShade: game.wallShade, MAP_W: game.MAP_W, MAP_H: game.MAP_H,
+      pickups: game.pickups.map(c=>({x:c.x,y:c.y,taken:c.taken,amt:c.amt,wob:c.wob})),
+      npcs: game.npcs.map(n=>({x:n.x,y:n.y,kind:n.kind,need:n.need,helped:n.helped,wob:n.wob})),
+      props: game.props.map(p=>({x:p.x,y:p.y,kind:p.kind,wob:p.wob})),
+      exit: game.exit ? {x:game.exit.x,y:game.exit.y,active:game.exit.active} : null,
+      // run tracking
+      run: Object.assign({}, game.run),
+    };
+  },
+  save(){
+    if(!game.run.active) return;
+    try { lsSet(K.save, this.serialize()); } catch(e){}
+  },
+  load(){
+    try {
+      const s = lsGet(K.save);
+      if(!s || s.v!==SAVE_VERSION || !s.runActive) return false;
+      game.seed=s.seed; game.district=s.district; game.totalScore=s.totalScore;
+      game.modifier=s.modifier; game.scoreMult=s.scoreMult;
+      game.timeLeft=s.timeLeft; game.quota=s.quota; game.helped=s.helped; game.delivered=s.delivered;
+      player.x=s.px; player.y=s.py; player.angle=s.pangle;
+      player.cans=s.cans; player.stamina=s.stamina;
+      player.maxCans=s.maxCans; player.maxStamina=s.maxStamina;
+      player.giveRange=s.giveRange; player.regenBonus=s.regenBonus;
+      player.minimapLevel=s.minimapLevel; player.radar=s.radar; player.handoffBonus=s.handoffBonus;
+      player.upgrades = s.upgrades || {pack:0,sprint:0,hand:0,map:0,radar:0};
+      game.map=s.map; game.MAP_W=s.MAP_W; game.MAP_H=s.MAP_H; game.wallShade=s.wallShade;
+      game.pickups=s.pickups; game.npcs=s.npcs; game.props=s.props;
+      game.exit=s.exit;
+      game.run = s.run || game.run;
+      game.run.active=true;
+      state=STATE.PLAY; paused=false;
+      return true;
+    } catch(e){ return false; }
+  },
+  clear(){ lsDel(K.save); },
+};
+// save before tab close
+addEventListener('beforeunload', ()=>{ if(state===STATE.PLAY && game.run.active) SAVE.save(); });
+
+// ---------------------------------------------------------------------------
+// 6. PROCEDURAL ASSETS  (wall textures + sprites + sky/mesa — all Canvas-drawn)
+// ---------------------------------------------------------------------------
+function newTex(w,h){ const c=document.createElement('canvas'); c.width=w; c.height=h; return c; }
+const TEXSIZE = 64;
+
+// --- WALL TEXTURE GENERATORS (64x64 tileable-ish, readable at raycast res) ---
+function mkTex(drawFn){ const c=newTex(TEXSIZE,TEXSIZE), x=c.getContext('2d'); drawFn(x); return c; }
+
+// noise helper for textures
+function noiseFill(x, base, vary, density){
+  for(let i=0;i<density;i++){
+    const px=(Math.random()*TEXSIZE)|0, py=(Math.random()*TEXSIZE)|0;
+    const v=(Math.random()-0.5)*vary;
+    x.fillStyle=`rgb(${(base[0]+v)|0},${(base[1]+v)|0},${(base[2]+v)|0})`;
+    x.fillRect(px,py,1+((Math.random()*2)|0),1+((Math.random()*2)|0));
+  }
+}
+
+const WALL_TEX = {
+  // tan stucco — sun-bleached adobe
+  [WALL.BUILDING]: mkTex(x=>{
+    x.fillStyle='#cdb78f'; x.fillRect(0,0,TEXSIZE,TEXSIZE);
+    noiseFill(x,[205,183,143],30,900);
+    // horizontal seam + sun patches
+    x.fillStyle='#b39e78'; x.fillRect(0,31,TEXSIZE,1);
+    x.fillStyle='rgba(255,240,200,0.10)'; x.fillRect(6,4,20,14);
+    x.fillStyle='rgba(120,90,50,0.10)'; x.fillRect(40,40,18,16);
+  }),
+  // red/brown brick storefront
+  [WALL.BRICK]: mkTex(x=>{
+    x.fillStyle='#9a4a3a'; x.fillRect(0,0,TEXSIZE,TEXSIZE);      // mortar
+    const bw=15, bh=7;
+    for(let row=0; row*bh<TEXSIZE; row++){
+      const off=(row%2)? bw/2:0;
+      for(let bx=-bw; bx<TEXSIZE+bw; bx+=bw){
+        x.fillStyle = (Math.random()<0.5)?'#a8503e':'#93453a';
+        if(Math.random()<0.15) x.fillStyle='#7e3a30';
+        x.fillRect(bx+off+1, row*bh+1, bw-2, bh-1);
+      }
+    }
+    noiseFill(x,[150,70,55],22,300);
+  }),
+  // chain-link fence (green-tinted, semi-open feel)
+  [WALL.FENCE]: mkTex(x=>{
+    x.fillStyle='#3d4a38'; x.fillRect(0,0,TEXSIZE,TEXSIZE);
+    // diamond mesh
+    x.strokeStyle='#7e9a6e'; x.lineWidth=1;
+    for(let i=-TEXSIZE;i<TEXSIZE*2;i+=8){
+      x.beginPath(); x.moveTo(i,0); x.lineTo(i+TEXSIZE,TEXSIZE); x.stroke();
+      x.beginPath(); x.moveTo(i,TEXSIZE); x.lineTo(i+TEXSIZE,0); x.stroke();
+    }
+    // top + bottom rails
+    x.fillStyle='#5a6e50'; x.fillRect(0,0,TEXSIZE,3); x.fillRect(0,TEXSIZE-3,TEXSIZE,3);
+  }),
+  // mural wall — painted shapes, faded
+  [WALL.MURAL]: mkTex(x=>{
+    x.fillStyle='#c9b78c'; x.fillRect(0,0,TEXSIZE,TEXSIZE);     // faded stucco base
+    const cols=['#c85a3a','#3a6e8a','#d8a23a','#5a8a5a','#8a5a8a'];
+    for(let i=0;i<14;i++){
+      x.fillStyle=cols[(Math.random()*cols.length)|0];
+      x.globalAlpha=0.55+Math.random()*0.35;
+      const w=6+((Math.random()*16)|0), h=6+((Math.random()*16)|0);
+      x.fillRect((Math.random()*TEXSIZE)|0,(Math.random()*TEXSIZE)|0,w,h);
+    }
+    x.globalAlpha=1;
+    noiseFill(x,[180,160,120],30,200);
+  }),
+  // van (side) — used as a parking-lot blocker wall
+  [WALL.VAN]: mkTex(x=>{
+    x.fillStyle='#6a6258'; x.fillRect(0,0,TEXSIZE,TEXSIZE);      // asphalt behind
+    x.fillStyle='#d8d2c4'; x.fillRect(2,16,60,34);               // body
+    x.fillStyle='#9a9488'; x.fillRect(2,46,60,6);                // lower trim
+    x.fillStyle='#3a4654'; x.fillRect(8,22,18,12); x.fillRect(32,22,22,12); // windows
+    x.fillStyle='#b8b2a4'; x.fillRect(2,30,60,2);                // body line
+    x.fillStyle='#222'; x.beginPath(); x.arc(16,52,6,0,7); x.fill();
+    x.beginPath(); x.arc(48,52,6,0,7); x.fill();                  // wheels
+    x.fillStyle='#444'; x.beginPath(); x.arc(16,52,2.5,0,7); x.fill();
+    x.beginPath(); x.arc(48,52,2.5,0,7); x.fill();
+  }),
+  // dark storefront glass with mullions + faded sign band
+  [WALL.GLASS]: mkTex(x=>{
+    x.fillStyle='#1f2a33'; x.fillRect(0,0,TEXSIZE,TEXSIZE);      // dark glass
+    // reflections
+    x.fillStyle='rgba(120,150,170,0.25)'; x.fillRect(4,6,14,40); x.fillRect(34,6,14,40);
+    // mullion frame
+    x.fillStyle='#3a3530'; x.fillRect(0,0,TEXSIZE,3); x.fillRect(0,48,TEXSIZE,3);
+    x.fillRect(30,0,3,TEXSIZE);
+    // faded sign band on top
+    x.fillStyle='#7a6a4a'; x.fillRect(0,0,TEXSIZE,12);
+    x.fillStyle='rgba(220,200,150,0.5)'; x.fillRect(6,4,20,4); x.fillRect(34,4,24,4);
+  }),
+  // service/garage roll-up door
+  [WALL.GARAGE]: mkTex(x=>{
+    x.fillStyle='#8a8478'; x.fillRect(0,0,TEXSIZE,TEXSIZE);
+    // horizontal roll-up seams
+    for(let i=0;i<TEXSIZE;i+=8){ x.fillStyle='#6e6a5e'; x.fillRect(0,i,TEXSIZE,2); }
+    x.fillStyle='#5a564c'; x.fillRect(0,0,3,TEXSIZE); x.fillRect(TEXSIZE-3,0,3,TEXSIZE);
+    // small service window
+    x.fillStyle='#2a3340'; x.fillRect(46,8,12,10);
+    noiseFill(x,[140,134,120],20,200);
+  }),
+  // blank concrete
+  [WALL.CONCRETE]: mkTex(x=>{
+    x.fillStyle='#948e80'; x.fillRect(0,0,TEXSIZE,TEXSIZE);
+    noiseFill(x,[148,142,128],26,700);
+    // hairline cracks
+    x.strokeStyle='rgba(60,56,48,0.4)'; x.lineWidth=1;
+    x.beginPath(); x.moveTo(4,8); x.lineTo(18,26); x.lineTo(14,44); x.stroke();
+    x.beginPath(); x.moveTo(40,6); x.lineTo(44,30); x.lineTo(58,40); x.stroke();
+  }),
+  // faded signage / billboard wall
+  [WALL.SIGNAGE]: mkTex(x=>{
+    x.fillStyle='#b8ac8e'; x.fillRect(0,0,TEXSIZE,TEXSIZE);      // faded panel
+    // billboard panel
+    x.fillStyle='#c94a3a'; x.fillRect(4,6,56,22);
+    x.fillStyle='rgba(240,220,180,0.6)';
+    x.fillRect(8,11,10,4); x.fillRect(22,11,16,4); x.fillRect(42,11,14,4);
+    x.fillRect(8,20,24,4);
+    // posts
+    x.fillStyle='#5a4a36'; x.fillRect(8,30,4,26); x.fillRect(50,30,4,26);
+    noiseFill(x,[170,158,130],24,200);
+  }),
+};
+// fallback for any unexpected wall id
+WALL_TEX[0] = WALL_TEX[WALL.CONCRETE];
+
+// minimap representative colors per wall type
+const WALL_MINI = {
+  [WALL.BUILDING]:'#b39e78', [WALL.BRICK]:'#9a4a3a', [WALL.FENCE]:'#5a6e50',
+  [WALL.MURAL]:'#a98a6a', [WALL.VAN]:'#9a9488', [WALL.GLASS]:'#2f3a44',
+  [WALL.GARAGE]:'#6e6a5e', [WALL.CONCRETE]:'#7a7468', [WALL.SIGNAGE]:'#b08a6a',
+};
+
+// --- SPRITE TEXTURES (billboards) ---
+function makePerson(body, head, legs, opts){
+  opts=opts||{};
+  const c=newTex(28,46), x=c.getContext('2d');
+  x.clearRect(0,0,28,46);
+  // shadow
+  x.fillStyle='rgba(0,0,0,0.28)'; x.beginPath(); x.ellipse(14,44,9,3,0,0,7); x.fill();
+  // legs
+  x.fillStyle=legs; x.fillRect(9,30,4,13); x.fillRect(15,30,4,13);
+  // shoes
+  x.fillStyle='#1a1a1e'; x.fillRect(8,42,5,2); x.fillRect(15,42,6,2);
+  // torso
+  x.fillStyle=body; x.fillRect(7,16,14,16);
+  // arms
+  x.fillStyle=body; x.fillRect(3,17,4,11); x.fillRect(21,17,4,11);
+  // hands
+  x.fillStyle=head; x.fillRect(3,27,4,3); x.fillRect(21,27,4,3);
+  // accessory
+  if(opts.vest){ x.fillStyle='#f0d24a'; x.fillRect(7,19,14,4); x.fillStyle='#3a3a3a'; x.fillRect(13,16,2,16); }
+  if(opts.cane){ x.fillStyle='#b89058'; x.fillRect(22,14,2,30); x.fillStyle='#8a6a3a'; x.fillRect(20,14,6,3); }
+  if(opts.hat){ x.fillStyle=opts.hatcol||'#6a4a3a'; x.fillRect(6,4,16,3); x.fillRect(9,1,10,4); }
+  if(opts.coat){ x.fillStyle=opts.coatcol; x.fillRect(7,16,14,16); x.fillStyle=body; x.fillRect(7,16,14,4); }
+  // head
+  x.fillStyle=head; x.beginPath(); x.arc(14,10,5,0,7); x.fill();
+  // face
+  x.fillStyle='#241a14'; x.fillRect(12,9,1,2); x.fillRect(15,9,1,2);
+  if(opts.smile){ x.fillStyle='#7a4a3a'; x.fillRect(12,12,4,1); }
+  // family: small child beside
+  if(opts.child){
+    x.fillStyle='#3a5a7a'; x.fillRect(0,30,5,10);
+    x.fillStyle=head; x.beginPath(); x.arc(2,28,3,0,7); x.fill();
+  }
+  return c;
+}
+const TEX = {
+  hungry:   makePerson('#c8543e','#e6b88c','#3a2e26',{hat:true,hatcol:'#7a4a2a'}),
+  family:   makePerson('#3a78b0','#e6b88c','#243044',{child:true}),
+  elder:    makePerson('#8a7ab0','#d8c09a','#4a3a5a',{cane:true,coat:true,coatcol:'#6a5a8a',hat:true,hatcol:'#5a4a3a'}),
+  volunteer:makePerson('#4ea872','#e6b88c','#2c5240',{vest:true,smile:true}),
+  // can pickup — distinct pantry-can look with glow
+  can: (()=>{ const c=newTex(20,22),x=c.getContext('2d');
+    x.fillStyle='rgba(255,210,90,0.30)'; x.beginPath(); x.arc(10,11,10,0,7); x.fill();
+    x.fillStyle='#d8d2c6'; x.fillRect(5,3,10,15);
+    x.fillStyle='#8a8478'; x.fillRect(5,3,10,2); x.fillRect(5,16,10,2);
+    x.fillStyle='#3a78c8'; x.fillRect(5,8,10,5);          // blue label
+    x.fillStyle='#ffffff'; x.fillRect(6,9,8,3);
+    x.fillStyle='#b8b2a4'; x.fillRect(8,2,4,2);           // pull tab
+    return c; })(),
+  // pantry crate / food box (decor + alt pickup visual flavor)
+  crate:(()=>{ const c=newTex(28,22),x=c.getContext('2d');
+    x.fillStyle='rgba(0,0,0,0.25)'; x.beginPath(); x.ellipse(14,20,12,3,0,0,7); x.fill();
+    x.fillStyle='#9a6a36'; x.fillRect(3,4,22,16);
+    x.fillStyle='#6a4a22'; x.fillRect(3,4,22,2); x.fillRect(3,18,22,2);
+    x.strokeStyle='#5a3a1a'; x.lineWidth=2; x.strokeRect(3,4,22,16);
+    x.beginPath(); x.moveTo(3,4); x.lineTo(25,20); x.moveTo(25,4); x.lineTo(3,20); x.stroke();
+    return c; })(),
+  // shopping cart (decor)
+  cart:(()=>{ const c=newTex(34,30),x=c.getContext('2d');
+    x.fillStyle='rgba(0,0,0,0.22)'; x.beginPath(); x.ellipse(17,28,14,3,0,0,7); x.fill();
+    x.strokeStyle='#9a9488'; x.lineWidth=2;
+    x.beginPath(); x.moveTo(4,4); x.lineTo(8,4); x.lineTo(28,24); x.stroke(); // handle
+    x.strokeRect(8,6,20,16);
+    for(let i=12;i<28;i+=4){ x.beginPath(); x.moveTo(i,6); x.lineTo(i,22); x.stroke(); }
+    x.beginPath(); x.moveTo(8,22); x.lineTo(28,22); x.stroke();
+    x.fillStyle='#3a3a3a'; x.beginPath(); x.arc(11,26,3,0,7); x.fill();
+    x.beginPath(); x.arc(25,26,3,0,7); x.fill();
+    return c; })(),
+  // dry grass clump (decor)
+  grass:(()=>{ const c=newTex(20,14),x=c.getContext('2d');
+    x.fillStyle='rgba(120,100,50,0.3)'; x.beginPath(); x.ellipse(10,12,9,2,0,0,7); x.fill();
+    const cols=['#9a8a3a','#8a7a32','#a89a44'];
+    for(let i=0;i<18;i++){ x.strokeStyle=cols[i%3]; x.lineWidth=1;
+      const bx=2+((Math.random()*16)|0), bh=4+((Math.random()*8)|0);
+      x.beginPath(); x.moveTo(bx,12); x.lineTo(bx+((Math.random()*4-2)|0),12-bh); x.stroke(); }
+    return c; })(),
+  // utility pole (tall thin decor)
+  pole:(()=>{ const c=newTex(14,60),x=c.getContext('2d');
+    x.fillStyle='rgba(0,0,0,0.2)'; x.beginPath(); x.ellipse(7,58,6,2,0,0,7); x.fill();
+    x.fillStyle='#6a5a3a'; x.fillRect(6,6,2,52);
+    x.fillRect(2,10,10,2); x.fillRect(3,16,8,2);              // crossbars
+    x.strokeStyle='#3a3a3a'; x.lineWidth=1;
+    x.beginPath(); x.moveTo(2,10); x.lineTo(0,4); x.moveTo(12,10); x.lineTo(14,4); x.stroke();
+    return c; })(),
+  // faded sign post (decor)
+  sign:(()=>{ const c=newTex(22,34),x=c.getContext('2d');
+    x.fillStyle='rgba(0,0,0,0.22)'; x.beginPath(); x.ellipse(11,32,8,2,0,0,7); x.fill();
+    x.fillStyle='#6a6258'; x.fillRect(10,10,2,22);
+    x.fillStyle='#7a6a4a'; x.fillRect(2,4,18,12);
+    x.fillStyle='rgba(230,210,160,0.5)'; x.fillRect(5,8,12,4);
+    return c; })(),
+  // bus stop shelter (decor)
+  busstop:(()=>{ const c=newTex(40,46),x=c.getContext('2d');
+    x.fillStyle='rgba(0,0,0,0.22)'; x.beginPath(); x.ellipse(20,44,18,3,0,0,7); x.fill();
+    x.fillStyle='#4a6a7a'; x.fillRect(4,8,32,4);             // roof
+    x.fillStyle='#8a9aa6'; x.fillRect(4,12,32,28);          // back glass
+    x.strokeStyle='#3a4650'; x.lineWidth=2;
+    x.strokeRect(4,12,32,28);
+    x.beginPath(); x.moveTo(6,12); x.lineTo(6,44); x.moveTo(34,12); x.lineTo(34,44); x.stroke();
+    x.fillStyle='#2a3340'; x.fillRect(16,18,12,14);         // bench
+    x.fillStyle='#d8a23a'; x.fillRect(4,2,32,6);            // sign band
+    return c; })(),
+  // exit portal — glowing arch
+  exit:(()=>{ const c=newTex(48,80),x=c.getContext('2d');
+    const g=x.createRadialGradient(24,40,4,24,40,38);
+    g.addColorStop(0,'rgba(255,250,200,0.95)'); g.addColorStop(0.5,'rgba(255,210,90,0.6)'); g.addColorStop(1,'rgba(255,180,40,0)');
+    x.fillStyle=g; x.fillRect(0,0,48,80);
+    x.fillStyle='#fff4b0'; x.fillRect(16,8,16,64);
+    x.fillStyle='#e8a13a'; x.fillRect(16,8,3,64); x.fillRect(29,8,3,64);
+    x.fillStyle='#3a2a00'; x.beginPath(); x.moveTo(24,40); x.lineTo(15,54); x.lineTo(33,54); x.fill();
+    return c; })(),
+};
+const HEIGHT = { hungry:0.86, family:1.0, elder:0.84, volunteer:0.92,
+                 can:0.42, crate:0.5, cart:0.62, grass:0.22, pole:1.1, sign:0.62, busstop:1.0, exit:1.25 };
+function propTex(kind){ return TEX[kind] || TEX.grass; }
+
+// --- SKY / MESA HORIZON (pre-rendered once; warm dusty Western Colorado) ---
+let skyCanvas=null, skyBuilt='none';
+function buildSky(modifier){
+  const W=RW, H=(RH/2)|0;
+  if(!skyCanvas) skyCanvas=newTex(W,H);
+  const x=skyCanvas.getContext('2d');
+  x.clearRect(0,0,W,H);
+  let topCol, horCol, mistCol;
+  if(modifier==='rainy'){ topCol='#3a4656'; horCol='#5a6678'; mistCol='rgba(90,100,116,0.5)'; }
+  else if(modifier==='maze'){ topCol='#5a6a86'; horCol='#a8927a'; mistCol='rgba(200,180,150,0.35)'; }
+  else { topCol='#7eaad0'; horCol='#f0d8a8'; mistCol='rgba(240,210,160,0.4)'; } // dusty clear
+  const g=x.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,topCol); g.addColorStop(0.62,horCol); g.addColorStop(1,'#e8c890');
+  x.fillStyle=g; x.fillRect(0,0,W,H);
+
+  // distant mesa silhouettes — Book Cliffs (tabular) + Grand Mesa (broad) inspired
+  // Band 1: far, hazy mauve
+  x.fillStyle='rgba(150,120,120,0.55)';
+  x.beginPath(); x.moveTo(0,H);
+  const baseY1=H-18;
+  for(let px=0;px<=W;px+=8){
+    const h=10+Math.sin(px*0.05)*4+Math.sin(px*0.13)*3;
+    x.lineTo(px, baseY1-h);
+  }
+  x.lineTo(W,H); x.fill();
+  // Band 2: closer, mesa-brown with flat tops (Book Cliffs feel)
+  x.fillStyle='rgba(120,86,64,0.78)';
+  x.beginPath(); x.moveTo(0,H);
+  const baseY2=H-10;
+  let mx=0;
+  while(mx<=W){
+    const topW=18+((Math.random()*26)|0);
+    const topH=8+((Math.random()*14)|0);
+    const topY=baseY2-topH;
+    x.lineTo(mx,baseY2); x.lineTo(mx,topY); x.lineTo(mx+topW,topY); x.lineTo(mx+topW,baseY2);
+    mx+=topW+2+((Math.random()*8)|0);
+  }
+  x.lineTo(W,H); x.fill();
+  // low haze line
+  x.fillStyle=mistCol; x.fillRect(0,H-6,W,6);
+  skyBuilt=modifier;
+}
+
+// ---------------------------------------------------------------------------
+// 7. RENDER
+// ---------------------------------------------------------------------------
+function drawScene(now){
+  // --- SKY (rebuild only if modifier changed) ---
+  if(skyBuilt!==game.modifier) buildSky(game.modifier);
+  bctx.drawImage(skyCanvas,0,0);
+
+  // --- FLOOR (asphalt gradient) ---
+  const gfloor=bctx.createLinearGradient(0,RH/2,0,RH);
+  if(game.modifier==='rainy'){ gfloor.addColorStop(0,'#2a2e36'); gfloor.addColorStop(1,'#181a20'); }
+  else { gfloor.addColorStop(0,'#3a3a3e'); gfloor.addColorStop(0.5,'#2c2c30'); gfloor.addColorStop(1,'#1c1c1e'); }
+  bctx.fillStyle=gfloor; bctx.fillRect(0,RH/2,RW,RH/2);
+  // faint road center-line flecks near horizon for asphalt feel
+  bctx.fillStyle='rgba(200,190,120,0.10)';
+  for(let i=0;i<10;i++){ bctx.fillRect((RW/2)-1+(i-5)*4, RH/2+2+i*2, 2, 1); }
+
+  const px=player.x, py=player.y, a=player.angle;
+  const dirX=Math.cos(a), dirY=Math.sin(a);
+  const planeX=-Math.sin(a)*cfg.fov, planeY=Math.cos(a)*cfg.fov;
+  const visRange = game.modifier==='rainy'?9.0:17.0;
+  const fog = game.modifier==='rainy'?[40,48,60] : [196,168,128]; // dusty warm fog / cool rainy
+  const fogStrength = game.modifier==='rainy'?0.9:0.78;
+
+  // ---- WALLS (DDA, textured) -> fills zbuffer per column ----
+  for(let col=0; col<RW; col++){
+    const cameraX = 2*col/RW - 1;
+    const rdx = dirX + planeX*cameraX;
+    const rdy = dirY + planeY*cameraX;
+    let mapX=px|0, mapY=py|0;
+    const ddx = Math.abs(1/(rdx||1e-9)), ddy = Math.abs(1/(rdy||1e-9));
+    let stepX, stepY, sdx, sdy;
+    if(rdx<0){ stepX=-1; sdx=(px-mapX)*ddx; } else { stepX=1; sdx=(mapX+1-px)*ddx; }
+    if(rdy<0){ stepY=-1; sdy=(py-mapY)*ddy; } else { stepY=1; sdy=(mapY+1-py)*ddy; }
+    let hit=0, side=0, wt=1, steps=0;
+    while(hit===0 && steps<80){
+      if(sdx<sdy){ sdx+=ddx; mapX+=stepX; side=0; } else { sdy+=ddy; mapY+=stepY; side=1; }
+      if(mapX<0||mapY<0||mapX>=game.MAP_W||mapY>=game.MAP_H){ wt=1; hit=1; break; }
+      if(game.map[mapY][mapX]!==0){ wt=game.map[mapY][mapX]; hit=1; }
+      steps++;
+    }
+    const perp = (side===0)? (sdx-ddx) : (sdy-ddy);
+    const d = Math.max(0.05, perp);
+    zbuffer[col]=d;
+    const lineH = RH/d;
+    const drawStart=Math.floor(RH/2 - lineH/2);
+    const drawEnd=Math.ceil(RH/2 + lineH/2);
+    const sliceH = drawEnd-drawStart;
+
+    // texture column selection (standard raycaster texturing)
+    let wallX = (side===0) ? (py + perp*rdy) : (px + perp*rdx);
+    wallX -= Math.floor(wallX);
+    let texX = (wallX * TEXSIZE)|0;
+    if(side===0 && rdx>0) texX = TEXSIZE-1-texX;
+    if(side===1 && rdy<0) texX = TEXSIZE-1-texX;
+    const tex = WALL_TEX[wt] || WALL_TEX[0];
+
+    // per-cell shade variation (preserved from base)
+    let sh = (game.wallShade[mapY]?(0.82+0.30*(game.wallShade[mapY][mapX]||0.5)):1);
+    if(side===1) sh*=0.68;   // y-side darker
+
+    // draw textured slice
+    bctx.drawImage(tex, texX,0,1,TEXSIZE, col, drawStart, 1, sliceH);
+    // shading overlay (side darkening via black alpha + distance fog toward fog color)
+    if(sh<1){ bctx.fillStyle=`rgba(0,0,0,${(1-sh).toFixed(3)})`; bctx.fillRect(col,drawStart,1,sliceH); }
+    const f = Math.min(1, d/visRange)*fogStrength;
+    if(f>0){ bctx.fillStyle=`rgba(${fog[0]},${fog[1]},${fog[2]},${f.toFixed(3)})`; bctx.fillRect(col,drawStart,1,sliceH); }
+  }
+
+  // ---- SPRITES (billboards), projected from WORLD coords (UNCHANGED math) ----
+  //   depth  = camera-plane projection (forward distance)
+  //   hscr   = direction projection (horizontal factor)
+  //   Rendering NEVER mutates obj.x / obj.y.
+  const sprites=[];
+  function pushSp(obj, tex, hp){
+    const rwx = obj.x - px;
+    const rwy = obj.y - py;
+    const invDet = 1/(planeX*dirY - dirX*planeY);
+    const depth = invDet * (-planeY*rwx + planeX*rwy);
+    const hscr  = invDet * (dirY*rwx - dirX*rwy);
+    if(depth <= 0.12){ dbg.spritesSkipped++; return; }
+    sprites.push({obj,tex,hp,depth,hscr});
+  }
+  // decor first (ground-level), then pickups, then npcs, then exit
+  for(const p of game.props)   pushSp(p, propTex(p.kind), HEIGHT[p.kind]||0.5);
+  for(const c of game.pickups) if(!c.taken) pushSp(c, TEX.can, HEIGHT.can);
+  for(const n of game.npcs)    if(!n.helped) pushSp(n, TEX[n.kind], HEIGHT[n.kind]);
+  if(game.exit && game.exit.active) pushSp(game.exit, TEX.exit, HEIGHT.exit);
+
+  sprites.sort((p,q)=>q.depth-p.depth);  // far first
+
+  for(const s of sprites){
+    const depth=s.depth;
+    const lineH=RH/depth;
+    const screenH=s.hp*lineH;
+    const screenW=screenH*(s.tex.width/s.tex.height);
+    const screenX=(RW/2)*(1 + s.hscr/depth);
+    const bottom=RH/2 + lineH/2;
+    const top=bottom-screenH;
+    const startCol=Math.floor(screenX-screenW/2);
+    const endCol=Math.ceil(screenX+screenW/2);
+    // distance fog on sprite (so distant sprites fade into haze)
+    const sf = Math.min(0.85, depth/visRange)*fogStrength;
+    for(let col=startCol; col<endCol; col++){
+      if(col<0||col>=RW) continue;
+      if(depth >= zbuffer[col]) continue;   // occluded by a closer wall
+      const u=(col-(screenX-screenW/2))/screenW;
+      const srcX=Math.max(0,Math.min(s.tex.width-1, (u*s.tex.width)|0));
+      let yoff=0;
+      if(s.obj && s.obj.wob!==undefined){ yoff=Math.sin(now/300+s.obj.wob)*(screenH*0.03); }
+      if(s.obj===game.exit){ yoff=Math.sin(now/180)*2.5; }
+      bctx.drawImage(s.tex, srcX,0,1,s.tex.height, col, top+yoff, 1, screenH);
+    }
+    if(sf>0.02){
+      bctx.fillStyle=`rgba(${fog[0]},${fog[1]},${fog[2]},${(sf*0.6).toFixed(3)})`;
+      const c0=Math.max(0,startCol), c1=Math.min(RW,endCol);
+      bctx.fillRect(c0, top, c1-c0, screenH);
+    }
+  }
+
+  // EXIT GLOW halo on the floor (when active & visible) — drawn into buffer
+  if(game.exit && game.exit.active){
+    const rwx=game.exit.x-px, rwy=game.exit.y-py;
+    const invDet=1/(planeX*dirY-dirX*planeY);
+    const depth=invDet*(-planeY*rwx+planeX*rwy);
+    const hscr=invDet*(dirY*rwx-dirX*rwy);
+    if(depth>0.2 && depth<14){
+      const screenX=(RW/2)*(1+hscr/depth)|0;
+      const glowR=(30/depth)|0;
+      if(screenX>=-glowR && screenX<RW+glowR){
+        const cy=RH/2;
+        const gg=bctx.createRadialGradient(screenX,cy,1,screenX,cy,glowR);
+        gg.addColorStop(0,'rgba(255,230,120,0.35)'); gg.addColorStop(1,'rgba(255,200,60,0)');
+        bctx.fillStyle=gg; bctx.fillRect(screenX-glowR,cy-glowR/2,glowR*2,glowR);
+      }
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 8. MINIMAP
+// ---------------------------------------------------------------------------
+// showMinimap declared earlier (before persistence module)
+function drawMinap(){
+  if(!showMinimap) return;
+  const cell=4, pad=10;
+  const W=game.MAP_W*cell, H=game.MAP_H*cell;
+  const ox=pad, oy=innerHeight-H-pad;
+  ctx.fillStyle='rgba(20,16,12,0.7)'; ctx.fillRect(ox-3,oy-3,W+6,H+6);
+  ctx.strokeStyle='rgba(180,150,100,0.4)'; ctx.lineWidth=1; ctx.strokeRect(ox-3,oy-3,W+6,H+6);
+  for(let y=0;y<game.MAP_H;y++) for(let x=0;x<game.MAP_W;x++){
+    const v=game.map[y][x];
+    if(v!==0){
+      ctx.fillStyle = WALL_MINI[v] || '#7a7468';
+      ctx.fillRect(ox+x*cell, oy+y*cell, cell, cell);
+    }
+  }
+  const revealCans = player.minimapLevel>=2 || game.revealT>0 || (player.radar && player.radarPingT>0);
+  if(revealCans){
+    ctx.fillStyle='#ffd24a';
+    for(const c of game.pickups) if(!c.taken) ctx.fillRect(ox+c.x*cell-1, oy+c.y*cell-1, 2,2);
+  }
+  if(player.minimapLevel>=2 || game.revealT>0){
+    for(const n of game.npcs) if(!n.helped){
+      ctx.fillStyle = n.kind==='family'?'#4a8fc8': n.kind==='elder'?'#9c8bd0': n.kind==='volunteer'?'#5fb37a':'#d05a48';
+      ctx.fillRect(ox+n.x*cell-1.5, oy+n.y*cell-1.5, 3,3);
+    }
+  }
+  if(game.exit){
+    ctx.fillStyle = game.exit.active?'#ffe066':'#666';
+    ctx.fillRect(ox+game.exit.x*cell-2, oy+game.exit.y*cell-2, 4,4);
+  }
+  // radar pulse ring on minimap
+  if(player.radar && player.radarRingT>0){
+    const pr=(1-player.radarRingT)*Math.max(W,H);
+    ctx.strokeStyle='rgba(255,210,90,'+player.radarRingT.toFixed(2)+')'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.arc(ox+player.x*cell, oy+player.y*cell, pr, 0,7); ctx.stroke();
+  }
+  // player + facing
+  ctx.fillStyle='#ffffff';
+  ctx.beginPath(); ctx.arc(ox+player.x*cell, oy+player.y*cell, 2.4, 0, 7); ctx.fill();
+  ctx.strokeStyle='#ffffff'; ctx.beginPath();
+  ctx.moveTo(ox+player.x*cell, oy+player.y*cell);
+  ctx.lineTo(ox+(player.x+Math.cos(player.angle)*1.5)*cell, oy+(player.y+Math.sin(player.angle)*1.5)*cell);
+  ctx.stroke();
+}
+
+// ---------------------------------------------------------------------------
+// 9. HUD + RETICLE + POPUPS
+// ---------------------------------------------------------------------------
+function staminaBar(){
+  const n=18, f=Math.round(n*player.stamina/player.maxStamina);
+  let s=''; for(let i=0;i<n;i++) s+= i<f?'█':'░'; return s;
+}
+function upgradeTag(){
+  const u=player.upgrades; const parts=[];
+  if(u.pack)   parts.push('pack×'+u.pack);
+  if(u.sprint) parts.push('sprint×'+u.sprint);
+  if(u.hand)   parts.push('hand×'+u.hand);
+  if(u.map)    parts.push('map×'+u.map);
+  if(u.radar)  parts.push('radar');
+  return parts.length?('UPG '+parts.join('  ')):'';
+}
+function panel(x,y,w,h){ ctx.fillStyle='rgba(18,14,10,0.66)'; ctx.fillRect(x,y,w,h);
+  ctx.strokeStyle='rgba(190,158,104,0.35)'; ctx.lineWidth=1; ctx.strokeRect(x+0.5,y+0.5,w-1,h-1); }
+function drawHUD(now){
+  ctx.textBaseline='top';
+  const q=(game.helped>=game.quota && game.exit && game.exit.active)?'EXIT OPEN':('quota '+game.helped+'/'+game.quota);
+  const cdTag = player.giveCD>0 ? ('  handoff '+player.giveCD.toFixed(1)+'s') : '';
+  const lines=[
+    ['TIME',  Math.max(0,game.timeLeft).toFixed(1),  game.timeLeft<20?'#ff9a6a':'#e9e9ef'],
+    ['CANS',  player.cans+'/'+player.maxCans,        player.cans>0?'#ffd24a':'#e9e9ef'],
+    ['PEOPLE',game.helped+'/'+game.quota+' helped · '+game.delivered+' delivered'+cdTag, '#9fffb6'],
+    ['STAM',  staminaBar(),                          player.stamina<15?'#ff9a6a':'#cfe0ff'],
+  ];
+  // main panel
+  const ph=lines.length*18+14;
+  panel(8,8,360,ph);
+  ctx.font='13px monospace';
+  for(let i=0;i<lines.length;i++){
+    ctx.fillStyle='#8a7a5a'; ctx.fillText(lines[i][0], 14, 13+i*18);
+    ctx.fillStyle=lines[i][2]; ctx.fillText(lines[i][1], 70, 13+i*18);
+  }
+  // meta panel (seed/district/modifier/score)
+  const meta=['DISTRICT '+game.district+'   ['+game.modifier.toUpperCase()+']   x'+game.scoreMult,
+              'SEED '+game.seed+'    SCORE '+game.totalScore];
+  const ut=upgradeTag(); if(ut) meta.push(ut);
+  const mh=meta.length*16+10;
+  panel(8, 8+ph+6, 360, mh);
+  ctx.font='12px monospace';
+  ctx.fillStyle='#e9d8b0';
+  for(let i=0;i<meta.length;i++) ctx.fillText(meta[i], 14, 8+ph+6+6+i*16);
+
+  // controls hint
+  ctx.font='11px monospace'; ctx.fillStyle='#9a8e72';
+  ctx.fillText('WASD move · Q/E or mouse turn · SPACE/CLICK give · SHIFT sprint · M map · P pause · R restart', 10, innerHeight-18);
+
+  // center reticle
+  const cx=innerWidth/2, cy=innerHeight/2;
+  const aim=game.aimNpc;
+  if(aim){
+    const ok=player.cans>=aim.need;
+    ctx.strokeStyle = ok?'rgba(140,255,170,0.95)':'rgba(255,140,90,0.95)';
+    ctx.lineWidth=2; ctx.beginPath(); ctx.arc(cx,cy,11,0,7); ctx.stroke();
+    // tick marks
+    ctx.beginPath();
+    ctx.moveTo(cx-15,cy); ctx.lineTo(cx-7,cy);
+    ctx.moveTo(cx+7,cy); ctx.lineTo(cx+15,cy);
+    ctx.moveTo(cx,cy-15); ctx.lineTo(cx,cy-7);
+    ctx.moveTo(cx,cy+7); ctx.lineTo(cx,cy+15); ctx.stroke();
+    ctx.font='13px monospace'; ctx.fillStyle= ok?'#a8ffc0':'#ffb088'; ctx.textAlign='center';
+    const lbl = aim.kind.toUpperCase()+' · needs '+aim.need+' can'+(aim.need>1?'s':'')+' · you have '+player.cans;
+    // bg for readability
+    const lw=ctx.measureText(lbl).width;
+    ctx.fillStyle='rgba(0,0,0,0.55)'; ctx.fillRect(cx-lw/2-6, cy+16, lw+12, 18);
+    ctx.fillStyle= ok?'#a8ffc0':'#ffb088'; ctx.fillText(lbl, cx, cy+19);
+    ctx.textAlign='left';
+  } else {
+    ctx.fillStyle='rgba(220,220,228,0.8)'; ctx.fillRect(cx-1,cy-5,2,4); ctx.fillRect(cx-1,cy+1,2,4);
+    ctx.fillRect(cx-5,cy-1,4,2); ctx.fillRect(cx+1,cy-1,4,2);
+  }
+
+  // message banner
+  if(game.msg && game.msgT>0){
+    ctx.font='17px monospace';
+    const mw=ctx.measureText(game.msg).width;
+    ctx.fillStyle='rgba(20,16,8,0.6)'; ctx.fillRect(cx-mw/2-12, 50, mw+24, 26);
+    ctx.fillStyle='#ffd24a'; ctx.textAlign='center'; ctx.fillText(game.msg, cx, 56); ctx.textAlign='left';
+  }
+
+  // score popups
+  for(const p of game.popups){
+    ctx.font='14px monospace'; ctx.fillStyle=p.color; ctx.textAlign='center';
+    ctx.globalAlpha=Math.max(0,Math.min(1,p.life));
+    const pw=ctx.measureText(p.text).width;
+    ctx.fillStyle='rgba(0,0,0,0.4)'; ctx.fillRect(p.x-pw/2-4, p.y-2, pw+8, 16);
+    ctx.fillStyle=p.color; ctx.fillText(p.text, p.x, p.y);
+    ctx.globalAlpha=1; ctx.textAlign='left';
+  }
+
+  // pickup flash (white)
+  if(game.flash>0){ ctx.fillStyle='rgba(255,240,200,'+(game.flash*0.5).toFixed(3)+')'; ctx.fillRect(0,0,innerWidth,innerHeight); }
+  // handoff pulse (green)
+  if(game.handoffFx>0){ ctx.fillStyle='rgba(120,255,160,'+(game.handoffFx*0.25).toFixed(3)+')'; ctx.fillRect(0,0,innerWidth,innerHeight); }
+
+  if(DEBUG){
+    ctx.font='12px monospace'; ctx.fillStyle='#9fe0ff';
+    const d=[
+      'DEBUG cans='+dbg.cansSpawned+' npcs='+dbg.npcsSpawned+' props='+dbg.props,
+      'invalid='+dbg.invalidPlacements+' rejected='+dbg.rejectedSpawns+' reach='+dbg.reachableCells,
+      'skipped sprites='+dbg.spritesSkipped+' pickups_live='+game.pickups.filter(c=>!c.taken).length,
+    ];
+    for(let i=0;i<d.length;i++) ctx.fillText(d[i], innerWidth-380, 13+i*16);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 10. GAMEPLAY ACTIONS  (logic unchanged; added flash/radar-ring effects)
+// ---------------------------------------------------------------------------
+function addPopup(text,color){ game.popups.push({x:innerWidth/2, y:innerHeight/2-40, vy:-26, life:1.0, text, color}); }
+function tickPickups(){
+  for(const c of game.pickups){
+    if(c.taken) continue;
+    const dx=c.x-player.x, dy=c.y-player.y;
+    if(dx*dx+dy*dy<0.18){
+      if(player.cans<player.maxCans){
+        const space=player.maxCans-player.cans;
+        const take=Math.min(c.amt,space);
+        player.cans+=take; c.amt-=take;
+        beep(660,0.08,'square',0.05);
+        addPopup('+'+take+' CAN'+(take>1?'S':''),'#ffd24a');
+        game.flash=0.5;
+        game.run.cansCollected += take;
+        SAVE.save();
+        if(c.amt<=0) c.taken=true;
+      }
+    }
+  }
+}
+function giveCan(){
+  if(player.giveCD>0){ return; }
+  const best=game.aimNpc;
+  if(!best){ setMsg('no one nearby'); beep(160,0.06,'sawtooth',0.03); return; }
+  if(player.cans<best.need){
+    setMsg('need '+best.need+' (have '+player.cans+')');
+    addPopup('NOT ENOUGH CANS','#ff7a6a');
+    beep(180,0.1,'sawtooth',0.04); return;
+  }
+  player.cans-=best.need; best.helped=true; game.helped++; game.delivered+=best.need;
+  game.run.helpedByKind[best.kind] = (game.run.helpedByKind[best.kind]||0)+1;
+  game.run.cansDelivered += best.need;
+  SAVE.save();
+  player.giveCD = player.baseGiveCD / (1 + player.handoffBonus*0.5);
+  beep(880,0.12,'triangle',0.05);
+  game.handoffFx=0.8;
+  const perGive = (best.need*25 + 100) * game.scoreMult;
+  if(best.kind==='elder'){ player.speedBoostT=5; setMsg('Elder blessed you — SPEED!'); }
+  else if(best.kind==='volunteer'){ game.revealT=8; setMsg('Volunteer — cans/people revealed!'); }
+  else setMsg('Helped! '+best.kind+' ('+best.need+')');
+  addPopup('+'+Math.round(perGive)+' pts','#9fffb6');
+  if(game.helped>game.quota){
+    const bonus = Math.round(150*game.scoreMult);
+    game.totalScore += bonus;
+    addPopup('BONUS +'+bonus,'#ffe066');
+  }
+  if(game.helped>=game.quota && !game.exit.active){
+    game.exit.active=true; setMsg('QUOTA MET — EXIT OPEN!');
+    beep(1200,0.25,'square',0.05);
+  }
+}
+function tickExit(){
+  if(!game.exit || !game.exit.active) return;
+  const dx=game.exit.x-player.x, dy=game.exit.y-player.y;
+  if(dx*dx+dy*dy<0.6) completeDistrict();
+}
+function completeDistrict(){
+  const timeBonus=Math.floor(game.timeLeft)*5;
+  const distBonus=game.district*200;
+  const leftover=player.cans*10;
+  game.totalScore += Math.round((game.helped*100 + game.delivered*25 + leftover + timeBonus + distBonus)*game.scoreMult);
+  state=STATE.UPGRADE;
+  window._offered = rollUpgrades();
+}
+
+const ALL_UPGRADES=[
+  {id:'pack',  name:'BIGGER BACKPACK', desc:'+6 can capacity'},
+  {id:'sprint',name:'LONGER SPRINT',    desc:'+30 max stamina, faster regen'},
+  {id:'hand',  name:'FASTER HANDOFF',   desc:'+range, +1 bonus, shorter cooldown'},
+  {id:'map',   name:'BETTER MINIMAP',   desc:'show cans & people always'},
+  {id:'radar', name:'CAN RADAR PULSE',  desc:'periodic can ping on map'},
+];
+function rollUpgrades(){
+  const pool=ALL_UPGRADES.slice(); const out=[];
+  for(let i=0;i<3 && pool.length;i++){ out.push(pool.splice((RNG()*pool.length)|0,1)[0]); }
+  return out;
+}
+function applyUpgrade(id){
+  player.upgrades[id]=(player.upgrades[id]||0)+1;
+  if(id==='pack') player.maxCans+=6;
+  else if(id==='sprint'){ player.maxStamina+=30; player.stamina=player.maxStamina; player.regenBonus+=8; }
+  else if(id==='hand'){ player.giveRange+=0.45; player.handoffBonus+=1; }
+  else if(id==='map') player.minimapLevel=Math.max(2,player.minimapLevel);
+  else if(id==='radar') player.radar=true;
+}
+function updateAim(){
+  let best=null, bd=player.giveRange*player.giveRange;
+  for(const n of game.npcs){
+    if(n.helped) continue;
+    const dx=n.x-player.x, dy=n.y-player.y, d=dx*dx+dy*dy;
+    if(d<bd){ bd=d; best=n; }
+  }
+  game.aimNpc=best;
+}
+
+// ---------------------------------------------------------------------------
+// 11. UPDATE + INPUT
+// ---------------------------------------------------------------------------
+const keys={};
+
+// --- MENU STATE ---
+let menuSel = 0;           // selected menu item index
+let seedInput = '';         // text input for seed entry
+let nameInput = '';         // text input for name entry
+let confirmAction = null;   // {msg, onYes, onNo} for confirmations
+let confirmSel = 0;         // 0=no, 1=yes
+let menuMouseY = -1;        // mouse Y for hover detection
+
+// define menu items for each screen (returned dynamically so save presence updates)
+function titleMenuItems(){
+  return [
+    {label:'START NEW RUN',         action:()=>startRun()},
+    {label: SAVE.hasValid()? 'CONTINUE SAVED RUN':'CONTINUE (no save)', action:()=>{ if(SAVE.hasValid()) continueRun(); }, enabled:SAVE.hasValid()},
+    {label:'SEEDED RUN',            action:()=>{ seedInput=''; state=STATE.SEEDED; menuSel=0; }},
+    {label:'STATS',                 action:()=>{ state=STATE.STATS; menuSel=0; }},
+    {label:'LEADERBOARDS',          action:()=>{ state=STATE.LB; menuSel=0; }},
+    {label:'OPTIONS / HELP',        action:()=>{ nameInput=profile.name; state=STATE.OPTIONS; menuSel=0; }},
+  ];
+}
+
+addEventListener('keydown',e=>{
+  keys[e.code]=true;
+
+  // --- confirmation dialog (highest priority) ---
+  if(confirmAction){
+    if(e.code==='ArrowLeft'||e.code==='KeyA') confirmSel=0;
+    if(e.code==='ArrowRight'||e.code==='KeyD') confirmSel=1;
+    if(e.code==='Enter'||e.code==='Space'){
+      const ca=confirmAction; confirmAction=null;
+      if(confirmSel===1) ca.onYes(); else ca.onNo();
+      beep(440,0.05,'sine',0.03);
+    }
+    if(e.code==='Escape'){ confirmAction=null; }
+    e.preventDefault();
+    return;
+  }
+
+  // --- text input states (seed, name) ---
+  if(state===STATE.SEEDED && menuSel===0){
+    if(e.code==='Backspace'){ seedInput=seedInput.slice(0,-1); e.preventDefault(); return; }
+    if(e.code==='Enter'){ const s=parseInt(seedInput); if(s&&!isNaN(s)) startRun(s); return; }
+    if(e.code==='Escape'){ state=STATE.TITLE; menuSel=1; return; }
+    if(e.code.length===1 && /[0-9]/.test(e.key) && seedInput.length<10){ seedInput+=e.key; e.preventDefault(); return; }
+  }
+  if(state===STATE.OPTIONS && menuSel===0){
+    if(e.code==='Backspace'){ nameInput=nameInput.slice(0,-1); e.preventDefault(); return; }
+    if(e.code==='Enter'){ profile.name=nameInput.trim().slice(0,12)||'RUNNER'; profile.save(); return; }
+    if(e.code.length===1 && nameInput.length<12 && e.key.match(/[\w \-!.]/)){ nameInput+=e.key.toUpperCase(); e.preventDefault(); return; }
+  }
+
+  // --- PLAY state keys ---
+  if(state===STATE.PLAY){
+    if(e.code==='KeyM') showMinimap=!showMinimap;
+    if(e.code==='KeyP' || e.code==='Escape'){
+      if(!paused){ paused=true; SAVE.save(); beep(440,0.06,'sine',0.03); }
+      else { paused=false; }
+    }
+    if(!paused && e.code==='Space'){ giveCan(); e.preventDefault(); }
+    if(!paused && e.code==='KeyR'){
+      confirmAction={msg:'Restart run? Current progress will be lost.', onYes:()=>{ SAVE.clear(); restartRun(false); }, onNo:()=>{}};
+    }
+    return;
+  }
+
+  // --- menu navigation for all non-PLAY states ---
+  const menuState = isMenuState(state) || (paused && state===STATE.PLAY);
+  if(menuState){
+    if(e.code==='ArrowUp'||e.code==='KeyW'){ menuSel=Math.max(0,menuSel-1); beep(520,0.03,'sine',0.02); e.preventDefault(); }
+    if(e.code==='ArrowDown'||e.code==='KeyS'){ menuSel++; beep(520,0.03,'sine',0.02); e.preventDefault(); }
+    if(e.code==='Escape'){
+      if(state===STATE.PLAY){ paused=false; }
+      else if(state!==STATE.TITLE){ state=STATE.TITLE; menuSel=0; }
+    }
+    if(e.code==='Enter' || (e.code==='Space' && state!==STATE.SEEDED)){
+      e.preventDefault();
+      menuActivate();
+    }
+  }
+});
+function menuActivate(){
+  beep(660,0.05,'sine',0.03);
+  if(state===STATE.TITLE){
+    const items=titleMenuItems();
+    if(menuSel>=0 && menuSel<items.length && items[menuSel].enabled!==false) items[menuSel].action();
+  }
+  else if(state===STATE.SEEDED){
+    if(menuSel===0){ const s=parseInt(seedInput); if(s&&!isNaN(s)) startRun(s); }
+    else if(menuSel===1){ startRun(); }
+    else if(menuSel===2){ state=STATE.TITLE; menuSel=2; }
+  }
+  else if(state===STATE.STATS){ state=STATE.TITLE; menuSel=3; }
+  else if(state===STATE.LB){ state=STATE.TITLE; menuSel=4; }
+  else if(state===STATE.OPTIONS){ activateOption(menuSel); }
+  else if(state===STATE.RESULTS){ activateResult(menuSel); }
+  else if(paused && state===STATE.PLAY){ activatePause(menuSel); }
+}
+// results screen items
+function resultItems(){
+  return [
+    {label:'NEW RUN',         action:()=>{ SAVE.clear(); startRun(); }},
+    {label:'RETRY SAME SEED',  action:()=>{ SAVE.clear(); startRun(game.run.seedUsed); }},
+    {label:'LEADERBOARDS',     action:()=>{ state=STATE.LB; menuSel=0; }},
+    {label:'MAIN MENU',        action:()=>{ state=STATE.TITLE; menuSel=0; }},
+  ];
+}
+function activateResult(idx){
+  const items=resultItems();
+  if(idx>=0 && idx<items.length) items[idx].action();
+}
+// pause menu items
+function pauseItems(){
+  return [
+    {label:'RESUME',           action:()=>{ paused=false; }},
+    {label:'RESTART RUN',      action:()=>{ confirmAction={msg:'Restart run? Progress will be lost.', onYes:()=>{ SAVE.clear(); restartRun(false); }, onNo:()=>{}}; }},
+    {label:'MAIN MENU',        action:()=>{ confirmAction={msg:'Return to main menu? Save will be kept.', onYes:()=>{ SAVE.save(); state=STATE.TITLE; menuSel=0; paused=false; }, onNo:()=>{}}; }},
+  ];
+}
+function activatePause(idx){
+  const items=pauseItems();
+  if(idx>=0 && idx<items.length) items[idx].action();
+}
+// options items (index 0 is name input, rest are toggle/action)
+function activateOption(idx){
+  if(idx===0){ profile.name=nameInput.trim().slice(0,12)||'RUNNER'; profile.save(); }
+  else if(idx===1){
+    const vals = ['auto','on','off'];
+    const cur = vals.indexOf(options.mobileControls);
+    options.mobileControls = vals[(cur+1)%vals.length];
+    mobileOverride = options.mobileControls==='auto' ? null : options.mobileControls;
+    setMobileMode(isMobile());
+    options.save();
+  }
+  else if(idx===2){ options.minimapDefault=!options.minimapDefault; showMinimap=options.minimapDefault; options.save(); }
+  else if(idx===3){ options.reduceFx=!options.reduceFx; options.save(); }
+  else if(idx===4){ options.mouseSens = options.mouseSens > 0.003 ? 0.0015 : options.mouseSens + 0.0005; options.save(); }
+  else if(idx===5){ confirmAction={msg:'Clear active save? Stats will be kept.', onYes:()=>{ SAVE.clear(); }, onNo:()=>{}}; }
+  else if(idx===6){ confirmAction={msg:'Reset ALL local data? This cannot be undone.', onYes:()=>{ SAVE.clear(); stats.reset(); leaderboards.reset(); profile.name='RUNNER'; profile.save(); options.mouseSens=0.0022; options.mobileTurnSens=0.0045; options.minimapDefault=true; options.reduceFx=false; options.mobileControls='auto'; options.save(); }, onNo:()=>{}}; }
+  else if(idx===7){ state=STATE.TITLE; menuSel=5; }
+}
+function isMenuState(s){
+  return s===STATE.TITLE || s===STATE.SEEDED || s===STATE.STATS || s===STATE.LB || s===STATE.OPTIONS || s===STATE.RESULTS;
+}
+
+addEventListener('keyup',e=>{ keys[e.code]=false; });
+
+let locked=false;
+view.addEventListener('mousedown',e=>{
+  // confirmation click
+  if(confirmAction){
+    const cy=innerHeight/2+60;
+    // yes=right, no=left
+    if(e.clientY > cy-15 && e.clientY < cy+15){
+      const yesX=innerWidth/2+30, noX=innerWidth/2-80;
+      if(Math.abs(e.clientX-yesX)<50){ const ca=confirmAction; confirmAction=null; ca.onYes(); }
+      else if(Math.abs(e.clientX-noX)<50){ confirmAction=null; }
+    }
+    return;
+  }
+  if(state===STATE.TITLE){
+    const items=titleMenuItems();
+    if(menuSel>=0 && menuSel<items.length && items[menuSel].enabled!==false){
+      items[menuSel].action();
+      beep(660,0.05,'sine',0.03);
+    }
+    return;
+  }
+  if(state===STATE.PLAY){
+    if(paused){ paused=false; return; }
+    if(!locked){ view.requestPointerLock(); }
+    else giveCan();
+  }
+});
+document.addEventListener('pointerlockchange',()=>{ locked = document.pointerLockElement===view; });
+addEventListener('mousemove',e=>{
+  if(locked && state===STATE.PLAY && !paused) player.angle += e.movementX*options.mouseSens;
+  menuMouseY = e.clientY;
+});
+
+function setMsg(m){ game.msg=m; game.msgT=1.6; }
+function pickModifier(){ const m=['rainy','shortage','clear','maze','clear','clear']; return m[(RNG()*m.length)|0]; }
+function resetPlayerUpgrades(){
+  player.maxCans=10; player.maxStamina=60; player.giveRange=1.4;
+  player.minimapLevel=1; player.radar=false; player.handoffBonus=0;
+  player.regenBonus=0; player.speedBoostT=0; player.giveCD=0;
+  player.upgrades={pack:0, sprint:0, hand:0, map:0, radar:0};
+}
+function initRunTracking(useSeed){
+  game.run = { active:true, startedAt:Date.now(), seedUsed:useSeed, modifierUsed:game.modifier,
+               cansCollected:0, cansDelivered:0,
+               helpedByKind:{hungry:0,family:0,elder:0,volunteer:0},
+               upgradesChosen:0, highestDistrict:1, runTime:0, completed:false, leaderboardRank:null };
+  stats.data.totalRunsStarted++;
+  stats.save();
+}
+function startRun(useSeed){
+  // seed from URL hash if present, or explicit, or random
+  let seed;
+  if(useSeed && !isNaN(useSeed)) seed = useSeed;
+  else { const h = parseInt((location.hash||'').replace('#','')); seed = (h && !isNaN(h)) ? h : ((Math.random()*1e9)|0); }
+  game.seed = seed;
+  game.district=1; game.totalScore=0;
+  game.modifier = pickModifier();
+  resetPlayerUpgrades();
+  genCity(game.seed, game.district, game.modifier);
+  player.cans=0; player.stamina=player.maxStamina;
+  state=STATE.PLAY; paused=false;
+  lookHintUsed = false;
+  initRunTracking(seed);
+  SAVE.save();
+}
+function continueRun(){
+  if(SAVE.load()){
+    setMsg('Run continued — District '+game.district);
+  } else {
+    setMsg('No valid save found');
+  }
+}
+function restartRun(sameSeed){
+  const seed = sameSeed ? game.seed : ((Math.random()*1e9)|0);
+  game.seed = seed;
+  game.district=1; game.totalScore=0;
+  game.modifier = pickModifier();
+  resetPlayerUpgrades();
+  genCity(game.seed, game.district, game.modifier);
+  player.cans=0; player.stamina=player.maxStamina;
+  state=STATE.PLAY; paused=false;
+  lookHintUsed = false;
+  initRunTracking(seed);
+  SAVE.save();
+}
+
+function update(dt){
+  // fx + popups update always
+  for(let i=game.popups.length-1;i>=0;i--){
+    const p=game.popups[i]; p.y += p.vy*dt; p.life -= dt*1.1;
+    if(p.life<=0) game.popups.splice(i,1);
+  }
+  if(game.flash>0) game.flash=Math.max(0,game.flash-dt*2.2);
+  if(game.handoffFx>0) game.handoffFx=Math.max(0,game.handoffFx-dt*2.0);
+  if(game.msgT>0) game.msgT-=dt;
+  // radar ring animation
+  if(player.radar){ player.radarRingT-=dt*0.5; if(player.radarRingT<0) player.radarRingT=1; }
+
+  if(state!==STATE.PLAY || paused) return;
+
+  game.timeLeft -= dt;
+  if(player.giveCD>0) player.giveCD=Math.max(0,player.giveCD-dt);
+  if(game.revealT>0) game.revealT-=dt;
+  if(player.speedBoostT>0) player.speedBoostT-=dt;
+  if(player.radar){
+    player.radarPingT -= dt;
+    if(player.radarPingT<=0){ player.radarPingT=3; player.radarRingT=1; setMsg('* radar ping *'); }
+  }
+  if(game.timeLeft<=0){ endRun(); return; }
+
+  // sync mobile joystick to inp abstraction
+  if(mobileMode) syncInpFromJoy();
+
+  // edge-detect for one-shot mobile actions
+  if(inp.map && !inp._lastMap){ showMinimap=!showMinimap; }
+  if(inp.pause && !inp._lastPause){
+    if(!paused){ paused=true; SAVE.save(); beep(440,0.06,'sine',0.03); }
+    else { paused=false; }
+  }
+  if(inp.give && !paused){ giveCan(); }
+  inp._lastMap = inp.map;
+  inp._lastPause = inp.pause;
+  // inp.give is edge-triggered via giveCD internally
+
+  const turn=2.4*dt;
+  if(keys['KeyQ']||inp.turnLeft)  player.angle-=turn;
+  if(keys['KeyE']||inp.turnRight) player.angle+=turn;
+
+  const sprinting = ((keys['ShiftLeft']||keys['ShiftRight']) || inp.sprint) && player.stamina>1;
+  let spd = (sprinting?cfg.sprintSpeed:cfg.walkSpeed);
+  if(player.speedBoostT>0) spd*=1.3;
+  const mv=spd*dt;
+  const fx=Math.cos(player.angle), fy=Math.sin(player.angle);
+  const rx=Math.cos(player.angle+Math.PI/2), ry=Math.sin(player.angle+Math.PI/2);
+  let dx=0, dy=0;
+  if(keys['KeyW']||keys['ArrowUp']   ||inp.fwd)  { dx+=fx; dy+=fy; }
+  if(keys['KeyS']||keys['ArrowDown'] ||inp.back) { dx-=fx; dy-=fy; }
+  if(keys['KeyD']||keys['ArrowRight']||inp.right){ dx+=rx; dy+=ry; }
+  if(keys['KeyA']||keys['ArrowLeft'] ||inp.left) { dx-=rx; dy-=ry; }
+  const len=Math.hypot(dx,dy)||1; dx=dx/len*mv; dy=dy/len*mv;
+  if(canStand(player.x+dx, player.y)) player.x+=dx;
+  if(canStand(player.x, player.y+dy)) player.y+=dy;
+
+  const moving=(dx*dx+dy*dy)>0.0001;
+  if(sprinting && moving){ player.stamina=Math.max(0,player.stamina-cfg.staminaDrain*dt); }
+  else { player.stamina=Math.min(player.maxStamina, player.stamina+(cfg.staminaRegen+player.regenBonus)*dt); }
+
+  updateAim();
+  tickPickups();
+  tickExit();
+}
+function endRun(){
+  game.run.runTime = (Date.now() - game.run.startedAt) / 1000;
+  game.run.completed = false;
+  // update stats
+  const s = stats.data;
+  s.totalRunsFailed++;
+  s.totalTimePlayedSec += game.run.runTime;
+  s.totalCansCollected += game.run.cansCollected;
+  s.totalCansDelivered += game.run.cansDelivered;
+  s.totalPeopleHelped += Object.values(game.run.helpedByKind).reduce((a,b)=>a+b,0);
+  for(const k of ['hungry','family','elder','volunteer']) s.helpedByKind[k] += game.run.helpedByKind[k]||0;
+  if(game.district-1 > s.highestDistrict) s.highestDistrict = game.district-1;
+  if(game.totalScore > s.bestScore) s.bestScore = game.totalScore;
+  stats.save();
+  // leaderboard entry
+  const entry = {
+    name: profile.name, score: game.totalScore, durationSec: Math.round(game.run.runTime),
+    district: game.district-1, seed: game.seed, modifier: game.modifier,
+    completed: false, date: Date.now(),
+  };
+  leaderboards.add(entry);
+  game.run.leaderboardRank = leaderboards.getRank('highestDistrict', entry);
+  game.run.active = false;
+  window._lastEntry = entry;
+  SAVE.clear();
+  state=STATE.RESULTS;
+  beep(140,0.4,'sawtooth',0.05);
+}
+function completeRun(){
+  // Called when player chooses to end a winning run (districts cleared ≥ target)
+  game.run.runTime = (Date.now() - game.run.startedAt) / 1000;
+  game.run.completed = true;
+  const s = stats.data;
+  s.totalRunsCompleted++;
+  s.totalTimePlayedSec += game.run.runTime;
+  s.totalCansCollected += game.run.cansCollected;
+  s.totalCansDelivered += game.run.cansDelivered;
+  s.totalPeopleHelped += Object.values(game.run.helpedByKind).reduce((a,b)=>a+b,0);
+  s.totalUpgradesChosen += game.run.upgradesChosen;
+  for(const k of ['hungry','family','elder','volunteer']) s.helpedByKind[k] += game.run.helpedByKind[k]||0;
+  if(game.district > s.highestDistrict) s.highestDistrict = game.district;
+  if(game.totalScore > s.bestScore) s.bestScore = game.totalScore;
+  if(s.fastestCompletedSec===null || game.run.runTime < s.fastestCompletedSec) s.fastestCompletedSec = Math.round(game.run.runTime);
+  stats.save();
+  const entry = {
+    name: profile.name, score: game.totalScore, durationSec: Math.round(game.run.runTime),
+    district: game.district, seed: game.seed, modifier: game.modifier,
+    completed: true, date: Date.now(),
+  };
+  leaderboards.add(entry);
+  game.run.leaderboardRank = leaderboards.getRank('bestScores', entry);
+  game.run.active = false;
+  window._lastEntry = entry;
+  SAVE.clear();
+  state=STATE.RESULTS;
+  beep(880,0.3,'triangle',0.06);
+}
+
+// ---------------------------------------------------------------------------
+// 12. OVERLAYS
+// ---------------------------------------------------------------------------
+function dim(){ ctx.fillStyle='rgba(0,0,0,0.74)'; ctx.fillRect(0,0,innerWidth,innerHeight); }
+function big(t,x,y,c){ ctx.font='40px monospace'; ctx.fillStyle=c||'#fff'; ctx.textAlign='center'; ctx.fillText(t,x,y); ctx.textAlign='left'; }
+function sub(t,x,y,c){ ctx.font='15px monospace'; ctx.fillStyle=c||'#d8c8a0'; ctx.textAlign='center'; ctx.fillText(t,x,y); ctx.textAlign='left'; }
+function drawOverlays(){
+  const cx=innerWidth/2;
+  // --- TITLE SCREEN ---
+  if(state===STATE.TITLE){
+    dim();
+    big('CANNED RUN', cx, 110, '#ffd24a');
+    sub('A desert-city food run', cx, 148, '#d8c8a0');
+    sub('Collect canned goods · help people · hit quota · reach exit', cx, 188, '#b8a878');
+    // menu items
+    const items=titleMenuItems();
+    menuSel=clampMenu(menuSel, 0, items.length-1);
+    drawMenuList(items, cx, 240, 6);
+    sub('↑↓ navigate · ENTER select · ESC back', cx, innerHeight-30, '#8a7a5a');
+  }
+  // --- SEEDED RUN ---
+  else if(state===STATE.SEEDED){
+    dim();
+    big('SEEDED RUN', cx, 120, '#ffd24a');
+    sub('Enter a numeric seed to reproduce the exact same city layout', cx, 160, '#b8a878');
+    const items=[
+      {label:'SEED: ['+seedInput.padEnd(10,'_')+']   (type digits, ENTER to start)', enabled:true},
+      {label:'START WITH RANDOM SEED'},
+      {label:'← BACK TO MENU'},
+    ];
+    menuSel=clampMenu(menuSel, 0, items.length-1);
+    drawMenuList(items, cx, 220, 3);
+  }
+  // --- STATS ---
+  else if(state===STATE.STATS){
+    dim();
+    big('STATISTICS', cx, 80, '#ffd24a');
+    const s=stats.data;
+    const L=[
+      ['Runs started', s.totalRunsStarted],
+      ['Runs completed', s.totalRunsCompleted],
+      ['Runs failed', s.totalRunsFailed],
+      ['Best score', s.bestScore],
+      ['Fastest completion', s.fastestCompletedSec!==null ? fmtTime(s.fastestCompletedSec) : '—'],
+      ['Highest district', s.highestDistrict],
+      ['Cans collected', s.totalCansCollected],
+      ['Cans delivered', s.totalCansDelivered],
+      ['People helped', s.totalPeopleHelped],
+      ['  Hungry', s.helpedByKind.hungry],
+      ['  Family', s.helpedByKind.family],
+      ['  Elder', s.helpedByKind.elder],
+      ['  Volunteer', s.helpedByKind.volunteer],
+      ['Upgrades chosen', s.totalUpgradesChosen],
+      ['Time played', fmtTime(Math.round(s.totalTimePlayedSec))],
+    ];
+    drawStatsPanel(L, cx, 120);
+    const items=[{label:'← BACK TO MENU'},{label:'RESET STATS'}];
+    menuSel=clampMenu(menuSel, 0, items.length-1);
+    if(menuSel===1){ items[1].action=()=>confirmAction={msg:'Reset all stats? This cannot be undone.', onYes:()=>stats.reset(), onNo:()=>{}}; }
+    drawMenuList(items, cx, 120+L.length*22+20, items.length);
+  }
+  // --- LEADERBOARDS ---
+  else if(state===STATE.LB){
+    dim();
+    big('LEADERBOARDS', cx, 80, '#ffd24a');
+    const boards=[
+      {key:'bestScores', title:'BEST SCORES', sort:'score'},
+      {key:'fastestRuns', title:'FASTEST RUNS', sort:'time'},
+      {key:'highestDistrict', title:'HIGHEST DISTRICT', sort:'district'},
+    ];
+    menuSel=clampMenu(menuSel, 0, 2);
+    const sel=menuSel;
+    // tabs
+    for(let i=0;i<3;i++){
+      const tx=cx-280+i*200;
+      const active=i===sel;
+      ctx.font='14px monospace'; ctx.textAlign='center';
+      ctx.fillStyle=active?'#ffd24a':'#8a7a5a';
+      ctx.fillText('['+(i+1)+'] '+boards[i].title, tx, 130);
+      if(active){ ctx.strokeStyle='#ffd24a'; ctx.beginPath(); ctx.moveTo(tx-60,138); ctx.lineTo(tx+60,138); ctx.stroke(); }
+    }
+    ctx.textAlign='left';
+    // entries
+    const arr=leaderboards.data[boards[sel].key]||[];
+    if(arr.length===0){ sub('No entries yet — complete a run!', cx, 180, '#8a7a5a'); }
+    else {
+      ctx.font='12px monospace';
+      for(let i=0;i<Math.min(arr.length,12);i++){
+        const e=arr[i];
+        const y=170+i*20;
+        const row=`#${i+1}  ${e.name.padEnd(10)}  ${String(e.score).padStart(6)}  ${fmtTime(e.durationSec).padStart(8)}  D${e.district}  seed:${e.seed}  [${e.modifier}]${e.completed?' ✓':''}`;
+        const tw=ctx.measureText(row).width;
+        ctx.fillStyle='rgba(20,16,10,0.5)'; ctx.fillRect(cx-tw/2-6, y-13, tw+12, 17);
+        ctx.fillStyle = e.completed?'#d8c8a0':'#8a7a5a'; ctx.textAlign='center';
+        ctx.fillText(row, cx, y);
+        ctx.textAlign='left';
+      }
+    }
+    sub('[1] Best Scores  [2] Fastest  [3] District  · ENTER back', cx, innerHeight-30, '#8a7a5a');
+  }
+  // --- OPTIONS / HELP ---
+  else if(state===STATE.OPTIONS){
+    dim();
+    big('OPTIONS & HELP', cx, 80, '#ffd24a');
+    const optItems=[
+      {label:'NAME: ['+(nameInput||profile.name).padEnd(12,'_')+']   (type, ENTER to save)'},
+      {label:'MOBILE CONTROLS: ' + options.mobileControls.toUpperCase()},
+      {label:'MINIMAP DEFAULT: '+(options.minimapDefault?'ON':'OFF')},
+      {label:'REDUCE VISUAL FX: '+(options.reduceFx?'ON':'OFF')},
+      {label:'MOUSE SENSITIVITY: '+options.mouseSens.toFixed(4)},
+      {label:'CLEAR ACTIVE SAVE'},
+      {label:'RESET ALL LOCAL DATA'},
+      {label:'← BACK TO MENU'},
+    ];
+    menuSel=clampMenu(menuSel, 0, optItems.length-1);
+    drawMenuList(optItems, cx, 130, optItems.length);
+    // help text
+    ctx.font='12px monospace'; ctx.fillStyle='#8a7a5a'; ctx.textAlign='center';
+    const help=[
+      'KEYBOARD: WASD/arrows move · Q/E or mouse turn · SHIFT sprint',
+      'SPACE/click give can · M minimap · P/ESC pause · R restart',
+      'MOBILE: left stick=move · right zone=turn · GIVE/GIVE=sprint/MAP/pause',
+      'People: hungry(1) · family(3) · elder(speed boost) · volunteer(reveal)',
+    ];
+    for(let i=0;i<help.length;i++) ctx.fillText(help[i], cx, innerHeight-90+i*16);
+    ctx.textAlign='left';
+  }
+  // --- UPGRADE (existing, preserved) ---
+  else if(state===STATE.UPGRADE){
+    dim();
+    big('DISTRICT '+game.district+' CLEARED', cx, 100, '#9cf09a');
+    sub('Score so far: '+game.totalScore+'   (modifier x'+game.scoreMult+')', cx, 140);
+    const u=player.upgrades; const owned=[];
+    if(u.pack)owned.push('pack×'+u.pack); if(u.sprint)owned.push('sprint×'+u.sprint);
+    if(u.hand)owned.push('hand×'+u.hand); if(u.map)owned.push('map×'+u.map); if(u.radar)owned.push('radar');
+    sub('Owned: '+(owned.length?owned.join('  '):'(none yet)'), cx, 165, '#8fa0ff');
+    const off=window._offered||[];
+    const bw=240, bh=130, gap=30;
+    const total=off.length*bw+(off.length-1)*gap;
+    let sx=cx-total/2;
+    ctx.font='14px monospace';
+    for(let i=0;i<off.length;i++){
+      const x=sx+i*(bw+gap), y=innerHeight/2-bh/2;
+      ctx.fillStyle='rgba(30,24,16,0.95)'; ctx.fillRect(x,y,bw,bh);
+      ctx.strokeStyle='rgba(200,168,110,0.6)'; ctx.lineWidth=2; ctx.strokeRect(x,y,bw,bh);
+      ctx.fillStyle='#ffd24a'; ctx.textAlign='center';
+      ctx.fillText('['+(i+1)+'] '+off[i].name, x+bw/2, y+32);
+      ctx.fillStyle='#d8c8a0'; ctx.fillText(off[i].desc, x+bw/2, y+62);
+      ctx.fillStyle='#8fa0ff'; ctx.fillText('press '+(i+1), x+bw/2, y+102);
+      ctx.textAlign='left';
+    }
+    sub('pick an upgrade (1/2/3) to descend into the next district', cx, innerHeight/2+bh/2+40);
+  }
+  // --- RESULTS SCREEN ---
+  else if(state===STATE.RESULTS){
+    dim();
+    const passed=game.run.completed;
+    big(passed?'RUN COMPLETE!':'RUN OVER', cx, 90, passed?'#9cf09a':'#ff7a6a');
+    const r=game.run;
+    const L=[
+      ['Result', passed?'COMPLETED':'FAILED (time up)'],
+      ['Final score', game.totalScore],
+      ['District reached', game.district-(passed?0:1)],
+      ['Cans collected', r.cansCollected],
+      ['Cans delivered', r.cansDelivered],
+      ['People helped', game.helped],
+      ['Run time', fmtTime(Math.round(r.runTime))],
+      ['Seed', r.seedUsed],
+      ['Modifier', r.modifierUsed],
+      ['Upgrades chosen', r.upgradesChosen],
+    ];
+    if(r.leaderboardRank){ L.push(['Leaderboard rank','#'+r.leaderboardRank+' (Best Scores)']); }
+    drawStatsPanel(L, cx, 130);
+    const items=resultItems();
+    menuSel=clampMenu(menuSel, 0, items.length-1);
+    drawMenuList(items, cx, 130+L.length*22+20, items.length);
+  }
+  // --- PAUSE MENU ---
+  if(paused && state===STATE.PLAY){
+    dim();
+    big('PAUSED', cx, innerHeight/2-130, '#ffd24a');
+    const pi=pauseItems();
+    menuSel=clampMenu(menuSel, 0, pi.length-1);
+    drawMenuList(pi, cx, innerHeight/2-80, pi.length);
+    // status info
+    ctx.font='12px monospace'; ctx.fillStyle='#8a7a5a'; ctx.textAlign='center';
+    ctx.fillText('District '+game.district+' · seed '+game.seed+' · ['+game.modifier+'] · score '+game.totalScore, cx, innerHeight/2+40);
+    ctx.fillText('Save: '+(SAVE.hasValid()?'active':'none'), cx, innerHeight/2+60);
+    ctx.textAlign='left';
+  }
+  // --- CONFIRMATION DIALOG (top-most) ---
+  if(confirmAction){
+    ctx.fillStyle='rgba(0,0,0,0.85)'; ctx.fillRect(0,0,innerWidth,innerHeight);
+    const pw=400, ph=160;
+    const px=cx-pw/2, py=innerHeight/2-ph/2;
+    ctx.fillStyle='rgba(30,24,16,0.98)'; ctx.fillRect(px,py,pw,ph);
+    ctx.strokeStyle='#ffd24a'; ctx.lineWidth=2; ctx.strokeRect(px,py,pw,ph);
+    ctx.font='16px monospace'; ctx.fillStyle='#ffd24a'; ctx.textAlign='center';
+    // wrap text
+    const words=confirmAction.msg.split(' ');
+    let line='', lineNum=0;
+    for(const w of words){ if((line+w).length>40){ ctx.fillText(line, cx, py+40+lineNum*22); lineNum++; line=w+' '; } else line+=w+' '; }
+    ctx.fillText(line, cx, py+40+lineNum*22);
+    // yes/no
+    const noX=cx-80, yesX=cx+30, by=py+ph-50;
+    ctx.font='15px monospace';
+    ctx.fillStyle=confirmSel===0?'#ffd24a':'#8a7a5a'; ctx.fillText('[NO]', noX, by);
+    ctx.fillStyle=confirmSel===1?'#9cf09a':'#8a7a5a'; ctx.fillText('[YES]', yesX, by);
+    ctx.fillStyle='#8a7a5a'; ctx.font='12px monospace';
+    ctx.fillText('←→ select · ENTER confirm', cx, by+22);
+    ctx.textAlign='left';
+  }
+}
+// helper: clamp menu selection
+function clampMenu(sel, min, max){ return Math.max(min, Math.min(max, sel)); }
+// helper: draw a list of selectable menu items
+function drawMenuList(items, cx, startY, count){
+  const itemH=30;
+  for(let i=0;i<count;i++){
+    const y=startY+i*itemH;
+    const sel=i===menuSel;
+    const en=items[i].enabled!==false;
+    ctx.font='16px monospace'; ctx.textAlign='center';
+    const tw=ctx.measureText(items[i].label).width;
+    if(sel){ ctx.fillStyle='rgba(255,210,74,0.15)'; ctx.fillRect(cx-tw/2-16, y-4, tw+32, 24); ctx.fillStyle=en?'#ffd24a':'#555'; ctx.fillText('▶ '+items[i].label, cx, y+12); }
+    else { ctx.fillStyle=en?'#d8c8a0':'#555'; ctx.fillText('  '+items[i].label, cx, y+12); }
+    ctx.textAlign='left';
+  }
+}
+// helper: draw a stats panel
+function drawStatsPanel(lines, cx, startY){
+  ctx.font='14px monospace';
+  const pw=460, lineH=22;
+  const ph=lines.length*lineH+20;
+  const px=cx-pw/2;
+  ctx.fillStyle='rgba(18,14,10,0.8)'; ctx.fillRect(px,startY-8,pw,ph);
+  ctx.strokeStyle='rgba(190,158,104,0.3)'; ctx.lineWidth=1; ctx.strokeRect(px,startY-8,pw,ph);
+  for(let i=0;i<lines.length;i++){
+    ctx.fillStyle='#8a7a5a'; ctx.textAlign='left';
+    ctx.fillText(lines[i][0], px+16, startY+i*lineH+8);
+    ctx.fillStyle='#e9d8b0'; ctx.textAlign='right';
+    ctx.fillText(String(lines[i][1]), px+pw-16, startY+i*lineH+8);
+  }
+  ctx.textAlign='left';
+}
+function fmtTime(sec){
+  if(sec===null||sec===undefined) return '—';
+  const m=Math.floor(sec/60), s=Math.floor(sec%60);
+  return m+':'+String(s).padStart(2,'0');
+}
+
+// upgrade choice keys
+function chooseUpgrade(idx){
+  const off=window._offered||[];
+  if(idx>=0 && off[idx]){
+    applyUpgrade(off[idx].id);
+    game.run.upgradesChosen++;
+    stats.data.upgradeCounts[off[idx].id] = (stats.data.upgradeCounts[off[idx].id]||0)+1;
+    stats.save();
+    game.district++;
+    game.run.highestDistrict = game.district;
+    game.modifier=pickModifier();
+    genCity(game.seed, game.district, game.modifier);
+    player.cans=0; player.stamina=player.maxStamina;
+    state=STATE.PLAY; paused=false;
+    beep(740,0.12,'triangle',0.05);
+    SAVE.save();
+  }
+}
+addEventListener('keydown',e=>{
+  if(state===STATE.UPGRADE){
+    let idx=-1;
+    if(e.code==='Digit1')idx=0; if(e.code==='Digit2')idx=1; if(e.code==='Digit3')idx=2;
+    chooseUpgrade(idx);
+  }
+});
+
+// ---------------------------------------------------------------------------
+// 13. MAIN LOOP
+// ---------------------------------------------------------------------------
+function playfieldLayout(){
+  // Use the actual canvas backing-store dimensions for perfect consistency.
+  const cw = view.width, ch = view.height;
+  const fit = Math.min(cw/RW, ch/RH);
+  // On mobile landscape, cover the screen so the world fills under overlays.
+  const scale = (mobileMode && cw > ch)
+    ? Math.max(cw/RW, ch/RH)
+    : fit;
+  const dw = RW*scale, dh = RH*scale;
+  return {scale,dw,dh,ox:(cw-dw)/2,oy:(ch-dh)/2};
+}
+let last=performance.now();
+function frame(now){
+  const dt=Math.min(0.05,(now-last)/1000); last=now;
+  update(dt);
+
+  if(state===STATE.PLAY || state===STATE.UPGRADE){
+    // full game scene render
+    drawScene(now);
+    ctx.imageSmoothingEnabled=false;
+    ctx.fillStyle='#000'; ctx.fillRect(0,0,innerWidth,innerHeight);
+    const {dw,dh,ox,oy} = playfieldLayout();
+    ctx.drawImage(buf,ox,oy,dw,dh);
+    if(game.modifier==='rainy' && state===STATE.PLAY){
+      ctx.fillStyle='rgba(40,60,90,0.16)'; ctx.fillRect(0,0,innerWidth,innerHeight);
+      ctx.strokeStyle='rgba(170,195,225,0.22)'; ctx.lineWidth=1;
+      const t=now/60;
+      for(let i=0;i<60;i++){
+        const rx=(i*97 + t*3) % innerWidth;
+        const ry=(i*53 + t*8) % innerHeight;
+        ctx.beginPath(); ctx.moveTo(rx,ry); ctx.lineTo(rx-3,ry+10); ctx.stroke();
+      }
+    } else if(state===STATE.PLAY && !options.reduceFx){
+      ctx.fillStyle='rgba(220,180,120,0.05)'; ctx.fillRect(0,0,innerWidth,innerHeight);
+    }
+    if(state===STATE.PLAY && !paused){ drawHUD(now); drawMinap(); }
+    drawOverlays();
+    drawMobileMenu();
+  }
+  else if(state===STATE.RESULTS){
+    // dimmed game scene behind results
+    drawScene(now);
+    ctx.imageSmoothingEnabled=false;
+    ctx.fillStyle='#000'; ctx.fillRect(0,0,innerWidth,innerHeight);
+    const {dw,dh,ox,oy} = playfieldLayout();
+    ctx.drawImage(buf,ox,oy,dw,dh);
+    drawOverlays();
+    drawMobileMenu();
+  }
+  else {
+    // menu states (TITLE/SEEDED/STATS/LB/OPTIONS): dark background + overlay only
+    ctx.fillStyle='#1a1410'; ctx.fillRect(0,0,innerWidth,innerHeight);
+    // subtle mesa silhouette behind menu
+    ctx.fillStyle='#2a2018';
+    ctx.beginPath(); ctx.moveTo(0,innerHeight);
+    for(let x=0;x<=innerWidth;x+=20){ ctx.lineTo(x, innerHeight-40-Math.sin(x*0.01+now*0.0003)*20); }
+    ctx.lineTo(innerWidth,innerHeight); ctx.fill();
+    drawOverlays();
+    drawMobileMenu();
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+function updateSeed(newSeed){
+  const n = parseInt(newSeed, 10);
+  if(!Number.isNaN(n)){
+    game.seed = n;
+    seedInput = String(n);
+  }
+  return game.seed;
+}
+
+function getDebugState(){
+  const vv = window.visualViewport;
+  return {
+    state, paused, mobileMode, mobileAuto:isMobile(),
+    seed:game.seed, district:game.district, score:game.totalScore,
+    player:{x:player.x,y:player.y,angle:player.angle,cans:player.cans,stamina:player.stamina},
+    runActive:!!game.run.active,
+    saveValid:!!SAVE.hasValid(),
+    canvas:{cssW:view.style.width,cssH:view.style.height,w:view.width,h:view.height,dpr:devicePixelRatio||1},
+    viewport:{w:innerWidth,h:innerHeight,visualW:vv?vv.width:null,visualH:vv?vv.height:null},
+    storageKeys:Object.assign({}, K),
+  };
+}
+
+globalThis.CR = window.CR = {
+  game,player,STATE,cfg,SAVE,stats,leaderboards,profile,options,dbg,
+  get state(){ return state; },
+  set state(v){ if(Object.values(STATE).includes(v)) state=v; },
+  get paused(){ return paused; },
+  set paused(v){ paused=!!v; },
+  get mobileMode(){ return mobileMode; },
+  startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,
+  setMobileMode,isMobile,rmenuAction,getDebugState,
+  toggleFullscreen,isFullscreen,enterFullscreen,exitFullscreen,
+};
+</script>
+</body>
+</html>

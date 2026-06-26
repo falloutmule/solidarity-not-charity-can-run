@@ -11,9 +11,15 @@ Navigation for maintainers and Hermes handoffs.
 | [q1k3-lessons.md](q1k3-lessons.md) | q1k3 reference; what we borrowed |
 | [handoff-rules.md](handoff-rules.md) | Travis / Hermes working contract |
 
+## Reports
+
+- **[reports/README.md](../reports/README.md)** — guard cards, history, proofs  
+- **[reports/guards/](../reports/guards/)** — current guard reports  
+- **[reports/reference/](../reports/reference/)** — reference studies  
+
 ## Also at repo root
 
 - **`PROJECT_STATUS.md`** — baseline, cards, blockers  
 - **`SOURCE_RELEASE_POLICY.md`** — shipped artifact policy  
-- **`reports/README.md`** — guard card report index  
+- **`reports/README.md`** — guard card report index (under `reports/`)  
 - **`src/README.md`** — non-runtime module scaffold

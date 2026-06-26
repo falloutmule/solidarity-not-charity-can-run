@@ -21,4 +21,4 @@
 
 ## Report
 
-Full study: **`Q1K3_LEARNING_REPORT.md`** (repo root).
+Full study: **`../reports/reference/Q1K3_LEARNING_REPORT.md`**.

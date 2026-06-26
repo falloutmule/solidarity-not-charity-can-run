@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Canned Run</title>
+<style>
+  html,body{margin:0;height:100%;background:#000;overflow:hidden;cursor:crosshair;}
+  #view{display:block;width:100vw;height:100vh;image-rendering:pixelated;}
+</style>
+</head>
+<body>
+<canvas id="view"></canvas>
+<script>
+"use strict";
+/* ============================================================================
+   CANNED RUN  —  flat raycaster speedrun roguelike (single file, no deps)
+
+   Major systems:
+     0. Canvas / low-res pixelated buffer
+     1. Seeded RNG (mulberry32) — reusable seeds shown on screen / via #seed
+     2. Game state machine (start / play / upgrade / over / paused)
+     3. Procedural city generator (roads, blocks, alleys, lots, decor)
+        + walkable clearance + flood-fill reachability validation
+        + spawn validation for every object
+     4. Collision helpers (isWalkableCell / isWalkableAt / hasClearance / canStand)
+     5. Audio (tiny WebAudio blips, fully guarded)
+     6. Procedural sprite textures (no external assets)
+     7. Renderer: DDA raycast walls (per-column z-buffer)
+                  + billboard sprites projected from WORLD coords only
+                  (depth = camera-plane projection; this is the fix for
+                   "cans slide with player" and "people show through walls")
+     8. Minimap (toggle M), levels up with upgrade
+     9. HUD (timer, cans, helped/delivered/quota, stamina, seed, district,
+             modifier, score, owned upgrades, reticle, needs label, popups)
+    10. Gameplay: pickups, handoff w/ cooldown + reticle + needs feedback,
+        quota -> exit -> upgrade choice -> next district
+    11. Update loop (movement, stamina, timers, modifiers)
+    12. Overlays (start / pause-help / upgrade / game over)
+    13. Main loop
+
+   DEBUG: append ?debug to the URL for a diagnostic overlay.
+   ========================================================================== */
+
+// ---------------------------------------------------------------------------
+// 0. CANVAS / RESOLUTION
+// ---------------------------------------------------------------------------
+const view = document.getElementById('view');
+const ctx  = view.getContext('2d');
+const RW = 320, RH = 200;                      // internal render resolution
+const buf = document.createElement('canvas'); buf.width = RW; buf.height = RH;
+const bctx = buf.getContext('2d');
+const zbuffer = new Float32Array(RW);          // per-column wall distance (sprite occlusion)
+
+function resize(){ view.width = innerWidth; view.height = innerHeight; }
+addEventListener('resize', resize); resize();
+
+// ---------------------------------------------------------------------------
+// DEBUG FLAG (URL: file.html?debug  or  ...#...&debug via search)
+// ---------------------------------------------------------------------------
+const DEBUG = new URLSearchParams(location.search).has('debug');
+const dbg = { cansSpawned:0, npcsSpawned:0, invalidPlacements:0,
+              spritesSkipped:0, reachableCells:0, rejectedSpawns:0 };
+
+// ---------------------------------------------------------------------------
+// 1. SEEDED RNG (mulberry32)
+// ---------------------------------------------------------------------------
+function mulberry32(a){
+  return function(){
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a>>>15, 1 | a);
+    t = t + Math.imul(t ^ t>>>7, 61 | t) ^ t;
+    return ((t ^ t>>>14) >>> 0) / 4294967296;
+  };
+}
+let RNG = mulberry32(12345);
+
+// ---------------------------------------------------------------------------
+// 2. GAME STATE
+// ---------------------------------------------------------------------------
+const STATE = { START:'start', PLAY:'play', UPGRADE:'upgrade', OVER:'over' };
+let state = STATE.START;
+let paused = false;
+
+const game = {
+  seed: 12345, district: 1, totalScore: 0,
+  map: null, MAP_W: 0, MAP_H: 0, wallShade: null,
+  pickups: [], npcs: [], exit: null,
+  quota: 0, helped: 0, delivered: 0, timeLeft: 0,
+  modifier: 'clear', scoreMult: 1,
+  msg: '', msgT: 0,
+  radarT: 0, revealT: 0,
+  aimNpc: null,                 // nearest handoffable npc this frame (for reticle)
+  popups: [],                   // floating score/text popups {x,y,vy,life,text,color}
+};
+
+const player = {
+  x:0, y:0, angle:0,
+  cans:0, maxCans:10,
+  stamina:60, maxStamina:60,
+  giveRange:1.4, giveCD:0, baseGiveCD:0.45,
+  speedBoostT:0,
+  minimapLevel:1, radar:false, radarPingT:0,
+  handoffBonus:0, regenBonus:0,
+  upgrades:{pack:0, sprint:0, hand:0, map:0, radar:0},
+};
+
+const cfg = {
+  walkSpeed:3.0, sprintSpeed:5.2,
+  staminaDrain:26, staminaRegen:16,
+  fov:0.66, fogColor:[14,16,24],
+  baseTime:95,
+};
+
+// ---------------------------------------------------------------------------
+// 3. CITY GENERATION
+//    Grid of roads. Each block region becomes a building, an open lot,
+//    or an alley-pierced block. Then we flood-fill from the player start to
+//    find REACHABLE floor cells and only place objects there, with clearance.
+// ---------------------------------------------------------------------------
+const WALL = { BUILDING:1, BRICK:2, FENCE:3, MURAL:4, VAN:5, GLASS:6 };
+const WALL_COLORS = {
+  1:[122,124,136], 2:[156,74,58], 3:[74,112,80], 4:[112,92,152],
+  5:[58,62,74], 6:[86,128,156],
+};
+
+function genCity(seed, district, modifier){
+  RNG = mulberry32((seed ^ 0x9e3779b9) + district*2654435761);
+  const r = RNG;
+
+  // modifier tuning
+  let spacing = 7, fill = 0.55, canMult = 1.0, peoMult = 1.0;
+  game.scoreMult = 1;
+  if(modifier==='clear'){ spacing = 9; fill = 0.24; }       // open roads
+  if(modifier==='maze'){  spacing = 5; fill = 0.80; }        // dense city
+  if(modifier==='shortage'){ canMult = 0.55; peoMult = 1.1; game.scoreMult = 1.5; }
+  // 'rainy' handled at render (visibility + tint)
+
+  const GW = 42, GH = 42;
+  const map = [], shade = [];
+  for(let y=0;y<GH;y++){ map.push(new Array(GW).fill(1)); shade.push(new Array(GW).fill(0)); }
+
+  const isRoad = (v)=> (v % spacing) < 2;
+
+  // carve roads
+  for(let y=0;y<GH;y++) for(let x=0;x<GW;x++){
+    if(isRoad(x) || isRoad(y)) map[y][x]=0;
+  }
+  // border walls
+  for(let i=0;i<GW;i++){ map[0][i]=1; map[GH-1][i]=1; }
+  for(let i=0;i<GH;i++){ map[i][0]=1; map[i][GW-1]=1; }
+
+  // process block regions
+  for(let by=2; by<GH-2; by+=spacing){
+    for(let bx=2; bx<GW-2; bx+=spacing){
+      const x0=bx+2, y0=by+2;
+      const x1=Math.min(bx+spacing-1, GW-2), y1=Math.min(by+spacing-1, GH-2);
+      if(x1<=x0||y1<=y0) continue;
+      const roll = r();
+      if(roll < fill){
+        // building block
+        const types=[WALL.BUILDING,WALL.BUILDING,WALL.BRICK,WALL.MURAL,WALL.VAN,WALL.GLASS];
+        const wt = types[(r()*types.length)|0];
+        for(let y=y0;y<y1;y++) for(let x=x0;x<x1;x++){ map[y][x]=wt; shade[y][x]=r(); }
+        // 1-2 alleys carved through (more alleys = more readable routing)
+        const alleys = 1 + ((r()*2)|0);
+        for(let k=0;k<alleys;k++){
+          if(r()<0.5){ const ay=y0+((r()*(y1-y0))|0); for(let x=x0;x<x1;x++) map[ay][x]=0; }
+          else       { const ax=x0+((r()*(x1-x0))|0); for(let y=y0;y<y1;y++) map[y][ax]=0; }
+        }
+      } else {
+        // open lot / parking lot: floor with a few decor posts
+        for(let y=y0;y<y1;y++) for(let x=x0;x<x1;x++){ map[y][x]=0; shade[y][x]=r(); }
+        if(r()<0.65){
+          const posts=1+((r()*3)|0);
+          for(let k=0;k<posts;k++){
+            const px=x0+((r()*(x1-x0))|0), py=y0+((r()*(y1-y0))|0);
+            map[py][px]=WALL.FENCE;
+          }
+        }
+      }
+    }
+  }
+
+  game.map = map; game.MAP_W = GW; game.MAP_H = GH; game.wallShade = shade;
+
+  // player start: first floor cell from top-left
+  let sx=2.5, sy=2.5, found=false;
+  for(let y=1;y<GH-1 && !found;y++) for(let x=1;x<GW-1 && !found;x++){
+    if(map[y][x]===0){ sx=x+0.5; sy=y+0.5; found=true; }
+  }
+  player.x=sx; player.y=sy; player.angle=Math.PI/4;
+
+  // ---- FLOOD-FILL REACHABILITY from player start cell ----
+  const reach = new Array(GH);
+  for(let y=0;y<GH;y++) reach[y]=new Array(GW).fill(false);
+  const stack=[[sx|0, sy|0]];
+  reach[sy|0][sx|0]=true;
+  let reachCount=0;
+  while(stack.length){
+    const [cx,cy]=stack.pop(); reachCount++;
+    const nb=[[cx+1,cy],[cx-1,cy],[cx,cy+1],[cx,cy-1]];
+    for(const [nx,ny] of nb){
+      if(nx<0||ny<0||nx>=GW||ny>=GH) continue;
+      if(reach[ny][nx]) continue;
+      if(map[ny][nx]!==0) continue;
+      reach[ny][nx]=true; stack.push([nx,ny]);
+    }
+  }
+  dbg.reachableCells = reachCount;
+
+  // ---- BUILD VALID CANDIDATE LIST (reachable + clearance) ----
+  // candidates carry center coords; we re-validate clearance per placement radius.
+  const candidates=[];
+  for(let y=1;y<GH-1;y++) for(let x=1;x<GW-1;x++){
+    if(!reach[y][x]) continue;
+    candidates.push([x+0.5, y+0.5]);
+  }
+
+  // helper: pop a random candidate that satisfies clearance + min distance from player
+  function takeCandidate(radius, minDistFromStart, used){
+    for(let tries=0; tries<300; tries++){
+      if(!candidates.length) return null;
+      const idx=(r()*candidates.length)|0;
+      const [cx,cy]=candidates[idx];
+      if(!hasClearance(cx,cy,radius)){ dbg.rejectedSpawns++; continue; }
+      if(Math.hypot(cx-sx, cy-sy) < minDistFromStart) continue;
+      let overlap=false;
+      if(used) for(const u of used){ if(Math.hypot(cx-u[0],cy-u[1])<0.9){ overlap=true; break; } }
+      if(overlap) continue;
+      candidates.splice(idx,1);
+      return [cx,cy];
+    }
+    return null;
+  }
+
+  // place CANS
+  game.pickups=[];
+  const canCount = Math.max(8, Math.floor((14 + district*2)*canMult));
+  const used=[];
+  for(let i=0;i<canCount;i++){
+    const spot=takeCandidate(0.30, 1.5, used);
+    if(!spot){ dbg.invalidPlacements++; break; }
+    used.push(spot);
+    game.pickups.push({x:spot[0], y:spot[1], taken:false, amt: r()<0.3?2:1});
+  }
+  dbg.cansSpawned = game.pickups.length;
+
+  // place PEOPLE (static)
+  game.npcs=[];
+  const KINDS=['hungry','hungry','hungry','family','family','elder','volunteer'];
+  const peoCount = Math.max(5, Math.floor((7+district)*peoMult));
+  for(let i=0;i<peoCount;i++){
+    const spot=takeCandidate(0.42, 2.0, used);
+    if(!spot){ dbg.invalidPlacements++; break; }
+    used.push(spot);
+    const kind=KINDS[(r()*KINDS.length)|0];
+    const need = kind==='family'?3:1;
+    game.npcs.push({x:spot[0], y:spot[1], kind, need, helped:false, wob:r()*6.28});
+  }
+  dbg.npcsSpawned = game.npcs.length;
+
+  game.quota = Math.max(3, Math.ceil(game.npcs.length*0.6));
+  game.helped=0; game.delivered=0;
+
+  // EXIT: farthest reachable candidate from start
+  let bestEx=[GW-2.5,GH-2.5], bestD=-1;
+  for(const [cx,cy] of candidates){
+    const d=Math.hypot(cx-sx,cy-sy);
+    if(d>bestD && hasClearance(cx,cy,0.5)){ bestD=d; bestEx=[cx,cy]; }
+  }
+  game.exit = {x:bestEx[0], y:bestEx[1], active:false};
+
+  game.timeLeft = cfg.baseTime + (district-1)*8;
+}
+
+// ---------------------------------------------------------------------------
+// 4. COLLISION / WALK HELPERS
+// ---------------------------------------------------------------------------
+function isWalkableCell(tx, ty){
+  if(ty<0||ty>=game.MAP_H||tx<0||tx>=game.MAP_W) return false;
+  return game.map[ty][tx] === 0;
+}
+function isWalkableAt(x, y){
+  return isWalkableCell(Math.floor(x), Math.floor(y));
+}
+// Check center + 8 surrounding points so objects don't hug/clip walls.
+function hasClearance(x, y, radius){
+  const pts=[
+    [0,0],
+    [-radius,0],[radius,0],[0,-radius],[0,radius],
+    [-radius,-radius],[radius,-radius],[-radius,radius],[radius,radius]
+  ];
+  for(const [ox,oy] of pts){ if(!isWalkableAt(x+ox, y+oy)) return false; }
+  return true;
+}
+function isWall(x,y){ return !isWalkableAt(x,y); }
+function canStand(x,y){
+  const r=0.22;
+  return !isWall(x-r,y-r)&&!isWall(x+r,y-r)&&!isWall(x-r,y+r)&&!isWall(x+r,y+r);
+}
+
+// ---------------------------------------------------------------------------
+// 5. AUDIO
+// ---------------------------------------------------------------------------
+let AC=null;
+function beep(freq,dur,type='square',gain=0.04){
+  try{
+    if(!AC) AC = new (window.AudioContext||window.webkitAudioContext)();
+    const o=AC.createOscillator(), g=AC.createGain();
+    o.type=type; o.frequency.value=freq; g.gain.value=gain;
+    o.connect(g); g.connect(AC.destination); o.start();
+    g.gain.exponentialRampToValueAtTime(0.0001, AC.currentTime+dur);
+    o.stop(AC.currentTime+dur);
+  }catch(e){}
+}
+
+// ---------------------------------------------------------------------------
+// 6. PROCEDURAL SPRITE TEXTURES
+// ---------------------------------------------------------------------------
+function newTex(w,h){ const c=document.createElement('canvas'); c.width=w; c.height=h; return c; }
+
+function makeFigure(body, head, legs, opts){
+  opts = opts || {};
+  const c=newTex(24,42), x=c.getContext('2d');
+  x.clearRect(0,0,24,42);
+  // legs
+  x.fillStyle=legs; x.fillRect(8,28,3,12); x.fillRect(13,28,3,12);
+  // torso
+  x.fillStyle=body; x.fillRect(6,15,12,14);
+  // arms
+  x.fillStyle=body; x.fillRect(3,16,4,10); x.fillRect(17,16,4,10);
+  // volunteer vest stripe
+  if(opts.vest){ x.fillStyle='#f4e04a'; x.fillRect(6,18,12,3); }
+  // elder cane
+  if(opts.cane){ x.fillStyle='#caa46a'; x.fillRect(18,14,2,26); }
+  // head
+  x.fillStyle=head; x.beginPath(); x.arc(12,9,5,0,7); x.fill();
+  x.fillStyle='#1a1a1a'; x.fillRect(10,8,1,2); x.fillRect(13,8,1,2);
+  // family child (small figure to the side)
+  if(opts.child){
+    x.fillStyle=body; x.fillRect(0,24,4,8);
+    x.fillStyle=head; x.beginPath(); x.arc(2,21,3,0,7); x.fill();
+  }
+  return c;
+}
+const TEX = {
+  hungry:   makeFigure('#d05a48','#e6b88c','#3a3a44'),
+  family:   makeFigure('#4a8fc8','#e6b88c','#2f3a55',{child:true}),
+  elder:    makeFigure('#9c8bd0','#dcc39a','#5a4a6a',{cane:true}),
+  volunteer:makeFigure('#5fb37a','#e6b88c','#36634a',{vest:true}),
+  can: (()=>{ const c=newTex(18,18),x=c.getContext('2d');
+    // glow halo so it's distinct on the ground
+    x.fillStyle='rgba(255,210,90,0.28)'; x.beginPath(); x.arc(9,9,9,0,7); x.fill();
+    x.fillStyle='#c2c2cc'; x.fillRect(4,3,10,12);
+    x.fillStyle='#8a8a92'; x.fillRect(4,3,10,2); x.fillRect(4,13,10,2);
+    x.fillStyle='#e23b3b'; x.fillRect(4,7,10,4);
+    x.fillStyle='#ffffff'; x.fillRect(5,8,8,2);
+    return c; })(),
+  exit: (()=>{ const c=newTex(40,72),x=c.getContext('2d');
+    const g=x.createLinearGradient(0,0,0,72); g.addColorStop(0,'#fff6a8'); g.addColorStop(1,'#e8a13a');
+    x.fillStyle=g; x.fillRect(10,0,20,72);
+    x.fillStyle='#ffffff'; x.fillRect(13,8,14,6); x.fillRect(13,22,14,6); x.fillRect(13,36,14,6);
+    // arrow
+    x.fillStyle='#3a2a00'; x.beginPath(); x.moveTo(20,50); x.lineTo(12,60); x.lineTo(28,60); x.fill();
+    return c; })(),
+};
+const HEIGHT = { hungry:0.85, family:1.0, elder:0.82, volunteer:0.9, can:0.4, exit:1.2 };
+
+// ---------------------------------------------------------------------------
+// 7. RENDER
+// ---------------------------------------------------------------------------
+function drawScene(){
+  // floor / ceiling
+  const gceil=bctx.createLinearGradient(0,0,0,RH/2);
+  gceil.addColorStop(0,'#1a1c26'); gceil.addColorStop(1,'#2e3140');
+  bctx.fillStyle=gceil; bctx.fillRect(0,0,RW,RH/2);
+  const gfloor=bctx.createLinearGradient(0,RH/2,0,RH);
+  gfloor.addColorStop(0,'#3c372e'); gfloor.addColorStop(1,'#221f18');
+  bctx.fillStyle=gfloor; bctx.fillRect(0,RH/2,RW,RH/2);
+
+  const px=player.x, py=player.y, a=player.angle;
+  const dirX=Math.cos(a), dirY=Math.sin(a);
+  const planeX=-Math.sin(a)*cfg.fov, planeY=Math.cos(a)*cfg.fov;
+  const visRange = game.modifier==='rainy'?9.0:16.0;
+  const fog=cfg.fogColor;
+
+  // ---- WALLS (DDA) -> fills zbuffer per column ----
+  for(let col=0; col<RW; col++){
+    const cameraX = 2*col/RW - 1;
+    const rdx = dirX + planeX*cameraX;
+    const rdy = dirY + planeY*cameraX;
+    let mapX=px|0, mapY=py|0;
+    const ddx = Math.abs(1/(rdx||1e-9)), ddy = Math.abs(1/(rdy||1e-9));
+    let stepX, stepY, sdx, sdy;
+    if(rdx<0){ stepX=-1; sdx=(px-mapX)*ddx; } else { stepX=1; sdx=(mapX+1-px)*ddx; }
+    if(rdy<0){ stepY=-1; sdy=(py-mapY)*ddy; } else { stepY=1; sdy=(mapY+1-py)*ddy; }
+    let hit=0, side=0, wt=1, steps=0;
+    while(hit===0 && steps<80){
+      if(sdx<sdy){ sdx+=ddx; mapX+=stepX; side=0; } else { sdy+=ddy; mapY+=stepY; side=1; }
+      if(mapX<0||mapY<0||mapX>=game.MAP_W||mapY>=game.MAP_H){ wt=1; hit=1; break; }
+      if(game.map[mapY][mapX]!==0){ wt=game.map[mapY][mapX]; hit=1; }
+      steps++;
+    }
+    const perp = (side===0)? (sdx-ddx) : (sdy-ddy);
+    const d = Math.max(0.05, perp);
+    zbuffer[col]=d;
+    const lineH = RH/d;
+    const drawStart=(RH/2 - lineH/2)|0;
+    const drawEnd=(RH/2 + lineH/2)|0;
+    let base = WALL_COLORS[wt] || WALL_COLORS[1];
+    let sh = (game.wallShade[mapY]?(0.85+0.3*(game.wallShade[mapY][mapX]||0.5)):1);
+    if(side===1) sh*=0.7;
+    let rr=base[0]*sh, gg=base[1]*sh, bb=base[2]*sh;
+    const f = Math.min(1, d/visRange);
+    rr=rr+(fog[0]-rr)*f; gg=gg+(fog[1]-gg)*f; bb=bb+(fog[2]-bb)*f;
+    bctx.fillStyle='rgb('+(rr|0)+','+(gg|0)+','+(bb|0)+')';
+    bctx.fillRect(col, drawStart, 1, drawEnd-drawStart+1);
+  }
+
+  // ---- SPRITES (billboards), projected from WORLD coords ----
+  //   depth  = camera-plane projection (forward distance)
+  //   hscr   = direction projection (horizontal screen factor)
+  //   Rendering NEVER mutates obj.x / obj.y.
+  const sprites=[];
+  function pushSp(obj, tex, hp){
+    const rwx = obj.x - px;
+    const rwy = obj.y - py;
+    const invDet = 1/(planeX*dirY - dirX*planeY);
+    const depth = invDet * (-planeY*rwx + planeX*rwy);   // forward distance
+    const hscr  = invDet * (dirY*rwx - dirX*rwy);         // horizontal factor
+    if(depth <= 0.12){ dbg.spritesSkipped++; return; }    // behind / too close
+    sprites.push({obj,tex,hp,depth,hscr});
+  }
+  for(const c of game.pickups) if(!c.taken) pushSp(c, TEX.can, HEIGHT.can);
+  for(const n of game.npcs)    if(!n.helped) pushSp(n, TEX[n.kind], HEIGHT[n.kind]);
+  if(game.exit && game.exit.active) pushSp(game.exit, TEX.exit, HEIGHT.exit);
+
+  // far first
+  sprites.sort((p,q)=>q.depth-p.depth);
+
+  for(const s of sprites){
+    const depth=s.depth;
+    const lineH=RH/depth;
+    const screenH=s.hp*lineH;
+    const screenW=screenH*(s.tex.width/s.tex.height);
+    const screenX=(RW/2)*(1 + s.hscr/depth);
+    const bottom=RH/2 + lineH/2;            // ground line at this depth
+    const top=bottom-screenH;
+    const startCol=Math.floor(screenX-screenW/2);
+    const endCol=Math.ceil(screenX+screenW/2);
+    for(let col=startCol; col<endCol; col++){
+      if(col<0||col>=RW) continue;
+      if(depth >= zbuffer[col]) continue;   // occluded by a closer wall
+      const u=(col-(screenX-screenW/2))/screenW;
+      const srcX=Math.max(0,Math.min(s.tex.width-1, (u*s.tex.width)|0));
+      let yoff=0;
+      if(s.obj && s.obj.wob!==undefined){
+        yoff=Math.sin(performance.now()/300+s.obj.wob)*(screenH*0.03);
+      }
+      // exit pulse
+      if(s.obj===game.exit){
+        yoff=Math.sin(performance.now()/200)*2;
+      }
+      bctx.drawImage(s.tex, srcX,0,1,s.tex.height, col, top+yoff, 1, screenH);
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 8. MINIMAP
+// ---------------------------------------------------------------------------
+let showMinimap = true;
+function drawMinap(){
+  if(!showMinimap) return;
+  const cell=4, pad=10;
+  const W=game.MAP_W*cell, H=game.MAP_H*cell;
+  const ox=pad, oy=innerHeight-H-pad;
+  ctx.fillStyle='rgba(0,0,0,0.55)'; ctx.fillRect(ox-2,oy-2,W+4,H+4);
+  for(let y=0;y<game.MAP_H;y++) for(let x=0;x<game.MAP_W;x++){
+    if(game.map[y][x]!==0){
+      const c=WALL_COLORS[game.map[y][x]]||WALL_COLORS[1];
+      ctx.fillStyle='rgb('+(c[0]*0.6|0)+','+(c[1]*0.6|0)+','+(c[2]*0.6|0)+')';
+      ctx.fillRect(ox+x*cell, oy+y*cell, cell, cell);
+    }
+  }
+  const revealCans = player.minimapLevel>=2 || game.revealT>0 || (player.radar && game.radarPingT>0);
+  if(revealCans){
+    ctx.fillStyle='#ffcc44';
+    for(const c of game.pickups) if(!c.taken) ctx.fillRect(ox+c.x*cell-1, oy+c.y*cell-1, 2,2);
+  }
+  if(player.minimapLevel>=2 || game.revealT>0){
+    for(const n of game.npcs) if(!n.helped){
+      ctx.fillStyle = n.kind==='family'?'#4a8fc8': n.kind==='elder'?'#9c8bd0': n.kind==='volunteer'?'#5fb37a':'#d05a48';
+      ctx.fillRect(ox+n.x*cell-1.5, oy+n.y*cell-1.5, 3,3);
+    }
+  }
+  if(game.exit){
+    ctx.fillStyle = game.exit.active?'#ffe066':'#666';
+    ctx.fillRect(ox+game.exit.x*cell-2, oy+game.exit.y*cell-2, 4,4);
+  }
+  // player + facing
+  ctx.fillStyle='#ffffff';
+  ctx.beginPath(); ctx.arc(ox+player.x*cell, oy+player.y*cell, 2.4, 0, 7); ctx.fill();
+  ctx.strokeStyle='#ffffff'; ctx.beginPath();
+  ctx.moveTo(ox+player.x*cell, oy+player.y*cell);
+  ctx.lineTo(ox+(player.x+Math.cos(player.angle)*1.5)*cell, oy+(player.y+Math.sin(player.angle)*1.5)*cell);
+  ctx.stroke();
+}
+
+// ---------------------------------------------------------------------------
+// 9. HUD + RETICLE + POPUPS
+// ---------------------------------------------------------------------------
+function staminaBar(){
+  const n=16, f=Math.round(n*player.stamina/player.maxStamina);
+  let s=''; for(let i=0;i<n;i++) s+= i<f?'#':'.'; return s;
+}
+function upgradeTag(){
+  const u=player.upgrades; const parts=[];
+  if(u.pack)   parts.push('pack'+u.pack);
+  if(u.sprint) parts.push('spr'+u.sprint);
+  if(u.hand)   parts.push('hnd'+u.hand);
+  if(u.map)    parts.push('map'+u.map);
+  if(u.radar)  parts.push('rad');
+  return parts.length?('UPG '+parts.join(' ')):'';
+}
+function drawHUD(){
+  ctx.textBaseline='top';
+  const q=(game.helped>=game.quota && game.exit && game.exit.active)?'EXIT OPEN':('quota '+game.helped+'/'+game.quota);
+  const cdTag = player.giveCD>0 ? (' handoff CD '+player.giveCD.toFixed(1)) : '';
+  const lines=[
+    'TIME '+Math.max(0,game.timeLeft).toFixed(1),
+    'CANS '+player.cans+'/'+player.maxCans,
+    'HELPED '+game.helped+'  DELIVERED '+game.delivered+'  '+q+cdTag,
+    'STAM ['+staminaBar()+']',
+    'SEED '+game.seed+'  DIST '+game.district+'  ['+game.modifier+']  x'+game.scoreMult+'  SCORE '+game.totalScore,
+  ];
+  const ut=upgradeTag(); if(ut) lines.push(ut);
+  ctx.font='15px monospace';
+  ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(8,8,460, lines.length*20+8);
+  ctx.fillStyle='#e9e9ef';
+  for(let i=0;i<lines.length;i++) ctx.fillText(lines[i], 14, 13+i*20);
+
+  // controls hint
+  ctx.font='12px monospace'; ctx.fillStyle='#9a9aa6';
+  ctx.fillText('WASD move · Q/E or mouse turn · SPACE/CLICK give · SHIFT sprint · M map · P pause · R restart', 10, innerHeight-22);
+
+  // center crosshair / reticle
+  const cx=innerWidth/2, cy=innerHeight/2;
+  const aim=game.aimNpc;
+  if(aim){
+    ctx.strokeStyle = player.cans>=aim.need ? '#7fffa0' : '#ff9a6a';
+    ctx.lineWidth=2; ctx.beginPath(); ctx.arc(cx,cy,10,0,7); ctx.stroke();
+    ctx.font='13px monospace'; ctx.fillStyle= player.cans>=aim.need?'#9fffb6':'#ffb088';
+    ctx.textAlign='center';
+    const label = aim.kind.toUpperCase()+' needs '+aim.need+' (you have '+player.cans+')';
+    ctx.fillText(label, cx, cy+18);
+    ctx.textAlign='left';
+  } else {
+    ctx.fillStyle='#cfcfd6'; ctx.fillRect(cx-1,cy-1,2,2);
+  }
+
+  // message
+  if(game.msg && game.msgT>0){
+    ctx.font='17px monospace'; ctx.fillStyle='#ffd24a'; ctx.textAlign='center';
+    ctx.fillText(game.msg, cx, 58); ctx.textAlign='left';
+  }
+
+  // score popups
+  for(const p of game.popups){
+    ctx.font='15px monospace'; ctx.fillStyle=p.color; ctx.textAlign='center';
+    ctx.globalAlpha=Math.max(0,Math.min(1,p.life));
+    ctx.fillText(p.text, p.x, p.y);
+    ctx.globalAlpha=1; ctx.textAlign='left';
+  }
+
+  // DEBUG overlay
+  if(DEBUG){
+    ctx.font='12px monospace'; ctx.fillStyle='#9fe0ff';
+    const d=[
+      'DEBUG cans='+dbg.cansSpawned+' npcs='+dbg.npcsSpawned,
+      'invalid='+dbg.invalidPlacements+' rejected='+dbg.rejectedSpawns+' reach='+dbg.reachableCells,
+      'skipped sprites='+dbg.spritesSkipped+' pickups_live='+game.pickups.filter(c=>!c.taken).length,
+    ];
+    for(let i=0;i<d.length;i++) ctx.fillText(d[i], innerWidth-360, 13+i*16);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 10. GAMEPLAY ACTIONS
+// ---------------------------------------------------------------------------
+function addPopup(text,color){
+  game.popups.push({x:innerWidth/2, y:innerHeight/2-40, vy:-26, life:1.0, text, color});
+}
+function tickPickups(){
+  for(const c of game.pickups){
+    if(c.taken) continue;
+    const dx=c.x-player.x, dy=c.y-player.y;
+    if(dx*dx+dy*dy<0.18){
+      if(player.cans<player.maxCans){
+        const space=player.maxCans-player.cans;
+        const take=Math.min(c.amt,space);
+        player.cans+=take; c.amt-=take;
+        beep(660,0.08,'square',0.05);
+        addPopup('+'+take+' CAN'+(take>1?'S':''),'#ffd24a');
+        if(c.amt<=0) c.taken=true;
+      }
+    }
+  }
+}
+function giveCan(){
+  if(player.giveCD>0){ return; }
+  const best=game.aimNpc;
+  if(!best){ setMsg('no one nearby'); beep(160,0.06,'sawtooth',0.03); return; }
+  if(player.cans<best.need){
+    setMsg('need '+best.need+' (have '+player.cans+')');
+    addPopup('NOT ENOUGH CANS','#ff7a6a');
+    beep(180,0.1,'sawtooth',0.04); return;
+  }
+  player.cans-=best.need; best.helped=true; game.helped++; game.delivered+=best.need;
+  player.giveCD = player.baseGiveCD / (1 + player.handoffBonus*0.5);  // faster handoff upgrade
+  beep(880,0.12,'triangle',0.05);
+  const perGive = (best.need*25 + 100) * game.scoreMult;
+  if(best.kind==='elder'){ player.speedBoostT=5; setMsg('Elder blessed you — SPEED!'); }
+  else if(best.kind==='volunteer'){ game.revealT=8; setMsg('Volunteer — cans/people revealed!'); }
+  else setMsg('Helped! '+best.kind+' ('+best.need+')');
+  addPopup('+'+Math.round(perGive)+' pts','#9fffb6');
+
+  // post-quota bonus: helping more people after exit is open pays immediately
+  if(game.helped>game.quota){
+    const bonus = Math.round(150*game.scoreMult);
+    game.totalScore += bonus;
+    addPopup('BONUS +'+bonus,'#ffe066');
+  }
+  if(game.helped>=game.quota && !game.exit.active){
+    game.exit.active=true; setMsg('QUOTA MET — EXIT OPEN!');
+    beep(1200,0.25,'square',0.05);
+  }
+}
+function tickExit(){
+  if(!game.exit || !game.exit.active) return;
+  const dx=game.exit.x-player.x, dy=game.exit.y-player.y;
+  if(dx*dx+dy*dy<0.6) completeDistrict();
+}
+function completeDistrict(){
+  const timeBonus=Math.floor(game.timeLeft)*5;
+  const distBonus=game.district*200;
+  const leftover=player.cans*10;
+  game.totalScore += Math.round((game.helped*100 + game.delivered*25 + leftover + timeBonus + distBonus)*game.scoreMult);
+  state=STATE.UPGRADE;
+  window._offered = rollUpgrades();
+}
+
+const ALL_UPGRADES=[
+  {id:'pack',  name:'BIGGER BACKPACK', desc:'+6 can capacity'},
+  {id:'sprint',name:'LONGER SPRINT',    desc:'+30 max stamina, faster regen'},
+  {id:'hand',  name:'FASTER HANDOFF',   desc:'+range, +1 bonus, shorter cooldown'},
+  {id:'map',   name:'BETTER MINIMAP',   desc:'show cans & people always'},
+  {id:'radar', name:'CAN RADAR PULSE',  desc:'periodic can ping on map'},
+];
+function rollUpgrades(){
+  const pool=ALL_UPGRADES.slice(); const out=[];
+  for(let i=0;i<3 && pool.length;i++){ out.push(pool.splice((RNG()*pool.length)|0,1)[0]); }
+  return out;
+}
+function applyUpgrade(id){
+  player.upgrades[id]=(player.upgrades[id]||0)+1;
+  if(id==='pack') player.maxCans+=6;
+  else if(id==='sprint'){ player.maxStamina+=30; player.stamina=player.maxStamina; player.regenBonus+=8; }
+  else if(id==='hand'){ player.giveRange+=0.45; player.handoffBonus+=1; }
+  else if(id==='map') player.minimapLevel=Math.max(2,player.minimapLevel);
+  else if(id==='radar') player.radar=true;
+}
+
+// compute nearest handoffable npc each frame (for reticle + give target)
+function updateAim(){
+  let best=null, bd=player.giveRange*player.giveRange;
+  for(const n of game.npcs){
+    if(n.helped) continue;
+    const dx=n.x-player.x, dy=n.y-player.y, d=dx*dx+dy*dy;
+    if(d<bd){ bd=d; best=n; }
+  }
+  game.aimNpc=best;
+}
+
+// ---------------------------------------------------------------------------
+// 11. UPDATE
+// ---------------------------------------------------------------------------
+const keys={};
+addEventListener('keydown',e=>{
+  keys[e.code]=true;
+  if(e.code==='KeyR') restartRun(false);
+  if(e.code==='KeyM') showMinimap=!showMinimap;
+  if(e.code==='KeyP' || e.code==='Escape'){
+    if(state===STATE.PLAY){ paused=!paused; if(paused) beep(440,0.06,'sine',0.03); }
+  }
+  if(state===STATE.PLAY && !paused && e.code==='Space'){ giveCan(); e.preventDefault(); }
+  if(state===STATE.START && (e.code==='Enter'||e.code==='Space')) startRun();
+  if(state===STATE.OVER && (e.code==='Enter'||e.code==='Space')) restartRun(false);
+});
+addEventListener('keyup',e=>{ keys[e.code]=false; });
+
+let locked=false;
+view.addEventListener('mousedown',e=>{
+  if(state===STATE.START){ startRun(); return; }
+  if(state===STATE.OVER){ restartRun(false); return; }
+  if(state===STATE.PLAY){
+    if(paused){ paused=false; return; }
+    if(!locked){ view.requestPointerLock(); }
+    else giveCan();
+  }
+});
+document.addEventListener('pointerlockchange',()=>{ locked = document.pointerLockElement===view; });
+addEventListener('mousemove',e=>{ if(locked && state===STATE.PLAY && !paused) player.angle += e.movementX*0.0022; });
+
+function setMsg(m){ game.msg=m; game.msgT=1.6; }
+
+function pickModifier(){
+  const m=['rainy','shortage','clear','maze','clear','clear'];
+  return m[(RNG()*m.length)|0];
+}
+function resetPlayerUpgrades(){
+  player.maxCans=10; player.maxStamina=60; player.giveRange=1.4;
+  player.minimapLevel=1; player.radar=false; player.handoffBonus=0;
+  player.regenBonus=0; player.speedBoostT=0; player.giveCD=0;
+  player.upgrades={pack:0, sprint:0, hand:0, map:0, radar:0};
+}
+function startRun(){
+  const h = parseInt((location.hash||'').replace('#',''));
+  if(h && !isNaN(h)) game.seed = h;
+  game.district=1; game.totalScore=0;
+  game.modifier = pickModifier();
+  resetPlayerUpgrades();
+  genCity(game.seed, game.district, game.modifier);
+  player.cans=0; player.stamina=player.maxStamina;
+  state=STATE.PLAY; paused=false;
+}
+function restartRun(sameSeed){
+  if(!sameSeed) game.seed = (Math.random()*1e9)|0;
+  game.district=1; game.totalScore=0;
+  game.modifier = pickModifier();
+  resetPlayerUpgrades();
+  genCity(game.seed, game.district, game.modifier);
+  player.cans=0; player.stamina=player.maxStamina;
+  state=STATE.PLAY; paused=false;
+}
+
+function update(dt){
+  // popups always update so they fade even on overlays
+  for(let i=game.popups.length-1;i>=0;i--){
+    const p=game.popups[i];
+    p.y += p.vy*dt; p.life -= dt*1.1;
+    if(p.life<=0) game.popups.splice(i,1);
+  }
+  if(game.msgT>0) game.msgT-=dt;
+
+  if(state!==STATE.PLAY || paused) return;
+
+  game.timeLeft -= dt;
+  if(player.giveCD>0) player.giveCD=Math.max(0,player.giveCD-dt);
+  if(game.revealT>0) game.revealT-=dt;
+  if(player.speedBoostT>0) player.speedBoostT-=dt;
+  // radar ping
+  if(player.radar){
+    player.radarPingT -= dt;
+    if(player.radarPingT<=0){ player.radarPingT=3; setMsg('* radar ping *'); }
+  }
+  if(game.timeLeft<=0){ endRun(); return; }
+
+  // turning (Q/E only; arrows are movement)
+  const turn=2.4*dt;
+  if(keys['KeyQ']) player.angle-=turn;
+  if(keys['KeyE']) player.angle+=turn;
+
+  // movement (WASD + arrows identical)
+  const sprinting = (keys['ShiftLeft']||keys['ShiftRight']) && player.stamina>1;
+  let spd = (sprinting?cfg.sprintSpeed:cfg.walkSpeed);
+  if(player.speedBoostT>0) spd*=1.3;
+  const mv=spd*dt;
+  const fx=Math.cos(player.angle), fy=Math.sin(player.angle);
+  const rx=Math.cos(player.angle+Math.PI/2), ry=Math.sin(player.angle+Math.PI/2);
+  let dx=0, dy=0;
+  if(keys['KeyW']||keys['ArrowUp']){ dx+=fx; dy+=fy; }
+  if(keys['KeyS']||keys['ArrowDown']){ dx-=fx; dy-=fy; }
+  if(keys['KeyD']||keys['ArrowRight']){ dx+=rx; dy+=ry; }
+  if(keys['KeyA']||keys['ArrowLeft']){ dx-=rx; dy-=ry; }
+  const len=Math.hypot(dx,dy)||1; dx=dx/len*mv; dy=dy/len*mv;
+  if(canStand(player.x+dx, player.y)) player.x+=dx;
+  if(canStand(player.x, player.y+dy)) player.y+=dy;
+
+  const moving=(dx*dx+dy*dy)>0.0001;
+  if(sprinting && moving){ player.stamina=Math.max(0,player.stamina-cfg.staminaDrain*dt); }
+  else { player.stamina=Math.min(player.maxStamina, player.stamina+(cfg.staminaRegen+player.regenBonus)*dt); }
+
+  updateAim();
+  tickPickups();
+  tickExit();
+}
+function endRun(){ state=STATE.OVER; beep(140,0.4,'sawtooth',0.05); }
+
+// ---------------------------------------------------------------------------
+// 12. OVERLAYS
+// ---------------------------------------------------------------------------
+function dim(){ ctx.fillStyle='rgba(0,0,0,0.72)'; ctx.fillRect(0,0,innerWidth,innerHeight); }
+function big(t,x,y,c){ ctx.font='40px monospace'; ctx.fillStyle=c||'#fff'; ctx.textAlign='center'; ctx.fillText(t,x,y); ctx.textAlign='left'; }
+function sub(t,x,y,c){ ctx.font='15px monospace'; ctx.fillStyle=c||'#cfd2e6'; ctx.textAlign='center'; ctx.fillText(t,x,y); ctx.textAlign='left'; }
+function drawOverlays(){
+  if(state===STATE.START){
+    dim();
+    big('CANNED RUN', innerWidth/2, innerHeight/2-110, '#ffd24a');
+    sub('a flat raycaster speedrun roguelike', innerWidth/2, innerHeight/2-70);
+    sub('Collect cans · hand them to people · hit the quota · reach the exit', innerWidth/2, innerHeight/2-30);
+    sub('WASD/arrows move · Q/E or mouse turn · SPACE/CLICK give · SHIFT sprint', innerWidth/2, innerHeight/2);
+    sub('M minimap · P pause · R restart · seed reusable via URL #1234', innerWidth/2, innerHeight/2+25);
+    sub('People: hungry(1) · family(3) · elder(speed) · volunteer(reveal)', innerWidth/2, innerHeight/2+50);
+    sub('CLICK or press ENTER to start', innerWidth/2, innerHeight/2+110, '#fff');
+  } else if(state===STATE.UPGRADE){
+    dim();
+    big('DISTRICT '+game.district+' CLEARED', innerWidth/2, 100, '#9cf09a');
+    sub('Score so far: '+game.totalScore+'   (modifier x'+game.scoreMult+')', innerWidth/2, 140);
+    // owned upgrades recap
+    const u=player.upgrades; const owned=[];
+    if(u.pack)owned.push('pack×'+u.pack); if(u.sprint)owned.push('sprint×'+u.sprint);
+    if(u.hand)owned.push('hand×'+u.hand); if(u.map)owned.push('map×'+u.map); if(u.radar)owned.push('radar');
+    sub('Owned: '+(owned.length?owned.join('  '):'(none yet)'), innerWidth/2, 165, '#8fa0ff');
+    const off=window._offered||[];
+    const bw=240, bh=130, gap=30;
+    const total=off.length*bw+(off.length-1)*gap;
+    let sx=innerWidth/2-total/2;
+    ctx.font='14px monospace';
+    for(let i=0;i<off.length;i++){
+      const x=sx+i*(bw+gap), y=innerHeight/2-bh/2;
+      ctx.fillStyle='rgba(30,35,52,0.95)'; ctx.fillRect(x,y,bw,bh);
+      ctx.strokeStyle='#6a7aff'; ctx.lineWidth=2; ctx.strokeRect(x,y,bw,bh);
+      ctx.fillStyle='#ffd24a'; ctx.textAlign='center';
+      ctx.fillText('['+(i+1)+'] '+off[i].name, x+bw/2, y+32);
+      ctx.fillStyle='#cfd2e6'; ctx.fillText(off[i].desc, x+bw/2, y+62);
+      ctx.fillStyle='#8fa0ff'; ctx.fillText('press '+(i+1), x+bw/2, y+102);
+      ctx.textAlign='left';
+    }
+    sub('pick an upgrade (1/2/3) to descend into the next district', innerWidth/2, innerHeight/2+bh/2+40);
+  } else if(state===STATE.OVER){
+    dim();
+    big('RUN OVER', innerWidth/2, innerHeight/2-90, '#ff7a6a');
+    sub('Districts cleared: '+(game.district-1), innerWidth/2, innerHeight/2-40);
+    sub('Total score: '+game.totalScore, innerWidth/2, innerHeight/2-12);
+    sub('Seed was: '+game.seed, innerWidth/2, innerHeight/2+20, '#9cf0ff');
+    sub('R = new run · reload with #seed to replay this seed', innerWidth/2, innerHeight/2+60);
+    sub('CLICK or ENTER to start a new run', innerWidth/2, innerHeight/2+100, '#fff');
+  }
+  if(paused && state===STATE.PLAY){
+    dim();
+    big('PAUSED', innerWidth/2, innerHeight/2-60, '#ffd24a');
+    sub('WASD/arrows move · Q/E or mouse turn · SPACE/CLICK give', innerWidth/2, innerHeight/2-10);
+    sub('SHIFT sprint · M map · R restart · seed '+game.seed, innerWidth/2, innerHeight/2+15);
+    sub('P or ESC to resume', innerWidth/2, innerHeight/2+55, '#fff');
+  }
+}
+
+// upgrade choice keys
+addEventListener('keydown',e=>{
+  if(state===STATE.UPGRADE){
+    const off=window._offered||[]; let idx=-1;
+    if(e.code==='Digit1')idx=0; if(e.code==='Digit2')idx=1; if(e.code==='Digit3')idx=2;
+    if(idx>=0 && off[idx]){
+      applyUpgrade(off[idx].id);
+      game.district++;
+      game.modifier=pickModifier();
+      genCity(game.seed, game.district, game.modifier);
+      player.cans=0; player.stamina=player.maxStamina;
+      state=STATE.PLAY; paused=false;
+      beep(740,0.12,'triangle',0.05);
+    }
+  }
+});
+
+// ---------------------------------------------------------------------------
+// 13. MAIN LOOP
+// ---------------------------------------------------------------------------
+let last=performance.now();
+function frame(now){
+  const dt=Math.min(0.05,(now-last)/1000); last=now;
+  update(dt);
+  if(state===STATE.PLAY || state===STATE.UPGRADE || state===STATE.OVER){
+    drawScene();
+    ctx.imageSmoothingEnabled=false;
+    ctx.fillStyle='#000'; ctx.fillRect(0,0,innerWidth,innerHeight);
+    const scale=Math.min(innerWidth/RW, innerHeight/RH);
+    const dw=RW*scale, dh=RH*scale;
+    ctx.drawImage(buf,(innerWidth-dw)/2,(innerHeight-dh)/2,dw,dh);
+    // rainy modifier: blue tint + rain streaks
+    if(game.modifier==='rainy' && state===STATE.PLAY){
+      ctx.fillStyle='rgba(40,70,120,0.18)'; ctx.fillRect(0,0,innerWidth,innerHeight);
+      ctx.strokeStyle='rgba(160,190,230,0.25)'; ctx.lineWidth=1;
+      const t=now/60;
+      for(let i=0;i<60;i++){
+        const rx=(i*97 + t*3) % innerWidth;
+        const ry=(i*53 + t*8) % innerHeight;
+        ctx.beginPath(); ctx.moveTo(rx,ry); ctx.lineTo(rx-3,ry+10); ctx.stroke();
+      }
+    }
+    if(state===STATE.PLAY){ drawHUD(); drawMinap(); }
+    drawOverlays();
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+window.CR={game,player,restartRun,startRun,dbg};
+</script>
+</body>
+</html>

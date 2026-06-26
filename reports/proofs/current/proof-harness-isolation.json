@@ -1,0 +1,43 @@
+{
+  "pass": true,
+  "build": "runprog1",
+  "errors": [],
+  "checks": {
+    "renderCheckRestoresState": true,
+    "fullCheckRestoresState": true,
+    "hallCheckRestoresState": true,
+    "noBenchmarkSave": true,
+    "normalBootNotBenchmark": true,
+    "selfcheckRestoresState": true,
+    "localStorageRestored": true
+  },
+  "before": {
+    "state": "title",
+    "paused": false,
+    "benchmark": false,
+    "mapW": 0,
+    "mapH": 0,
+    "timeLeft": 0,
+    "seed": 12345,
+    "runActive": false,
+    "harnessOnly": false,
+    "customLevel": null,
+    "lsHarness": false,
+    "lsSavePresent": true
+  },
+  "after": {
+    "state": "title",
+    "paused": false,
+    "benchmark": false,
+    "mapW": 0,
+    "mapH": 0,
+    "timeLeft": 0,
+    "seed": 12345,
+    "runActive": false,
+    "harnessOnly": false,
+    "customLevel": null,
+    "lsHarness": false,
+    "lsSavePresent": true
+  },
+  "timestamp": "2026-06-26T17:19:25.135Z"
+}

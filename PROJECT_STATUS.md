@@ -1,6 +1,8 @@
 # Project status — Solidarity Not Charity Can Run
 
-Last updated: repo organization pass (docs only).
+Last updated: structural repo cleanup (reports under `reports/`).
+
+Reports were moved into **`reports/`** to keep the GitHub root readable. Index: **`reports/README.md`**; guard write-ups: **`reports/guards/`**.
 
 ## Gameplay baseline
 
@@ -48,7 +50,8 @@ Last updated: repo organization pass (docs only).
 
 ## Quick links
 
-- Reports index: `reports/README.md`  
-- Docs index: `docs/README.md`  
+- Reports index: [reports/README.md](reports/README.md)  
+- Guard reports: [reports/guards/](reports/guards/)  
+- Docs index: [docs/README.md](docs/README.md)  
 - Contributing: `CONTRIBUTING.md`  
 - Release policy: `SOURCE_RELEASE_POLICY.md`

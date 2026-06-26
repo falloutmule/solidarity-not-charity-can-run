@@ -1,0 +1,30 @@
+{
+  "pass": true,
+  "before": {
+    "BUILD_ID": "runprog1",
+    "gateBound": true,
+    "unlockAttempted": false,
+    "hasContext": false,
+    "state": "none",
+    "gestureEvents": [
+      "pointerdown",
+      "keydown",
+      "touchstart"
+    ],
+    "resumeEntry": "resumeAudioContext"
+  },
+  "after": {
+    "BUILD_ID": "runprog1",
+    "gateBound": true,
+    "unlockAttempted": false,
+    "hasContext": true,
+    "state": "running",
+    "gestureEvents": [
+      "pointerdown",
+      "keydown",
+      "touchstart"
+    ],
+    "resumeEntry": "resumeAudioContext"
+  },
+  "beepOk": true
+}

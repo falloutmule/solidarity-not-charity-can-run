@@ -1,0 +1,48 @@
+{
+  "pass": true,
+  "build": "runprog1",
+  "reliability": {
+    "pass": true,
+    "build": "runprog1",
+    "errors": [],
+    "warnings": [],
+    "checks": {
+      "moveStarts": true,
+      "moveChangesPosition": true,
+      "moveDriftReleaseClears": true,
+      "moveStopsOnRelease": true,
+      "lookChangesAngle": true,
+      "lookReleaseClears": true,
+      "pointerCancelClears": true,
+      "sprintBurstWorks": true,
+      "giveSafe": true,
+      "menuSafe": true,
+      "touchActionSafe": true
+    },
+    "evidence": {
+      "moveRelease": {
+        "driftDist": 0,
+        "joyActive": false
+      },
+      "sprint": {
+        "burstUntil": 1.0968999999761582,
+        "stamBefore": 60,
+        "stamAfter": 40
+      },
+      "touchAction": {
+        "gameplayTouchNone": true,
+        "bad": [],
+        "optionsPanY": true
+      }
+    }
+  },
+  "stuckAfterTorture": {
+    "joyActive": false
+  },
+  "screenshots": [
+    "proof-control-move-drag.png",
+    "proof-control-look-drag.png",
+    "proof-control-menu-open.png"
+  ],
+  "timestamp": "2026-06-26T17:19:17.582Z"
+}

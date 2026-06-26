@@ -27,4 +27,4 @@
 - Playwright: `proof-mobile-control-reliability.json`, portrait sections in `tests/run_selfcheck_playwright.js`.
 - Real-phone issues still matter for **feel**; harness proves logic and layout contracts on emulated viewport.
 
-See **`MOBILE_CONTROL_RELIABILITY_REPORT.md`** and **`PORTRAIT_LAYOUT_USABILITY_REPORT.md`** (repo root).
+See **`../reports/guards/MOBILE_CONTROL_RELIABILITY_REPORT.md`** and **`../reports/guards/PORTRAIT_LAYOUT_USABILITY_REPORT.md`**.

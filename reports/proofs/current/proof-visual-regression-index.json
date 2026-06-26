@@ -1,0 +1,61 @@
+{
+  "pass": true,
+  "shots": [
+    {
+      "scenario": "normal-seed42",
+      "file": "proof-visual-normal-seed42.png",
+      "blankOk": true,
+      "canvas": {
+        "ok": true,
+        "nonblack": 4096,
+        "w": 390,
+        "h": 844
+      }
+    },
+    {
+      "scenario": "snc-hall",
+      "file": "proof-visual-snc-hall.png",
+      "blankOk": true,
+      "canvas": {
+        "ok": true,
+        "nonblack": 4096,
+        "w": 390,
+        "h": 844
+      }
+    },
+    {
+      "scenario": "options",
+      "file": "proof-visual-options.png",
+      "blankOk": true,
+      "canvas": {
+        "ok": true,
+        "nonblack": 4096,
+        "w": 390,
+        "h": 844
+      }
+    },
+    {
+      "scenario": "dock-mid",
+      "file": "proof-visual-dock-mid.png",
+      "blankOk": true,
+      "canvas": {
+        "ok": true,
+        "nonblack": 4096,
+        "w": 390,
+        "h": 844
+      }
+    },
+    {
+      "scenario": "dock-high",
+      "file": "proof-visual-dock-high.png",
+      "blankOk": true,
+      "canvas": {
+        "ok": true,
+        "nonblack": 4096,
+        "w": 390,
+        "h": 844
+      }
+    }
+  ],
+  "timestamp": "2026-06-26T17:19:41.075Z"
+}

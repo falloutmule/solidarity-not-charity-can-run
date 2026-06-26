@@ -1,0 +1,70 @@
+{
+  "pass": true,
+  "build": "runprog1",
+  "movementCollision": {
+    "pass": true,
+    "build": "runprog1",
+    "errors": [],
+    "warnings": [],
+    "checks": {
+      "normalSpawnSafe": true,
+      "hallSpawnSafe": true,
+      "wallCollisionSafe": true,
+      "cornerCollisionSafe": true,
+      "highSpeedNoTunnel": true,
+      "corridorMoveWorks": true,
+      "releaseStops": true,
+      "noNaN": true,
+      "harnessStateRestored": true
+    },
+    "measurements": {
+      "attemptedSteps": 63,
+      "finalPositions": [
+        {
+          "scene": "normalSpawn",
+          "x": 1.5,
+          "y": 1.5,
+          "pathOk": true
+        },
+        {
+          "scene": "hallSpawn",
+          "x": 12.5,
+          "y": 7
+        },
+        {
+          "scene": "corridor",
+          "x": 3.5,
+          "y": 3.700000000000004,
+          "advanced": true,
+          "corridorStopped": true
+        }
+      ],
+      "collisionResults": [
+        {
+          "test": "wall",
+          "steps": 21,
+          "x": 4,
+          "y": 2
+        },
+        {
+          "test": "corner",
+          "x": 3.1000000000000023,
+          "y": 3.7250000000000028,
+          "jitter": 0
+        },
+        {
+          "test": "highSpeed",
+          "steps": 42,
+          "x": 6.499999999999991,
+          "dx": 4.999999999999991
+        }
+      ]
+    },
+    "mobileControlReliabilityPass": true
+  },
+  "harnessStateOk": true,
+  "screenshots": [
+    "proof-collision-corridor.png"
+  ],
+  "timestamp": "2026-06-26T17:19:18.210Z"
+}

@@ -1,0 +1,11 @@
+{
+  "build": "runprog1",
+  "hashes": {
+    "proof-render-visible-sprite.png": 1255030,
+    "proof-render-occluded-sprite.png": 1255030,
+    "proof-render-can-near-wall.png": 1255030,
+    "proof-render-npc-near-wall.png": 1255030,
+    "proof-render-hall-start.png": 1255030
+  },
+  "timestamp": "2026-06-26T17:19:33.050Z"
+}

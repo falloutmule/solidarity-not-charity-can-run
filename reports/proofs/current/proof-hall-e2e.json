@@ -1,0 +1,65 @@
+{
+  "pass": true,
+  "build": "runprog1",
+  "crHallSelfCheck": {
+    "pass": true,
+    "build": "runprog1",
+    "errors": [],
+    "warnings": [],
+    "hall": {
+      "started": true,
+      "map": {
+        "MAP_W": 30,
+        "MAP_H": 14,
+        "rectangular": true
+      },
+      "spawnCanStand": true,
+      "movementStarted": true,
+      "movementStopped": true,
+      "pickupCollected": true,
+      "npcHelped": true,
+      "thankShown": true,
+      "quotaReached": true,
+      "exitActivated": true,
+      "completed": true,
+      "customLevel": "hall_of_servants",
+      "helpedByKind": {
+        "hungry": 0,
+        "family": 0,
+        "elder": 0,
+        "volunteer": 1
+      }
+    },
+    "normalRegression": {
+      "started": true,
+      "wideMap": true,
+      "movementStarted": true,
+      "movementStopped": true,
+      "customLevelCleared": true
+    },
+    "runtimeErrors": [],
+    "runtimeClean": true,
+    "timestamp": "2026-06-26T17:19:35.922Z"
+  },
+  "playwright": {
+    "helpedSnap": {
+      "helped": 1,
+      "thankPopup": [
+        "You showed up."
+      ]
+    },
+    "exitSnap": {
+      "helped": 5,
+      "quota": 5,
+      "exitActive": true,
+      "state": "results",
+      "completed": true
+    }
+  },
+  "screenshots": [
+    "proof-hall-start.png",
+    "proof-hall-helped.png",
+    "proof-hall-exit.png"
+  ],
+  "timestamp": "2026-06-26T17:19:35.923Z"
+}

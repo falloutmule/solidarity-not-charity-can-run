@@ -1,0 +1,23 @@
+{
+  "pass": true,
+  "artifactPath": "index.html",
+  "artifactAbsolute": "C:\\Users\\fallo\\Documents\\HermesProjects\\canned-run\\index.html",
+  "githubPagesServes": "root index.html",
+  "singleFile": true,
+  "runtimeDependencyCheck": {
+    "externalScript": false,
+    "externalCss": false
+  },
+  "externalRequestCount": 0,
+  "consoleErrorCount": 0,
+  "pageErrorCount": 0,
+  "fullSelfCheck": {
+    "pass": true,
+    "build": "runprog1"
+  },
+  "playwrightSummaryPass": true,
+  "buildId": "runprog1",
+  "commitHash": "cae4918",
+  "errors": [],
+  "timestamp": "2026-06-26T17:19:44.438Z"
+}

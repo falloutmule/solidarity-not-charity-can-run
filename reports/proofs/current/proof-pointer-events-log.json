@@ -1,0 +1,34 @@
+{
+  "checks": {
+    "moveStarts": true,
+    "moveChangesPosition": true,
+    "moveDriftReleaseClears": true,
+    "moveStopsOnRelease": true,
+    "lookChangesAngle": true,
+    "lookReleaseClears": true,
+    "pointerCancelClears": true,
+    "sprintBurstWorks": true,
+    "giveSafe": true,
+    "menuSafe": true,
+    "touchActionSafe": true
+  },
+  "evidence": {
+    "moveRelease": {
+      "driftDist": 0,
+      "joyActive": false
+    },
+    "sprint": {
+      "burstUntil": 1.0968999999761582,
+      "stamBefore": 60,
+      "stamAfter": 40
+    },
+    "touchAction": {
+      "gameplayTouchNone": true,
+      "bad": [],
+      "optionsPanY": true
+    }
+  },
+  "stuck": {
+    "joyActive": false
+  }
+}

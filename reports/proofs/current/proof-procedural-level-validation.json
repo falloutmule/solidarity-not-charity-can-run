@@ -1,0 +1,36 @@
+{
+  "pass": true,
+  "build": "runprog1",
+  "proceduralLevelValidation": {
+    "pass": true,
+    "build": "runprog1",
+    "seedCount": 52,
+    "districtCount": 3,
+    "errors": [],
+    "warnings": [],
+    "summary": {
+      "levelsChecked": 52,
+      "levelsPassed": 52,
+      "levelsFailed": 0,
+      "minReachableCells": 277,
+      "maxReachableCells": 421,
+      "totalUnreachablePickups": 0,
+      "totalUnreachableNpcs": 0
+    },
+    "failures": [],
+    "checks": {
+      "allMapsRectangular": true,
+      "allSpawnsValid": true,
+      "allReachableAreasLargeEnough": true,
+      "allQuotasReachable": true,
+      "allExitsReachable": true,
+      "requiredNpcsReachable": true,
+      "noRuntimeErrors": true,
+      "harnessStateRestored": true
+    },
+    "cases": 52,
+    "timestamp": "2026-06-26T17:19:21.661Z"
+  },
+  "harnessStateOk": true,
+  "timestamp": "2026-06-26T17:19:21.665Z"
+}

@@ -13,7 +13,7 @@ SNC Can Run uses **in-browser self-checks** (`window.CR`) plus a **Playwright** 
 
 - **`tests/run_selfcheck_playwright.js`** — launches browser, runs section checks, writes JSON proofs to repo root.
 - Run: `node tests/run_selfcheck_playwright.js`
-- Summary: **`proof-playwright-summary.json`** (`pass: true` required for ship).
+- Summary: **`proof-playwright-summary.json`** at repo root when harness runs (`pass: true` required for ship). Archived copies: **`reports/proofs/current/`**.
 
 ## Proof JSON (examples)
 

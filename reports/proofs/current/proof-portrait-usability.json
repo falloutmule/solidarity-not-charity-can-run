@@ -1,0 +1,166 @@
+{
+  "pass": true,
+  "build": "runprog1",
+  "usability": {
+    "pass": true,
+    "build": "runprog1",
+    "errors": [],
+    "warnings": [],
+    "thresholds": {
+      "singleControlMax": 0.15,
+      "totalMax": 0.25
+    },
+    "overlapBeforeClamp": {
+      "perControl": {
+        "move": 0.13590214067278286,
+        "give": 0.045516819571865444,
+        "look": 0.14248318042813457,
+        "sprint": 0.041149847094801226
+      },
+      "totalFraction": 0.3650519877675841,
+      "miniArea": 81750,
+      "totalArea": 29843
+    },
+    "presets": [
+      {
+        "key": "low",
+        "label": "LOW",
+        "requestedYOffset": 120,
+        "overlap": {
+          "perControl": {
+            "move": 0,
+            "give": 0,
+            "look": 0,
+            "sprint": 0
+          },
+          "totalFraction": 0,
+          "miniArea": 81750,
+          "totalArea": 0
+        },
+        "overlapPass": true,
+        "fpvVisible": true,
+        "minimapVisible": true,
+        "menuLockedBelowMinimap": true,
+        "statsVisible": true,
+        "controlsVisible": true,
+        "labelObscures": false
+      },
+      {
+        "key": "mid",
+        "label": "MID",
+        "requestedYOffset": 0,
+        "overlap": {
+          "perControl": {
+            "move": 0,
+            "give": 0,
+            "look": 0,
+            "sprint": 0
+          },
+          "totalFraction": 0,
+          "miniArea": 81750,
+          "totalArea": 0
+        },
+        "overlapPass": true,
+        "fpvVisible": true,
+        "minimapVisible": true,
+        "menuLockedBelowMinimap": true,
+        "statsVisible": true,
+        "controlsVisible": true,
+        "labelObscures": false
+      },
+      {
+        "key": "high",
+        "label": "HIGH",
+        "requestedYOffset": -120,
+        "overlap": {
+          "perControl": {
+            "move": 0,
+            "give": 0.045516819571865444,
+            "look": 0,
+            "sprint": 0.015608562691131499
+          },
+          "totalFraction": 0.06112538226299694,
+          "miniArea": 81750,
+          "totalArea": 4997
+        },
+        "overlapPass": true,
+        "fpvVisible": true,
+        "minimapVisible": true,
+        "menuLockedBelowMinimap": true,
+        "statsVisible": true,
+        "controlsVisible": true,
+        "labelObscures": true
+      },
+      {
+        "key": "veryHigh",
+        "label": "VERY HIGH",
+        "requestedYOffset": -240,
+        "overlap": {
+          "perControl": {
+            "move": 0,
+            "give": 0,
+            "look": 0,
+            "sprint": 0
+          },
+          "totalFraction": 0,
+          "miniArea": 81750,
+          "totalArea": 0
+        },
+        "overlapPass": true,
+        "fpvVisible": true,
+        "minimapVisible": true,
+        "menuLockedBelowMinimap": true,
+        "statsVisible": true,
+        "controlsVisible": true,
+        "labelObscures": false
+      }
+    ],
+    "checks": {
+      "fpvVisible": true,
+      "minimapVisible": true,
+      "menuBelowMinimap": true,
+      "statsVisible": true,
+      "controlsVisible": true,
+      "overlapAllPresetsPass": true,
+      "intentionalLookSprintOverlapAllowed": true
+    }
+  },
+  "settingsSafety": {
+    "pass": true,
+    "build": "runprog1",
+    "errors": [],
+    "warnings": [],
+    "checks": {
+      "migrateAdjustsUnsafe": true,
+      "midSafe": true,
+      "resetcontrolsSafe": true,
+      "harnessRestoresSafeY": true
+    },
+    "migrationSample": {
+      "changed": true,
+      "from": -240,
+      "to": -120
+    },
+    "thresholds": {
+      "singleControlMax": 0.15,
+      "totalMax": 0.25
+    }
+  },
+  "resetProof": {
+    "controlsYOffsetPx": 0,
+    "overlapPass": true,
+    "settingsPass": true
+  },
+  "afterHarness": {
+    "controlsYOffsetPx": 0,
+    "overlapPass": true
+  },
+  "screenshots": [
+    "proof-usability-low.png",
+    "proof-usability-mid.png",
+    "proof-usability-high.png",
+    "proof-usability-very-high.png",
+    "proof-resetcontrols-safe.png"
+  ],
+  "timestamp": "2026-06-26T17:19:16.421Z"
+}

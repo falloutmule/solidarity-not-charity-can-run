@@ -26,4 +26,4 @@ Authoritative rules also appear at the top of **`index.html`** script and in **`
 
 ## Policy
 
-See **`SOURCE_RELEASE_POLICY.md`** and **`AI_SAFE_SOURCE_PIPELINE_REPORT.md`**.
+See **`SOURCE_RELEASE_POLICY.md`** and **`../reports/guards/AI_SAFE_SOURCE_PIPELINE_REPORT.md`**.

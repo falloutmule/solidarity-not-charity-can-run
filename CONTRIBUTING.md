@@ -14,7 +14,7 @@ Short rules for **Solidarity Not Charity Can Run** only.
 2. Bump **`BUILD_ID`** when shipping a guard card.  
 3. Preserve **single-file** runtime (no external JS/CSS at runtime).  
 4. Run **`node tests/run_selfcheck_playwright.js`** before push.  
-5. Add or update a **`*_REPORT.md`** and list it in **`reports/README.md`**.  
+5. Add or update a card report under **`reports/guards/`** and list it in **`reports/README.md`**.  
 6. Commit with a **clear, scoped message** (gameplay vs docs).
 
 ## Reports

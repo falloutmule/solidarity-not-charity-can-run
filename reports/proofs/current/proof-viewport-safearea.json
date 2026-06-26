@@ -1,0 +1,1515 @@
+{
+  "pass": true,
+  "build": "runprog1",
+  "scenarios": [
+    {
+      "label": "pixel7-portrait",
+      "viewport": {
+        "width": 412,
+        "height": 915
+      },
+      "pass": true,
+      "checkInitial": {
+        "pass": true,
+        "build": "runprog1",
+        "errors": [],
+        "warnings": [],
+        "checks": {
+          "visualViewportUsed": true,
+          "noRaw100vhShell": true,
+          "canvasVisible": true,
+          "fpvVisible": true,
+          "minimapVisible": true,
+          "menuVisible": true,
+          "controlsVisible": true,
+          "statsVisible": true,
+          "optionsBackReachable": true,
+          "resizeReappliesLayout": true,
+          "safeAreaAccountedFor": true,
+          "vvResizeHooked": true
+        },
+        "rects": {
+          "fpv": {
+            "x": 0,
+            "y": 0,
+            "w": 412,
+            "h": 270
+          },
+          "minimap": {
+            "x": 19,
+            "y": 270,
+            "w": 375,
+            "h": 218
+          },
+          "menu": {
+            "left": 126,
+            "top": 494,
+            "width": 160,
+            "height": 44
+          },
+          "stats": {
+            "x": 0,
+            "y": 840,
+            "w": 412,
+            "h": 75
+          },
+          "move": {
+            "left": 10,
+            "top": 610,
+            "width": 110,
+            "height": 110
+          },
+          "give": {
+            "left": 35,
+            "top": 537,
+            "width": 61,
+            "height": 61
+          },
+          "sprint": {
+            "left": 335,
+            "top": 586,
+            "width": 58,
+            "height": 58
+          },
+          "look": {
+            "left": 290,
+            "top": 610,
+            "width": 112,
+            "height": 112
+          }
+        },
+        "safeArea": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "viewport": {
+          "BUILD_ID": "runprog1",
+          "inner": {
+            "w": 412,
+            "h": 915
+          },
+          "visual": {
+            "w": 412,
+            "h": 915,
+            "offsetX": 0,
+            "offsetY": 0,
+            "scale": 1
+          },
+          "cssVars": {
+            "appVwPx": "412px",
+            "appVhPx": "915px",
+            "vvOffX": "0px",
+            "vvOffY": "0px",
+            "appVh": "100dvh",
+            "safeTop": "0px",
+            "safeBottom": "0px"
+          },
+          "safeAreaInsetsPx": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "canvas": {
+            "w": 412,
+            "h": 915,
+            "cssW": "412px",
+            "cssH": "915px"
+          },
+          "mob": {
+            "w": "",
+            "h": "",
+            "top": "",
+            "left": ""
+          }
+        },
+        "layoutCss": {
+          "cw": 412,
+          "ch": 915
+        },
+        "timestamp": "2026-06-26T17:19:04.263Z"
+      },
+      "checkAfterResize": {
+        "pass": true,
+        "build": "runprog1",
+        "errors": [],
+        "warnings": [],
+        "checks": {
+          "visualViewportUsed": true,
+          "noRaw100vhShell": true,
+          "canvasVisible": true,
+          "fpvVisible": true,
+          "minimapVisible": true,
+          "menuVisible": true,
+          "controlsVisible": true,
+          "statsVisible": true,
+          "optionsBackReachable": true,
+          "resizeReappliesLayout": true,
+          "safeAreaAccountedFor": true,
+          "vvResizeHooked": true
+        },
+        "rects": {
+          "fpv": {
+            "x": 0,
+            "y": 0,
+            "w": 412,
+            "h": 270
+          },
+          "minimap": {
+            "x": 19,
+            "y": 270,
+            "w": 375,
+            "h": 208
+          },
+          "menu": {
+            "left": 126,
+            "top": 484,
+            "width": 160,
+            "height": 44
+          },
+          "stats": {
+            "x": 0,
+            "y": 803,
+            "w": 412,
+            "h": 72
+          },
+          "move": {
+            "left": 10,
+            "top": 583,
+            "width": 110,
+            "height": 110
+          },
+          "give": {
+            "left": 35,
+            "top": 510,
+            "width": 61,
+            "height": 61
+          },
+          "sprint": {
+            "left": 335,
+            "top": 559,
+            "width": 58,
+            "height": 58
+          },
+          "look": {
+            "left": 290,
+            "top": 583,
+            "width": 112,
+            "height": 112
+          }
+        },
+        "safeArea": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "viewport": {
+          "BUILD_ID": "runprog1",
+          "inner": {
+            "w": 412,
+            "h": 875
+          },
+          "visual": {
+            "w": 412,
+            "h": 875,
+            "offsetX": 0,
+            "offsetY": 0,
+            "scale": 1
+          },
+          "cssVars": {
+            "appVwPx": "412px",
+            "appVhPx": "875px",
+            "vvOffX": "0px",
+            "vvOffY": "0px",
+            "appVh": "100dvh",
+            "safeTop": "0px",
+            "safeBottom": "0px"
+          },
+          "safeAreaInsetsPx": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "canvas": {
+            "w": 412,
+            "h": 875,
+            "cssW": "412px",
+            "cssH": "875px"
+          },
+          "mob": {
+            "w": "",
+            "h": "",
+            "top": "",
+            "left": ""
+          }
+        },
+        "layoutCss": {
+          "cw": 412,
+          "ch": 875
+        },
+        "timestamp": "2026-06-26T17:19:04.481Z"
+      },
+      "fingerprint": {
+        "state": "play",
+        "paused": false,
+        "benchmark": false,
+        "mapW": 40,
+        "mapH": 20,
+        "timeLeft": 94.41680000000004,
+        "seed": 77,
+        "runActive": true,
+        "harnessOnly": false,
+        "customLevel": null,
+        "lsHarness": false,
+        "lsSavePresent": true
+      },
+      "shot": "proof-viewport-pixel7-portrait.png"
+    },
+    {
+      "label": "pixel7-landscape",
+      "viewport": {
+        "width": 915,
+        "height": 412
+      },
+      "pass": true,
+      "checkInitial": {
+        "pass": true,
+        "build": "runprog1",
+        "errors": [],
+        "warnings": [],
+        "checks": {
+          "visualViewportUsed": true,
+          "noRaw100vhShell": true,
+          "canvasVisible": true,
+          "fpvVisible": true,
+          "minimapVisible": true,
+          "menuVisible": true,
+          "controlsVisible": true,
+          "statsVisible": true,
+          "optionsBackReachable": true,
+          "resizeReappliesLayout": true,
+          "safeAreaAccountedFor": true,
+          "vvResizeHooked": true
+        },
+        "rects": {
+          "mode": "landscape-mobile"
+        },
+        "safeArea": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "viewport": {
+          "BUILD_ID": "runprog1",
+          "inner": {
+            "w": 915,
+            "h": 412
+          },
+          "visual": {
+            "w": 915,
+            "h": 412,
+            "offsetX": 0,
+            "offsetY": 0,
+            "scale": 1
+          },
+          "cssVars": {
+            "appVwPx": "915px",
+            "appVhPx": "412px",
+            "vvOffX": "0px",
+            "vvOffY": "0px",
+            "appVh": "100dvh",
+            "safeTop": "0px",
+            "safeBottom": "0px"
+          },
+          "safeAreaInsetsPx": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "canvas": {
+            "w": 915,
+            "h": 412,
+            "cssW": "915px",
+            "cssH": "412px"
+          },
+          "mob": {
+            "w": "",
+            "h": "",
+            "top": "",
+            "left": ""
+          }
+        },
+        "layoutCss": {
+          "cw": 915,
+          "ch": 412
+        },
+        "timestamp": "2026-06-26T17:19:05.351Z"
+      },
+      "checkAfterResize": {
+        "pass": true,
+        "build": "runprog1",
+        "errors": [],
+        "warnings": [],
+        "checks": {
+          "visualViewportUsed": true,
+          "noRaw100vhShell": true,
+          "canvasVisible": true,
+          "fpvVisible": true,
+          "minimapVisible": true,
+          "menuVisible": true,
+          "controlsVisible": true,
+          "statsVisible": true,
+          "optionsBackReachable": true,
+          "resizeReappliesLayout": true,
+          "safeAreaAccountedFor": true,
+          "vvResizeHooked": true
+        },
+        "rects": {
+          "mode": "landscape-mobile"
+        },
+        "safeArea": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "viewport": {
+          "BUILD_ID": "runprog1",
+          "inner": {
+            "w": 915,
+            "h": 400
+          },
+          "visual": {
+            "w": 915,
+            "h": 400,
+            "offsetX": 0,
+            "offsetY": 0,
+            "scale": 1
+          },
+          "cssVars": {
+            "appVwPx": "915px",
+            "appVhPx": "400px",
+            "vvOffX": "0px",
+            "vvOffY": "0px",
+            "appVh": "100dvh",
+            "safeTop": "0px",
+            "safeBottom": "0px"
+          },
+          "safeAreaInsetsPx": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "canvas": {
+            "w": 915,
+            "h": 400,
+            "cssW": "915px",
+            "cssH": "400px"
+          },
+          "mob": {
+            "w": "",
+            "h": "",
+            "top": "",
+            "left": ""
+          }
+        },
+        "layoutCss": {
+          "cw": 915,
+          "ch": 400
+        },
+        "timestamp": "2026-06-26T17:19:05.568Z"
+      },
+      "fingerprint": {
+        "state": "play",
+        "paused": false,
+        "benchmark": false,
+        "mapW": 40,
+        "mapH": 20,
+        "timeLeft": 94.43330000000003,
+        "seed": 77,
+        "runActive": true,
+        "harnessOnly": false,
+        "customLevel": null,
+        "lsHarness": false,
+        "lsSavePresent": true
+      },
+      "shot": "proof-viewport-pixel7-landscape.png"
+    },
+    {
+      "label": "travislike-portrait",
+      "viewport": {
+        "width": 360,
+        "height": 800
+      },
+      "pass": true,
+      "checkInitial": {
+        "pass": true,
+        "build": "runprog1",
+        "errors": [],
+        "warnings": [],
+        "checks": {
+          "visualViewportUsed": true,
+          "noRaw100vhShell": true,
+          "canvasVisible": true,
+          "fpvVisible": true,
+          "minimapVisible": true,
+          "menuVisible": true,
+          "controlsVisible": true,
+          "statsVisible": true,
+          "optionsBackReachable": true,
+          "resizeReappliesLayout": true,
+          "safeAreaAccountedFor": true,
+          "vvResizeHooked": true
+        },
+        "rects": {
+          "fpv": {
+            "x": 0,
+            "y": 0,
+            "w": 360,
+            "h": 236
+          },
+          "minimap": {
+            "x": 16,
+            "y": 236,
+            "w": 328,
+            "h": 190
+          },
+          "menu": {
+            "left": 105,
+            "top": 432,
+            "width": 151,
+            "height": 44
+          },
+          "stats": {
+            "x": 0,
+            "y": 734,
+            "w": 360,
+            "h": 66
+          },
+          "move": {
+            "left": 10,
+            "top": 519,
+            "width": 110,
+            "height": 110
+          },
+          "give": {
+            "left": 35,
+            "top": 446,
+            "width": 61,
+            "height": 61
+          },
+          "sprint": {
+            "left": 283,
+            "top": 495,
+            "width": 58,
+            "height": 58
+          },
+          "look": {
+            "left": 238,
+            "top": 519,
+            "width": 112,
+            "height": 112
+          }
+        },
+        "safeArea": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "viewport": {
+          "BUILD_ID": "runprog1",
+          "inner": {
+            "w": 360,
+            "h": 800
+          },
+          "visual": {
+            "w": 360,
+            "h": 800,
+            "offsetX": 0,
+            "offsetY": 0,
+            "scale": 1
+          },
+          "cssVars": {
+            "appVwPx": "360px",
+            "appVhPx": "800px",
+            "vvOffX": "0px",
+            "vvOffY": "0px",
+            "appVh": "100dvh",
+            "safeTop": "0px",
+            "safeBottom": "0px"
+          },
+          "safeAreaInsetsPx": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "canvas": {
+            "w": 360,
+            "h": 800,
+            "cssW": "360px",
+            "cssH": "800px"
+          },
+          "mob": {
+            "w": "",
+            "h": "",
+            "top": "",
+            "left": ""
+          }
+        },
+        "layoutCss": {
+          "cw": 360,
+          "ch": 800
+        },
+        "timestamp": "2026-06-26T17:19:06.439Z"
+      },
+      "checkAfterResize": {
+        "pass": true,
+        "build": "runprog1",
+        "errors": [],
+        "warnings": [],
+        "checks": {
+          "visualViewportUsed": true,
+          "noRaw100vhShell": true,
+          "canvasVisible": true,
+          "fpvVisible": true,
+          "minimapVisible": true,
+          "menuVisible": true,
+          "controlsVisible": true,
+          "statsVisible": true,
+          "optionsBackReachable": true,
+          "resizeReappliesLayout": true,
+          "safeAreaAccountedFor": true,
+          "vvResizeHooked": true
+        },
+        "rects": {
+          "fpv": {
+            "x": 0,
+            "y": 0,
+            "w": 360,
+            "h": 236
+          },
+          "minimap": {
+            "x": 16,
+            "y": 236,
+            "w": 328,
+            "h": 181
+          },
+          "menu": {
+            "left": 105,
+            "top": 423,
+            "width": 151,
+            "height": 44
+          },
+          "stats": {
+            "x": 0,
+            "y": 696,
+            "w": 360,
+            "h": 64
+          },
+          "move": {
+            "left": 10,
+            "top": 491,
+            "width": 110,
+            "height": 110
+          },
+          "give": {
+            "left": 35,
+            "top": 418,
+            "width": 61,
+            "height": 61
+          },
+          "sprint": {
+            "left": 283,
+            "top": 467,
+            "width": 58,
+            "height": 58
+          },
+          "look": {
+            "left": 238,
+            "top": 491,
+            "width": 112,
+            "height": 112
+          }
+        },
+        "safeArea": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "viewport": {
+          "BUILD_ID": "runprog1",
+          "inner": {
+            "w": 360,
+            "h": 760
+          },
+          "visual": {
+            "w": 360,
+            "h": 760,
+            "offsetX": 0,
+            "offsetY": 0,
+            "scale": 1
+          },
+          "cssVars": {
+            "appVwPx": "360px",
+            "appVhPx": "760px",
+            "vvOffX": "0px",
+            "vvOffY": "0px",
+            "appVh": "100dvh",
+            "safeTop": "0px",
+            "safeBottom": "0px"
+          },
+          "safeAreaInsetsPx": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "canvas": {
+            "w": 360,
+            "h": 760,
+            "cssW": "360px",
+            "cssH": "760px"
+          },
+          "mob": {
+            "w": "",
+            "h": "",
+            "top": "",
+            "left": ""
+          }
+        },
+        "layoutCss": {
+          "cw": 360,
+          "ch": 760
+        },
+        "timestamp": "2026-06-26T17:19:06.655Z"
+      },
+      "fingerprint": {
+        "state": "play",
+        "paused": false,
+        "benchmark": false,
+        "mapW": 40,
+        "mapH": 20,
+        "timeLeft": 94.41670000000003,
+        "seed": 77,
+        "runActive": true,
+        "harnessOnly": false,
+        "customLevel": null,
+        "lsHarness": false,
+        "lsSavePresent": true
+      },
+      "shot": null
+    },
+    {
+      "label": "short-portrait-urlbar",
+      "viewport": {
+        "width": 390,
+        "height": 720
+      },
+      "pass": true,
+      "checkInitial": {
+        "pass": true,
+        "build": "runprog1",
+        "errors": [],
+        "warnings": [],
+        "checks": {
+          "visualViewportUsed": true,
+          "noRaw100vhShell": true,
+          "canvasVisible": true,
+          "fpvVisible": true,
+          "minimapVisible": true,
+          "menuVisible": true,
+          "controlsVisible": true,
+          "statsVisible": true,
+          "optionsBackReachable": true,
+          "resizeReappliesLayout": true,
+          "safeAreaAccountedFor": true,
+          "vvResizeHooked": true
+        },
+        "rects": {
+          "fpv": {
+            "x": 0,
+            "y": 0,
+            "w": 390,
+            "h": 256
+          },
+          "minimap": {
+            "x": 18,
+            "y": 256,
+            "w": 355,
+            "h": 171
+          },
+          "menu": {
+            "left": 115,
+            "top": 433,
+            "width": 160,
+            "height": 44
+          },
+          "stats": {
+            "x": 0,
+            "y": 656,
+            "w": 390,
+            "h": 64
+          },
+          "move": {
+            "left": 10,
+            "top": 468,
+            "width": 110,
+            "height": 110
+          },
+          "give": {
+            "left": 35,
+            "top": 395,
+            "width": 61,
+            "height": 61
+          },
+          "sprint": {
+            "left": 313,
+            "top": 444,
+            "width": 58,
+            "height": 58
+          },
+          "look": {
+            "left": 268,
+            "top": 468,
+            "width": 112,
+            "height": 112
+          }
+        },
+        "safeArea": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "viewport": {
+          "BUILD_ID": "runprog1",
+          "inner": {
+            "w": 390,
+            "h": 720
+          },
+          "visual": {
+            "w": 390,
+            "h": 720,
+            "offsetX": 0,
+            "offsetY": 0,
+            "scale": 1
+          },
+          "cssVars": {
+            "appVwPx": "390px",
+            "appVhPx": "720px",
+            "vvOffX": "0px",
+            "vvOffY": "0px",
+            "appVh": "100dvh",
+            "safeTop": "0px",
+            "safeBottom": "0px"
+          },
+          "safeAreaInsetsPx": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "canvas": {
+            "w": 390,
+            "h": 720,
+            "cssW": "390px",
+            "cssH": "720px"
+          },
+          "mob": {
+            "w": "",
+            "h": "",
+            "top": "",
+            "left": ""
+          }
+        },
+        "layoutCss": {
+          "cw": 390,
+          "ch": 720
+        },
+        "timestamp": "2026-06-26T17:19:07.834Z"
+      },
+      "checkAfterResize": {
+        "pass": true,
+        "build": "runprog1",
+        "errors": [],
+        "warnings": [],
+        "checks": {
+          "visualViewportUsed": true,
+          "noRaw100vhShell": true,
+          "canvasVisible": true,
+          "fpvVisible": true,
+          "minimapVisible": true,
+          "menuVisible": true,
+          "controlsVisible": true,
+          "statsVisible": true,
+          "optionsBackReachable": true,
+          "resizeReappliesLayout": true,
+          "safeAreaAccountedFor": true,
+          "vvResizeHooked": true
+        },
+        "rects": {
+          "fpv": {
+            "x": 0,
+            "y": 0,
+            "w": 390,
+            "h": 256
+          },
+          "minimap": {
+            "x": 18,
+            "y": 256,
+            "w": 355,
+            "h": 162
+          },
+          "menu": {
+            "left": 115,
+            "top": 424,
+            "width": 160,
+            "height": 44
+          },
+          "stats": {
+            "x": 0,
+            "y": 616,
+            "w": 390,
+            "h": 64
+          },
+          "move": {
+            "left": 10,
+            "top": 439,
+            "width": 110,
+            "height": 110
+          },
+          "give": {
+            "left": 35,
+            "top": 366,
+            "width": 61,
+            "height": 61
+          },
+          "sprint": {
+            "left": 313,
+            "top": 415,
+            "width": 58,
+            "height": 58
+          },
+          "look": {
+            "left": 268,
+            "top": 439,
+            "width": 112,
+            "height": 112
+          }
+        },
+        "safeArea": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "viewport": {
+          "BUILD_ID": "runprog1",
+          "inner": {
+            "w": 390,
+            "h": 680
+          },
+          "visual": {
+            "w": 390,
+            "h": 680,
+            "offsetX": 0,
+            "offsetY": 0,
+            "scale": 1
+          },
+          "cssVars": {
+            "appVwPx": "390px",
+            "appVhPx": "680px",
+            "vvOffX": "0px",
+            "vvOffY": "0px",
+            "appVh": "100dvh",
+            "safeTop": "0px",
+            "safeBottom": "0px"
+          },
+          "safeAreaInsetsPx": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "canvas": {
+            "w": 390,
+            "h": 680,
+            "cssW": "390px",
+            "cssH": "680px"
+          },
+          "mob": {
+            "w": "",
+            "h": "",
+            "top": "",
+            "left": ""
+          }
+        },
+        "layoutCss": {
+          "cw": 390,
+          "ch": 680
+        },
+        "timestamp": "2026-06-26T17:19:08.056Z"
+      },
+      "fingerprint": {
+        "state": "play",
+        "paused": false,
+        "benchmark": false,
+        "mapW": 40,
+        "mapH": 20,
+        "timeLeft": 94.41670000000003,
+        "seed": 77,
+        "runActive": true,
+        "harnessOnly": false,
+        "customLevel": null,
+        "lsHarness": false,
+        "lsSavePresent": true
+      },
+      "shot": "proof-viewport-short-portrait.png"
+    },
+    {
+      "label": "tall-portrait-no-urlbar",
+      "viewport": {
+        "width": 390,
+        "height": 900
+      },
+      "pass": true,
+      "checkInitial": {
+        "pass": true,
+        "build": "runprog1",
+        "errors": [],
+        "warnings": [],
+        "checks": {
+          "visualViewportUsed": true,
+          "noRaw100vhShell": true,
+          "canvasVisible": true,
+          "fpvVisible": true,
+          "minimapVisible": true,
+          "menuVisible": true,
+          "controlsVisible": true,
+          "statsVisible": true,
+          "optionsBackReachable": true,
+          "resizeReappliesLayout": true,
+          "safeAreaAccountedFor": true,
+          "vvResizeHooked": true
+        },
+        "rects": {
+          "fpv": {
+            "x": 0,
+            "y": 0,
+            "w": 390,
+            "h": 256
+          },
+          "minimap": {
+            "x": 18,
+            "y": 256,
+            "w": 355,
+            "h": 214
+          },
+          "menu": {
+            "left": 115,
+            "top": 476,
+            "width": 160,
+            "height": 44
+          },
+          "stats": {
+            "x": 0,
+            "y": 826,
+            "w": 390,
+            "h": 74
+          },
+          "move": {
+            "left": 10,
+            "top": 595,
+            "width": 110,
+            "height": 110
+          },
+          "give": {
+            "left": 35,
+            "top": 522,
+            "width": 61,
+            "height": 61
+          },
+          "sprint": {
+            "left": 313,
+            "top": 571,
+            "width": 58,
+            "height": 58
+          },
+          "look": {
+            "left": 268,
+            "top": 595,
+            "width": 112,
+            "height": 112
+          }
+        },
+        "safeArea": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "viewport": {
+          "BUILD_ID": "runprog1",
+          "inner": {
+            "w": 390,
+            "h": 900
+          },
+          "visual": {
+            "w": 390,
+            "h": 900,
+            "offsetX": 0,
+            "offsetY": 0,
+            "scale": 1
+          },
+          "cssVars": {
+            "appVwPx": "390px",
+            "appVhPx": "900px",
+            "vvOffX": "0px",
+            "vvOffY": "0px",
+            "appVh": "100dvh",
+            "safeTop": "0px",
+            "safeBottom": "0px"
+          },
+          "safeAreaInsetsPx": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "canvas": {
+            "w": 390,
+            "h": 900,
+            "cssW": "390px",
+            "cssH": "900px"
+          },
+          "mob": {
+            "w": "",
+            "h": "",
+            "top": "",
+            "left": ""
+          }
+        },
+        "layoutCss": {
+          "cw": 390,
+          "ch": 900
+        },
+        "timestamp": "2026-06-26T17:19:08.940Z"
+      },
+      "checkAfterResize": {
+        "pass": true,
+        "build": "runprog1",
+        "errors": [],
+        "warnings": [],
+        "checks": {
+          "visualViewportUsed": true,
+          "noRaw100vhShell": true,
+          "canvasVisible": true,
+          "fpvVisible": true,
+          "minimapVisible": true,
+          "menuVisible": true,
+          "controlsVisible": true,
+          "statsVisible": true,
+          "optionsBackReachable": true,
+          "resizeReappliesLayout": true,
+          "safeAreaAccountedFor": true,
+          "vvResizeHooked": true
+        },
+        "rects": {
+          "fpv": {
+            "x": 0,
+            "y": 0,
+            "w": 390,
+            "h": 256
+          },
+          "minimap": {
+            "x": 18,
+            "y": 256,
+            "w": 355,
+            "h": 205
+          },
+          "menu": {
+            "left": 115,
+            "top": 467,
+            "width": 160,
+            "height": 44
+          },
+          "stats": {
+            "x": 0,
+            "y": 789,
+            "w": 390,
+            "h": 71
+          },
+          "move": {
+            "left": 10,
+            "top": 567,
+            "width": 110,
+            "height": 110
+          },
+          "give": {
+            "left": 35,
+            "top": 494,
+            "width": 61,
+            "height": 61
+          },
+          "sprint": {
+            "left": 313,
+            "top": 543,
+            "width": 58,
+            "height": 58
+          },
+          "look": {
+            "left": 268,
+            "top": 567,
+            "width": 112,
+            "height": 112
+          }
+        },
+        "safeArea": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "viewport": {
+          "BUILD_ID": "runprog1",
+          "inner": {
+            "w": 390,
+            "h": 860
+          },
+          "visual": {
+            "w": 390,
+            "h": 860,
+            "offsetX": 0,
+            "offsetY": 0,
+            "scale": 1
+          },
+          "cssVars": {
+            "appVwPx": "390px",
+            "appVhPx": "860px",
+            "vvOffX": "0px",
+            "vvOffY": "0px",
+            "appVh": "100dvh",
+            "safeTop": "0px",
+            "safeBottom": "0px"
+          },
+          "safeAreaInsetsPx": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "canvas": {
+            "w": 390,
+            "h": 860,
+            "cssW": "390px",
+            "cssH": "860px"
+          },
+          "mob": {
+            "w": "",
+            "h": "",
+            "top": "",
+            "left": ""
+          }
+        },
+        "layoutCss": {
+          "cw": 390,
+          "ch": 860
+        },
+        "timestamp": "2026-06-26T17:19:09.159Z"
+      },
+      "fingerprint": {
+        "state": "play",
+        "paused": false,
+        "benchmark": false,
+        "mapW": 40,
+        "mapH": 20,
+        "timeLeft": 94.41670000000003,
+        "seed": 77,
+        "runActive": true,
+        "harnessOnly": false,
+        "customLevel": null,
+        "lsHarness": false,
+        "lsSavePresent": true
+      },
+      "shot": "proof-viewport-tall-portrait.png"
+    },
+    {
+      "label": "fullscreen-like",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "pass": true,
+      "checkInitial": {
+        "pass": true,
+        "build": "runprog1",
+        "errors": [],
+        "warnings": [],
+        "checks": {
+          "visualViewportUsed": true,
+          "noRaw100vhShell": true,
+          "canvasVisible": true,
+          "fpvVisible": true,
+          "minimapVisible": true,
+          "menuVisible": true,
+          "controlsVisible": true,
+          "statsVisible": true,
+          "optionsBackReachable": true,
+          "resizeReappliesLayout": true,
+          "safeAreaAccountedFor": true,
+          "vvResizeHooked": true
+        },
+        "rects": {
+          "fpv": {
+            "x": 0,
+            "y": 0,
+            "w": 390,
+            "h": 256
+          },
+          "minimap": {
+            "x": 18,
+            "y": 256,
+            "w": 355,
+            "h": 201
+          },
+          "menu": {
+            "left": 115,
+            "top": 463,
+            "width": 160,
+            "height": 44
+          },
+          "stats": {
+            "x": 0,
+            "y": 775,
+            "w": 390,
+            "h": 69
+          },
+          "move": {
+            "left": 10,
+            "top": 557,
+            "width": 110,
+            "height": 110
+          },
+          "give": {
+            "left": 35,
+            "top": 484,
+            "width": 61,
+            "height": 61
+          },
+          "sprint": {
+            "left": 313,
+            "top": 533,
+            "width": 58,
+            "height": 58
+          },
+          "look": {
+            "left": 268,
+            "top": 557,
+            "width": 112,
+            "height": 112
+          }
+        },
+        "safeArea": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "viewport": {
+          "BUILD_ID": "runprog1",
+          "inner": {
+            "w": 390,
+            "h": 844
+          },
+          "visual": {
+            "w": 390,
+            "h": 844,
+            "offsetX": 0,
+            "offsetY": 0,
+            "scale": 1
+          },
+          "cssVars": {
+            "appVwPx": "390px",
+            "appVhPx": "844px",
+            "vvOffX": "0px",
+            "vvOffY": "0px",
+            "appVh": "100dvh",
+            "safeTop": "0px",
+            "safeBottom": "0px"
+          },
+          "safeAreaInsetsPx": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "canvas": {
+            "w": 390,
+            "h": 844,
+            "cssW": "390px",
+            "cssH": "844px"
+          },
+          "mob": {
+            "w": "",
+            "h": "",
+            "top": "",
+            "left": ""
+          }
+        },
+        "layoutCss": {
+          "cw": 390,
+          "ch": 844
+        },
+        "timestamp": "2026-06-26T17:19:10.033Z"
+      },
+      "checkAfterResize": {
+        "pass": true,
+        "build": "runprog1",
+        "errors": [],
+        "warnings": [],
+        "checks": {
+          "visualViewportUsed": true,
+          "noRaw100vhShell": true,
+          "canvasVisible": true,
+          "fpvVisible": true,
+          "minimapVisible": true,
+          "menuVisible": true,
+          "controlsVisible": true,
+          "statsVisible": true,
+          "optionsBackReachable": true,
+          "resizeReappliesLayout": true,
+          "safeAreaAccountedFor": true,
+          "vvResizeHooked": true
+        },
+        "rects": {
+          "fpv": {
+            "x": 0,
+            "y": 0,
+            "w": 390,
+            "h": 256
+          },
+          "minimap": {
+            "x": 18,
+            "y": 256,
+            "w": 355,
+            "h": 191
+          },
+          "menu": {
+            "left": 115,
+            "top": 453,
+            "width": 160,
+            "height": 44
+          },
+          "stats": {
+            "x": 0,
+            "y": 738,
+            "w": 390,
+            "h": 66
+          },
+          "move": {
+            "left": 10,
+            "top": 529,
+            "width": 110,
+            "height": 110
+          },
+          "give": {
+            "left": 35,
+            "top": 456,
+            "width": 61,
+            "height": 61
+          },
+          "sprint": {
+            "left": 313,
+            "top": 505,
+            "width": 58,
+            "height": 58
+          },
+          "look": {
+            "left": 268,
+            "top": 529,
+            "width": 112,
+            "height": 112
+          }
+        },
+        "safeArea": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "viewport": {
+          "BUILD_ID": "runprog1",
+          "inner": {
+            "w": 390,
+            "h": 804
+          },
+          "visual": {
+            "w": 390,
+            "h": 804,
+            "offsetX": 0,
+            "offsetY": 0,
+            "scale": 1
+          },
+          "cssVars": {
+            "appVwPx": "390px",
+            "appVhPx": "804px",
+            "vvOffX": "0px",
+            "vvOffY": "0px",
+            "appVh": "100dvh",
+            "safeTop": "0px",
+            "safeBottom": "0px"
+          },
+          "safeAreaInsetsPx": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "canvas": {
+            "w": 390,
+            "h": 804,
+            "cssW": "390px",
+            "cssH": "804px"
+          },
+          "mob": {
+            "w": "",
+            "h": "",
+            "top": "",
+            "left": ""
+          }
+        },
+        "layoutCss": {
+          "cw": 390,
+          "ch": 804
+        },
+        "timestamp": "2026-06-26T17:19:10.251Z"
+      },
+      "fingerprint": {
+        "state": "play",
+        "paused": false,
+        "benchmark": false,
+        "mapW": 40,
+        "mapH": 20,
+        "timeLeft": 94.43330000000003,
+        "seed": 77,
+        "runActive": true,
+        "harnessOnly": false,
+        "customLevel": null,
+        "lsHarness": false,
+        "lsSavePresent": true
+      },
+      "shot": null
+    }
+  ],
+  "timestamp": "2026-06-26T17:19:10.253Z"
+}

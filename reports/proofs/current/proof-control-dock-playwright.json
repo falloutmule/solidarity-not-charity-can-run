@@ -1,0 +1,328 @@
+{
+  "pass": true,
+  "moveDelta": 120,
+  "menuDelta": 0,
+  "menuTextStable": true,
+  "minimapStable": true,
+  "mid": {
+    "y": 0,
+    "ml": {
+      "top": 557,
+      "left": 10,
+      "menuText": "MENUrunprog1"
+    },
+    "mg": {
+      "top": 484,
+      "left": 35,
+      "menuText": "MENUrunprog1"
+    },
+    "ms": {
+      "top": 533,
+      "left": 313,
+      "menuText": "MENUrunprog1"
+    },
+    "mlookpad": {
+      "top": 557,
+      "left": 268,
+      "menuText": "MENUrunprog1"
+    },
+    "mportmenu": {
+      "top": 463,
+      "left": 115,
+      "menuText": "MENUrunprog1"
+    },
+    "canvas": {
+      "top": 0,
+      "height": 844
+    },
+    "layout": {
+      "fpvRect": {
+        "x": 0,
+        "y": 0,
+        "w": 390,
+        "h": 256
+      },
+      "minimapRect": {
+        "x": 18,
+        "y": 256,
+        "w": 355,
+        "h": 201
+      },
+      "statsRect": {
+        "x": 0,
+        "y": 775,
+        "w": 390,
+        "h": 69
+      },
+      "controlsRect": {
+        "x": 0,
+        "y": 457,
+        "w": 390,
+        "h": 318
+      },
+      "moveRect": {
+        "left": 10,
+        "top": 557,
+        "width": 110,
+        "height": 110
+      },
+      "giveRect": {
+        "left": 35,
+        "top": 484,
+        "width": 61,
+        "height": 61
+      },
+      "sprintRect": {
+        "left": 313,
+        "top": 533,
+        "width": 58,
+        "height": 58
+      },
+      "lookRect": {
+        "left": 268,
+        "top": 557,
+        "width": 112,
+        "height": 112
+      },
+      "menuRect": {
+        "left": 115,
+        "top": 463,
+        "width": 160,
+        "height": 44
+      },
+      "controlsYOffsetApplied": 0,
+      "dockDy": 0,
+      "safeAreaInsets": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "minimapOverlap": {
+        "perControl": {
+          "move": 0,
+          "give": 0,
+          "look": 0,
+          "sprint": 0
+        },
+        "totalFraction": 0,
+        "miniArea": 71355,
+        "totalArea": 0
+      }
+    }
+  },
+  "high": {
+    "y": -120,
+    "ml": {
+      "top": 437,
+      "left": 10,
+      "menuText": "MENUrunprog1"
+    },
+    "mg": {
+      "top": 364,
+      "left": 35,
+      "menuText": "MENUrunprog1"
+    },
+    "ms": {
+      "top": 413,
+      "left": 313,
+      "menuText": "MENUrunprog1"
+    },
+    "mlookpad": {
+      "top": 437,
+      "left": 268,
+      "menuText": "MENUrunprog1"
+    },
+    "mportmenu": {
+      "top": 463,
+      "left": 115,
+      "menuText": "MENUrunprog1"
+    },
+    "canvas": {
+      "top": 0,
+      "height": 844
+    },
+    "layout": {
+      "fpvRect": {
+        "x": 0,
+        "y": 0,
+        "w": 390,
+        "h": 256
+      },
+      "minimapRect": {
+        "x": 18,
+        "y": 256,
+        "w": 355,
+        "h": 201
+      },
+      "statsRect": {
+        "x": 0,
+        "y": 775,
+        "w": 390,
+        "h": 69
+      },
+      "controlsRect": {
+        "x": 0,
+        "y": 457,
+        "w": 390,
+        "h": 318
+      },
+      "moveRect": {
+        "left": 10,
+        "top": 437,
+        "width": 110,
+        "height": 110
+      },
+      "giveRect": {
+        "left": 35,
+        "top": 364,
+        "width": 61,
+        "height": 61
+      },
+      "sprintRect": {
+        "left": 313,
+        "top": 413,
+        "width": 58,
+        "height": 58
+      },
+      "lookRect": {
+        "left": 268,
+        "top": 437,
+        "width": 112,
+        "height": 112
+      },
+      "menuRect": {
+        "left": 115,
+        "top": 463,
+        "width": 160,
+        "height": 44
+      },
+      "controlsYOffsetApplied": -120,
+      "dockDy": -120,
+      "safeAreaInsets": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "minimapOverlap": {
+        "perControl": {
+          "move": 0.02858944713054446,
+          "give": 0.052147712143507816,
+          "look": 0.029430313222619298,
+          "sprint": 0.035764837782916406
+        },
+        "totalFraction": 0.14593231027958797,
+        "miniArea": 71355,
+        "totalArea": 10413
+      }
+    }
+  },
+  "very": {
+    "y": -240,
+    "ml": {
+      "top": 534,
+      "left": 10,
+      "menuText": "MENUrunprog1"
+    },
+    "mg": {
+      "top": 461,
+      "left": 35,
+      "menuText": "MENUrunprog1"
+    },
+    "ms": {
+      "top": 510,
+      "left": 313,
+      "menuText": "MENUrunprog1"
+    },
+    "mlookpad": {
+      "top": 534,
+      "left": 268,
+      "menuText": "MENUrunprog1"
+    },
+    "mportmenu": {
+      "top": 463,
+      "left": 115,
+      "menuText": "MENUrunprog1"
+    },
+    "canvas": {
+      "top": 0,
+      "height": 844
+    },
+    "layout": {
+      "fpvRect": {
+        "x": 0,
+        "y": 0,
+        "w": 390,
+        "h": 256
+      },
+      "minimapRect": {
+        "x": 18,
+        "y": 256,
+        "w": 355,
+        "h": 201
+      },
+      "statsRect": {
+        "x": 0,
+        "y": 775,
+        "w": 390,
+        "h": 69
+      },
+      "controlsRect": {
+        "x": 0,
+        "y": 457,
+        "w": 390,
+        "h": 318
+      },
+      "moveRect": {
+        "left": 10,
+        "top": 534,
+        "width": 110,
+        "height": 110
+      },
+      "giveRect": {
+        "left": 35,
+        "top": 461,
+        "width": 61,
+        "height": 61
+      },
+      "sprintRect": {
+        "left": 313,
+        "top": 510,
+        "width": 58,
+        "height": 58
+      },
+      "lookRect": {
+        "left": 268,
+        "top": 534,
+        "width": 112,
+        "height": 112
+      },
+      "menuRect": {
+        "left": 115,
+        "top": 463,
+        "width": 160,
+        "height": 44
+      },
+      "controlsYOffsetApplied": -240,
+      "dockDy": -240,
+      "safeAreaInsets": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "minimapOverlap": {
+        "perControl": {
+          "move": 0,
+          "give": 0,
+          "look": 0,
+          "sprint": 0
+        },
+        "totalFraction": 0,
+        "miniArea": 71355,
+        "totalArea": 0
+      }
+    }
+  }
+}

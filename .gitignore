@@ -1,23 +1,42 @@
-# Temporary smoke-test scripts/output
-*_smoke.py
-*_smoke_output.json
+# .gitignore
 
-# Python/cache/editor noise
+# Scratch / local dev (not shipped)
 __pycache__/
 *.pyc
 *.log
 .DS_Store
+node_modules/
+.env
+.env.*
+*.tmp
+*.bak
+.cache/
+playwright-report/
+test-results/
+*_smoke.py
+*_smoke_output.json
 
-# Local proof screenshots and older local reports/backups
+# Harness writes proof artifacts to repo root by default (tests unchanged)
+proof-*.json
 proof-*.png
-*.png
+
+# Index backups belong under reports/backups/ when tracked
 index.before-*.html
+
+# Reports live under reports/ — do not accumulate at root
 *_REPORT.md
+!SNC_REPO_ORGANIZATION_REPORT.md
+!reports/**
 
-# Keep the deployment report in the repo
-!GITHUB_PAGES_DEPLOY_REPORT.md
+# Local screenshots (non-proof)
+*.png
+!reports/proofs/**
 
-# Keep the game and project docs
-!index.html
-!README.md
-!.gitignore
+# Optional local scripts
+/_*.js
+/_*.mjs
+/cdp_test*.py
+/emulator_chrome_onboarding.py
+/emulator_proof/
+/sprite_halo_guard.mjs
+/test_*.js

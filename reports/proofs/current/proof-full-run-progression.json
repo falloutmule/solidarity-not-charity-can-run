@@ -1,0 +1,62 @@
+{
+  "pass": true,
+  "build": "runprog1",
+  "fullRunProgression": {
+    "pass": true,
+    "build": "runprog1",
+    "errors": [],
+    "warnings": [],
+    "checks": {
+      "normalRunStarted": true,
+      "spawnValid": true,
+      "collectedQuota": true,
+      "giveIfNeededPassed": true,
+      "exitReachable": true,
+      "exitCompleted": true,
+      "progressionAdvanced": true,
+      "midRunSaveLoadPassed": true,
+      "postCompletionSaveLoadPassed": true,
+      "hallE2EStillPasses": true,
+      "mobileControlsStillPass": true,
+      "noRuntimeErrors": true,
+      "harnessStateRestored": true
+    },
+    "measurements": {
+      "seed": 880017,
+      "district": 2,
+      "collectedCount": 8,
+      "quota": 5,
+      "reachableCells": 434,
+      "saveKeysTouched": [
+        "cannedRun.save.v1"
+      ],
+      "beforeLoadState": {
+        "district": 1,
+        "seed": 880018,
+        "helped": 0,
+        "quota": 5,
+        "px": 19.5,
+        "py": 15.5,
+        "cans": 1,
+        "taken": true,
+        "amt": 0,
+        "runCans": 1
+      },
+      "afterLoadState": {
+        "district": 1,
+        "seed": 880018,
+        "helped": 0,
+        "px": 19.5,
+        "py": 15.5,
+        "cans": 1,
+        "taken": false,
+        "amt": 0
+      }
+    },
+    "hallPass": true,
+    "mobilePass": true,
+    "timestamp": "2026-06-26T17:19:22.211Z"
+  },
+  "harnessStateOk": true,
+  "timestamp": "2026-06-26T17:19:22.214Z"
+}

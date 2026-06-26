@@ -1,0 +1,38 @@
+{
+  "pass": true,
+  "build": "runprog1",
+  "reachability": {
+    "pass": true,
+    "build": "runprog1",
+    "errors": [],
+    "warnings": [],
+    "checks": {
+      "clearTracePasses": true,
+      "wallTraceBlocks": true,
+      "diagonalWallBlocks": true,
+      "outOfBoundsSafe": true,
+      "normalSpawnReachable": true,
+      "normalPickupsReachabilityMeasured": true,
+      "normalNpcsReachabilityMeasured": true,
+      "normalExitReachabilityMeasured": true,
+      "hallAllPickupsReachable": true,
+      "hallAllNpcsReachable": true,
+      "hallExitReachable": true,
+      "giveDoesNotPassThroughWalls": true,
+      "harnessStateRestored": true
+    },
+    "measurements": {
+      "normalReachableCells": 431,
+      "hallReachableCells": 253,
+      "unreachableNormalPickups": 0,
+      "unreachableNormalNpcs": 0,
+      "traceSamples": 39
+    }
+  },
+  "harnessStateOk": true,
+  "screenshots": [
+    "proof-reachability-hall.png",
+    "proof-reachability-wallblocked.png"
+  ],
+  "timestamp": "2026-06-26T17:19:19.017Z"
+}
