@@ -1,0 +1,336 @@
+{
+  "pass": true,
+  "build": "menufix1",
+  "checks": {
+    "moveMoved": true,
+    "giveMoved": true,
+    "sprintMoved": true,
+    "lookMoved": true,
+    "menuStayed": true,
+    "menuTextStayed": true,
+    "minimapStayed": true,
+    "statsStayed": true,
+    "fpvStayed": true,
+    "canvasStayed": true
+  },
+  "movementPx": {
+    "midToHigh": {
+      "move": 120,
+      "give": 120,
+      "sprint": 120,
+      "look": 120,
+      "menu": 0
+    },
+    "lowToVery_menu": 0
+  },
+  "minMovementThresholdPx": 20,
+  "preferredMidHighPx": 40,
+  "viewport": {
+    "cw": 390,
+    "ch": 844
+  },
+  "isMobilePortrait": true,
+  "rects": {
+    "mid": {
+      "label": "mid",
+      "controlsYOffsetPx": 0,
+      "dom": {
+        "ml": {
+          "top": 557,
+          "left": 10,
+          "width": 114,
+          "height": 114,
+          "display": "flex",
+          "pointerEvents": "auto"
+        },
+        "mg": {
+          "top": 484,
+          "left": 35,
+          "width": 65,
+          "height": 65,
+          "display": "flex",
+          "pointerEvents": "auto"
+        },
+        "ms": {
+          "top": 533,
+          "left": 313,
+          "width": 62,
+          "height": 62,
+          "display": "flex",
+          "pointerEvents": "auto"
+        },
+        "mlookpad": {
+          "top": 557,
+          "left": 268,
+          "width": 116,
+          "height": 116,
+          "display": "flex",
+          "pointerEvents": "auto"
+        },
+        "mportmenu": {
+          "top": 463,
+          "left": 115,
+          "width": 160,
+          "height": 44,
+          "display": "flex",
+          "pointerEvents": "auto",
+          "text": "MENU menufix1",
+          "innerHTML": "<span class=\"mportmenu-t\">MENU</span><span class=\"mportmenu-b\">menufix1</span>"
+        }
+      },
+      "layout": {
+        "minimap": {
+          "top": 256,
+          "left": 18,
+          "height": 201
+        },
+        "stats": {
+          "top": 775,
+          "left": 0,
+          "height": 69
+        },
+        "fpv": {
+          "top": 0,
+          "height": 256
+        },
+        "menu": {
+          "top": 463,
+          "left": 115,
+          "height": 44
+        }
+      },
+      "canvas": {
+        "top": 0,
+        "left": 0,
+        "width": 390,
+        "height": 844
+      }
+    },
+    "low": {
+      "label": "low",
+      "controlsYOffsetPx": 120,
+      "dom": {
+        "ml": {
+          "top": 661,
+          "left": 10,
+          "width": 114,
+          "height": 114,
+          "display": "flex",
+          "pointerEvents": "auto"
+        },
+        "mg": {
+          "top": 604,
+          "left": 35,
+          "width": 65,
+          "height": 65,
+          "display": "flex",
+          "pointerEvents": "auto"
+        },
+        "ms": {
+          "top": 653,
+          "left": 313,
+          "width": 62,
+          "height": 62,
+          "display": "flex",
+          "pointerEvents": "auto"
+        },
+        "mlookpad": {
+          "top": 659,
+          "left": 268,
+          "width": 116,
+          "height": 116,
+          "display": "flex",
+          "pointerEvents": "auto"
+        },
+        "mportmenu": {
+          "top": 463,
+          "left": 115,
+          "width": 160,
+          "height": 44,
+          "display": "flex",
+          "pointerEvents": "auto",
+          "text": "MENU menufix1",
+          "innerHTML": "<span class=\"mportmenu-t\">MENU</span><span class=\"mportmenu-b\">menufix1</span>"
+        }
+      },
+      "layout": {
+        "minimap": {
+          "top": 256,
+          "left": 18,
+          "height": 201
+        },
+        "stats": {
+          "top": 775,
+          "left": 0,
+          "height": 69
+        },
+        "fpv": {
+          "top": 0,
+          "height": 256
+        },
+        "menu": {
+          "top": 463,
+          "left": 115,
+          "height": 44
+        }
+      },
+      "canvas": {
+        "top": 0,
+        "left": 0,
+        "width": 390,
+        "height": 844
+      }
+    },
+    "high": {
+      "label": "high",
+      "controlsYOffsetPx": -120,
+      "dom": {
+        "ml": {
+          "top": 437,
+          "left": 10,
+          "width": 114,
+          "height": 114,
+          "display": "flex",
+          "pointerEvents": "auto"
+        },
+        "mg": {
+          "top": 364,
+          "left": 35,
+          "width": 65,
+          "height": 65,
+          "display": "flex",
+          "pointerEvents": "auto"
+        },
+        "ms": {
+          "top": 413,
+          "left": 313,
+          "width": 62,
+          "height": 62,
+          "display": "flex",
+          "pointerEvents": "auto"
+        },
+        "mlookpad": {
+          "top": 437,
+          "left": 268,
+          "width": 116,
+          "height": 116,
+          "display": "flex",
+          "pointerEvents": "auto"
+        },
+        "mportmenu": {
+          "top": 463,
+          "left": 115,
+          "width": 160,
+          "height": 44,
+          "display": "flex",
+          "pointerEvents": "auto",
+          "text": "MENU menufix1",
+          "innerHTML": "<span class=\"mportmenu-t\">MENU</span><span class=\"mportmenu-b\">menufix1</span>"
+        }
+      },
+      "layout": {
+        "minimap": {
+          "top": 256,
+          "left": 18,
+          "height": 201
+        },
+        "stats": {
+          "top": 775,
+          "left": 0,
+          "height": 69
+        },
+        "fpv": {
+          "top": 0,
+          "height": 256
+        },
+        "menu": {
+          "top": 463,
+          "left": 115,
+          "height": 44
+        }
+      },
+      "canvas": {
+        "top": 0,
+        "left": 0,
+        "width": 390,
+        "height": 844
+      }
+    },
+    "veryHigh": {
+      "label": "veryHigh",
+      "controlsYOffsetPx": -240,
+      "dom": {
+        "ml": {
+          "top": 317,
+          "left": 10,
+          "width": 114,
+          "height": 114,
+          "display": "flex",
+          "pointerEvents": "auto"
+        },
+        "mg": {
+          "top": 244,
+          "left": 35,
+          "width": 65,
+          "height": 65,
+          "display": "flex",
+          "pointerEvents": "auto"
+        },
+        "ms": {
+          "top": 293,
+          "left": 313,
+          "width": 62,
+          "height": 62,
+          "display": "flex",
+          "pointerEvents": "auto"
+        },
+        "mlookpad": {
+          "top": 317,
+          "left": 268,
+          "width": 116,
+          "height": 116,
+          "display": "flex",
+          "pointerEvents": "auto"
+        },
+        "mportmenu": {
+          "top": 463,
+          "left": 115,
+          "width": 160,
+          "height": 44,
+          "display": "flex",
+          "pointerEvents": "auto",
+          "text": "MENU menufix1",
+          "innerHTML": "<span class=\"mportmenu-t\">MENU</span><span class=\"mportmenu-b\">menufix1</span>"
+        }
+      },
+      "layout": {
+        "minimap": {
+          "top": 256,
+          "left": 18,
+          "height": 201
+        },
+        "stats": {
+          "top": 775,
+          "left": 0,
+          "height": 69
+        },
+        "fpv": {
+          "top": 0,
+          "height": 256
+        },
+        "menu": {
+          "top": 463,
+          "left": 115,
+          "height": 44
+        }
+      },
+      "canvas": {
+        "top": 0,
+        "left": 0,
+        "width": 390,
+        "height": 844
+      }
+    }
+  },
+  "errors": []
+}

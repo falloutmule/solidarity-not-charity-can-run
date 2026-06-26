@@ -415,6 +415,8 @@ resize();
 // ---------------------------------------------------------------------------
 const DEBUG = new URLSearchParams(location.search).has('debug');
 const _forcePortraitLayout = new URLSearchParams(location.search).get('portraitlayout') === '1';
+/** Set true during CR.runControlDockSelfCheck() to force portrait layout math on desktop. */
+let _selfCheckForcePortrait = false;
 const dbg = { cansSpawned:0, npcsSpawned:0, invalidPlacements:0,
               spritesSkipped:0, reachableCells:0, rejectedSpawns:0, props:0 };
 
@@ -485,7 +487,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'safe1';
+const BUILD_ID = 'menufix1';
 const IS_FILE_ORIGIN = (typeof location !== 'undefined' && location.protocol === 'file:');
 const FILE_ORIGIN_SAVE_NOTE = 'Local file mode: saves may not persist. Use GitHub Pages for reliable saves.';
 function fileOriginMenuNoteHTML(){
@@ -618,13 +620,12 @@ function readSafeAreaInsets(){
 function syncPortraitMenuLabel(){
   const mportmenu = document.getElementById('mportmenu');
   if(!mportmenu) return;
-  const dock = controlHeightMenuLabel(options.controlsYOffsetPx);
-  const want = `<span class="mportmenu-t">MENU</span><span class="mportmenu-b">${BUILD_ID}<br>dock: ${dock}</span>`;
+  const want = `<span class="mportmenu-t">MENU</span><span class="mportmenu-b">${BUILD_ID}</span>`;
   if(mportmenu.innerHTML !== want) mportmenu.innerHTML = want;
 }
 function isMobilePortrait(){
   if(!mobileInputActive()) return false;
-  if(_forcePortraitLayout) return true;
+  if(_selfCheckForcePortrait || _forcePortraitLayout) return true;
   const { cw, ch } = layoutCssSize();
   if(ch > cw) return true;
   return isOrientationPortrait();
@@ -788,8 +789,10 @@ function touchDebug(data){
         const portrait = isMobilePortrait();
         const ml=document.getElementById('ml'), mr=document.getElementById('mr'), mg=document.getElementById('mg'), ms=document.getElementById('ms'), mm=document.getElementById('mm'), mp=document.getElementById('mp');
         const mlookpad=document.getElementById('mlookpad');
+        const mportmenu=document.getElementById('mportmenu');
         const mob=document.getElementById('mob');
         const zone = el=>{ if(!el) return 'MISSING'; const b=el.getBoundingClientRect?.(); const pe=getComputedStyle(el).pointerEvents; const dp=getComputedStyle(el).display; return `${b?(b.left|0)+','+(b.top|0)+' '+(b.right|0)+'x'+(b.bottom|0):'?'} d:${dp} pe:${pe}`; };
+        const menuTxt = mportmenu ? String(mportmenu.innerText||'').replace(/\s+/g,' ').trim() : 'MISSING';
         const vv=window.visualViewport;
         touchDebug({
           orient: portrait ? 'PORTRAIT' : 'LANDSCAPE',
@@ -810,6 +813,10 @@ function touchDebug(data){
           '#ms': zone(ms),
           '#mm/map': zone(mm),
           '#mp/pause': zone(mp),
+          '#mportmenu': zone(mportmenu),
+          mportmenu_display: mportmenu ? getComputedStyle(mportmenu).display : 'MISSING',
+          mportmenu_pe: mportmenu ? getComputedStyle(mportmenu).pointerEvents : 'MISSING',
+          mportmenu_text: menuTxt,
           lastTouch: _lastTouch.type + ' #' + _lastTouch.target + ' (' + _lastTouch.x + ',' + _lastTouch.y + ')' + (_lastTouch.consumed?' PREVENTED':'') + (_lastTouch.handler?' ['+_lastTouch.handler+']':''),
           inp: typeof inp !== 'undefined' ? JSON.stringify({g:inp.give,s:inp.sprint,m:inp.map,p:inp.pause}) : '?',
         });
@@ -823,8 +830,8 @@ function touchDebug(data){
   const params = new URLSearchParams(location.search);
   if(params.get('layoutdebug') !== '1') return;
   document.addEventListener('DOMContentLoaded', ()=>{
-    const ids = ['ml','mlookpad','mg','ms','mm','mp','mr'];
-    const colors = { ml:'#ff0', mlookpad:'#0ff', mg:'#f80', ms:'#08f', mm:'#8f0', mp:'#f08', mr:'#888' };
+    const ids = ['ml','mlookpad','mg','ms','mm','mp','mr','mportmenu'];
+    const colors = { ml:'#ff0', mlookpad:'#0ff', mg:'#f80', ms:'#08f', mm:'#8f0', mp:'#f08', mr:'#888', mportmenu:'#f0f' };
     function applyOutlines(){
       ids.forEach(id=>{
         const el = document.getElementById(id);
@@ -4084,10 +4091,9 @@ function drawPortraitDashboardChrome(){
       ctx.fillText(lbl, r.x + 4, r.y + 12);
     });
   }
-  const dockLbl = controlHeightMenuLabel(options.controlsYOffsetPx);
   ctx.font = 'bold 9px monospace';
   ctx.fillStyle = 'rgba(210,170,110,0.92)';
-  ctx.fillText(BUILD_ID + ' · dock: ' + dockLbl, L.menuRect.left, L.menuRect.top + L.menuRect.height + 11);
+  ctx.fillText('build ' + BUILD_ID, L.menuRect.left, L.menuRect.top + L.menuRect.height + 11);
 }
 function drawPortraitStatsPanel(){
   const L = portraitLayout();
@@ -4525,6 +4531,159 @@ function getViewportProof(){
   };
 }
 
+/** Automated MENU vs CONTROL DOCK HEIGHT independence check. */
+function runControlDockSelfCheck(){
+  const errors = [];
+  const MIN_MOVE_PX = 20;
+  const PREFERRED_MID_HIGH = 40;
+  const savedY = Number(options.controlsYOffsetPx) || 0;
+  const savedOverride = mobileOverride;
+  const snapDom = (id)=>{
+    const el = document.getElementById(id);
+    if(!el) return { missing: true, top: null, left: null };
+    const b = el.getBoundingClientRect();
+    const cs = getComputedStyle(el);
+    return {
+      top: Math.round(b.top),
+      left: Math.round(b.left),
+      width: Math.round(b.width),
+      height: Math.round(b.height),
+      display: cs.display,
+      pointerEvents: cs.pointerEvents,
+    };
+  };
+  const snapMenuText = ()=>{
+    const el = document.getElementById('mportmenu');
+    if(!el) return { text: '', innerHTML: '' };
+    return {
+      text: String(el.innerText || '').replace(/\s+/g, ' ').trim(),
+      innerHTML: el.innerHTML,
+    };
+  };
+  const capture = (label, yPx)=>{
+    options.controlsYOffsetPx = yPx;
+    options.save();
+    applyMobileControlSettings();
+    syncPortraitMenuLabel();
+    const L = portraitLayout(yPx);
+    const viewEl = document.getElementById('view');
+    const canvasRect = viewEl ? (()=>{ const b=viewEl.getBoundingClientRect(); return { top:Math.round(b.top), left:Math.round(b.left), width:Math.round(b.width), height:Math.round(b.height) }; })() : null;
+    return {
+      label,
+      controlsYOffsetPx: yPx,
+      dom: {
+        ml: snapDom('ml'),
+        mg: snapDom('mg'),
+        ms: snapDom('ms'),
+        mlookpad: snapDom('mlookpad'),
+        mportmenu: Object.assign({}, snapDom('mportmenu'), snapMenuText()),
+      },
+      layout: {
+        minimap: { top: L.minimapRect.y, left: L.minimapRect.x, height: L.minimapRect.h },
+        stats: { top: L.statsRect.y, left: L.statsRect.x, height: L.statsRect.h },
+        fpv: { top: L.fpvRect.y, height: L.fpvRect.h },
+        menu: { top: L.menuRect.top, left: L.menuRect.left, height: L.menuRect.height },
+      },
+      canvas: canvasRect,
+    };
+  };
+  const yDelta = (a,b,id)=>{
+    const ta = a.dom[id] && a.dom[id].top;
+    const tb = b.dom[id] && b.dom[id].top;
+    if(ta == null || tb == null) return 0;
+    return Math.abs(ta - tb);
+  };
+  const layoutYDelta = (a,b,key)=>Math.abs((a.layout[key].top||0) - (b.layout[key].top||0));
+
+  _selfCheckForcePortrait = true;
+  try {
+    mobileOverride = 'on';
+    if(typeof setMobileMode === 'function') setMobileMode(true);
+    if(state !== STATE.PLAY && typeof startRun === 'function') startRun(42);
+    paused = false;
+    resize();
+    syncPortraitMenuLabel();
+    if(!isMobilePortrait()) errors.push('portrait layout not active');
+
+    const mid = capture('mid', 0);
+    const low = capture('low', 120);
+    const high = capture('high', -120);
+    const veryHigh = capture('veryHigh', -240);
+
+    const moveMidHigh = yDelta(mid, high, 'ml');
+    const giveMidHigh = yDelta(mid, high, 'mg');
+    const sprintMidHigh = yDelta(mid, high, 'ms');
+    const lookMidHigh = yDelta(mid, high, 'mlookpad');
+    const menuMidHigh = yDelta(mid, high, 'mportmenu');
+    const menuLowVery = yDelta(low, veryHigh, 'mportmenu');
+
+    const menuTextStable = mid.dom.mportmenu.innerHTML === high.dom.mportmenu.innerHTML
+      && mid.dom.mportmenu.innerHTML === veryHigh.dom.mportmenu.innerHTML;
+
+    const checks = {
+      moveMoved: moveMidHigh >= MIN_MOVE_PX,
+      giveMoved: giveMidHigh >= MIN_MOVE_PX,
+      sprintMoved: sprintMidHigh >= MIN_MOVE_PX,
+      lookMoved: lookMidHigh >= MIN_MOVE_PX,
+      menuStayed: menuMidHigh === 0 && menuLowVery === 0,
+      menuTextStayed: menuTextStable,
+      minimapStayed: layoutYDelta(mid, veryHigh, 'minimap') === 0,
+      statsStayed: layoutYDelta(mid, veryHigh, 'stats') === 0,
+      fpvStayed: layoutYDelta(mid, veryHigh, 'fpv') === 0,
+      canvasStayed: (()=>{
+        if(!mid.canvas || !veryHigh.canvas) return true;
+        return mid.canvas.top === veryHigh.canvas.top && mid.canvas.height === veryHigh.canvas.height;
+      })(),
+    };
+
+    if(!checks.moveMoved) errors.push('MOVE mid→high delta '+moveMidHigh+' < '+MIN_MOVE_PX);
+    if(!checks.giveMoved) errors.push('GIVE mid→high delta '+giveMidHigh+' < '+MIN_MOVE_PX);
+    if(!checks.sprintMoved) errors.push('SPRINT mid→high delta '+sprintMidHigh+' < '+MIN_MOVE_PX);
+    if(!checks.lookMoved) errors.push('LOOK mid→high delta '+lookMidHigh+' < '+MIN_MOVE_PX);
+    if(!checks.menuStayed) errors.push('MENU Y changed (mid→high '+menuMidHigh+', low→very '+menuLowVery+')');
+    if(!checks.menuTextStayed) errors.push('MENU text/HTML changed across dock heights');
+    if(!checks.minimapStayed) errors.push('minimap layout Y changed');
+    if(!checks.statsStayed) errors.push('stats layout Y changed');
+    if(!checks.fpvStayed) errors.push('FPV layout Y changed');
+    if(!checks.canvasStayed) errors.push('canvas/FPV DOM rect changed');
+
+    const pass = Object.values(checks).every(Boolean);
+
+    options.controlsYOffsetPx = savedY;
+    options.save();
+    applyMobileControlSettings();
+    syncPortraitMenuLabel();
+
+    return {
+      pass,
+      build: BUILD_ID,
+      checks,
+      movementPx: {
+        midToHigh: { move: moveMidHigh, give: giveMidHigh, sprint: sprintMidHigh, look: lookMidHigh, menu: menuMidHigh },
+        lowToVery_menu: menuLowVery,
+      },
+      minMovementThresholdPx: MIN_MOVE_PX,
+      preferredMidHighPx: PREFERRED_MID_HIGH,
+      viewport: layoutCssSize(),
+      isMobilePortrait: isMobilePortrait(),
+      rects: { mid, low, high, veryHigh },
+      errors,
+    };
+  } catch(e){
+    errors.push(String(e && e.message ? e.message : e));
+    try {
+      options.controlsYOffsetPx = savedY;
+      options.save();
+      applyMobileControlSettings();
+      syncPortraitMenuLabel();
+    } catch(_r){}
+    return { pass: false, build: BUILD_ID, checks: {}, rects: {}, errors };
+  } finally {
+    _selfCheckForcePortrait = false;
+    mobileOverride = savedOverride;
+  }
+}
+
 globalThis.CR = window.CR = {
   game,player,STATE,cfg,SAVE,stats,leaderboards,profile,options,dbg,
   get state(){ return state; },
@@ -4533,7 +4692,7 @@ globalThis.CR = window.CR = {
   set paused(v){ paused=!!v; },
   get mobileMode(){ return mobileMode; },
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
-  setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
+  setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
   editRunnerName,applyMobileControlSettings,mobileSprintCost,mobileSprintBurstSec,
   toggleFullscreen,isFullscreen,enterFullscreen,exitFullscreen,
   getAudioContext,resumeAudioContext,bindAudioUnlockGate,getAudioUnlockProof,
