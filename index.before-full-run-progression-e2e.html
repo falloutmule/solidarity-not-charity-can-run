@@ -514,7 +514,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'runprog1';
+const BUILD_ID = 'multiseed1';
 const IS_FILE_ORIGIN = (typeof location !== 'undefined' && location.protocol === 'file:');
 const FILE_ORIGIN_SAVE_NOTE = 'Local file mode: saves may not persist. Use GitHub Pages for reliable saves.';
 function fileOriginMenuNoteHTML(){
@@ -2601,8 +2601,6 @@ const SAVE = {
       npcs: game.npcs.map(n=>({x:n.x,y:n.y,kind:n.kind,need:n.need,helped:n.helped,wob:n.wob,thank:n.thank||''})),
       props: game.props.map(p=>({x:p.x,y:p.y,kind:p.kind,wob:p.wob})),
       exit: game.exit ? {x:game.exit.x,y:game.exit.y,active:game.exit.active} : null,
-      screenState: state,
-      upgradeOffered: state === STATE.UPGRADE ? (window._offered || []).map(o => ({ id: o.id, name: o.name, desc: o.desc })) : null,
       // run tracking
       run: Object.assign({}, game.run),
     };
@@ -2632,13 +2630,7 @@ const SAVE = {
       game.exit=s.exit;
       game.run = s.run || game.run;
       game.run.active=true;
-      if(s.screenState === STATE.UPGRADE && Array.isArray(s.upgradeOffered) && s.upgradeOffered.length){
-        state = STATE.UPGRADE;
-        window._offered = s.upgradeOffered;
-        paused = false;
-      } else {
-        state=STATE.PLAY; paused=false;
-      }
+      state=STATE.PLAY; paused=false;
       return true;
     } catch(e){ return false; }
   },
@@ -5638,12 +5630,11 @@ function runFullSelfCheckInner(){
   const movementCollision = runMovementCollisionSelfCheck();
   const reachability = runReachabilitySelfCheck();
   const proceduralLevelValidation = runProceduralLevelValidationSelfCheck();
-  const fullRunProgression = runFullRunProgressionSelfCheck();
   const input = runInputSelfCheck();
   const levels = runLevelSelfCheck();
   const renderFailure = runRenderFailureSelfCheck();
   const runtimeClean = window.__crRuntimeErrors.length === err0;
-  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && mobileControlReliability.pass && movementCollision.pass && reachability.pass && proceduralLevelValidation.pass && fullRunProgression.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
+  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && mobileControlReliability.pass && movementCollision.pass && reachability.pass && proceduralLevelValidation.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
   return {
     pass,
     build: BUILD_ID,
@@ -5655,7 +5646,6 @@ function runFullSelfCheckInner(){
     movementCollision,
     reachability,
     proceduralLevelValidation,
-    fullRunProgression,
     input,
     levels,
     renderFailure,
@@ -6274,288 +6264,6 @@ function runReachabilitySelfCheckBody(){
     applyMobileControlSettings();
     clearInputState();
     game.npcs = game.npcs || [];
-  }
-}
-
-function crHarnessWriteSaveToStorage(){
-  const wasBlock = _crBlockHarnessSave;
-  const wasHarness = !!(game.run && game.run.harnessOnly);
-  _crBlockHarnessSave = false;
-  if(game.run) game.run.harnessOnly = false;
-  try {
-    lsSet(K.save, SAVE.serialize());
-    return true;
-  } catch(e){ return false; }
-  finally {
-    _crBlockHarnessSave = wasBlock;
-    if(game.run) game.run.harnessOnly = wasHarness;
-  }
-}
-
-function crHarnessStartDeterministicRun(seed, modifier){
-  SAVE.clear();
-  game.seed = seed;
-  game.district = 1;
-  game.totalScore = 0;
-  game.modifier = modifier || 'clear';
-  resetPlayerUpgrades();
-  genCity(game.seed, game.district, game.modifier);
-  player.cans = 0;
-  player.stamina = player.maxStamina;
-  sharedEnterPlay();
-  game.run = {
-    active: true, startedAt: Date.now(), seedUsed: seed, modifierUsed: game.modifier, customLevel: null,
-    cansCollected: 0, cansDelivered: 0,
-    helpedByKind: { hungry: 0, family: 0, elder: 0, volunteer: 0 },
-    upgradesChosen: 0, highestDistrict: 1, runTime: 0, completed: false, leaderboardRank: null,
-    harnessOnly: true,
-  };
-  clearInputState();
-  state = STATE.PLAY;
-  paused = false;
-}
-
-function crHarnessMoveNearWorld(wx, wy){
-  const tx = Math.floor(wx), ty = Math.floor(wy);
-  const offsets = [
-    [0, 0], [0.35, 0], [-0.35, 0], [0, 0.35], [0, -0.35],
-    [0.5, 0], [-0.5, 0], [0.35, 0.35], [-0.35, -0.35],
-  ];
-  for(const [ox, oy] of offsets){
-    const px = wx + ox, py = wy + oy;
-    if(canStand(px, py)){ player.x = px; player.y = py; return true; }
-  }
-  const px = tx + 0.5, py = ty + 0.5;
-  if(canStand(px, py)){ player.x = px; player.y = py; return true; }
-  return false;
-}
-
-function crHarnessCollectReachablePickups(){
-  let collected = 0;
-  const spawnX = player.x, spawnY = player.y;
-  for(const p of game.pickups || []){
-    if(p.taken) continue;
-    if(!crHarnessEssentialConnected(p.x, p.y, spawnX, spawnY)) continue;
-    if(!crHarnessMoveNearWorld(p.x, p.y)) continue;
-    const c0 = player.cans;
-    const a0 = p.amt;
-    tickPickups();
-    if(player.cans > c0 || p.taken || p.amt < a0) collected++;
-  }
-  return collected;
-}
-
-function crHarnessGiveUntilQuota(errors, label){
-  let gave = false;
-  player.giveCD = 0;
-  let guard = 0;
-  while(game.helped < game.quota && guard < 48){
-    const npc = (game.npcs || []).find(n => !n.helped);
-    if(!npc){ errors.push(label + ': no unhelped NPC'); return gave; }
-    player.cans = Math.max(player.cans, npc.need + 3);
-    player.giveCD = 0;
-    if(!crHarnessMoveNearWorld(npc.x, npc.y)){
-      errors.push(label + ': cannot reach NPC ' + npc.kind);
-      return gave;
-    }
-    updateAim();
-    if(!game.aimNpc){ errors.push(label + ': aimNpc null at NPC'); return gave; }
-    const h0 = game.helped;
-    giveCan();
-    if(game.helped > h0) gave = true;
-    else { errors.push(label + ': giveCan did not advance helped'); return gave; }
-    guard++;
-  }
-  return gave;
-}
-
-function crHarnessAssertValidRunState(label, errors){
-  if(state !== STATE.PLAY && state !== STATE.UPGRADE) errors.push(label + ': bad state ' + state);
-  if(!game.run || !game.run.active) errors.push(label + ': run not active');
-  if(!canStand(player.x, player.y)) errors.push(label + ': player not canStand');
-}
-
-function runFullRunProgressionSelfCheck(){
-  if(_crHarnessDepth > 0) return runFullRunProgressionSelfCheckBody();
-  return crWithTemporaryState('fullRunProgression', () => runFullRunProgressionSelfCheckBody());
-}
-
-function runFullRunProgressionSelfCheckBody(){
-  const errors = [];
-  const warnings = [];
-  const err0 = window.__crRuntimeErrors.length;
-  const E2E_SEED = 880017;
-  const MID_SEED = 880018;
-  const POST_SEED = 880019;
-  const measurements = {
-    seed: E2E_SEED,
-    district: 1,
-    collectedCount: 0,
-    quota: 0,
-    reachableCells: 0,
-    saveKeysTouched: [K.save],
-    beforeLoadState: null,
-    afterLoadState: null,
-  };
-  const checks = {
-    normalRunStarted: false,
-    spawnValid: false,
-    collectedQuota: false,
-    giveIfNeededPassed: false,
-    exitReachable: false,
-    exitCompleted: false,
-    progressionAdvanced: false,
-    midRunSaveLoadPassed: false,
-    postCompletionSaveLoadPassed: false,
-    hallE2EStillPasses: false,
-    mobileControlsStillPass: false,
-    noRuntimeErrors: true,
-    harnessStateRestored: true,
-  };
-  const statsSnap = crCloneJson(stats.data);
-  const savedOverride = mobileOverride;
-  crPrepareSelfCheckPortrait();
-  try {
-    crHarnessStartDeterministicRun(E2E_SEED, 'clear');
-    checks.normalRunStarted = state === STATE.PLAY && game.run.active;
-    checks.spawnValid = canStand(player.x, player.y);
-    measurements.quota = game.quota;
-    const bfs = gridReachableFrom(player.x, player.y);
-    measurements.reachableCells = bfs.count;
-    if(!checks.normalRunStarted) errors.push('normal: run did not start');
-    if(!checks.spawnValid) errors.push('normal: invalid spawn');
-
-    const collected = crHarnessCollectReachablePickups();
-    measurements.collectedCount = collected;
-    if(collected < 1) errors.push('normal: no pickup collected via tickPickups');
-
-    const gave = crHarnessGiveUntilQuota(errors, 'normal');
-    checks.giveIfNeededPassed = gave && game.helped >= game.quota;
-    checks.collectedQuota = game.helped >= game.quota;
-    if(!checks.collectedQuota) errors.push('normal: quota not met');
-
-    if(!game.exit || !game.exit.active) errors.push('normal: exit not active after quota');
-    else {
-      checks.exitReachable = crHarnessEssentialConnected(game.exit.x, game.exit.y, player.x, player.y);
-      if(!checks.exitReachable) errors.push('normal: exit not reachable');
-      else if(crHarnessMoveNearWorld(game.exit.x, game.exit.y)){
-        const dist0 = game.district;
-        completeDistrict();
-        checks.exitCompleted = state === STATE.UPGRADE && game.helped >= game.quota;
-        if(!checks.exitCompleted) errors.push('normal: completeDistrict did not reach UPGRADE');
-        if(window._offered && window._offered.length >= 1){
-          chooseUpgrade(0);
-          checks.progressionAdvanced = state === STATE.PLAY && game.district === dist0 + 1;
-          measurements.district = game.district;
-          if(!checks.progressionAdvanced) errors.push('normal: chooseUpgrade did not advance district');
-        } else errors.push('normal: no upgrade offered');
-      }
-    }
-
-    crHarnessStartDeterministicRun(MID_SEED, 'clear');
-    const midPickup = (game.pickups || []).find(p => !p.taken);
-    if(!midPickup) errors.push('mid-save: no pickup');
-    else {
-      crHarnessMoveNearWorld(midPickup.x, midPickup.y);
-      tickPickups();
-      const snapBefore = {
-        district: game.district, seed: game.seed, helped: game.helped, quota: game.quota,
-        px: player.x, py: player.y, cans: player.cans,
-        taken: midPickup.taken, amt: midPickup.amt,
-        runCans: game.run.cansCollected,
-      };
-      measurements.beforeLoadState = snapBefore;
-      if(!crHarnessWriteSaveToStorage()) errors.push('mid-save: write failed');
-      else {
-        player.x += 2.5;
-        player.cans = 0;
-        if(midPickup) midPickup.taken = false;
-        const loaded = SAVE.load();
-        const snapAfter = {
-          district: game.district, seed: game.seed, helped: game.helped,
-          px: player.x, py: player.y, cans: player.cans,
-          taken: midPickup.taken, amt: midPickup.amt,
-        };
-        measurements.afterLoadState = snapAfter;
-        clearInputState();
-        checks.midRunSaveLoadPassed = loaded &&
-          snapAfter.district === snapBefore.district &&
-          snapAfter.seed === snapBefore.seed &&
-          Math.abs(snapAfter.px - snapBefore.px) < 0.02 &&
-          snapAfter.cans === snapBefore.cans &&
-          !inp.fwd && !inp.back && !joy.active;
-        if(!checks.midRunSaveLoadPassed) errors.push('mid-save: load mismatch');
-        crHarnessAssertValidRunState('mid-load', errors);
-      }
-    }
-
-    crHarnessStartDeterministicRun(POST_SEED, 'clear');
-    crHarnessCollectReachablePickups();
-    crHarnessGiveUntilQuota(errors, 'post');
-    if(game.exit && game.exit.active && crHarnessMoveNearWorld(game.exit.x, game.exit.y)){
-      const helpedSnap = game.helped;
-      const distSnap = game.district;
-      completeDistrict();
-      if(state === STATE.UPGRADE){
-        const offeredSnap = (window._offered || []).length;
-        if(!crHarnessWriteSaveToStorage()) errors.push('post-save: write failed');
-        else {
-          state = STATE.TITLE;
-          game.helped = 0;
-          window._offered = null;
-          const loaded = SAVE.load();
-          checks.postCompletionSaveLoadPassed = loaded &&
-            state === STATE.UPGRADE &&
-            game.helped === helpedSnap &&
-            game.district === distSnap &&
-            (window._offered || []).length === offeredSnap;
-          if(!checks.postCompletionSaveLoadPassed) errors.push('post-save: upgrade state not restored');
-        }
-      } else errors.push('post-save: not in UPGRADE before save');
-    } else errors.push('post-save: could not complete district');
-
-    const hall = runHallSelfCheck();
-    checks.hallE2EStillPasses = hall.pass === true;
-    if(!checks.hallE2EStillPasses) errors.push('hall regression: ' + (hall.errors || []).join('; '));
-
-    const mobile = runMobileControlReliabilitySelfCheck();
-    checks.mobileControlsStillPass = mobile.pass === true;
-    if(!checks.mobileControlsStillPass) errors.push('mobile regression');
-
-    checks.noRuntimeErrors = window.__crRuntimeErrors.length === err0;
-    if(!checks.noRuntimeErrors) errors.push('runtime errors during full-run check');
-
-    const pass = errors.length === 0 &&
-      checks.normalRunStarted && checks.spawnValid && checks.collectedQuota &&
-      checks.giveIfNeededPassed && checks.exitCompleted && checks.progressionAdvanced &&
-      checks.midRunSaveLoadPassed && checks.postCompletionSaveLoadPassed &&
-      checks.hallE2EStillPasses && checks.mobileControlsStillPass && checks.noRuntimeErrors;
-
-    window.__crLastFullRunProgression = { pass, checks, measurements, errors, warnings };
-    return {
-      pass,
-      build: BUILD_ID,
-      errors,
-      warnings,
-      checks,
-      measurements,
-      hallPass: hall.pass,
-      mobilePass: mobile.pass,
-      timestamp: new Date().toISOString(),
-    };
-  } catch(e){
-    errors.push(String(e && e.message ? e.message : e));
-    return { pass: false, build: BUILD_ID, errors, warnings, checks, measurements };
-  } finally {
-    stats.data = statsSnap;
-    stats.save();
-    _selfCheckForcePortrait = false;
-    mobileOverride = savedOverride;
-    applyMobileControlSettings();
-    clearInputState();
-    crClearHarnessLeakFromStorage();
-    SAVE.clear();
-    crForceSafeTitleAfterHarness();
   }
 }
 
@@ -7689,7 +7397,7 @@ globalThis.CR = window.CR = {
   set paused(v){ paused=!!v; },
   get mobileMode(){ return mobileMode; },
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
-  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runMobileControlReliabilitySelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
+  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runMobileControlReliabilitySelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runProceduralLevelValidationSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
   editRunnerName,applyMobileControlSettings,mobileSprintCost,mobileSprintBurstSec,triggerMobileSprintBurst,crDispatchPointer,crDispatchTouch,
   toggleFullscreen,isFullscreen,enterFullscreen,exitFullscreen,
   getAudioContext,resumeAudioContext,bindAudioUnlockGate,getAudioUnlockProof,

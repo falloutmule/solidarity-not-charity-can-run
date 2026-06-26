@@ -780,6 +780,36 @@ async function proceduralLevelValidationSection(page) {
   return { pass, proof, proceduralLevelValidation: proc };
 }
 
+async function fullRunProgressionSection(page) {
+  const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await waitGameReady(page);
+
+  const fr = await page.evaluate(() => CR.runFullRunProgressionSelfCheck());
+  const isoOk = await page.evaluate(() => CR.crFingerprintPublicSafe(CR.crPublicStateFingerprint()));
+
+  const proof = {
+    pass: fr.pass === true && isoOk !== false,
+    build: fr.build,
+    fullRunProgression: fr,
+    harnessStateOk: isoOk,
+    timestamp: new Date().toISOString(),
+  };
+  if (fr.measurements && fr.measurements.beforeLoadState) {
+    writeProof('proof-full-run-before-save.json', fr.measurements.beforeLoadState);
+  }
+  if (fr.measurements && fr.measurements.afterLoadState) {
+    writeProof('proof-full-run-after-load.json', fr.measurements.afterLoadState);
+  }
+  writeProof('proof-full-run-progression.json', proof);
+  try {
+    await page.screenshot({ path: path.join(ROOT, 'proof-full-run-complete.png') });
+    proof.screenshot = 'proof-full-run-complete.png';
+  } catch (_e) {}
+  return { pass: proof.pass, proof, fullRunProgression: fr };
+}
+
 async function portraitUsabilitySection(page) {
   const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
   const presetList = [
@@ -1081,6 +1111,7 @@ async function main() {
   const movementCollision = await movementCollisionSection(page);
   const reachability = await reachabilitySection(page);
   const proceduralLevelValidation = await proceduralLevelValidationSection(page);
+  const fullRunProgression = await fullRunProgressionSection(page);
 
   const harnessIsolation = await harnessIsolationSection(page);
   const renderFailure = await renderFailureSection(page);
@@ -1121,6 +1152,7 @@ async function main() {
     movementCollision.pass &&
     reachability.pass &&
     proceduralLevelValidation.pass &&
+    fullRunProgression.pass &&
     harnessIsolation.pass &&
     renderFailure.pass &&
     hallE2E.pass &&
@@ -1161,6 +1193,7 @@ async function main() {
     movementCollision,
     reachability,
     proceduralLevelValidation,
+    fullRunProgression,
     harnessIsolation,
     renderFailure,
     hallE2E,
