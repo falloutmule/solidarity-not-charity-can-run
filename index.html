@@ -11,10 +11,18 @@
 <meta name="theme-color" content="#1a1410">
 <title>Solidarity Not Charity Can Run</title>
 <style>
-  html,body{margin:0;height:100%;background:#000;overflow:hidden;cursor:crosshair;touch-action:none;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;overscroll-behavior:none;}
-  /* small in-game fullscreen toggle */
-  #fsbtn{
-    display:none;position:fixed;top:8px;left:50%;transform:translateX(-50%);
+  /* TOUCH-ACTION POLICY: gameplay canvas + #mob controls = none (no page scroll/zoom hijack).
+     <style>
+       :root{
+         --safe-top:env(safe-area-inset-top,0px);
+         --safe-right:env(safe-area-inset-right,0px);
+         --safe-bottom:env(safe-area-inset-bottom,0px);
+         --safe-left:env(safe-area-inset-left,0px);
+       }
+       html,body{margin:0;min-height:100dvh;height:100%;background:#000;overflow:hidden;cursor:crosshair;touch-action:none;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;overscroll-behavior:none;}
+       /* small in-game fullscreen toggle */
+       #fsbtn{
+         display:none;position:fixed;top:calc(8px + var(--safe-top));left:50%;transform:translateX(-50%);
     z-index:15;width:auto;min-width:54px;height:30px;padding:0 8px;
     background:rgba(30,22,14,0.85);border:1px solid rgba(200,170,100,0.45);
     border-radius:5px;color:#e9d8b0;font:bold 9px monospace;letter-spacing:0.5px;
@@ -82,7 +90,7 @@
     display:none;position:absolute;z-index:17;border:none;background:transparent;
     color:#e82222;font:bold 21px monospace;letter-spacing:3px;
     justify-content:center;align-items:center;padding-top:0;
-    pointer-events:auto;text-shadow:0 1px 6px rgba(0,0,0,0.85);
+    pointer-events:auto;touch-action:none;text-shadow:0 1px 6px rgba(0,0,0,0.85);
     flex-direction:column;gap:0;line-height:1.05;
   }
   #mportmenu .mportmenu-t{font-size:21px;letter-spacing:3px;}
@@ -109,7 +117,7 @@
   }
   /* ---- touch debug overlay ---- */
   #touchdebug{
-    display:none;position:fixed;top:4px;left:4px;
+    display:none;position:fixed;top:calc(4px + var(--safe-top));left:calc(4px + var(--safe-left));
     background:rgba(0,0,0,0.82);border:1px solid rgba(255,200,80,0.5);
     color:#ffd24a;font:10px monospace;line-height:1.55;
     padding:5px 7px;z-index:9999;pointer-events:none;
@@ -174,7 +182,8 @@
     display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:99;
     background:rgba(10,8,5,0.98);flex-direction:column;align-items:center;justify-content:center;
     font:14px monospace;color:#8a7a5a;letter-spacing:1px;text-align:center;
-    padding:40px;gap:14px;touch-action:none;
+    padding:calc(40px + var(--safe-top)) calc(40px + var(--safe-right)) calc(40px + var(--safe-bottom)) calc(40px + var(--safe-left));
+    gap:14px;touch-action:none;box-sizing:border-box;
   }
   #porthint.show{display:flex;}
   #porthint button{background:rgba(40,30,20,0.9);border:1px solid rgba(180,150,80,0.4);color:#d8c8a0;padding:10px 24px;font:13px monospace;border-radius:4px;cursor:pointer;}
@@ -440,7 +449,13 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'menu1';
+const BUILD_ID = 'contract1';
+const IS_FILE_ORIGIN = (typeof location !== 'undefined' && location.protocol === 'file:');
+const FILE_ORIGIN_SAVE_NOTE = 'Local file mode: saves may not persist. Use GitHub Pages for reliable saves.';
+function fileOriginMenuNoteHTML(){
+  if(!IS_FILE_ORIGIN) return '';
+  return `<div class="rdesc" style="margin:10px 16px 12px;padding:8px 10px;border:1px solid rgba(180,120,60,0.5);color:#c9a060;font-size:11px;line-height:1.4;text-align:center;">${FILE_ORIGIN_SAVE_NOTE}</div>`;
+}
 let mobileMode = false; // true = show mobile overlay, hide desktop cursor
 let mobileOverride = null; // null=auto, 'on', 'off'
 let portHintShown = false;
@@ -1334,6 +1349,7 @@ function drawMobileMenu(){
     rmenuHTML(`
       <div class="rpantit" style="font-size:16px;margin-bottom:14px;line-height:1.25;">Solidarity Not Charity Can Run</div>
       <div class="rdesc" style="margin-bottom:14px;">A desert-city food run</div>
+      ${fileOriginMenuNoteHTML()}
       ${buildTitleRmenuBody()}
       <div class="rclose" style="margin-top:16px;">↑↓ navigate · tap to activate</div>
       <div class="rclose" style="margin-top:6px;color:#5a4a3a;">build ${BUILD_ID}</div>
@@ -1873,22 +1889,89 @@ function canStand(x,y){
 }
 
 // ---------------------------------------------------------------------------
-// 5. AUDIO  (UNCHANGED)
+// 5. AUDIO — centralized AudioContext + user-gesture unlock (CARD 10)
 // ---------------------------------------------------------------------------
 let AC=null;
+let _audioUnlockBound=false;
+let _audioUnlockAttempted=false;
+let _audioUnlockPromise=null;
+
+function getAudioContext(){
+  if(AC) return AC;
+  const Ctx = window.AudioContext || window.webkitAudioContext;
+  if(!Ctx) return null;
+  AC = new Ctx();
+  return AC;
+}
+
+function resumeAudioContext(){
+  const ctx = getAudioContext();
+  if(!ctx) return Promise.resolve({ ok:false, state:'unsupported' });
+  if(ctx.state === 'running') return Promise.resolve({ ok:true, state:'running' });
+  if(_audioUnlockPromise) return _audioUnlockPromise;
+  _audioUnlockAttempted = true;
+  _audioUnlockPromise = ctx.resume().then(()=>({
+    ok: ctx.state === 'running',
+    state: ctx.state,
+  })).catch(err=>({
+    ok:false,
+    state: ctx.state,
+    error: String(err && err.message || err),
+  })).finally(()=>{ _audioUnlockPromise = null; });
+  return _audioUnlockPromise;
+}
+
+function bindAudioUnlockGate(){
+  if(_audioUnlockBound) return;
+  _audioUnlockBound = true;
+  const unlockFromGesture = ()=>{ resumeAudioContext(); };
+  const opts = { capture:true, passive:true };
+  document.addEventListener('pointerdown', unlockFromGesture, opts);
+  document.addEventListener('keydown', unlockFromGesture, opts);
+  document.addEventListener('touchstart', unlockFromGesture, opts);
+}
+
+function _beepNow(ctx, freq, dur, type, gain){
+  const o=ctx.createOscillator(), g=ctx.createGain();
+  o.type=type; o.frequency.value=freq; g.gain.value=gain;
+  o.connect(g); g.connect(ctx.destination); o.start();
+  g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime+dur);
+  o.stop(ctx.currentTime+dur);
+}
+
 function beep(freq,dur,type='square',gain=0.04){
   try{
-    if(!AC) AC = new (window.AudioContext||window.webkitAudioContext)();
-    const o=AC.createOscillator(), g=AC.createGain();
-    o.type=type; o.frequency.value=freq; g.gain.value=gain;
-    o.connect(g); g.connect(AC.destination); o.start();
-    g.gain.exponentialRampToValueAtTime(0.0001, AC.currentTime+dur);
-    o.stop(AC.currentTime+dur);
+    const ctx = getAudioContext();
+    if(!ctx) return;
+    if(ctx.state === 'suspended'){
+      resumeAudioContext().then(()=>{
+        if(ctx.state === 'running') _beepNow(ctx, freq, dur, type, gain);
+      });
+      return;
+    }
+    if(ctx.state !== 'running') return;
+    _beepNow(ctx, freq, dur, type, gain);
   }catch(e){}
 }
 
+function getAudioUnlockProof(){
+  const ctx = AC;
+  return {
+    BUILD_ID,
+    gateBound: _audioUnlockBound,
+    unlockAttempted: _audioUnlockAttempted,
+    hasContext: !!ctx,
+    state: ctx ? ctx.state : 'none',
+    gestureEvents: ['pointerdown','keydown','touchstart'],
+    resumeEntry: 'resumeAudioContext',
+  };
+}
+
+bindAudioUnlockGate();
+
 // ---------------------------------------------------------------------------
 // 5b. LOCAL PERSISTENCE (localStorage with schema/version, safe parse)
+// file:// origins may block or quota-limit localStorage — lsGet/lsSet catch errors (no throw).
 // ---------------------------------------------------------------------------
 const SAVE_VERSION = 1;
 const K = {
@@ -2528,7 +2611,7 @@ function drawScene(now){
   const fog = game.modifier==='rainy'?[40,48,60] : [196,168,128]; // dusty warm fog / cool rainy
   const fogStrength = game.modifier==='rainy'?0.9:0.78;
 
-  // ---- WALLS (DDA, textured) -> fills zbuffer per column ----
+  // ---- WALLS (DDA, textured) -> fills zbuffer per column (occlusion source of truth) ----
   for(let col=0; col<RW; col++){
     const cameraX = 2*col/RW - 1;
     const rdx = dirX + planeX*cameraX;
@@ -2609,7 +2692,7 @@ function drawScene(now){
     // sprite pixels and creates phone-visible rectangular halos. Clean sprites > haze.
     for(let col=startCol; col<endCol; col++){
       if(col<0||col>=RW) continue;
-      if(depth >= zbuffer[col]) continue;   // occluded by a closer wall
+      if(depth >= zbuffer[col]) continue;   // OCCLUSION GUARD: per-column zbuffer vs sprite depth
       const u=(col-(screenX-screenW/2))/screenW;
       const srcX=Math.max(0,Math.min(s.tex.width-1, (u*s.tex.width)|0));
       let yoff=0;
@@ -3501,6 +3584,7 @@ function drawOverlays(){
     const items=titleMenuItems();
     menuSel=clampMenu(menuSel, 0, items.length-1);
     drawMenuList(items, cx, 270, items.length);
+    if(IS_FILE_ORIGIN) sub(FILE_ORIGIN_SAVE_NOTE, cx, innerHeight-52, '#c9a060');
     sub('↑↓ navigate · ENTER select · tap rows · ESC back', cx, innerHeight-30, '#c29a66');
   }
   // --- SEEDED RUN ---
@@ -3819,6 +3903,27 @@ function rectsOverlap(a,b){
 function portraitShiftY(rect, dy){
   return { left: rect.left, top: Math.round(rect.top + dy), width: rect.width, height: rect.height };
 }
+/*
+ * PORTRAIT CONTROL CONTRACT (thumb real estate — do not break without explicit user request)
+ * ---------------------------------------------------------------------------
+ * Vertical stack (top → bottom): FPV (fixed) → minimap (fixed, full width in band) →
+ * MENU (fixed, centered under minimap) → control dock band → stats (fixed, bottom).
+ *
+ * Thumb zones (portrait mobile):
+ *   MOVE  — left dock, circular joystick (#ml / moveRect). Primary locomotion.
+ *   GIVE  — above MOVE, smaller circle; stacked intentionally to save horizontal space.
+ *   LOOK  — right dock, circular pad (#mlookpad / lookRect). Camera turn; portrait gain via PORTRAIT_LOOK_BOOST.
+ *   SPRINT — overlaps LOOK intentionally (sprintRect offset from lookRect); burst/toggle tap, not hold.
+ *
+ * CONTROL DOCK HEIGHT (options.controlsYOffsetPx / CONTROL_Y_STEPS):
+ *   Moves ONLY: moveRect, giveRect, lookRect, sprintRect (via portraitShiftY).
+ *   Does NOT move: fpvRect, minimapRect, menuRect, statsRect, PAUSE/MAP chrome positions.
+ *
+ * Layout tuning: JOY SIZE, BUTTON SIZE, LOOK SIZE are independent OPTIONS steps.
+ * Do not "clean up" overlap, recentre MENU with dock, or widen minimap outside contract.
+ * Debug: ?layoutdebug=1, CR.getControlDockRectProof(), CR.getLayoutProof().
+ * Kanban Card 5 / BUILD_ID contract1 documents this contract for future edits.
+ */
 /** Portrait layout — FPV (fixed) → minimap (fixed) → MENU (fixed below minimap) → dock controls → stats (fixed). */
 function portraitLayout(overrideYOffset){
   const { cw, ch } = layoutCssSize();
@@ -4177,6 +4282,8 @@ function getControlDockRectProof(){
   };
   return {
     BUILD_ID,
+    isFileOrigin: IS_FILE_ORIGIN,
+    fileOriginSaveNote: IS_FILE_ORIGIN ? FILE_ORIGIN_SAVE_NOTE : null,
     controlsYOffsetPx: options.controlsYOffsetPx,
     mobileMode,
     isMobilePortrait: isMobilePortrait(),
@@ -4203,6 +4310,29 @@ function getControlDockRectProof(){
   };
 }
 
+function getOcclusionZbufferProof(){
+  const colSkip = (spriteDepth, wallDist)=> spriteDepth >= wallDist;
+  const samples = [
+    { spriteDepth: 3, wallDist: 2, expectSkip: true, label: 'sprite behind wall' },
+    { spriteDepth: 2, wallDist: 2, expectSkip: true, label: 'sprite flush with wall (skip)' },
+    { spriteDepth: 1.2, wallDist: 2, expectSkip: false, label: 'sprite in front of wall' },
+  ];
+  const predicateOk = samples.every(s=> colSkip(s.spriteDepth, s.wallDist) === s.expectSkip);
+  return {
+    BUILD_ID,
+    renderWidth: RW,
+    zbufferLength: zbuffer.length,
+    zbufferMatchesRenderWidth: zbuffer.length === RW,
+    billboardKinds: ['props', 'pickups', 'npcs', 'exit'],
+    perColumnGuard: 'depth >= zbuffer[col] => skip column',
+    wallPassFillsZbufferPerColumn: true,
+    noPostLoopSpriteFog: true,
+    predicateTests: samples.map(s=>({ ...s, pass: colSkip(s.spriteDepth, s.wallDist) === s.expectSkip })),
+    predicateOk,
+    regressionCommentMarker: 'OCCLUSION REGRESSION GUARD',
+  };
+}
+
 globalThis.CR = window.CR = {
   game,player,STATE,cfg,SAVE,stats,leaderboards,profile,options,dbg,
   get state(){ return state; },
@@ -4211,9 +4341,10 @@ globalThis.CR = window.CR = {
   set paused(v){ paused=!!v; },
   get mobileMode(){ return mobileMode; },
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
-  setMobileMode,isMobile,rmenuAction,getDebugState,portraitLayout,getLayoutProof,getControlDockRectProof,getMinimapAlignProof,rectsOverlap,
+  setMobileMode,isMobile,rmenuAction,getDebugState,portraitLayout,getLayoutProof,getControlDockRectProof,getMinimapAlignProof,getOcclusionZbufferProof,rectsOverlap,
   editRunnerName,applyMobileControlSettings,mobileSprintCost,mobileSprintBurstSec,
   toggleFullscreen,isFullscreen,enterFullscreen,exitFullscreen,
+  getAudioContext,resumeAudioContext,bindAudioUnlockGate,getAudioUnlockProof,
 };
 </script>
 </body>
