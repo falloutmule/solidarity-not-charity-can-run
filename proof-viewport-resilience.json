@@ -1,0 +1,26 @@
+{
+  "pass": true,
+  "rows": [
+    {
+      "h": 844,
+      "layoutPass": true,
+      "menuVisible": true,
+      "controlsVisible": true,
+      "runtimeErrors": 0
+    },
+    {
+      "h": 720,
+      "layoutPass": true,
+      "menuVisible": true,
+      "controlsVisible": true,
+      "runtimeErrors": 0
+    },
+    {
+      "h": 932,
+      "layoutPass": true,
+      "menuVisible": true,
+      "controlsVisible": true,
+      "runtimeErrors": 0
+    }
+  ]
+}

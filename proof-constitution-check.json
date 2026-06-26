@@ -1,0 +1,33 @@
+{
+  "pass": true,
+  "checks": {
+    "hasConstitution": true,
+    "BUILD_ID": true,
+    "SAVE_VERSION": true,
+    "windowCR": true,
+    "noEval": true,
+    "noExternalScript": true,
+    "noExternalStylesheet": true,
+    "noInlineOnclick": true
+  },
+  "sectionHits": {
+    "CANVAS / RESOLUTION": true,
+    "GAME STATE": true,
+    "MOBILE / TOUCH INPUT": true,
+    "CITY GENERATION": true,
+    "CUSTOM LEVELS": true,
+    "COLLISION": true,
+    "AUDIO": true,
+    "LOCAL PERSISTENCE": true,
+    "PROCEDURAL ASSETS": true,
+    "RENDER": true,
+    "MINIMAP": true,
+    "HUD": true,
+    "GAMEPLAY ACTIONS": true,
+    "UPDATE + INPUT": true,
+    "OVERLAYS": true,
+    "MAIN LOOP": true
+  },
+  "errors": [],
+  "file": "C:\\Users\\fallo\\Documents\\HermesProjects\\canned-run\\index.html"
+}

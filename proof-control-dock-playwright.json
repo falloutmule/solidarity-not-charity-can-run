@@ -1,0 +1,295 @@
+{
+  "pass": true,
+  "moveDelta": 120,
+  "menuDelta": 0,
+  "menuTextStable": true,
+  "minimapStable": true,
+  "mid": {
+    "y": 0,
+    "ml": {
+      "top": 557,
+      "left": 10,
+      "menuText": "MENUselfharness1"
+    },
+    "mg": {
+      "top": 484,
+      "left": 35,
+      "menuText": "MENUselfharness1"
+    },
+    "ms": {
+      "top": 533,
+      "left": 313,
+      "menuText": "MENUselfharness1"
+    },
+    "mlookpad": {
+      "top": 557,
+      "left": 268,
+      "menuText": "MENUselfharness1"
+    },
+    "mportmenu": {
+      "top": 463,
+      "left": 115,
+      "menuText": "MENUselfharness1"
+    },
+    "canvas": {
+      "top": 0,
+      "height": 844
+    },
+    "layout": {
+      "fpvRect": {
+        "x": 0,
+        "y": 0,
+        "w": 390,
+        "h": 256
+      },
+      "minimapRect": {
+        "x": 18,
+        "y": 256,
+        "w": 355,
+        "h": 201
+      },
+      "statsRect": {
+        "x": 0,
+        "y": 775,
+        "w": 390,
+        "h": 69
+      },
+      "controlsRect": {
+        "x": 0,
+        "y": 457,
+        "w": 390,
+        "h": 318
+      },
+      "moveRect": {
+        "left": 10,
+        "top": 557,
+        "width": 110,
+        "height": 110
+      },
+      "giveRect": {
+        "left": 35,
+        "top": 484,
+        "width": 61,
+        "height": 61
+      },
+      "sprintRect": {
+        "left": 313,
+        "top": 533,
+        "width": 58,
+        "height": 58
+      },
+      "lookRect": {
+        "left": 268,
+        "top": 557,
+        "width": 112,
+        "height": 112
+      },
+      "menuRect": {
+        "left": 115,
+        "top": 463,
+        "width": 160,
+        "height": 44
+      },
+      "controlsYOffsetApplied": 0,
+      "dockDy": 0,
+      "safeAreaInsets": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      }
+    }
+  },
+  "high": {
+    "y": -120,
+    "ml": {
+      "top": 437,
+      "left": 10,
+      "menuText": "MENUselfharness1"
+    },
+    "mg": {
+      "top": 364,
+      "left": 35,
+      "menuText": "MENUselfharness1"
+    },
+    "ms": {
+      "top": 413,
+      "left": 313,
+      "menuText": "MENUselfharness1"
+    },
+    "mlookpad": {
+      "top": 437,
+      "left": 268,
+      "menuText": "MENUselfharness1"
+    },
+    "mportmenu": {
+      "top": 463,
+      "left": 115,
+      "menuText": "MENUselfharness1"
+    },
+    "canvas": {
+      "top": 0,
+      "height": 844
+    },
+    "layout": {
+      "fpvRect": {
+        "x": 0,
+        "y": 0,
+        "w": 390,
+        "h": 256
+      },
+      "minimapRect": {
+        "x": 18,
+        "y": 256,
+        "w": 355,
+        "h": 201
+      },
+      "statsRect": {
+        "x": 0,
+        "y": 775,
+        "w": 390,
+        "h": 69
+      },
+      "controlsRect": {
+        "x": 0,
+        "y": 457,
+        "w": 390,
+        "h": 318
+      },
+      "moveRect": {
+        "left": 10,
+        "top": 437,
+        "width": 110,
+        "height": 110
+      },
+      "giveRect": {
+        "left": 35,
+        "top": 364,
+        "width": 61,
+        "height": 61
+      },
+      "sprintRect": {
+        "left": 313,
+        "top": 413,
+        "width": 58,
+        "height": 58
+      },
+      "lookRect": {
+        "left": 268,
+        "top": 437,
+        "width": 112,
+        "height": 112
+      },
+      "menuRect": {
+        "left": 115,
+        "top": 463,
+        "width": 160,
+        "height": 44
+      },
+      "controlsYOffsetApplied": -120,
+      "dockDy": -120,
+      "safeAreaInsets": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      }
+    }
+  },
+  "very": {
+    "y": -240,
+    "ml": {
+      "top": 317,
+      "left": 10,
+      "menuText": "MENUselfharness1"
+    },
+    "mg": {
+      "top": 244,
+      "left": 35,
+      "menuText": "MENUselfharness1"
+    },
+    "ms": {
+      "top": 293,
+      "left": 313,
+      "menuText": "MENUselfharness1"
+    },
+    "mlookpad": {
+      "top": 317,
+      "left": 268,
+      "menuText": "MENUselfharness1"
+    },
+    "mportmenu": {
+      "top": 463,
+      "left": 115,
+      "menuText": "MENUselfharness1"
+    },
+    "canvas": {
+      "top": 0,
+      "height": 844
+    },
+    "layout": {
+      "fpvRect": {
+        "x": 0,
+        "y": 0,
+        "w": 390,
+        "h": 256
+      },
+      "minimapRect": {
+        "x": 18,
+        "y": 256,
+        "w": 355,
+        "h": 201
+      },
+      "statsRect": {
+        "x": 0,
+        "y": 775,
+        "w": 390,
+        "h": 69
+      },
+      "controlsRect": {
+        "x": 0,
+        "y": 457,
+        "w": 390,
+        "h": 318
+      },
+      "moveRect": {
+        "left": 10,
+        "top": 317,
+        "width": 110,
+        "height": 110
+      },
+      "giveRect": {
+        "left": 35,
+        "top": 244,
+        "width": 61,
+        "height": 61
+      },
+      "sprintRect": {
+        "left": 313,
+        "top": 293,
+        "width": 58,
+        "height": 58
+      },
+      "lookRect": {
+        "left": 268,
+        "top": 317,
+        "width": 112,
+        "height": 112
+      },
+      "menuRect": {
+        "left": 115,
+        "top": 463,
+        "width": 160,
+        "height": 44
+      },
+      "controlsYOffsetApplied": -240,
+      "dockDy": -240,
+      "safeAreaInsets": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "pass": true,
+  "errors": [],
+  "checks": {
+    "joyActive": true,
+    "joyCleared": true,
+    "inpCleared": true,
+    "lookAngle": true
+  }
+}

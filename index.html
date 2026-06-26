@@ -128,6 +128,14 @@
     max-width:210px;white-space:pre;
     border-radius:4px;
   }
+  #crselfcheck{
+    display:none;position:fixed;bottom:calc(8px + var(--safe-bottom));right:calc(8px + var(--safe-right));
+    background:rgba(0,40,0,0.88);border:2px solid #3f8;
+    color:#9f9;font:bold 11px monospace;line-height:1.4;
+    padding:6px 10px;z-index:10000;pointer-events:none;
+    max-width:240px;white-space:pre;border-radius:4px;
+  }
+  #crselfcheck.fail{background:rgba(50,0,0,0.9);border-color:#f55;color:#faa;}
   .mjl{
     position:absolute;width:44px;height:44px;border-radius:50%;
     background:rgba(160,130,60,0.3);border:2px solid rgba(200,170,100,0.5);
@@ -225,6 +233,7 @@
 <div id="fstoast"></div>
 <!-- touch debug overlay (gated by ?touchdebug=1) -->
 <div id="touchdebug" aria-hidden="true"></div>
+<div id="crselfcheck" aria-hidden="true"></div>
 <script>
 "use strict";
 /* ============================================================================
@@ -414,6 +423,7 @@ resize();
 // SECTION 0c — DEBUG FLAG
 // ---------------------------------------------------------------------------
 const DEBUG = new URLSearchParams(location.search).has('debug');
+const _selfCheckUrl = new URLSearchParams(location.search).get('selfcheck') === '1';
 const _forcePortraitLayout = new URLSearchParams(location.search).get('portraitlayout') === '1';
 /** Set true during CR.runControlDockSelfCheck() to force portrait layout math on desktop. */
 let _selfCheckForcePortrait = false;
@@ -487,7 +497,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'menufix1';
+const BUILD_ID = 'selfharness1';
 const IS_FILE_ORIGIN = (typeof location !== 'undefined' && location.protocol === 'file:');
 const FILE_ORIGIN_SAVE_NOTE = 'Local file mode: saves may not persist. Use GitHub Pages for reliable saves.';
 function fileOriginMenuNoteHTML(){
@@ -4531,6 +4541,324 @@ function getViewportProof(){
   };
 }
 
+function showCrSelfCheckOverlay(result){
+  const el = document.getElementById('crselfcheck');
+  if(!el) return;
+  el.style.display = 'block';
+  el.classList.toggle('fail', !result.pass);
+  if(result.pass){
+    el.textContent = 'SELF-CHECK PASS\nbuild '+BUILD_ID;
+  } else {
+    const errs = []
+      .concat(result.layout?.errors||[])
+      .concat(result.input?.errors||[])
+      .concat(result.levels?.errors||[])
+      .concat(result.render?.errors||[]);
+    el.textContent = 'SELF-CHECK FAIL\n'+(errs.slice(0,4).join('\n')||'see console');
+  }
+}
+
+function crPrepareSelfCheckPortrait(){
+  _selfCheckForcePortrait = true;
+  mobileOverride = 'on';
+  setMobileMode(true);
+  resize();
+  applyMobileControlSettings();
+  syncPortraitMenuLabel();
+}
+
+function crDispatchPointer(el, type, clientX, clientY, pointerId, pointerType){
+  if(!el) return;
+  const pe = new PointerEvent(type, {
+    bubbles: true, cancelable: true, clientX, clientY, pointerId,
+    pointerType: pointerType || 'touch', isPrimary: true,
+    buttons: type === 'pointerdown' ? 1 : 0,
+  });
+  el.dispatchEvent(pe);
+}
+
+function crDispatchTouch(el, type, clientX, clientY, identifier){
+  if(!el || typeof Touch === 'undefined') return;
+  const id = identifier != null ? identifier : 77;
+  const t = new Touch({
+    identifier: id, target: el, clientX, clientY,
+    pageX: clientX, pageY: clientY, screenX: clientX, screenY: clientY,
+  });
+  const touches = type === 'touchend' || type === 'touchcancel' ? [] : [t];
+  el.dispatchEvent(new TouchEvent(type, {
+    bubbles: true, cancelable: true, touches, targetTouches: touches, changedTouches: [t],
+  }));
+}
+
+function runLayoutSelfCheck(){
+  const errors = [];
+  const warnings = [];
+  const savedOverride = mobileOverride;
+  crPrepareSelfCheckPortrait();
+  try {
+    const canvasOk = !!view && view.width > 0 && view.height > 0;
+    if(!canvasOk) errors.push('FPV canvas missing or zero size');
+    const L = portraitLayout();
+    const rectKeys = ['fpvRect','minimapRect','statsRect','menuRect','moveRect','giveRect','sprintRect','lookRect'];
+    for(const k of rectKeys){
+      if(!L[k]) errors.push('portraitLayout missing '+k);
+    }
+    const proof = getLayoutProof();
+    const menuEl = document.getElementById('mportmenu');
+    const menuText = menuEl ? (menuEl.textContent || '') : '';
+    const menuNoDock = !/dock/i.test(menuText);
+    if(!menuNoDock) errors.push('MENU text includes dock height');
+    if(proof.overlap && proof.overlap.giveMove) errors.push('unexpected GIVE/MOVE overlap');
+    if(proof.overlap && proof.overlap.sprintMove) errors.push('unexpected SPRINT/MOVE overlap');
+    if(proof.overlap && proof.overlap.giveLook) warnings.push('GIVE/LOOK overlap present');
+    if(proof.overlap && proof.overlap.sprintLook) warnings.push('intentional SPRINT/LOOK overlap');
+    const dock = runControlDockSelfCheck();
+    if(!dock.pass) errors.push(...(dock.errors || []));
+    const checks = {
+      canvasOk,
+      minimapRect: !!L.minimapRect,
+      statsRect: !!L.statsRect,
+      menuRect: !!L.menuRect,
+      moveRect: !!L.moveRect,
+      giveRect: !!L.giveRect,
+      sprintRect: !!L.sprintRect,
+      lookRect: !!L.lookRect,
+      menuNoDockText: menuNoDock,
+      controlsMoveWithHeight: !!(dock.checks && dock.checks.moveMoved),
+      menuFixedWithHeight: !!(dock.checks && dock.checks.menuStayed),
+      minimapFixedWithHeight: !!(dock.checks && dock.checks.minimapStayed),
+      statsFixedWithHeight: !!(dock.checks && dock.checks.statsStayed),
+      fpvFixedWithHeight: !!(dock.checks && dock.checks.fpvStayed),
+    };
+    const pass = errors.length === 0 && Object.values(checks).every(Boolean);
+    return { pass, build: BUILD_ID, errors, warnings, rects: proof, checks, dockSummary: { pass: dock.pass, movementPx: dock.movementPx } };
+  } catch(e){
+    errors.push(String(e && e.message ? e.message : e));
+    return { pass: false, build: BUILD_ID, errors, warnings, rects: {}, checks: {} };
+  } finally {
+    _selfCheckForcePortrait = false;
+    mobileOverride = savedOverride;
+    applyMobileControlSettings();
+    syncPortraitMenuLabel();
+  }
+}
+
+function runInputSelfCheck(){
+  const errors = [];
+  const checks = {};
+  const savedOverride = mobileOverride;
+  const err0 = window.__crRuntimeErrors.length;
+  crPrepareSelfCheckPortrait();
+  try {
+    startRun(42);
+    paused = false;
+    state = STATE.PLAY;
+    applyMobileControlSettings();
+    checks.startRunWorks = state === STATE.PLAY && !!game.map && game.map.length > 0;
+    if(!checks.startRunWorks) errors.push('startRun did not reach PLAY with map');
+
+    const ml = document.getElementById('ml');
+    const br = ml.getBoundingClientRect();
+    const cx = br.left + br.width * 0.5;
+    const cy = br.top + br.height * 0.5;
+    const px0 = player.x, py0 = player.y;
+    const angle0 = player.angle;
+
+    crDispatchPointer(ml, 'pointerdown', cx, cy, 42, 'touch');
+    checks.joyStarts = joy.active === true;
+    if(!checks.joyStarts) errors.push('joystick did not activate');
+
+    crDispatchPointer(ml, 'pointermove', cx, cy - 35, 42, 'touch');
+    syncInpFromJoy();
+    checks.moveIntent = inp.fwd || inp.back || inp.left || inp.right || joyStrength() > 0.15;
+    update(0.06);
+    const moved = Math.hypot(player.x - px0, player.y - py0) > 0.0005;
+    checks.moveAfterJoy = moved || checks.moveIntent;
+    if(!checks.moveAfterJoy) errors.push('no movement intent after joystick drag');
+
+    const pxMid = player.x, pyMid = player.y;
+    crDispatchPointer(ml, 'pointermove', cx + 120, cy + 120, 42, 'touch');
+    crDispatchPointer(ml, 'pointerup', cx + 120, cy + 120, 42, 'touch');
+    checks.joyClears = !joy.active;
+    checks.inpClears = !inp.fwd && !inp.back && !inp.left && !inp.right;
+    if(!checks.joyClears) errors.push('joy.active after release');
+    if(!checks.inpClears) errors.push('inp movement flags after release');
+
+    update(0.08);
+    checks.moveStopsOnRelease = Math.hypot(player.x - pxMid, player.y - pyMid) < 0.03;
+    if(!checks.moveStopsOnRelease) errors.push('player kept moving after joystick release');
+
+    try { giveCan(); checks.giveSafe = true; } catch(e){ checks.giveSafe = false; errors.push('giveCan threw: '+e.message); }
+
+    const ms = document.getElementById('ms');
+    try {
+      const mbr = ms.getBoundingClientRect();
+      crDispatchTouch(ms, 'touchstart', mbr.left + 10, mbr.top + 10, 88);
+      crDispatchTouch(ms, 'touchend', mbr.left + 10, mbr.top + 10, 88);
+      update(0.02);
+      checks.sprintSafe = true;
+    } catch(e){ checks.sprintSafe = false; errors.push('sprint touch threw: '+e.message); }
+
+    const lpad = document.getElementById('mlookpad');
+    const lbr = lpad.getBoundingClientRect();
+    const lx = lbr.left + lbr.width * 0.5;
+    const ly = lbr.top + lbr.height * 0.5;
+    crDispatchPointer(lpad, 'pointerdown', lx, ly, 44, 'mouse');
+    crDispatchPointer(lpad, 'pointermove', lx + 40, ly, 44, 'mouse');
+    checks.lookChangesAngle = Math.abs(player.angle - angle0) > 0.008;
+    crDispatchPointer(lpad, 'pointerup', lx + 40, ly, 44, 'mouse');
+    if(!checks.lookChangesAngle) errors.push('LOOK drag did not change player.angle');
+
+    checks.runtimeClean = window.__crRuntimeErrors.length === err0;
+    if(!checks.runtimeClean) errors.push('runtime errors during input self-check');
+
+    const pass = errors.length === 0 && Object.values(checks).every(Boolean);
+    return { pass, errors, checks };
+  } catch(e){
+    errors.push(String(e && e.message ? e.message : e));
+    return { pass: false, errors, checks };
+  } finally {
+    _selfCheckForcePortrait = false;
+    mobileOverride = savedOverride;
+    applyMobileControlSettings();
+  }
+}
+
+function runLevelSelfCheck(){
+  const errors = [];
+  const err0 = window.__crRuntimeErrors.length;
+  const savedOverride = mobileOverride;
+  function snapNormal(){
+    const fx = Math.cos(player.angle), fy = Math.sin(player.angle);
+    let pathOk = false;
+    for(const d of [0.15, 0.3, 0.5, 0.8]){
+      if(canStand(player.x + fx * d, player.y + fy * d)){ pathOk = true; break; }
+    }
+    return {
+      mapExists: !!(game.map && game.map.length),
+      MAP_W: game.MAP_W,
+      MAP_H: game.MAP_H,
+      wideMap: game.MAP_W > game.MAP_H,
+      spawnCanStand: canStand(player.x, player.y),
+      pickups: (game.pickups || []).filter(p => !p.taken).length,
+      npcs: (game.npcs || []).length,
+      exitExists: !!(game.exit && game.exit.x != null),
+      pathNotBlockedImmediately: pathOk,
+    };
+  }
+  crPrepareSelfCheckPortrait();
+  try {
+    startRun(42);
+    paused = false;
+    const normal = snapNormal();
+    if(!normal.mapExists) errors.push('normal run: map missing');
+    if(!normal.wideMap) errors.push('normal run: MAP_W not > MAP_H');
+    if(!normal.spawnCanStand) errors.push('normal run: spawn not canStand');
+    if(normal.pickups < 1) errors.push('normal run: no pickups');
+    if(normal.npcs < 1) errors.push('normal run: no npcs');
+    if(!normal.exitExists) errors.push('normal run: no exit');
+    if(!normal.pathNotBlockedImmediately) errors.push('normal run: forward path blocked at spawn');
+
+    startCustomLevel('hall_of_servants');
+    paused = false;
+    const hall = snapNormal();
+    hall.customLevel = game.run && game.run.customLevel;
+    hall.hallIdOk = hall.customLevel === 'hall_of_servants';
+    hall.customNpcs = (game.npcs || []).filter(n => String(n.kind || '').startsWith('hall_')).length;
+    hall.thankTextExists = (game.npcs || []).some(n => n.thank && String(n.thank).length > 0);
+
+    const hx0 = player.x, hy0 = player.y;
+    const ml = document.getElementById('ml');
+    const br = ml.getBoundingClientRect();
+    const cx = br.left + br.width * 0.5, cy = br.top + br.height * 0.5;
+    crDispatchPointer(ml, 'pointerdown', cx, cy, 55, 'touch');
+    crDispatchPointer(ml, 'pointermove', cx, cy - 30, 55, 'touch');
+    update(0.05);
+    const hallMoved = Math.hypot(player.x - hx0, player.y - hy0) > 0.0003;
+    crDispatchPointer(ml, 'pointerup', cx, cy - 30, 55, 'touch');
+    update(0.05);
+    const hallStopped = Math.hypot(player.x - hx0, player.y - hy0) < 0.15 || !joy.active;
+    hall.movementStarts = hallMoved;
+    hall.movementStopsOnRelease = hallStopped && !joy.active;
+
+    if(!hall.hallIdOk) errors.push('hall: customLevel not hall_of_servants');
+    if(!hall.wideMap) errors.push('hall: MAP_W not > MAP_H');
+    if(!hall.spawnCanStand) errors.push('hall: spawn not canStand');
+    if(hall.pickups < 1) errors.push('hall: no pickups');
+    if(hall.customNpcs < 1) errors.push('hall: no custom NPCs');
+    if(!hall.thankTextExists) errors.push('hall: no thank text on NPCs');
+    if(!hall.exitExists) errors.push('hall: no exit');
+    if(!hall.movementStarts) errors.push('hall: movement did not start');
+    if(!hall.movementStopsOnRelease) errors.push('hall: movement did not stop on release');
+
+    const runtimeClean = window.__crRuntimeErrors.length === err0;
+    const pass = errors.length === 0 && runtimeClean;
+    return { pass, errors, normal, hall, runtimeClean };
+  } catch(e){
+    errors.push(String(e && e.message ? e.message : e));
+    return { pass: false, errors, normal: {}, hall: {} };
+  } finally {
+    _selfCheckForcePortrait = false;
+    mobileOverride = savedOverride;
+    applyMobileControlSettings();
+  }
+}
+
+function runRenderSelfCheck(){
+  const errors = [];
+  const err0 = window.__crRuntimeErrors.length;
+  crPrepareSelfCheckPortrait();
+  try {
+    startRun(42);
+    paused = false;
+    if(typeof drawScene === 'function'){
+      try { drawScene(performance.now()); } catch(e){ errors.push('drawScene threw: '+e.message); }
+    } else errors.push('drawScene missing');
+    const halo = getSpriteHaloRegressionProof();
+    const occ = getOcclusionZbufferProof();
+    const checks = {
+      zbufferExists: !!(zbuffer && zbuffer.length === RW),
+      zbufferMatchesWidth: zbuffer.length === RW,
+      spriteOcclusionGuardPresent: !!occ.predicateOk,
+      noSpriteFogHaloMode: !!halo.spriteLoopOk,
+      runtimeClean: window.__crRuntimeErrors.length === err0,
+    };
+    if(!checks.zbufferExists) errors.push('zbuffer missing');
+    if(!checks.spriteOcclusionGuardPresent) errors.push('occlusion predicate failed');
+    if(!checks.noSpriteFogHaloMode) errors.push('sprite fog/halo guard failed');
+    if(!checks.runtimeClean) errors.push('runtime errors during render self-check');
+    const pass = errors.length === 0 && Object.values(checks).every(Boolean);
+    return { pass, errors, checks, halo, occlusion: occ };
+  } catch(e){
+    errors.push(String(e && e.message ? e.message : e));
+    return { pass: false, errors, checks: {} };
+  } finally {
+    _selfCheckForcePortrait = false;
+    applyMobileControlSettings();
+  }
+}
+
+function runFullSelfCheck(){
+  const err0 = window.__crRuntimeErrors.length;
+  const layout = runLayoutSelfCheck();
+  const input = runInputSelfCheck();
+  const levels = runLevelSelfCheck();
+  const render = runRenderSelfCheck();
+  const runtimeClean = window.__crRuntimeErrors.length === err0;
+  const pass = layout.pass && input.pass && levels.pass && render.pass && runtimeClean;
+  return {
+    pass,
+    build: BUILD_ID,
+    layout,
+    input,
+    levels,
+    render,
+    runtimeErrors: window.__crRuntimeErrors.slice(),
+    runtimeClean,
+    timestamp: new Date().toISOString(),
+  };
+}
+
 /** Automated MENU vs CONTROL DOCK HEIGHT independence check. */
 function runControlDockSelfCheck(){
   const errors = [];
@@ -4692,11 +5020,23 @@ globalThis.CR = window.CR = {
   set paused(v){ paused=!!v; },
   get mobileMode(){ return mobileMode; },
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
-  setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
+  setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runFullSelfCheck,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
   editRunnerName,applyMobileControlSettings,mobileSprintCost,mobileSprintBurstSec,
   toggleFullscreen,isFullscreen,enterFullscreen,exitFullscreen,
   getAudioContext,resumeAudioContext,bindAudioUnlockGate,getAudioUnlockProof,
 };
+
+if(_selfCheckUrl){
+  window.__crSelfCheckRan = false;
+  const _bootSelfCheckOnce = ()=>{
+    if(window.__crSelfCheckRan) return;
+    window.__crSelfCheckRan = true;
+    const result = runFullSelfCheck();
+    window.__crSelfCheckResult = result;
+    showCrSelfCheckOverlay(result);
+  };
+  requestAnimationFrame(()=>setTimeout(_bootSelfCheckOnce, 900));
+}
 </script>
 </body>
 </html>

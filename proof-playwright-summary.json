@@ -1,0 +1,1381 @@
+{
+  "pass": true,
+  "constitution": {
+    "pass": true,
+    "checks": {
+      "hasConstitution": true,
+      "BUILD_ID": true,
+      "SAVE_VERSION": true,
+      "windowCR": true,
+      "noEval": true,
+      "noExternalScript": true,
+      "noExternalStylesheet": true,
+      "noInlineOnclick": true
+    },
+    "sectionHits": {
+      "CANVAS / RESOLUTION": true,
+      "GAME STATE": true,
+      "MOBILE / TOUCH INPUT": true,
+      "CITY GENERATION": true,
+      "CUSTOM LEVELS": true,
+      "COLLISION": true,
+      "AUDIO": true,
+      "LOCAL PERSISTENCE": true,
+      "PROCEDURAL ASSETS": true,
+      "RENDER": true,
+      "MINIMAP": true,
+      "HUD": true,
+      "GAMEPLAY ACTIONS": true,
+      "UPDATE + INPUT": true,
+      "OVERLAYS": true,
+      "MAIN LOOP": true
+    },
+    "errors": [],
+    "file": "C:\\Users\\fallo\\Documents\\HermesProjects\\canned-run\\index.html"
+  },
+  "fullSelfCheck": {
+    "pass": true,
+    "build": "selfharness1"
+  },
+  "dock": {
+    "pass": true,
+    "moveDelta": 120,
+    "menuDelta": 0,
+    "menuTextStable": true,
+    "minimapStable": true,
+    "mid": {
+      "y": 0,
+      "ml": {
+        "top": 557,
+        "left": 10,
+        "menuText": "MENUselfharness1"
+      },
+      "mg": {
+        "top": 484,
+        "left": 35,
+        "menuText": "MENUselfharness1"
+      },
+      "ms": {
+        "top": 533,
+        "left": 313,
+        "menuText": "MENUselfharness1"
+      },
+      "mlookpad": {
+        "top": 557,
+        "left": 268,
+        "menuText": "MENUselfharness1"
+      },
+      "mportmenu": {
+        "top": 463,
+        "left": 115,
+        "menuText": "MENUselfharness1"
+      },
+      "canvas": {
+        "top": 0,
+        "height": 844
+      },
+      "layout": {
+        "fpvRect": {
+          "x": 0,
+          "y": 0,
+          "w": 390,
+          "h": 256
+        },
+        "minimapRect": {
+          "x": 18,
+          "y": 256,
+          "w": 355,
+          "h": 201
+        },
+        "statsRect": {
+          "x": 0,
+          "y": 775,
+          "w": 390,
+          "h": 69
+        },
+        "controlsRect": {
+          "x": 0,
+          "y": 457,
+          "w": 390,
+          "h": 318
+        },
+        "moveRect": {
+          "left": 10,
+          "top": 557,
+          "width": 110,
+          "height": 110
+        },
+        "giveRect": {
+          "left": 35,
+          "top": 484,
+          "width": 61,
+          "height": 61
+        },
+        "sprintRect": {
+          "left": 313,
+          "top": 533,
+          "width": 58,
+          "height": 58
+        },
+        "lookRect": {
+          "left": 268,
+          "top": 557,
+          "width": 112,
+          "height": 112
+        },
+        "menuRect": {
+          "left": 115,
+          "top": 463,
+          "width": 160,
+          "height": 44
+        },
+        "controlsYOffsetApplied": 0,
+        "dockDy": 0,
+        "safeAreaInsets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      }
+    },
+    "high": {
+      "y": -120,
+      "ml": {
+        "top": 437,
+        "left": 10,
+        "menuText": "MENUselfharness1"
+      },
+      "mg": {
+        "top": 364,
+        "left": 35,
+        "menuText": "MENUselfharness1"
+      },
+      "ms": {
+        "top": 413,
+        "left": 313,
+        "menuText": "MENUselfharness1"
+      },
+      "mlookpad": {
+        "top": 437,
+        "left": 268,
+        "menuText": "MENUselfharness1"
+      },
+      "mportmenu": {
+        "top": 463,
+        "left": 115,
+        "menuText": "MENUselfharness1"
+      },
+      "canvas": {
+        "top": 0,
+        "height": 844
+      },
+      "layout": {
+        "fpvRect": {
+          "x": 0,
+          "y": 0,
+          "w": 390,
+          "h": 256
+        },
+        "minimapRect": {
+          "x": 18,
+          "y": 256,
+          "w": 355,
+          "h": 201
+        },
+        "statsRect": {
+          "x": 0,
+          "y": 775,
+          "w": 390,
+          "h": 69
+        },
+        "controlsRect": {
+          "x": 0,
+          "y": 457,
+          "w": 390,
+          "h": 318
+        },
+        "moveRect": {
+          "left": 10,
+          "top": 437,
+          "width": 110,
+          "height": 110
+        },
+        "giveRect": {
+          "left": 35,
+          "top": 364,
+          "width": 61,
+          "height": 61
+        },
+        "sprintRect": {
+          "left": 313,
+          "top": 413,
+          "width": 58,
+          "height": 58
+        },
+        "lookRect": {
+          "left": 268,
+          "top": 437,
+          "width": 112,
+          "height": 112
+        },
+        "menuRect": {
+          "left": 115,
+          "top": 463,
+          "width": 160,
+          "height": 44
+        },
+        "controlsYOffsetApplied": -120,
+        "dockDy": -120,
+        "safeAreaInsets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      }
+    },
+    "very": {
+      "y": -240,
+      "ml": {
+        "top": 317,
+        "left": 10,
+        "menuText": "MENUselfharness1"
+      },
+      "mg": {
+        "top": 244,
+        "left": 35,
+        "menuText": "MENUselfharness1"
+      },
+      "ms": {
+        "top": 293,
+        "left": 313,
+        "menuText": "MENUselfharness1"
+      },
+      "mlookpad": {
+        "top": 317,
+        "left": 268,
+        "menuText": "MENUselfharness1"
+      },
+      "mportmenu": {
+        "top": 463,
+        "left": 115,
+        "menuText": "MENUselfharness1"
+      },
+      "canvas": {
+        "top": 0,
+        "height": 844
+      },
+      "layout": {
+        "fpvRect": {
+          "x": 0,
+          "y": 0,
+          "w": 390,
+          "h": 256
+        },
+        "minimapRect": {
+          "x": 18,
+          "y": 256,
+          "w": 355,
+          "h": 201
+        },
+        "statsRect": {
+          "x": 0,
+          "y": 775,
+          "w": 390,
+          "h": 69
+        },
+        "controlsRect": {
+          "x": 0,
+          "y": 457,
+          "w": 390,
+          "h": 318
+        },
+        "moveRect": {
+          "left": 10,
+          "top": 317,
+          "width": 110,
+          "height": 110
+        },
+        "giveRect": {
+          "left": 35,
+          "top": 244,
+          "width": 61,
+          "height": 61
+        },
+        "sprintRect": {
+          "left": 313,
+          "top": 293,
+          "width": 58,
+          "height": 58
+        },
+        "lookRect": {
+          "left": 268,
+          "top": 317,
+          "width": 112,
+          "height": 112
+        },
+        "menuRect": {
+          "left": 115,
+          "top": 463,
+          "width": 160,
+          "height": 44
+        },
+        "controlsYOffsetApplied": -240,
+        "dockDy": -240,
+        "safeAreaInsets": {
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        }
+      }
+    }
+  },
+  "pointer": {
+    "pass": true,
+    "errors": [],
+    "checks": {
+      "joyActive": true,
+      "joyCleared": true,
+      "inpCleared": true,
+      "lookAngle": true
+    }
+  },
+  "resilience": {
+    "pass": true,
+    "rows": [
+      {
+        "h": 844,
+        "layoutPass": true,
+        "menuVisible": true,
+        "controlsVisible": true,
+        "runtimeErrors": 0
+      },
+      {
+        "h": 720,
+        "layoutPass": true,
+        "menuVisible": true,
+        "controlsVisible": true,
+        "runtimeErrors": 0
+      },
+      {
+        "h": 932,
+        "layoutPass": true,
+        "menuVisible": true,
+        "controlsVisible": true,
+        "runtimeErrors": 0
+      }
+    ]
+  },
+  "saveLoad": {
+    "pass": true,
+    "loaded": true,
+    "x": 1.85,
+    "savedX": 1.85,
+    "errors": []
+  },
+  "audio": {
+    "pass": true,
+    "before": {
+      "BUILD_ID": "selfharness1",
+      "gateBound": true,
+      "unlockAttempted": false,
+      "hasContext": false,
+      "state": "none",
+      "gestureEvents": [
+        "pointerdown",
+        "keydown",
+        "touchstart"
+      ],
+      "resumeEntry": "resumeAudioContext"
+    },
+    "after": {
+      "BUILD_ID": "selfharness1",
+      "gateBound": true,
+      "unlockAttempted": false,
+      "hasContext": true,
+      "state": "running",
+      "gestureEvents": [
+        "pointerdown",
+        "keydown",
+        "touchstart"
+      ],
+      "resumeEntry": "resumeAudioContext"
+    },
+    "beepOk": true
+  },
+  "visual": {
+    "pass": true,
+    "shots": [
+      {
+        "scenario": "normal-seed42",
+        "file": "proof-visual-normal-seed42.png",
+        "blankOk": true,
+        "canvas": {
+          "ok": true,
+          "nonblack": 4096,
+          "w": 390,
+          "h": 844
+        }
+      },
+      {
+        "scenario": "snc-hall",
+        "file": "proof-visual-snc-hall.png",
+        "blankOk": true,
+        "canvas": {
+          "ok": true,
+          "nonblack": 4096,
+          "w": 390,
+          "h": 844
+        }
+      },
+      {
+        "scenario": "options",
+        "file": "proof-visual-options.png",
+        "blankOk": true,
+        "canvas": {
+          "ok": true,
+          "nonblack": 4096,
+          "w": 390,
+          "h": 844
+        }
+      },
+      {
+        "scenario": "dock-mid",
+        "file": "proof-visual-dock-mid.png",
+        "blankOk": true,
+        "canvas": {
+          "ok": true,
+          "nonblack": 4096,
+          "w": 390,
+          "h": 844
+        }
+      },
+      {
+        "scenario": "dock-high",
+        "file": "proof-visual-dock-high.png",
+        "blankOk": true,
+        "canvas": {
+          "ok": true,
+          "nonblack": 4096,
+          "w": 390,
+          "h": 844
+        }
+      }
+    ],
+    "timestamp": "2026-06-26T12:12:43.779Z"
+  },
+  "network": {
+    "pass": true,
+    "external": 0
+  },
+  "console": {
+    "pass": true,
+    "errors": []
+  },
+  "pageErrors": {
+    "pass": true,
+    "errors": []
+  },
+  "canvas": {
+    "ok": true,
+    "nonblack": 4096,
+    "w": 390,
+    "h": 844
+  },
+  "raf": {
+    "rafOk": true,
+    "playerXDelta": 0,
+    "state": "play"
+  },
+  "viewports": [
+    {
+      "label": "pixel7-portrait",
+      "viewport": {
+        "width": 412,
+        "height": 915
+      },
+      "layoutPass": true,
+      "layout": {
+        "pass": true,
+        "build": "selfharness1",
+        "errors": [],
+        "warnings": [],
+        "rects": {
+          "portrait": true,
+          "fpvRect": {
+            "x": 0,
+            "y": 0,
+            "w": 412,
+            "h": 270
+          },
+          "minimapRect": {
+            "x": 19,
+            "y": 270,
+            "w": 375,
+            "h": 218
+          },
+          "statsRect": {
+            "x": 0,
+            "y": 840,
+            "w": 412,
+            "h": 75
+          },
+          "controlsRect": {
+            "x": 0,
+            "y": 488,
+            "w": 412,
+            "h": 352
+          },
+          "menuRect": {
+            "left": 126,
+            "top": 494,
+            "width": 160,
+            "height": 44
+          },
+          "menuDom": {
+            "left": 0,
+            "top": 0,
+            "width": 0,
+            "height": 0
+          },
+          "moveRect": {
+            "left": 0,
+            "top": 0,
+            "width": 0,
+            "height": 0
+          },
+          "giveRect": {
+            "left": 0,
+            "top": 0,
+            "width": 0,
+            "height": 0
+          },
+          "sprintRect": {
+            "left": 0,
+            "top": 0,
+            "width": 0,
+            "height": 0
+          },
+          "lookRect": {
+            "left": 0,
+            "top": 0,
+            "width": 0,
+            "height": 0
+          },
+          "mapButtonHidden": true,
+          "overlap": {
+            "giveLook": false,
+            "sprintLook": false,
+            "giveMove": false,
+            "sprintMove": false,
+            "giveSprint": false
+          },
+          "controlsYOffsetPx": 0,
+          "controlsYOffsetApplied": 0,
+          "dockDy": 0,
+          "mapSize": {
+            "w": 0,
+            "h": 0,
+            "aspect": null
+          },
+          "safeAreaInsets": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          }
+        },
+        "checks": {
+          "canvasOk": true,
+          "minimapRect": true,
+          "statsRect": true,
+          "menuRect": true,
+          "moveRect": true,
+          "giveRect": true,
+          "sprintRect": true,
+          "lookRect": true,
+          "menuNoDockText": true,
+          "controlsMoveWithHeight": true,
+          "menuFixedWithHeight": true,
+          "minimapFixedWithHeight": true,
+          "statsFixedWithHeight": true,
+          "fpvFixedWithHeight": true
+        },
+        "dockSummary": {
+          "pass": true,
+          "movementPx": {
+            "midToHigh": {
+              "move": 120,
+              "give": 120,
+              "sprint": 120,
+              "look": 120,
+              "menu": 0
+            },
+            "lowToVery_menu": 0
+          }
+        }
+      },
+      "inViewport": [
+        {
+          "id": "ml",
+          "visible": true,
+          "inView": true
+        },
+        {
+          "id": "mg",
+          "visible": true,
+          "inView": true
+        },
+        {
+          "id": "ms",
+          "visible": true,
+          "inView": true
+        },
+        {
+          "id": "mlookpad",
+          "visible": true,
+          "inView": true
+        },
+        {
+          "id": "mportmenu",
+          "visible": true,
+          "inView": true
+        },
+        {
+          "id": "view",
+          "visible": true,
+          "inView": true
+        }
+      ],
+      "screenshot": "proof-playwright-pixel7-portrait.png"
+    },
+    {
+      "label": "pixel7-landscape",
+      "viewport": {
+        "width": 915,
+        "height": 412
+      },
+      "layoutPass": true,
+      "layout": {
+        "pass": true,
+        "build": "selfharness1",
+        "errors": [],
+        "warnings": [],
+        "rects": {
+          "portrait": true,
+          "fpvRect": {
+            "x": 0,
+            "y": 0,
+            "w": 412,
+            "h": 270
+          },
+          "minimapRect": {
+            "x": 19,
+            "y": 270,
+            "w": 375,
+            "h": 218
+          },
+          "statsRect": {
+            "x": 0,
+            "y": 840,
+            "w": 412,
+            "h": 75
+          },
+          "controlsRect": {
+            "x": 0,
+            "y": 488,
+            "w": 412,
+            "h": 352
+          },
+          "menuRect": {
+            "left": 126,
+            "top": 494,
+            "width": 160,
+            "height": 44
+          },
+          "menuDom": {
+            "left": 0,
+            "top": 0,
+            "width": 0,
+            "height": 0
+          },
+          "moveRect": {
+            "left": 0,
+            "top": 0,
+            "width": 0,
+            "height": 0
+          },
+          "giveRect": {
+            "left": 0,
+            "top": 0,
+            "width": 0,
+            "height": 0
+          },
+          "sprintRect": {
+            "left": 0,
+            "top": 0,
+            "width": 0,
+            "height": 0
+          },
+          "lookRect": {
+            "left": 0,
+            "top": 0,
+            "width": 0,
+            "height": 0
+          },
+          "mapButtonHidden": true,
+          "overlap": {
+            "giveLook": false,
+            "sprintLook": false,
+            "giveMove": false,
+            "sprintMove": false,
+            "giveSprint": false
+          },
+          "controlsYOffsetPx": 0,
+          "controlsYOffsetApplied": 0,
+          "dockDy": 0,
+          "mapSize": {
+            "w": 0,
+            "h": 0,
+            "aspect": null
+          },
+          "safeAreaInsets": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          }
+        },
+        "checks": {
+          "canvasOk": true,
+          "minimapRect": true,
+          "statsRect": true,
+          "menuRect": true,
+          "moveRect": true,
+          "giveRect": true,
+          "sprintRect": true,
+          "lookRect": true,
+          "menuNoDockText": true,
+          "controlsMoveWithHeight": true,
+          "menuFixedWithHeight": true,
+          "minimapFixedWithHeight": true,
+          "statsFixedWithHeight": true,
+          "fpvFixedWithHeight": true
+        },
+        "dockSummary": {
+          "pass": true,
+          "movementPx": {
+            "midToHigh": {
+              "move": 120,
+              "give": 120,
+              "sprint": 120,
+              "look": 120,
+              "menu": 0
+            },
+            "lowToVery_menu": 0
+          }
+        }
+      },
+      "inViewport": [
+        {
+          "id": "ml",
+          "visible": true,
+          "inView": false
+        },
+        {
+          "id": "mg",
+          "visible": true,
+          "inView": false
+        },
+        {
+          "id": "ms",
+          "visible": true,
+          "inView": false
+        },
+        {
+          "id": "mlookpad",
+          "visible": true,
+          "inView": false
+        },
+        {
+          "id": "mportmenu",
+          "visible": true,
+          "inView": false
+        },
+        {
+          "id": "view",
+          "visible": true,
+          "inView": true
+        }
+      ],
+      "screenshot": "proof-playwright-pixel7-landscape.png"
+    },
+    {
+      "label": "travislike-portrait",
+      "viewport": {
+        "width": 360,
+        "height": 800
+      },
+      "layoutPass": true,
+      "layout": {
+        "pass": true,
+        "build": "selfharness1",
+        "errors": [],
+        "warnings": [],
+        "rects": {
+          "portrait": true,
+          "fpvRect": {
+            "x": 0,
+            "y": 0,
+            "w": 360,
+            "h": 236
+          },
+          "minimapRect": {
+            "x": 16,
+            "y": 236,
+            "w": 328,
+            "h": 190
+          },
+          "statsRect": {
+            "x": 0,
+            "y": 734,
+            "w": 360,
+            "h": 66
+          },
+          "controlsRect": {
+            "x": 0,
+            "y": 426,
+            "w": 360,
+            "h": 308
+          },
+          "menuRect": {
+            "left": 105,
+            "top": 432,
+            "width": 151,
+            "height": 44
+          },
+          "menuDom": {
+            "left": 0,
+            "top": 0,
+            "width": 0,
+            "height": 0
+          },
+          "moveRect": {
+            "left": 0,
+            "top": 0,
+            "width": 0,
+            "height": 0
+          },
+          "giveRect": {
+            "left": 0,
+            "top": 0,
+            "width": 0,
+            "height": 0
+          },
+          "sprintRect": {
+            "left": 0,
+            "top": 0,
+            "width": 0,
+            "height": 0
+          },
+          "lookRect": {
+            "left": 0,
+            "top": 0,
+            "width": 0,
+            "height": 0
+          },
+          "mapButtonHidden": true,
+          "overlap": {
+            "giveLook": false,
+            "sprintLook": false,
+            "giveMove": false,
+            "sprintMove": false,
+            "giveSprint": false
+          },
+          "controlsYOffsetPx": 0,
+          "controlsYOffsetApplied": 0,
+          "dockDy": 0,
+          "mapSize": {
+            "w": 0,
+            "h": 0,
+            "aspect": null
+          },
+          "safeAreaInsets": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          }
+        },
+        "checks": {
+          "canvasOk": true,
+          "minimapRect": true,
+          "statsRect": true,
+          "menuRect": true,
+          "moveRect": true,
+          "giveRect": true,
+          "sprintRect": true,
+          "lookRect": true,
+          "menuNoDockText": true,
+          "controlsMoveWithHeight": true,
+          "menuFixedWithHeight": true,
+          "minimapFixedWithHeight": true,
+          "statsFixedWithHeight": true,
+          "fpvFixedWithHeight": true
+        },
+        "dockSummary": {
+          "pass": true,
+          "movementPx": {
+            "midToHigh": {
+              "move": 120,
+              "give": 120,
+              "sprint": 120,
+              "look": 120,
+              "menu": 0
+            },
+            "lowToVery_menu": 0
+          }
+        }
+      },
+      "inViewport": [
+        {
+          "id": "ml",
+          "visible": true,
+          "inView": true
+        },
+        {
+          "id": "mg",
+          "visible": true,
+          "inView": true
+        },
+        {
+          "id": "ms",
+          "visible": true,
+          "inView": true
+        },
+        {
+          "id": "mlookpad",
+          "visible": true,
+          "inView": true
+        },
+        {
+          "id": "mportmenu",
+          "visible": true,
+          "inView": true
+        },
+        {
+          "id": "view",
+          "visible": true,
+          "inView": true
+        }
+      ],
+      "screenshot": "proof-playwright-travislike-portrait.png"
+    },
+    {
+      "label": "desktop-smoke",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "layoutPass": true,
+      "layout": {
+        "pass": true,
+        "build": "selfharness1",
+        "errors": [],
+        "warnings": [],
+        "rects": {
+          "portrait": true,
+          "fpvRect": {
+            "x": 0,
+            "y": 0,
+            "w": 720,
+            "h": 473
+          },
+          "minimapRect": {
+            "x": 33,
+            "y": 473,
+            "w": 655,
+            "h": 305
+          },
+          "statsRect": {
+            "x": 0,
+            "y": 1175,
+            "w": 720,
+            "h": 105
+          },
+          "controlsRect": {
+            "x": 0,
+            "y": 778,
+            "w": 720,
+            "h": 397
+          },
+          "menuRect": {
+            "left": 280,
+            "top": 784,
+            "width": 160,
+            "height": 44
+          },
+          "menuDom": {
+            "left": 0,
+            "top": 0,
+            "width": 0,
+            "height": 0
+          },
+          "moveRect": {
+            "left": 0,
+            "top": 0,
+            "width": 0,
+            "height": 0
+          },
+          "giveRect": {
+            "left": 0,
+            "top": 0,
+            "width": 0,
+            "height": 0
+          },
+          "sprintRect": {
+            "left": 0,
+            "top": 0,
+            "width": 0,
+            "height": 0
+          },
+          "lookRect": {
+            "left": 0,
+            "top": 0,
+            "width": 0,
+            "height": 0
+          },
+          "mapButtonHidden": true,
+          "overlap": {
+            "giveLook": false,
+            "sprintLook": false,
+            "giveMove": false,
+            "sprintMove": false,
+            "giveSprint": false
+          },
+          "controlsYOffsetPx": 0,
+          "controlsYOffsetApplied": 0,
+          "dockDy": 0,
+          "mapSize": {
+            "w": 0,
+            "h": 0,
+            "aspect": null
+          },
+          "safeAreaInsets": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          }
+        },
+        "checks": {
+          "canvasOk": true,
+          "minimapRect": true,
+          "statsRect": true,
+          "menuRect": true,
+          "moveRect": true,
+          "giveRect": true,
+          "sprintRect": true,
+          "lookRect": true,
+          "menuNoDockText": true,
+          "controlsMoveWithHeight": true,
+          "menuFixedWithHeight": true,
+          "minimapFixedWithHeight": true,
+          "statsFixedWithHeight": true,
+          "fpvFixedWithHeight": true
+        },
+        "dockSummary": {
+          "pass": true,
+          "movementPx": {
+            "midToHigh": {
+              "move": 120,
+              "give": 120,
+              "sprint": 120,
+              "look": 120,
+              "menu": 0
+            },
+            "lowToVery_menu": 0
+          }
+        }
+      },
+      "inViewport": [
+        {
+          "id": "ml",
+          "visible": true,
+          "inView": false
+        },
+        {
+          "id": "mg",
+          "visible": true,
+          "inView": false
+        },
+        {
+          "id": "ms",
+          "visible": true,
+          "inView": false
+        },
+        {
+          "id": "mlookpad",
+          "visible": true,
+          "inView": false
+        },
+        {
+          "id": "mportmenu",
+          "visible": true,
+          "inView": false
+        },
+        {
+          "id": "view",
+          "visible": true,
+          "inView": true
+        }
+      ],
+      "screenshot": "proof-playwright-desktop-smoke.png"
+    }
+  ],
+  "selfcheckUrl": {
+    "result": {
+      "pass": true,
+      "build": "selfharness1",
+      "layout": {
+        "pass": true,
+        "build": "selfharness1",
+        "errors": [],
+        "warnings": [],
+        "rects": {
+          "portrait": true,
+          "fpvRect": {
+            "x": 0,
+            "y": 0,
+            "w": 390,
+            "h": 256
+          },
+          "minimapRect": {
+            "x": 18,
+            "y": 256,
+            "w": 355,
+            "h": 201
+          },
+          "statsRect": {
+            "x": 0,
+            "y": 775,
+            "w": 390,
+            "h": 69
+          },
+          "controlsRect": {
+            "x": 0,
+            "y": 457,
+            "w": 390,
+            "h": 318
+          },
+          "menuRect": {
+            "left": 115,
+            "top": 463,
+            "width": 160,
+            "height": 44
+          },
+          "menuDom": {
+            "left": 0,
+            "top": 0,
+            "width": 0,
+            "height": 0
+          },
+          "moveRect": {
+            "left": 0,
+            "top": 0,
+            "width": 0,
+            "height": 0
+          },
+          "giveRect": {
+            "left": 0,
+            "top": 0,
+            "width": 0,
+            "height": 0
+          },
+          "sprintRect": {
+            "left": 0,
+            "top": 0,
+            "width": 0,
+            "height": 0
+          },
+          "lookRect": {
+            "left": 0,
+            "top": 0,
+            "width": 0,
+            "height": 0
+          },
+          "mapButtonHidden": true,
+          "overlap": {
+            "giveLook": false,
+            "sprintLook": false,
+            "giveMove": false,
+            "sprintMove": false,
+            "giveSprint": false
+          },
+          "controlsYOffsetPx": -240,
+          "controlsYOffsetApplied": -240,
+          "dockDy": -240,
+          "mapSize": {
+            "w": 0,
+            "h": 0,
+            "aspect": null
+          },
+          "safeAreaInsets": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          }
+        },
+        "checks": {
+          "canvasOk": true,
+          "minimapRect": true,
+          "statsRect": true,
+          "menuRect": true,
+          "moveRect": true,
+          "giveRect": true,
+          "sprintRect": true,
+          "lookRect": true,
+          "menuNoDockText": true,
+          "controlsMoveWithHeight": true,
+          "menuFixedWithHeight": true,
+          "minimapFixedWithHeight": true,
+          "statsFixedWithHeight": true,
+          "fpvFixedWithHeight": true
+        },
+        "dockSummary": {
+          "pass": true,
+          "movementPx": {
+            "midToHigh": {
+              "move": 120,
+              "give": 120,
+              "sprint": 120,
+              "look": 120,
+              "menu": 0
+            },
+            "lowToVery_menu": 0
+          }
+        }
+      },
+      "input": {
+        "pass": true,
+        "errors": [],
+        "checks": {
+          "startRunWorks": true,
+          "joyStarts": true,
+          "moveIntent": true,
+          "moveAfterJoy": true,
+          "joyClears": true,
+          "inpClears": true,
+          "moveStopsOnRelease": true,
+          "giveSafe": true,
+          "sprintSafe": true,
+          "lookChangesAngle": true,
+          "runtimeClean": true
+        }
+      },
+      "levels": {
+        "pass": true,
+        "errors": [],
+        "normal": {
+          "mapExists": true,
+          "MAP_W": 40,
+          "MAP_H": 20,
+          "wideMap": true,
+          "spawnCanStand": true,
+          "pickups": 16,
+          "npcs": 8,
+          "exitExists": true,
+          "pathNotBlockedImmediately": true
+        },
+        "hall": {
+          "mapExists": true,
+          "MAP_W": 30,
+          "MAP_H": 14,
+          "wideMap": true,
+          "spawnCanStand": true,
+          "pickups": 7,
+          "npcs": 7,
+          "exitExists": true,
+          "pathNotBlockedImmediately": true,
+          "customLevel": "hall_of_servants",
+          "hallIdOk": true,
+          "customNpcs": 7,
+          "thankTextExists": true,
+          "movementStarts": true,
+          "movementStopsOnRelease": true
+        },
+        "runtimeClean": true
+      },
+      "render": {
+        "pass": true,
+        "errors": [],
+        "checks": {
+          "zbufferExists": true,
+          "zbufferMatchesWidth": true,
+          "spriteOcclusionGuardPresent": true,
+          "noSpriteFogHaloMode": true,
+          "runtimeClean": true
+        },
+        "halo": {
+          "BUILD_ID": "selfharness1",
+          "policy": "walls own distance fog; billboards drawImage only — no post-loop sprite fog fillRect",
+          "forbiddenPatternsAbsent": true,
+          "forbiddenHits": [],
+          "requiredMarkersPresent": true,
+          "requiredMissing": [],
+          "spriteLoopOk": true,
+          "regressionCommentMarker": "SPRITE HALO REGRESSION GUARD"
+        },
+        "occlusion": {
+          "BUILD_ID": "selfharness1",
+          "renderWidth": 320,
+          "zbufferLength": 320,
+          "zbufferMatchesRenderWidth": true,
+          "billboardKinds": [
+            "props",
+            "pickups",
+            "npcs",
+            "exit"
+          ],
+          "perColumnGuard": "depth >= zbuffer[col] => skip column",
+          "wallPassFillsZbufferPerColumn": true,
+          "noPostLoopSpriteFog": true,
+          "predicateTests": [
+            {
+              "spriteDepth": 3,
+              "wallDist": 2,
+              "expectSkip": true,
+              "label": "sprite behind wall",
+              "pass": true
+            },
+            {
+              "spriteDepth": 2,
+              "wallDist": 2,
+              "expectSkip": true,
+              "label": "sprite flush with wall (skip)",
+              "pass": true
+            },
+            {
+              "spriteDepth": 1.2,
+              "wallDist": 2,
+              "expectSkip": false,
+              "label": "sprite in front of wall",
+              "pass": true
+            }
+          ],
+          "predicateOk": true,
+          "regressionCommentMarker": "OCCLUSION REGRESSION GUARD"
+        }
+      },
+      "runtimeErrors": [],
+      "runtimeClean": true,
+      "timestamp": "2026-06-26T12:12:44.735Z"
+    },
+    "overlayText": "SELF-CHECK PASS\nbuild selfharness1",
+    "overlayVisible": true
+  },
+  "timestamp": "2026-06-26T12:12:45.803Z"
+}
