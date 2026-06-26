@@ -57,7 +57,7 @@
 |------|--------|
 | **BUILD_ID** | `runprog1` |
 | **Gameplay commit** | `1437b6f` |
-| **Structural cleanup commit** | (see git after push) |
+| **Structural cleanup commit** | **`498279a`** |
 | **Pass 1 docs commit** | `6859bb5` |
 
 ## REMAINING BLOCKERS
