@@ -58,6 +58,6 @@
 
 ## GITHUB PAGES URL
 
-- Commit: **PLACEHOLDER**
-- Normal: https://falloutmule.github.io/solidarity-not-charity-can-run/?v=PLACEHOLDER&mobile=on&portraitlayout=1
-- Self-check: https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=PLACEHOLDER&mobile=on&portraitlayout=1
+- Commit: **4611b1e**
+- Normal: https://falloutmule.github.io/solidarity-not-charity-can-run/?v=4611b1e&mobile=on&portraitlayout=1
+- Self-check: https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=4611b1e&mobile=on&portraitlayout=1
