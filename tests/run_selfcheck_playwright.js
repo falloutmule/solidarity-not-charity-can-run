@@ -675,6 +675,40 @@ async function mobileControlReliabilitySection(page) {
   return { pass, proof, reliability: rel };
 }
 
+async function movementCollisionSection(page) {
+  const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await waitGameReady(page);
+
+  const fpBefore = await page.evaluate(() => CR.crPublicStateFingerprint());
+
+  const mov = await page.evaluate(() => CR.runMovementCollisionSelfCheck());
+
+  await page.evaluate(() => {
+    CR.startRun(88);
+    CR.state = CR.STATE.PLAY;
+    CR.paused = false;
+  });
+  await page.waitForTimeout(80);
+  await page.screenshot({ path: path.join(ROOT, 'proof-collision-corridor.png') });
+
+  const isoOk = await page.evaluate(() => CR.crFingerprintPublicSafe(CR.crPublicStateFingerprint()));
+
+  const pass = mov.pass === true && isoOk !== false;
+
+  const proof = {
+    pass,
+    build: mov.build,
+    movementCollision: mov,
+    harnessStateOk: isoOk,
+    screenshots: ['proof-collision-corridor.png'],
+    timestamp: new Date().toISOString(),
+  };
+  writeProof('proof-movement-collision.json', proof);
+  return { pass, proof, movementCollision: mov };
+}
+
 async function portraitUsabilitySection(page) {
   const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
   const presetList = [
@@ -973,6 +1007,7 @@ async function main() {
   const settingsSafetyPass = portraitUsability.settingsSafety?.pass === true;
 
   const mobileControlReliability = await mobileControlReliabilitySection(page);
+  const movementCollision = await movementCollisionSection(page);
 
   const harnessIsolation = await harnessIsolationSection(page);
   const renderFailure = await renderFailureSection(page);
@@ -1010,6 +1045,7 @@ async function main() {
     portraitUsability.pass &&
     settingsSafetyPass &&
     mobileControlReliability.pass &&
+    movementCollision.pass &&
     harnessIsolation.pass &&
     renderFailure.pass &&
     hallE2E.pass &&
@@ -1047,6 +1083,7 @@ async function main() {
     portraitUsability,
     settingsSafety: portraitUsability.settingsSafety || { pass: settingsSafetyPass },
     mobileControlReliability,
+    movementCollision,
     harnessIsolation,
     renderFailure,
     hallE2E,

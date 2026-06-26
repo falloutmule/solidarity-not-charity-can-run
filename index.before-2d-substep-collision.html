@@ -514,7 +514,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'movcoll1';
+const BUILD_ID = 'controlrel1';
 const IS_FILE_ORIGIN = (typeof location !== 'undefined' && location.protocol === 'file:');
 const FILE_ORIGIN_SAVE_NOTE = 'Local file mode: saves may not persist. Use GitHub Pages for reliable saves.';
 function fileOriginMenuNoteHTML(){
@@ -2130,29 +2130,6 @@ function canStand(x,y){
   return !isWall(x-r,y-r)&&!isWall(x+r,y-r)&&!isWall(x-r,y+r)&&!isWall(x+r,y+r);
 }
 
-/** 2D movement with axis-separated substeps (q1k3-inspired tunnel guard). */
-const CR_MOVE_SUBSTEP_MAX = 0.12;
-function movePlayerWithCollision(dx, dy){
-  if(!Number.isFinite(dx) || !Number.isFinite(dy)){
-    return { steps: 0, moved: false, reason: 'non-finite' };
-  }
-  const adx = Math.abs(dx), ady = Math.abs(dy);
-  if(adx < 1e-9 && ady < 1e-9) return { steps: 0, moved: false };
-  const n = Math.max(1, Math.ceil(Math.max(adx, ady) / CR_MOVE_SUBSTEP_MAX));
-  const sx = dx / n, sy = dy / n;
-  const x0 = player.x, y0 = player.y;
-  for(let i = 0; i < n; i++){
-    const px = player.x, py = player.y;
-    if(canStand(player.x + sx, player.y)) player.x += sx;
-    if(canStand(player.x, player.y + sy)) player.y += sy;
-    if(!Number.isFinite(player.x) || !Number.isFinite(player.y) || !canStand(player.x, player.y)){
-      player.x = px;
-      player.y = py;
-    }
-  }
-  return { steps: n, moved: Math.hypot(player.x - x0, player.y - y0) > 1e-7 };
-}
-
 // ---------------------------------------------------------------------------
 // SECTION 5 — AUDIO (centralized AudioContext unlock gate, CARD 10)
 // ---------------------------------------------------------------------------
@@ -3727,8 +3704,9 @@ function update(dt){
   }
   const len=Math.hypot(dx,dy)||1; dx=dx/len*mv; dy=dy/len*mv;
   const px0 = player.x, py0 = player.y;
-  const moveRes = movePlayerWithCollision(dx, dy);
-  window._moveDbg = { joy:jstr.toFixed(3), active:joy.active, paused, mobileMode, mm:mobileInputActive(), st:state, dpx:+(player.x-px0).toFixed(4), dpy:+(player.y-py0).toFixed(4), moveSteps: moveRes.steps };
+  if(canStand(player.x+dx, player.y)) player.x+=dx;
+  if(canStand(player.x, player.y+dy)) player.y+=dy;
+  window._moveDbg = { joy:jstr.toFixed(3), active:joy.active, paused, mobileMode, mm:mobileInputActive(), st:state, dpx:+(player.x-px0).toFixed(4), dpy:+(player.y-py0).toFixed(4) };
 
   const moving=(dx*dx+dy*dy)>0.0001;
   if(shiftHeld && sprinting && moving){ player.stamina=Math.max(0,player.stamina-cfg.staminaDrain*dt); }
@@ -5535,12 +5513,11 @@ function runFullSelfCheckInner(){
   const portraitUsability = runPortraitUsabilitySelfCheck();
   const settingsSafety = runSettingsSafetySelfCheck();
   const mobileControlReliability = runMobileControlReliabilitySelfCheck();
-  const movementCollision = runMovementCollisionSelfCheck();
   const input = runInputSelfCheck();
   const levels = runLevelSelfCheck();
   const renderFailure = runRenderFailureSelfCheck();
   const runtimeClean = window.__crRuntimeErrors.length === err0;
-  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && mobileControlReliability.pass && movementCollision.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
+  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && mobileControlReliability.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
   return {
     pass,
     build: BUILD_ID,
@@ -5549,7 +5526,6 @@ function runFullSelfCheckInner(){
     portraitUsability,
     settingsSafety,
     mobileControlReliability,
-    movementCollision,
     input,
     levels,
     renderFailure,
@@ -5793,188 +5769,6 @@ function runInputSelfCheck(){
     _selfCheckForcePortrait = false;
     mobileOverride = savedOverride;
     applyMobileControlSettings();
-  }
-}
-
-function crHarnessInstallMicroMap(lineRows){
-  const map = lineRows.map(line => [...line].map(ch => (ch === ' ' || ch === '.' ? 0 : 1)));
-  game.map = map;
-  game.MAP_W = map[0].length;
-  game.MAP_H = map.length;
-  game.wallShade = game.wallShade || [];
-  game.pickups = [];
-  game.npcs = [];
-  game.props = [];
-  game.exit = { x: Math.max(1, game.MAP_W - 2), y: Math.max(1, game.MAP_H - 2) };
-  if(game.run) game.run.harnessOnly = true;
-  state = STATE.PLAY;
-  paused = false;
-  clearInputState();
-}
-
-function runMovementCollisionSelfCheck(){
-  if(_crHarnessDepth > 0) return runMovementCollisionSelfCheckBody();
-  return crWithTemporaryState('movementCollision', () => runMovementCollisionSelfCheckBody());
-}
-
-function runMovementCollisionSelfCheckBody(){
-  const errors = [];
-  const warnings = [];
-  const measurements = { attemptedSteps: 0, finalPositions: [], collisionResults: [] };
-  const checks = {
-    normalSpawnSafe: false,
-    hallSpawnSafe: false,
-    wallCollisionSafe: false,
-    cornerCollisionSafe: false,
-    highSpeedNoTunnel: false,
-    corridorMoveWorks: false,
-    releaseStops: false,
-    noNaN: true,
-    harnessStateRestored: true,
-  };
-  const savedOverride = mobileOverride;
-  const err0 = window.__crRuntimeErrors.length;
-  crPrepareSelfCheckPortrait();
-  try {
-    startRun(88);
-    paused = false;
-    state = STATE.PLAY;
-    clearInputState();
-    let pathOk = false;
-    const fx = Math.cos(player.angle), fy = Math.sin(player.angle);
-    for(const d of [0.15, 0.3, 0.5, 0.8]){
-      if(canStand(player.x + fx * d, player.y + fy * d)){ pathOk = true; break; }
-    }
-    checks.normalSpawnSafe = canStand(player.x, player.y) && pathOk;
-    measurements.finalPositions.push({ scene: 'normalSpawn', x: player.x, y: player.y, pathOk });
-    if(!checks.normalSpawnSafe) errors.push('normal spawn unsafe');
-
-    startCustomLevel('hall_of_servants');
-    paused = false;
-    clearInputState();
-    checks.hallSpawnSafe = canStand(player.x, player.y) && state === STATE.PLAY;
-    measurements.finalPositions.push({ scene: 'hallSpawn', x: player.x, y: player.y });
-    if(!checks.hallSpawnSafe) errors.push('hall spawn unsafe');
-
-    crHarnessInstallMicroMap([
-      '#######',
-      '#.....#',
-      '#.....#',
-      '#.....#',
-      '#######',
-    ]);
-    player.x = 1.5; player.y = 2.0;
-    const wallRes = movePlayerWithCollision(2.5, 0);
-    measurements.attemptedSteps += wallRes.steps;
-    measurements.collisionResults.push({ test: 'wall', steps: wallRes.steps, x: player.x, y: player.y });
-    checks.wallCollisionSafe = canStand(player.x, player.y) && player.x < 4.85;
-    if(!checks.wallCollisionSafe) errors.push('wall collision failed');
-
-    crHarnessInstallMicroMap([
-      '#######',
-      '#..##.#',
-      '#..##.#',
-      '#.....#',
-      '#######',
-    ]);
-    player.x = 1.6; player.y = 2.6;
-    let cornerJitter = 0;
-    for(let i = 0; i < 10; i++){
-      const px = player.x, py = player.y;
-      movePlayerWithCollision(0.15, 0.15);
-      if(!Number.isFinite(player.x) || !Number.isFinite(player.y) || !canStand(player.x, player.y)){
-        checks.noNaN = false;
-        errors.push('corner: invalid position');
-        break;
-      }
-      if(Math.hypot(player.x - px, player.y - py) < 0.00002) cornerJitter++;
-    }
-    checks.cornerCollisionSafe = checks.noNaN && canStand(player.x, player.y) && cornerJitter < 8;
-    measurements.collisionResults.push({ test: 'corner', x: player.x, y: player.y, jitter: cornerJitter });
-    if(!checks.cornerCollisionSafe) errors.push('corner collision failed');
-
-    crHarnessInstallMicroMap([
-      '#########',
-      '#.......#',
-      '#.......#',
-      '#.......#',
-      '#########',
-    ]);
-    player.x = 1.5; player.y = 2.0;
-    const tunnelX0 = player.x;
-    const hiRes = movePlayerWithCollision(5.0, 0);
-    measurements.attemptedSteps += hiRes.steps;
-    checks.highSpeedNoTunnel = canStand(player.x, player.y) && player.x < 7.2 && player.x > tunnelX0;
-    measurements.collisionResults.push({ test: 'highSpeed', steps: hiRes.steps, x: player.x, dx: player.x - tunnelX0 });
-    if(!checks.highSpeedNoTunnel) errors.push('high-speed tunnel');
-
-    crHarnessInstallMicroMap([
-      '#######',
-      '#.....#',
-      '#.#.#.#',
-      '#.....#',
-      '#.....#',
-      '#.....#',
-      '#######',
-    ]);
-    player.x = 3.5; player.y = 5.2;
-    const cy0c = player.y;
-    movePlayerWithCollision(0, -1.5);
-    const advanced = player.y < cy0c - 0.25 && canStand(player.x, player.y);
-    const pyHold = player.y;
-    clearInputState();
-    for(let i = 0; i < 8; i++) update(0.05);
-    const corridorStopped = Math.abs(player.y - pyHold) < 0.04;
-    checks.corridorMoveWorks = advanced && corridorStopped;
-    measurements.finalPositions.push({ scene: 'corridor', x: player.x, y: player.y, advanced, corridorStopped });
-    if(!checks.corridorMoveWorks) errors.push('corridor move failed');
-
-    startRun(42);
-    state = STATE.PLAY;
-    paused = false;
-    applyMobileControlSettings();
-    clearInputState();
-    const ml = document.getElementById('ml');
-    const br = ml.getBoundingClientRect();
-    const cx = br.left + br.width * 0.5, cy = br.top + br.height * 0.5;
-    const jpx0 = player.x, jpy0 = player.y;
-    crDispatchPointer(ml, 'pointerdown', cx, cy, 42, 'touch');
-    crDispatchPointer(ml, 'pointermove', cx, cy - 35, 42, 'touch');
-    update(0.06);
-    const jpxMid = player.x, jpyMid = player.y;
-    crDispatchPointer(ml, 'pointerup', cx, cy - 35, 42, 'touch');
-    clearMoveInput();
-    for(let i = 0; i < 10; i++) update(0.05);
-    const drift = Math.hypot(player.x - jpxMid, player.y - jpyMid);
-    checks.releaseStops = !joy.active && drift < 0.06;
-    if(!checks.releaseStops) errors.push('release did not stop movement');
-
-    const mobileRel = _crHarnessDepth > 0
-      ? runMobileControlReliabilitySelfCheckBody()
-      : runMobileControlReliabilitySelfCheck();
-    if(!mobileRel.pass) errors.push('mobile control reliability regressed');
-
-    if(window.__crRuntimeErrors.length !== err0) errors.push('runtime errors during movement collision check');
-
-    const pass = errors.length === 0 && Object.values(checks).every(Boolean);
-    checks.harnessStateRestored = true;
-    return {
-      pass,
-      build: BUILD_ID,
-      errors,
-      warnings,
-      checks,
-      measurements,
-      mobileControlReliabilityPass: mobileRel.pass,
-    };
-  } catch(e){
-    errors.push(String(e && e.message ? e.message : e));
-    return { pass: false, build: BUILD_ID, errors, warnings, checks, measurements };
-  } finally {
-    _selfCheckForcePortrait = false;
-    mobileOverride = savedOverride;
-    applyMobileControlSettings();
-    clearInputState();
   }
 }
 
@@ -6906,7 +6700,7 @@ globalThis.CR = window.CR = {
   set paused(v){ paused=!!v; },
   get mobileMode(){ return mobileMode; },
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
-  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runMobileControlReliabilitySelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
+  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runMobileControlReliabilitySelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
   editRunnerName,applyMobileControlSettings,mobileSprintCost,mobileSprintBurstSec,triggerMobileSprintBurst,crDispatchPointer,crDispatchTouch,
   toggleFullscreen,isFullscreen,enterFullscreen,exitFullscreen,
   getAudioContext,resumeAudioContext,bindAudioUnlockGate,getAudioUnlockProof,
