@@ -52,9 +52,9 @@
 
 ## GITHUB PAGES URL
 
-- Commit: **PLACEHOLDER**
-- Normal: https://falloutmule.github.io/solidarity-not-charity-can-run/?v=PLACEHOLDER&mobile=on&portraitlayout=1
-- Self-check: https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=PLACEHOLDER&mobile=on&portraitlayout=1
+- Commit: **a12ee0a**
+- Normal: https://falloutmule.github.io/solidarity-not-charity-can-run/?v=a12ee0a&mobile=on&portraitlayout=1
+- Self-check: https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=a12ee0a&mobile=on&portraitlayout=1
 
 ## FUNCTIONS WRAPPED / ISOLATED
 
