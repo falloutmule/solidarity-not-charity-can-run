@@ -35,7 +35,7 @@
   },
   "fullSelfCheck": {
     "pass": true,
-    "build": "hallharness1"
+    "build": "renderguard1"
   },
   "dock": {
     "pass": true,
@@ -48,27 +48,27 @@
       "ml": {
         "top": 557,
         "left": 10,
-        "menuText": "MENUhallharness1"
+        "menuText": "MENUrenderguard1"
       },
       "mg": {
         "top": 484,
         "left": 35,
-        "menuText": "MENUhallharness1"
+        "menuText": "MENUrenderguard1"
       },
       "ms": {
         "top": 533,
         "left": 313,
-        "menuText": "MENUhallharness1"
+        "menuText": "MENUrenderguard1"
       },
       "mlookpad": {
         "top": 557,
         "left": 268,
-        "menuText": "MENUhallharness1"
+        "menuText": "MENUrenderguard1"
       },
       "mportmenu": {
         "top": 463,
         "left": 115,
-        "menuText": "MENUhallharness1"
+        "menuText": "MENUrenderguard1"
       },
       "canvas": {
         "top": 0,
@@ -144,27 +144,27 @@
       "ml": {
         "top": 437,
         "left": 10,
-        "menuText": "MENUhallharness1"
+        "menuText": "MENUrenderguard1"
       },
       "mg": {
         "top": 364,
         "left": 35,
-        "menuText": "MENUhallharness1"
+        "menuText": "MENUrenderguard1"
       },
       "ms": {
         "top": 413,
         "left": 313,
-        "menuText": "MENUhallharness1"
+        "menuText": "MENUrenderguard1"
       },
       "mlookpad": {
         "top": 437,
         "left": 268,
-        "menuText": "MENUhallharness1"
+        "menuText": "MENUrenderguard1"
       },
       "mportmenu": {
         "top": 463,
         "left": 115,
-        "menuText": "MENUhallharness1"
+        "menuText": "MENUrenderguard1"
       },
       "canvas": {
         "top": 0,
@@ -240,27 +240,27 @@
       "ml": {
         "top": 317,
         "left": 10,
-        "menuText": "MENUhallharness1"
+        "menuText": "MENUrenderguard1"
       },
       "mg": {
         "top": 244,
         "left": 35,
-        "menuText": "MENUhallharness1"
+        "menuText": "MENUrenderguard1"
       },
       "ms": {
         "top": 293,
         "left": 313,
-        "menuText": "MENUhallharness1"
+        "menuText": "MENUrenderguard1"
       },
       "mlookpad": {
         "top": 317,
         "left": 268,
-        "menuText": "MENUhallharness1"
+        "menuText": "MENUrenderguard1"
       },
       "mportmenu": {
         "top": 463,
         "left": 115,
-        "menuText": "MENUhallharness1"
+        "menuText": "MENUrenderguard1"
       },
       "canvas": {
         "top": 0,
@@ -378,7 +378,7 @@
   "audio": {
     "pass": true,
     "before": {
-      "BUILD_ID": "hallharness1",
+      "BUILD_ID": "renderguard1",
       "gateBound": true,
       "unlockAttempted": false,
       "hasContext": false,
@@ -391,7 +391,7 @@
       "resumeEntry": "resumeAudioContext"
     },
     "after": {
-      "BUILD_ID": "hallharness1",
+      "BUILD_ID": "renderguard1",
       "gateBound": true,
       "unlockAttempted": false,
       "hasContext": true,
@@ -405,12 +405,245 @@
     },
     "beepOk": true
   },
+  "renderFailure": {
+    "pass": true,
+    "build": "renderguard1",
+    "crRenderFailureSelfCheck": {
+      "pass": true,
+      "build": "renderguard1",
+      "errors": [],
+      "warnings": [],
+      "checks": {
+        "zbufferExists": true,
+        "zbufferLengthMatches": true,
+        "spriteDepthCheckPresent": true,
+        "noSpriteFullRectFog": true,
+        "visibleSpriteSceneRendered": true,
+        "occludedSpriteHidden": true,
+        "canNearWallClean": true,
+        "npcNearWallClean": true,
+        "exitNearWallClean": true,
+        "hallStartRendered": true,
+        "canvasNotBlank": true,
+        "runtimeClean": true
+      },
+      "evidence": {
+        "haloSource": {
+          "BUILD_ID": "renderguard1",
+          "policy": "walls own distance fog; billboards drawImage only — no post-loop sprite fog fillRect",
+          "forbiddenPatternsAbsent": true,
+          "forbiddenHits": [],
+          "requiredMarkersPresent": true,
+          "requiredMissing": [],
+          "spriteLoopOk": true,
+          "regressionCommentMarker": "SPRITE HALO REGRESSION GUARD"
+        },
+        "occlusionSource": {
+          "BUILD_ID": "renderguard1",
+          "renderWidth": 320,
+          "zbufferLength": 320,
+          "zbufferMatchesRenderWidth": true,
+          "billboardKinds": [
+            "props",
+            "pickups",
+            "npcs",
+            "exit"
+          ],
+          "perColumnGuard": "depth >= zbuffer[col] => skip column",
+          "wallPassFillsZbufferPerColumn": true,
+          "noPostLoopSpriteFog": true,
+          "predicateTests": [
+            {
+              "spriteDepth": 3,
+              "wallDist": 2,
+              "expectSkip": true,
+              "label": "sprite behind wall",
+              "pass": true
+            },
+            {
+              "spriteDepth": 2,
+              "wallDist": 2,
+              "expectSkip": true,
+              "label": "sprite flush with wall (skip)",
+              "pass": true
+            },
+            {
+              "spriteDepth": 1.2,
+              "wallDist": 2,
+              "expectSkip": false,
+              "label": "sprite in front of wall",
+              "pass": true
+            }
+          ],
+          "predicateOk": true,
+          "regressionCommentMarker": "OCCLUSION REGRESSION GUARD"
+        },
+        "textures": {
+          "can": {
+            "ok": true,
+            "width": 20,
+            "height": 22,
+            "transparent": 286,
+            "opaque": 154,
+            "hasTransparency": true
+          },
+          "exit": {
+            "ok": true,
+            "width": 48,
+            "height": 80,
+            "transparent": 1780,
+            "opaque": 2060,
+            "hasTransparency": true
+          },
+          "hungry": {
+            "ok": true,
+            "width": 28,
+            "height": 46,
+            "transparent": 712,
+            "opaque": 576,
+            "hasTransparency": true
+          },
+          "hall_volunteer": {
+            "ok": true,
+            "width": 28,
+            "height": 46,
+            "transparent": 778,
+            "opaque": 510,
+            "hasTransparency": true
+          }
+        },
+        "visibleSprite": {
+          "pass": true,
+          "haloPass": true,
+          "borderStats": {
+            "mean": 133.9878893280636,
+            "brightRatio": 0.08300395256916997,
+            "variance": 3853.8646591537545,
+            "count": 506
+          },
+          "proj": {
+            "depth": 5,
+            "startCol": 152,
+            "endCol": 168,
+            "top": 103,
+            "bottom": 120,
+            "screenW": 15.272727272727273,
+            "screenH": 16.8
+          },
+          "canvasVariance": 5000.56148586527
+        },
+        "occludedSprite": {
+          "pass": true,
+          "occDiff": 0,
+          "visDiff": 105.90583554376659,
+          "zPass": true,
+          "proj": {
+            "depth": 8,
+            "startCol": 155,
+            "endCol": 165,
+            "top": 102,
+            "bottom": 113,
+            "screenW": 9.545454545454545,
+            "screenH": 10.5
+          },
+          "visProj": {
+            "depth": 3,
+            "startCol": 147,
+            "endCol": 173,
+            "top": 105,
+            "bottom": 134,
+            "screenW": 25.454545454545453,
+            "screenH": 28
+          }
+        },
+        "canNearWall": {
+          "pass": true,
+          "haloPass": true,
+          "proj": {
+            "depth": 3.9000000000000004,
+            "startCol": 150,
+            "endCol": 170,
+            "top": 104,
+            "bottom": 126,
+            "screenW": 19.580419580419576,
+            "screenH": 21.538461538461537
+          }
+        },
+        "npcNearWall": {
+          "pass": true,
+          "haloPass": true,
+          "proj": {
+            "depth": 3.8499999999999996,
+            "startCol": 146,
+            "endCol": 174,
+            "top": 81,
+            "bottom": 126,
+            "screenW": 27.19367588932807,
+            "screenH": 44.67532467532468
+          }
+        },
+        "exitNearWall": {
+          "pass": true,
+          "haloPass": true,
+          "proj": {
+            "depth": 3.8,
+            "startCol": 140,
+            "endCol": 180,
+            "top": 60,
+            "bottom": 127,
+            "screenW": 39.47368421052632,
+            "screenH": 65.78947368421053
+          }
+        },
+        "hallStart": {
+          "pass": true,
+          "stats": {
+            "mean": 73.46850433767251,
+            "brightRatio": 0.03936567164179104,
+            "variance": 2304.0802480246634,
+            "count": 42880
+          },
+          "customLevel": "hall_of_servants"
+        },
+        "canvas": {
+          "pass": true,
+          "viewSize": {
+            "w": 390,
+            "h": 844
+          },
+          "stats": {
+            "mean": 112.27743993757684,
+            "brightRatio": 0.172484375,
+            "variance": 4698.241602974924,
+            "count": 64000
+          }
+        }
+      },
+      "runtimeErrors": [],
+      "timestamp": "2026-06-26T12:52:28.868Z"
+    },
+    "imageHashes": {
+      "proof-render-visible-sprite.png": 1807037,
+      "proof-render-occluded-sprite.png": 1572463,
+      "proof-render-can-near-wall.png": 1784200,
+      "proof-render-npc-near-wall.png": 1784200,
+      "proof-render-hall-start.png": 1461094
+    },
+    "screenshots": [
+      "proof-render-visible-sprite.png",
+      "proof-render-occluded-sprite.png",
+      "proof-render-can-near-wall.png",
+      "proof-render-npc-near-wall.png",
+      "proof-render-hall-start.png"
+    ],
+    "timestamp": "2026-06-26T12:52:28.869Z"
+  },
   "hallE2E": {
     "pass": true,
-    "build": "hallharness1",
+    "build": "renderguard1",
     "crHallSelfCheck": {
       "pass": true,
-      "build": "hallharness1",
+      "build": "renderguard1",
       "errors": [],
       "warnings": [],
       "hall": {
@@ -446,7 +679,7 @@
       },
       "runtimeErrors": [],
       "runtimeClean": true,
-      "timestamp": "2026-06-26T12:33:37.493Z"
+      "timestamp": "2026-06-26T12:52:31.799Z"
     },
     "playwright": {
       "helpedSnap": {
@@ -468,7 +701,7 @@
       "proof-hall-helped.png",
       "proof-hall-exit.png"
     ],
-    "timestamp": "2026-06-26T12:33:37.493Z"
+    "timestamp": "2026-06-26T12:52:31.799Z"
   },
   "visual": {
     "pass": true,
@@ -529,7 +762,7 @@
         }
       }
     ],
-    "timestamp": "2026-06-26T12:33:42.621Z"
+    "timestamp": "2026-06-26T12:52:36.980Z"
   },
   "network": {
     "pass": true,
@@ -564,7 +797,7 @@
       "layoutPass": true,
       "layout": {
         "pass": true,
-        "build": "hallharness1",
+        "build": "renderguard1",
         "errors": [],
         "warnings": [],
         "rects": {
@@ -725,7 +958,7 @@
       "layoutPass": true,
       "layout": {
         "pass": true,
-        "build": "hallharness1",
+        "build": "renderguard1",
         "errors": [],
         "warnings": [],
         "rects": {
@@ -886,7 +1119,7 @@
       "layoutPass": true,
       "layout": {
         "pass": true,
-        "build": "hallharness1",
+        "build": "renderguard1",
         "errors": [],
         "warnings": [],
         "rects": {
@@ -1047,7 +1280,7 @@
       "layoutPass": true,
       "layout": {
         "pass": true,
-        "build": "hallharness1",
+        "build": "renderguard1",
         "errors": [],
         "warnings": [],
         "rects": {
@@ -1203,10 +1436,10 @@
   "selfcheckUrl": {
     "result": {
       "pass": true,
-      "build": "hallharness1",
+      "build": "renderguard1",
       "layout": {
         "pass": true,
-        "build": "hallharness1",
+        "build": "renderguard1",
         "errors": [],
         "warnings": [],
         "rects": {
@@ -1374,73 +1607,440 @@
         },
         "runtimeClean": true
       },
-      "render": {
+      "renderFailure": {
         "pass": true,
+        "build": "renderguard1",
         "errors": [],
+        "warnings": [],
         "checks": {
           "zbufferExists": true,
-          "zbufferMatchesWidth": true,
-          "spriteOcclusionGuardPresent": true,
-          "noSpriteFogHaloMode": true,
+          "zbufferLengthMatches": true,
+          "spriteDepthCheckPresent": true,
+          "noSpriteFullRectFog": true,
+          "visibleSpriteSceneRendered": true,
+          "occludedSpriteHidden": true,
+          "canNearWallClean": true,
+          "npcNearWallClean": true,
+          "exitNearWallClean": true,
+          "hallStartRendered": true,
+          "canvasNotBlank": true,
           "runtimeClean": true
         },
-        "halo": {
-          "BUILD_ID": "hallharness1",
-          "policy": "walls own distance fog; billboards drawImage only — no post-loop sprite fog fillRect",
-          "forbiddenPatternsAbsent": true,
-          "forbiddenHits": [],
-          "requiredMarkersPresent": true,
-          "requiredMissing": [],
-          "spriteLoopOk": true,
-          "regressionCommentMarker": "SPRITE HALO REGRESSION GUARD"
-        },
-        "occlusion": {
-          "BUILD_ID": "hallharness1",
-          "renderWidth": 320,
-          "zbufferLength": 320,
-          "zbufferMatchesRenderWidth": true,
-          "billboardKinds": [
-            "props",
-            "pickups",
-            "npcs",
-            "exit"
-          ],
-          "perColumnGuard": "depth >= zbuffer[col] => skip column",
-          "wallPassFillsZbufferPerColumn": true,
-          "noPostLoopSpriteFog": true,
-          "predicateTests": [
-            {
-              "spriteDepth": 3,
-              "wallDist": 2,
-              "expectSkip": true,
-              "label": "sprite behind wall",
-              "pass": true
+        "evidence": {
+          "haloSource": {
+            "BUILD_ID": "renderguard1",
+            "policy": "walls own distance fog; billboards drawImage only — no post-loop sprite fog fillRect",
+            "forbiddenPatternsAbsent": true,
+            "forbiddenHits": [],
+            "requiredMarkersPresent": true,
+            "requiredMissing": [],
+            "spriteLoopOk": true,
+            "regressionCommentMarker": "SPRITE HALO REGRESSION GUARD"
+          },
+          "occlusionSource": {
+            "BUILD_ID": "renderguard1",
+            "renderWidth": 320,
+            "zbufferLength": 320,
+            "zbufferMatchesRenderWidth": true,
+            "billboardKinds": [
+              "props",
+              "pickups",
+              "npcs",
+              "exit"
+            ],
+            "perColumnGuard": "depth >= zbuffer[col] => skip column",
+            "wallPassFillsZbufferPerColumn": true,
+            "noPostLoopSpriteFog": true,
+            "predicateTests": [
+              {
+                "spriteDepth": 3,
+                "wallDist": 2,
+                "expectSkip": true,
+                "label": "sprite behind wall",
+                "pass": true
+              },
+              {
+                "spriteDepth": 2,
+                "wallDist": 2,
+                "expectSkip": true,
+                "label": "sprite flush with wall (skip)",
+                "pass": true
+              },
+              {
+                "spriteDepth": 1.2,
+                "wallDist": 2,
+                "expectSkip": false,
+                "label": "sprite in front of wall",
+                "pass": true
+              }
+            ],
+            "predicateOk": true,
+            "regressionCommentMarker": "OCCLUSION REGRESSION GUARD"
+          },
+          "textures": {
+            "can": {
+              "ok": true,
+              "width": 20,
+              "height": 22,
+              "transparent": 286,
+              "opaque": 154,
+              "hasTransparency": true
             },
-            {
-              "spriteDepth": 2,
-              "wallDist": 2,
-              "expectSkip": true,
-              "label": "sprite flush with wall (skip)",
-              "pass": true
+            "exit": {
+              "ok": true,
+              "width": 48,
+              "height": 80,
+              "transparent": 1780,
+              "opaque": 2060,
+              "hasTransparency": true
             },
-            {
-              "spriteDepth": 1.2,
-              "wallDist": 2,
-              "expectSkip": false,
-              "label": "sprite in front of wall",
-              "pass": true
+            "hungry": {
+              "ok": true,
+              "width": 28,
+              "height": 46,
+              "transparent": 712,
+              "opaque": 576,
+              "hasTransparency": true
+            },
+            "hall_volunteer": {
+              "ok": true,
+              "width": 28,
+              "height": 46,
+              "transparent": 778,
+              "opaque": 510,
+              "hasTransparency": true
             }
-          ],
-          "predicateOk": true,
-          "regressionCommentMarker": "OCCLUSION REGRESSION GUARD"
-        }
+          },
+          "visibleSprite": {
+            "pass": true,
+            "haloPass": true,
+            "borderStats": {
+              "mean": 133.87341501976317,
+              "brightRatio": 0.08300395256916997,
+              "variance": 3845.313990606426,
+              "count": 506
+            },
+            "proj": {
+              "depth": 5,
+              "startCol": 152,
+              "endCol": 168,
+              "top": 103,
+              "bottom": 120,
+              "screenW": 15.272727272727273,
+              "screenH": 16.8
+            },
+            "canvasVariance": 5025.148268847841
+          },
+          "occludedSprite": {
+            "pass": true,
+            "occDiff": 0,
+            "visDiff": 105.27586206896552,
+            "zPass": true,
+            "proj": {
+              "depth": 8,
+              "startCol": 155,
+              "endCol": 165,
+              "top": 102,
+              "bottom": 113,
+              "screenW": 9.545454545454545,
+              "screenH": 10.5
+            },
+            "visProj": {
+              "depth": 3,
+              "startCol": 147,
+              "endCol": 173,
+              "top": 105,
+              "bottom": 134,
+              "screenW": 25.454545454545453,
+              "screenH": 28
+            }
+          },
+          "canNearWall": {
+            "pass": true,
+            "haloPass": true,
+            "proj": {
+              "depth": 3.9000000000000004,
+              "startCol": 150,
+              "endCol": 170,
+              "top": 104,
+              "bottom": 126,
+              "screenW": 19.580419580419576,
+              "screenH": 21.538461538461537
+            }
+          },
+          "npcNearWall": {
+            "pass": true,
+            "haloPass": true,
+            "proj": {
+              "depth": 3.8499999999999996,
+              "startCol": 146,
+              "endCol": 174,
+              "top": 81,
+              "bottom": 126,
+              "screenW": 27.19367588932807,
+              "screenH": 44.67532467532468
+            }
+          },
+          "exitNearWall": {
+            "pass": true,
+            "haloPass": true,
+            "proj": {
+              "depth": 3.8,
+              "startCol": 140,
+              "endCol": 180,
+              "top": 60,
+              "bottom": 127,
+              "screenW": 39.47368421052632,
+              "screenH": 65.78947368421053
+            }
+          },
+          "hallStart": {
+            "pass": true,
+            "stats": {
+              "mean": 72.31536746734022,
+              "brightRatio": 0.035634328358208955,
+              "variance": 2144.216295076055,
+              "count": 42880
+            },
+            "customLevel": "hall_of_servants"
+          },
+          "canvas": {
+            "pass": true,
+            "viewSize": {
+              "w": 390,
+              "h": 844
+            },
+            "stats": {
+              "mean": 111.50483823444978,
+              "brightRatio": 0.169984375,
+              "variance": 4651.39445609805,
+              "count": 64000
+            }
+          }
+        },
+        "runtimeErrors": [],
+        "timestamp": "2026-06-26T12:52:37.964Z"
+      },
+      "render": {
+        "pass": true,
+        "build": "renderguard1",
+        "errors": [],
+        "warnings": [],
+        "checks": {
+          "zbufferExists": true,
+          "zbufferLengthMatches": true,
+          "spriteDepthCheckPresent": true,
+          "noSpriteFullRectFog": true,
+          "visibleSpriteSceneRendered": true,
+          "occludedSpriteHidden": true,
+          "canNearWallClean": true,
+          "npcNearWallClean": true,
+          "exitNearWallClean": true,
+          "hallStartRendered": true,
+          "canvasNotBlank": true,
+          "runtimeClean": true
+        },
+        "evidence": {
+          "haloSource": {
+            "BUILD_ID": "renderguard1",
+            "policy": "walls own distance fog; billboards drawImage only — no post-loop sprite fog fillRect",
+            "forbiddenPatternsAbsent": true,
+            "forbiddenHits": [],
+            "requiredMarkersPresent": true,
+            "requiredMissing": [],
+            "spriteLoopOk": true,
+            "regressionCommentMarker": "SPRITE HALO REGRESSION GUARD"
+          },
+          "occlusionSource": {
+            "BUILD_ID": "renderguard1",
+            "renderWidth": 320,
+            "zbufferLength": 320,
+            "zbufferMatchesRenderWidth": true,
+            "billboardKinds": [
+              "props",
+              "pickups",
+              "npcs",
+              "exit"
+            ],
+            "perColumnGuard": "depth >= zbuffer[col] => skip column",
+            "wallPassFillsZbufferPerColumn": true,
+            "noPostLoopSpriteFog": true,
+            "predicateTests": [
+              {
+                "spriteDepth": 3,
+                "wallDist": 2,
+                "expectSkip": true,
+                "label": "sprite behind wall",
+                "pass": true
+              },
+              {
+                "spriteDepth": 2,
+                "wallDist": 2,
+                "expectSkip": true,
+                "label": "sprite flush with wall (skip)",
+                "pass": true
+              },
+              {
+                "spriteDepth": 1.2,
+                "wallDist": 2,
+                "expectSkip": false,
+                "label": "sprite in front of wall",
+                "pass": true
+              }
+            ],
+            "predicateOk": true,
+            "regressionCommentMarker": "OCCLUSION REGRESSION GUARD"
+          },
+          "textures": {
+            "can": {
+              "ok": true,
+              "width": 20,
+              "height": 22,
+              "transparent": 286,
+              "opaque": 154,
+              "hasTransparency": true
+            },
+            "exit": {
+              "ok": true,
+              "width": 48,
+              "height": 80,
+              "transparent": 1780,
+              "opaque": 2060,
+              "hasTransparency": true
+            },
+            "hungry": {
+              "ok": true,
+              "width": 28,
+              "height": 46,
+              "transparent": 712,
+              "opaque": 576,
+              "hasTransparency": true
+            },
+            "hall_volunteer": {
+              "ok": true,
+              "width": 28,
+              "height": 46,
+              "transparent": 778,
+              "opaque": 510,
+              "hasTransparency": true
+            }
+          },
+          "visibleSprite": {
+            "pass": true,
+            "haloPass": true,
+            "borderStats": {
+              "mean": 133.87341501976317,
+              "brightRatio": 0.08300395256916997,
+              "variance": 3845.313990606426,
+              "count": 506
+            },
+            "proj": {
+              "depth": 5,
+              "startCol": 152,
+              "endCol": 168,
+              "top": 103,
+              "bottom": 120,
+              "screenW": 15.272727272727273,
+              "screenH": 16.8
+            },
+            "canvasVariance": 5025.148268847841
+          },
+          "occludedSprite": {
+            "pass": true,
+            "occDiff": 0,
+            "visDiff": 105.27586206896552,
+            "zPass": true,
+            "proj": {
+              "depth": 8,
+              "startCol": 155,
+              "endCol": 165,
+              "top": 102,
+              "bottom": 113,
+              "screenW": 9.545454545454545,
+              "screenH": 10.5
+            },
+            "visProj": {
+              "depth": 3,
+              "startCol": 147,
+              "endCol": 173,
+              "top": 105,
+              "bottom": 134,
+              "screenW": 25.454545454545453,
+              "screenH": 28
+            }
+          },
+          "canNearWall": {
+            "pass": true,
+            "haloPass": true,
+            "proj": {
+              "depth": 3.9000000000000004,
+              "startCol": 150,
+              "endCol": 170,
+              "top": 104,
+              "bottom": 126,
+              "screenW": 19.580419580419576,
+              "screenH": 21.538461538461537
+            }
+          },
+          "npcNearWall": {
+            "pass": true,
+            "haloPass": true,
+            "proj": {
+              "depth": 3.8499999999999996,
+              "startCol": 146,
+              "endCol": 174,
+              "top": 81,
+              "bottom": 126,
+              "screenW": 27.19367588932807,
+              "screenH": 44.67532467532468
+            }
+          },
+          "exitNearWall": {
+            "pass": true,
+            "haloPass": true,
+            "proj": {
+              "depth": 3.8,
+              "startCol": 140,
+              "endCol": 180,
+              "top": 60,
+              "bottom": 127,
+              "screenW": 39.47368421052632,
+              "screenH": 65.78947368421053
+            }
+          },
+          "hallStart": {
+            "pass": true,
+            "stats": {
+              "mean": 72.31536746734022,
+              "brightRatio": 0.035634328358208955,
+              "variance": 2144.216295076055,
+              "count": 42880
+            },
+            "customLevel": "hall_of_servants"
+          },
+          "canvas": {
+            "pass": true,
+            "viewSize": {
+              "w": 390,
+              "h": 844
+            },
+            "stats": {
+              "mean": 111.50483823444978,
+              "brightRatio": 0.169984375,
+              "variance": 4651.39445609805,
+              "count": 64000
+            }
+          }
+        },
+        "runtimeErrors": [],
+        "timestamp": "2026-06-26T12:52:37.964Z"
       },
       "runtimeErrors": [],
       "runtimeClean": true,
-      "timestamp": "2026-06-26T12:33:43.564Z"
+      "timestamp": "2026-06-26T12:52:37.964Z"
     },
-    "overlayText": "SELF-CHECK PASS\nbuild hallharness1",
+    "overlayText": "SELF-CHECK PASS\nbuild renderguard1",
     "overlayVisible": true
   },
-  "timestamp": "2026-06-26T12:33:44.655Z"
+  "timestamp": "2026-06-26T12:52:39.017Z"
 }

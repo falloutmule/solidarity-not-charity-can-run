@@ -461,6 +461,62 @@ async function hallE2ESection(page) {
   return proof;
 }
 
+async function renderFailureSection(page) {
+  const url = `${BASE}/index.html?mobile=on&portraitlayout=1`;
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(url, { waitUntil: 'domcontentloaded' });
+  await waitGameReady(page);
+
+  const shots = [
+    ['visible_sprite', 'proof-render-visible-sprite.png'],
+    ['occluded_sprite', 'proof-render-occluded-sprite.png'],
+    ['can_near_wall', 'proof-render-can-near-wall.png'],
+    ['npc_near_wall', 'proof-render-npc-near-wall.png'],
+    ['hall_start', 'proof-render-hall-start.png'],
+  ];
+  const imageHashes = {};
+  for (const [scene, file] of shots) {
+    await page.evaluate((s) => {
+      CR.setMobileMode(true);
+      CR.crRenderFailureBenchScene(s);
+    }, scene);
+    await page.waitForTimeout(400);
+    const outPath = path.join(ROOT, file);
+    await page.screenshot({ path: outPath });
+    const hash = await page.evaluate(() => {
+      const v = document.getElementById('view');
+      if (!v || !v.width) return null;
+      const cx = v.getContext('2d');
+      const w = Math.min(96, v.width);
+      const h = Math.min(72, v.height);
+      const d = cx.getImageData(Math.floor(v.width * 0.2), Math.floor(v.height * 0.15), w, h);
+      let sum = 0;
+      for (let i = 0; i < d.data.length; i += 4) sum += d.data[i] + d.data[i + 1] + d.data[i + 2];
+      return sum;
+    });
+    imageHashes[file] = hash;
+  }
+
+  await page.goto(url, { waitUntil: 'domcontentloaded' });
+  await waitGameReady(page);
+  const cr = await page.evaluate(() => {
+    window.__crRuntimeErrors = window.__crRuntimeErrors || [];
+    return CR.runRenderFailureSelfCheck();
+  });
+
+  const proof = {
+    pass: cr.pass === true,
+    build: cr.build,
+    crRenderFailureSelfCheck: cr,
+    imageHashes,
+    screenshots: shots.map((s) => s[1]),
+    timestamp: new Date().toISOString(),
+  };
+  writeProof('proof-render-failure-guard.json', proof);
+  writeProof('proof-render-image-hashes.json', { build: cr.build, hashes: imageHashes, timestamp: new Date().toISOString() });
+  return proof;
+}
+
 async function main() {
   const constitution = runConstitutionCheck();
   const srv = await startStaticServer();
@@ -497,6 +553,7 @@ async function main() {
   const resilience = await viewportResilience(page);
   const saveLoad = await saveLoadRoundtrip(page);
   const audio = await audioUnlock(page);
+  const renderFailure = await renderFailureSection(page);
   const hallE2E = await hallE2ESection(page);
   const visual = await visualRegressionShots(page);
 
@@ -528,6 +585,7 @@ async function main() {
       resilience.pass &&
       (saveLoad.pass !== false) &&
       audio.pass &&
+      renderFailure.pass &&
       hallE2E.pass &&
       visual.pass &&
       networkPass &&
@@ -542,6 +600,7 @@ async function main() {
     resilience,
     saveLoad,
     audio,
+    renderFailure,
     hallE2E,
     visual,
     network: { pass: networkPass, external: net.externalRequests.length },

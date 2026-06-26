@@ -1,9 +1,9 @@
 {
   "pass": true,
-  "build": "hallharness1",
+  "build": "renderguard1",
   "crHallSelfCheck": {
     "pass": true,
-    "build": "hallharness1",
+    "build": "renderguard1",
     "errors": [],
     "warnings": [],
     "hall": {
@@ -39,7 +39,7 @@
     },
     "runtimeErrors": [],
     "runtimeClean": true,
-    "timestamp": "2026-06-26T12:33:37.493Z"
+    "timestamp": "2026-06-26T12:52:31.799Z"
   },
   "playwright": {
     "helpedSnap": {
@@ -61,5 +61,5 @@
     "proof-hall-helped.png",
     "proof-hall-exit.png"
   ],
-  "timestamp": "2026-06-26T12:33:37.493Z"
+  "timestamp": "2026-06-26T12:52:31.799Z"
 }
