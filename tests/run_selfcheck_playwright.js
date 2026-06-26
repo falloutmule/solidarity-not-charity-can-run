@@ -466,6 +466,84 @@ async function viewportSafeAreaSection(page) {
   return { pass, proof, results };
 }
 
+async function portraitUsabilitySection(page) {
+  const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
+  const presetList = [
+    { key: 'low', y: 120, shot: 'proof-usability-low.png' },
+    { key: 'mid', y: 0, shot: 'proof-usability-mid.png' },
+    { key: 'high', y: -120, shot: 'proof-usability-high.png' },
+    { key: 'veryHigh', y: -240, shot: 'proof-usability-very-high.png' },
+  ];
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await waitGameReady(page);
+  await page.evaluate(() => {
+    CR.setMobileMode(true);
+    CR.startRun(88);
+    CR.state = CR.STATE.PLAY;
+    CR.paused = false;
+  });
+
+  for (const p of presetList) {
+    await page.evaluate((y) => {
+      CR.options.controlsYOffsetPx = y;
+      CR.applyMobileControlSettings();
+      if (typeof drawMobileMenu === 'function') drawMobileMenu();
+    }, p.y);
+    await page.waitForTimeout(200);
+    await page.screenshot({ path: path.join(ROOT, p.shot) });
+  }
+
+  const usability = await page.evaluate(() => CR.runPortraitUsabilitySelfCheck());
+  const settingsSafety = await page.evaluate(() => CR.runSettingsSafetySelfCheck());
+
+  await page.goto(`${BASE}/index.html?mobile=on&portraitlayout=1&resetcontrols=1`, { waitUntil: 'domcontentloaded' });
+  await waitGameReady(page);
+  await page.evaluate(() => {
+    CR.setMobileMode(true);
+    CR.startRun(88);
+    CR.state = CR.STATE.PLAY;
+    CR.applyMobileControlSettings();
+    if (typeof drawMobileMenu === 'function') drawMobileMenu();
+  });
+  await page.waitForTimeout(200);
+  await page.screenshot({ path: path.join(ROOT, 'proof-resetcontrols-safe.png') });
+  const resetProof = await page.evaluate(() => ({
+    controlsYOffsetPx: CR.options.controlsYOffsetPx,
+    overlapPass: CR.runPortraitUsabilitySelfCheck().pass,
+    settingsPass: CR.runSettingsSafetySelfCheck().pass,
+  }));
+
+  await page.goto(`${BASE}/index.html?selfcheck=1&mobile=on&portraitlayout=1`, { waitUntil: 'domcontentloaded' });
+  await page.waitForTimeout(2500);
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await waitGameReady(page);
+  const afterHarness = await page.evaluate(() => ({
+    controlsYOffsetPx: CR.options.controlsYOffsetPx,
+    overlapPass: CR.crMinimapOverlapPass ? CR.crMinimapOverlapPass(CR.portraitLayout(CR.options.controlsYOffsetPx)) : true,
+  }));
+
+  const pass =
+    usability.pass === true &&
+    settingsSafety.pass === true &&
+    resetProof.controlsYOffsetPx === 0 &&
+    resetProof.overlapPass === true &&
+    resetProof.settingsPass === true;
+
+  const proof = {
+    pass,
+    build: usability.build,
+    usability,
+    settingsSafety,
+    resetProof,
+    afterHarness,
+    screenshots: presetList.map((p) => p.shot).concat(['proof-resetcontrols-safe.png']),
+    timestamp: new Date().toISOString(),
+  };
+  writeProof('proof-portrait-usability.json', proof);
+  return { pass, proof };
+}
+
 function fpIsPublicSafe(fp) {
   if (!fp) return false;
   if (fp.benchmark) return false;
@@ -680,6 +758,7 @@ async function main() {
   const saveLoad = await saveLoadRoundtrip(page);
   const audio = await audioUnlock(page);
   const viewportSafeArea = await viewportSafeAreaSection(page);
+  const portraitUsability = await portraitUsabilitySection(page);
   const harnessIsolation = await harnessIsolationSection(page);
   const renderFailure = await renderFailureSection(page);
   const hallE2E = await hallE2ESection(page);
@@ -714,6 +793,7 @@ async function main() {
       (saveLoad.pass !== false) &&
       audio.pass &&
       viewportSafeArea.pass &&
+      portraitUsability.pass &&
       harnessIsolation.pass &&
       renderFailure.pass &&
       hallE2E.pass &&
@@ -731,6 +811,7 @@ async function main() {
     saveLoad,
     audio,
     viewportSafeArea,
+    portraitUsability,
     harnessIsolation,
     renderFailure,
     hallE2E,

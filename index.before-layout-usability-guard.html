@@ -310,9 +310,6 @@ function _debouncedResize(){
     if(typeof applyMobileControlSettings === 'function'){
       applyMobileControlSettings();
     }
-    if(typeof crMigrateUnsafeControlsYOffset === 'function' && typeof isMobilePortrait === 'function' && isMobilePortrait()){
-      crMigrateUnsafeControlsYOffset({ quiet: true });
-    }
   }, 120);
 }
 function isFullscreen(){
@@ -503,7 +500,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'layoutguard1';
+const BUILD_ID = 'viewportfix1';
 const IS_FILE_ORIGIN = (typeof location !== 'undefined' && location.protocol === 'file:');
 const FILE_ORIGIN_SAVE_NOTE = 'Local file mode: saves may not persist. Use GitHub Pages for reliable saves.';
 function fileOriginMenuNoteHTML(){
@@ -556,106 +553,6 @@ const BTN_SIZE_STEPS = [60, 70, 80, 85, 95, 100, 110, 120, 130, 145, 160, 175];
 const LOOK_PAD_SIZE_STEPS = [72, 88, 100, 112, 128, 144, 160, 176, 200, 220, 240];
 /** Positive = controls lower on screen; negative = higher. */
 const CONTROL_Y_STEPS = [120, 0, -120, -240];
-const CR_MINIMAP_OVERLAP_SINGLE_MAX = 0.15;
-const CR_MINIMAP_OVERLAP_TOTAL_MAX = 0.25;
-const CR_MINIMAP_USABILITY_GAP_PX = 4;
-
-function crDomRectToXYWH(r){
-  return { x: r.left, y: r.top, w: r.width, h: r.height };
-}
-
-function crRectIntersectArea(a, b){
-  const ax = a.x !== undefined ? a.x : a.left;
-  const ay = a.y !== undefined ? a.y : a.top;
-  const aw = a.w !== undefined ? a.w : a.width;
-  const ah = a.h !== undefined ? a.h : a.height;
-  const bx = b.x !== undefined ? b.x : b.left;
-  const by = b.y !== undefined ? b.y : b.top;
-  const bw = b.w !== undefined ? b.w : b.width;
-  const bh = b.h !== undefined ? b.h : b.height;
-  const ix = Math.max(0, Math.min(ax + aw, bx + bw) - Math.max(ax, bx));
-  const iy = Math.max(0, Math.min(ay + ah, by + bh) - Math.max(ay, by));
-  return ix * iy;
-}
-
-function crMinimapOverlapMetrics(L){
-  const mini = L.minimapRect;
-  const miniArea = Math.max(1, mini.w * mini.h);
-  const controls = [
-    { id: 'move', rect: crDomRectToXYWH(L.moveRect) },
-    { id: 'give', rect: crDomRectToXYWH(L.giveRect) },
-    { id: 'look', rect: crDomRectToXYWH(L.lookRect) },
-    { id: 'sprint', rect: crDomRectToXYWH(L.sprintRect) },
-  ];
-  let totalArea = 0;
-  const perControl = {};
-  controls.forEach(c => {
-    const area = crRectIntersectArea(c.rect, mini);
-    perControl[c.id] = area / miniArea;
-    totalArea += area;
-  });
-  return {
-    perControl,
-    totalFraction: totalArea / miniArea,
-    miniArea,
-    totalArea,
-  };
-}
-
-function crMinimapOverlapPass(L){
-  const m = crMinimapOverlapMetrics(L);
-  if(m.totalFraction > CR_MINIMAP_OVERLAP_TOTAL_MAX) return false;
-  return Object.values(m.perControl).every(v => v <= CR_MINIMAP_OVERLAP_SINGLE_MAX);
-}
-
-function crApplyMinimapUsabilityClamp(moveRect, giveRect, lookRect, sprintRect, minimapRect, controlsY0, statsY){
-  const rects = [moveRect, giveRect, lookRect, sprintRect];
-  const minTop = minimapRect.y + minimapRect.h + CR_MINIMAP_USABILITY_GAP_PX;
-  let guard = 0;
-  while(guard++ < 96){
-    const Ltmp = {
-      minimapRect,
-      moveRect, giveRect, lookRect, sprintRect,
-    };
-    if(crMinimapOverlapPass(Ltmp)) break;
-    let highest = Infinity;
-    rects.forEach(r => { if(r.top < highest) highest = r.top; });
-    const shift = Math.max(6, minTop - highest);
-    rects.forEach(r => { r.top += shift; });
-    rects.forEach(r => {
-      if(r.top + r.height > statsY - 4) r.top = Math.max(controlsY0, statsY - 4 - r.height);
-    });
-  }
-}
-
-function crSafeControlsYOffsetPx(requested){
-  const target = nearestStep(Number(requested) || 0, CONTROL_Y_STEPS);
-  const order = [...CONTROL_Y_STEPS].sort((a, b) => a - b);
-  const idx = Math.max(0, order.indexOf(target));
-  for(let i = idx; i < order.length; i++){
-    const y = order[i];
-    const L = portraitLayout(y, { skipMinimapClamp: true });
-    if(crMinimapOverlapPass(L)) return y;
-  }
-  return 120;
-}
-
-function crMigrateUnsafeControlsYOffset(opts){
-  const quiet = opts && opts.quiet;
-  const req = Number(options.controlsYOffsetPx) || 0;
-  if(!mobileInputActive() && !_forcePortraitLayout && !_selfCheckForcePortrait) return { changed: false, from: req, to: req };
-  const { cw, ch } = layoutCssSize();
-  if(ch <= cw && !_forcePortraitLayout && !_selfCheckForcePortrait) return { changed: false, from: req, to: req };
-  const safe = crSafeControlsYOffsetPx(req);
-  if(safe === req) return { changed: false, from: req, to: req };
-  options.controlsYOffsetPx = safe;
-  options.save();
-  applyMobileControlSettings();
-  if(!quiet){
-    showToast('CONTROL DOCK HEIGHT adjusted to safe ' + controlHeightMenuLabel(safe), 2800);
-  }
-  return { changed: true, from: req, to: safe };
-}
 function controlHeightLabel(px){
   const v = Number(px) || 0;
   if(v >= 60) return 'LOW';
@@ -666,9 +563,7 @@ function controlHeightLabel(px){
 function controlHeightMenuLabel(px){
   const v = Number(px) || 0;
   const sign = v > 0 ? `+${v}` : String(v);
-  const base = `${controlHeightLabel(v)} (${sign}px)`;
-  if(v <= -180) return base + ' — clamps if overlap';
-  return base;
+  return `${controlHeightLabel(v)} (${sign}px)`;
 }
 const OPACITY_STEPS = [0.30,0.45,0.60,0.75];
 const DEADZONE_STEPS = [4,8,12,16];
@@ -694,7 +589,6 @@ function bumpControlHeight(){
   options.controlsYOffsetPx = cycleStepValue(options.controlsYOffsetPx, CONTROL_Y_STEPS);
   options.controlsYOffsetPx = Number(options.controlsYOffsetPx);
   options.save();
-  crMigrateUnsafeControlsYOffset({ quiet: true });
   applyMobileControlSettings();
   _optionsMenuStamp++;
   const lbl = controlHeightMenuLabel(options.controlsYOffsetPx);
@@ -2269,7 +2163,6 @@ const options = {
   },
 };
 options.load();
-crMigrateUnsafeControlsYOffset({ quiet: true });
 
 // ---------------------------------------------------------------------------
 // EMERGENCY URL FLAGS (query-param overrides for bad phone-local state)
@@ -4120,8 +4013,7 @@ function portraitShiftY(rect, dy){
  * Kanban Card 5 / BUILD_ID contract1 documents this contract for future edits.
  */
 /** Portrait layout — FPV (fixed) → minimap (fixed) → MENU (fixed below minimap) → dock controls → stats (fixed). */
-function portraitLayout(overrideYOffset, layoutOpts){
-  const skipMinimapClamp = !!(layoutOpts && layoutOpts.skipMinimapClamp);
+function portraitLayout(overrideYOffset){
   const { cw, ch } = layoutCssSize();
   const sa = readSafeAreaInsets();
   const fpvH = portraitPlayH();
@@ -4179,13 +4071,7 @@ function portraitLayout(overrideYOffset, layoutOpts){
   [moveRect, lookRect, sprintRect, giveRect].forEach(r=>{
     if(r.top + r.height > maxCtlBot) r.top = Math.max(controlsY0, maxCtlBot - r.height);
   });
-  if(!skipMinimapClamp){
-    crApplyMinimapUsabilityClamp(moveRect, giveRect, lookRect, sprintRect, minimapRect, controlsY0, statsY);
-  }
-  const overlap = crMinimapOverlapMetrics({
-    minimapRect, moveRect, giveRect, lookRect, sprintRect,
-  });
-  return { fpvRect, minimapRect, statsRect, controlsRect, moveRect, giveRect, sprintRect, lookRect, menuRect, controlsYOffsetApplied: dy, dockDy: dy, safeAreaInsets: sa, minimapOverlap: overlap };
+  return { fpvRect, minimapRect, statsRect, controlsRect, moveRect, giveRect, sprintRect, lookRect, menuRect, controlsYOffsetApplied: dy, dockDy: dy, safeAreaInsets: sa };
 }
 function drawPortraitDashboardChrome(){
   if(!mobileMode || !isMobilePortrait()) return;
@@ -5125,210 +5011,20 @@ function crGuardHarnessLeakOutsideCheck(){
   crClearHarnessLeakFromStorage();
 }
 
-const CR_PORTRAIT_USABILITY_PRESETS = [
-  { key: 'low', label: 'LOW', y: 120 },
-  { key: 'mid', label: 'MID', y: 0 },
-  { key: 'high', label: 'HIGH', y: -120 },
-  { key: 'veryHigh', label: 'VERY HIGH', y: -240 },
-];
-
-function runPortraitUsabilitySelfCheck(){
-  if(_crHarnessDepth > 0) return runPortraitUsabilitySelfCheckBody();
-  return crWithTemporaryState('portraitUsability', () => runPortraitUsabilitySelfCheckBody());
-}
-
-function runPortraitUsabilitySelfCheckBody(){
-  const errors = [];
-  const warnings = [];
-  const savedY = Number(options.controlsYOffsetPx) || 0;
-  const savedState = state;
-  crPrepareSelfCheckPortrait();
-  try {
-    crForceMobileOverlayVisible();
-    syncVisualViewportShell();
-    resize();
-    startRun(88);
-    state = STATE.PLAY;
-    paused = false;
-    applyMobileControlSettings();
-
-    const thresholds = {
-      singleControlMax: CR_MINIMAP_OVERLAP_SINGLE_MAX,
-      totalMax: CR_MINIMAP_OVERLAP_TOTAL_MAX,
-    };
-    const presets = [];
-    const rawBeforeClamp = portraitLayout(-240, { skipMinimapClamp: true });
-    const overlapBeforeClamp = crMinimapOverlapMetrics(rawBeforeClamp);
-
-    for(const p of CR_PORTRAIT_USABILITY_PRESETS){
-      options.controlsYOffsetPx = p.y;
-      applyMobileControlSettings();
-      const L = portraitLayout(p.y);
-      const overlap = L.minimapOverlap || crMinimapOverlapMetrics(L);
-      const overlapPass = crMinimapOverlapPass(L);
-      const fpvVisible = L.fpvRect.h >= 24 && L.fpvRect.w >= 40;
-      const minimapVisible = L.minimapRect.w >= 48 && L.minimapRect.h >= 48;
-      const menuLockedBelowMinimap = L.menuRect.top >= L.minimapRect.y + L.minimapRect.h - 10;
-      const statsVisible = L.statsRect.h >= 20;
-      const controlsVisible = L.moveRect.width > 8 && L.giveRect.width > 8 && L.lookRect.width > 8 && L.sprintRect.width > 8;
-      const mini = L.minimapRect;
-      const rectById = { move: L.moveRect, give: L.giveRect, look: L.lookRect, sprint: L.sprintRect };
-      const labelObscures = ['move', 'give', 'look', 'sprint'].some(id => {
-        const r = crDomRectToXYWH(rectById[id]);
-        const cx = r.x + r.w * 0.5;
-        const cy = r.y + r.h * 0.5;
-        return cx >= mini.x && cx <= mini.x + mini.w && cy >= mini.y && cy <= mini.y + mini.h;
-      });
-      if(!overlapPass) errors.push(p.label + ' overlap exceeds threshold total=' + overlap.totalFraction.toFixed(3));
-      if(!fpvVisible) errors.push(p.label + ' FPV not visible');
-      if(!minimapVisible) errors.push(p.label + ' minimap not visible');
-      if(!menuLockedBelowMinimap) errors.push(p.label + ' MENU not below minimap');
-      if(!statsVisible) errors.push(p.label + ' stats not visible');
-      if(!controlsVisible) errors.push(p.label + ' controls not visible');
-      if(labelObscures && overlapPass === false) errors.push(p.label + ' control labels obscure minimap');
-      presets.push({
-        key: p.key,
-        label: p.label,
-        requestedYOffset: p.y,
-        overlap,
-        overlapPass,
-        fpvVisible,
-        minimapVisible,
-        menuLockedBelowMinimap,
-        statsVisible,
-        controlsVisible,
-        labelObscures,
-      });
-    }
-
-    const lookSprintOverlap = crRectIntersectArea(
-      crDomRectToXYWH(presets[presets.length - 1] ? portraitLayout(-240).lookRect : { left:0, top:0, width:0, height:0 }),
-      crDomRectToXYWH(portraitLayout(-240).sprintRect)
-    );
-    const intentionalLookSprintOverlapAllowed = lookSprintOverlap > 0;
-
-    const pass = errors.length === 0;
-    return {
-      pass,
-      build: BUILD_ID,
-      errors,
-      warnings,
-      thresholds,
-      overlapBeforeClamp,
-      presets,
-      checks: {
-        fpvVisible: presets.every(x => x.fpvVisible),
-        minimapVisible: presets.every(x => x.minimapVisible),
-        menuBelowMinimap: presets.every(x => x.menuLockedBelowMinimap),
-        statsVisible: presets.every(x => x.statsVisible),
-        controlsVisible: presets.every(x => x.controlsVisible),
-        overlapAllPresetsPass: presets.every(x => x.overlapPass),
-        intentionalLookSprintOverlapAllowed,
-      },
-    };
-  } catch(e){
-    errors.push(String(e && e.message ? e.message : e));
-    return { pass: false, build: BUILD_ID, errors, warnings: [], checks: {}, presets: [] };
-  } finally {
-    state = savedState;
-    options.controlsYOffsetPx = savedY;
-    applyMobileControlSettings();
-    _selfCheckForcePortrait = false;
-  }
-}
-
-function runSettingsSafetySelfCheck(){
-  if(_crHarnessDepth > 0) return runSettingsSafetySelfCheckBody();
-  return crWithTemporaryState('settingsSafety', () => runSettingsSafetySelfCheckBody());
-}
-
-function runSettingsSafetySelfCheckBody(){
-  const errors = [];
-  const warnings = [];
-  const savedY = Number(options.controlsYOffsetPx) || 0;
-  crPrepareSelfCheckPortrait();
-  try {
-    crForceMobileOverlayVisible();
-    syncVisualViewportShell();
-    resize();
-
-    options.controlsYOffsetPx = -240;
-    options.save();
-    const mig = crMigrateUnsafeControlsYOffset({ quiet: true });
-    const migratedSafe = crMinimapOverlapPass(portraitLayout(options.controlsYOffsetPx));
-    if(!migratedSafe) errors.push('saved controlsYOffsetPx still produces minimap overlap after migrate');
-
-    options.controlsYOffsetPx = 0;
-    options.save();
-    applyMobileControlSettings();
-    const midSafe = crMinimapOverlapPass(portraitLayout(0));
-    if(!midSafe) errors.push('MID (0) layout not safe');
-
-    const resetSim = {
-      controlsYOffsetPx: 0,
-      joySizePx: 110,
-      buttonSizePx: 85,
-      lookSizePx: 112,
-    };
-    options.controlsYOffsetPx = resetSim.controlsYOffsetPx;
-    options.joySizePx = resetSim.joySizePx;
-    options.buttonSizePx = resetSim.buttonSizePx;
-    options.lookSizePx = resetSim.lookSizePx;
-    applyMobileControlSettings();
-    const resetSafe = crMinimapOverlapPass(portraitLayout(0));
-    if(!resetSafe) errors.push('resetcontrols-style MID layout not safe');
-
-    const harnessSnap = crWithTemporaryState('settingsSafetyProbe', () => {
-      runPortraitUsabilitySelfCheck();
-      return Number(options.controlsYOffsetPx) || 0;
-    });
-    const harnessLeavesSafeY = crMinimapOverlapPass(portraitLayout(harnessSnap));
-    if(!harnessLeavesSafeY) errors.push('harness left unsafe controlsYOffsetPx=' + harnessSnap);
-
-    const pass = errors.length === 0;
-    return {
-      pass,
-      build: BUILD_ID,
-      errors,
-      warnings,
-      checks: {
-        migrateAdjustsUnsafe: mig.changed || migratedSafe,
-        midSafe,
-        resetcontrolsSafe: resetSafe,
-        harnessRestoresSafeY: harnessLeavesSafeY,
-      },
-      migrationSample: mig,
-      thresholds: { singleControlMax: CR_MINIMAP_OVERLAP_SINGLE_MAX, totalMax: CR_MINIMAP_OVERLAP_TOTAL_MAX },
-    };
-  } catch(e){
-    errors.push(String(e && e.message ? e.message : e));
-    return { pass: false, build: BUILD_ID, errors, warnings: [], checks: {} };
-  } finally {
-    options.controlsYOffsetPx = savedY;
-    options.save();
-    applyMobileControlSettings();
-    _selfCheckForcePortrait = false;
-  }
-}
-
 function runFullSelfCheckInner(){
   const err0 = window.__crRuntimeErrors.length;
   const layout = runLayoutSelfCheck();
   const viewportSafeArea = runViewportSafeAreaSelfCheck();
-  const portraitUsability = runPortraitUsabilitySelfCheck();
-  const settingsSafety = runSettingsSafetySelfCheck();
   const input = runInputSelfCheck();
   const levels = runLevelSelfCheck();
   const renderFailure = runRenderFailureSelfCheck();
   const runtimeClean = window.__crRuntimeErrors.length === err0;
-  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
+  const pass = layout.pass && viewportSafeArea.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
   return {
     pass,
     build: BUILD_ID,
     layout,
     viewportSafeArea,
-    portraitUsability,
-    settingsSafety,
     input,
     levels,
     renderFailure,
@@ -6503,7 +6199,7 @@ globalThis.CR = window.CR = {
   set paused(v){ paused=!!v; },
   get mobileMode(){ return mobileMode; },
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
-  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
+  setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
   editRunnerName,applyMobileControlSettings,mobileSprintCost,mobileSprintBurstSec,
   toggleFullscreen,isFullscreen,enterFullscreen,exitFullscreen,
   getAudioContext,resumeAudioContext,bindAudioUnlockGate,getAudioUnlockProof,
