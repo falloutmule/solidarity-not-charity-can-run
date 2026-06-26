@@ -75,7 +75,7 @@ Optional: hard-refresh cache-busted URL if you want to eyeball Hall on device; r
 ## GITHUB PAGES URL
 
 - Normal: https://falloutmule.github.io/solidarity-not-charity-can-run/
-- Cache-busted: https://falloutmule.github.io/solidarity-not-charity-can-run/?v=COMMIT&mobile=on&portraitlayout=1
-- Self-check overlay: https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=COMMIT&mobile=on&portraitlayout=1
+- Cache-busted: https://falloutmule.github.io/solidarity-not-charity-can-run/?v=e34445c&mobile=on&portraitlayout=1
+- Self-check overlay: https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=e34445c&mobile=on&portraitlayout=1
 
-*(COMMIT filled after `git push`)*
+**Commit:** `e34445c` · **BUILD_ID:** `hallharness1`
