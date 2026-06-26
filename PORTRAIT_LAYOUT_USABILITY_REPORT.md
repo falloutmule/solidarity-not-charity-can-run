@@ -3,7 +3,10 @@
 ## WHAT WAS DONE
 
 - Backup: `index.before-layout-usability-guard.html`
-- Baseline: **viewportfix1 / 4611b1e** → **`layoutguard1`**
+- Prior baseline: **viewportfix1 / 4611b1e**
+- **Before clamp (VERY HIGH -240 raw):** total overlap **36.5%** (move 13.6%, look 14.2%, give 4.6%, sprint 4.1%) — would fail harness
+- **After clamp (all presets):** per-control ≤15%, total ≤25% (VERY HIGH clamped to **0%** overlap in proof run)
+- Commit: **cf88dc2**
 - Minimap/control **overlap metrics** (`crMinimapOverlapMetrics`, `crMinimapOverlapPass`)
 - **Runtime clamp** in `portraitLayout()` — `crApplyMinimapUsabilityClamp` keeps controls from covering the minimap beyond thresholds (without moving MENU/minimap)
 - **`crMigrateUnsafeControlsYOffset()`** — persists a safer `controlsYOffsetPx` when raw preset would exceed overlap limits on the current viewport
@@ -49,7 +52,7 @@
 
 ## GITHUB PAGES URL
 
-- Commit: **PLACEHOLDER**
-- Normal: https://falloutmule.github.io/solidarity-not-charity-can-run/?v=PLACEHOLDER&mobile=on&portraitlayout=1
-- Self-check: https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=PLACEHOLDER&mobile=on&portraitlayout=1
-- Reset controls: https://falloutmule.github.io/solidarity-not-charity-can-run/?v=PLACEHOLDER&mobile=on&portraitlayout=1&resetcontrols=1
+- Commit: **cf88dc2**
+- Normal: https://falloutmule.github.io/solidarity-not-charity-can-run/?v=cf88dc2&mobile=on&portraitlayout=1
+- Self-check: https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=cf88dc2&mobile=on&portraitlayout=1
+- Reset controls: https://falloutmule.github.io/solidarity-not-charity-can-run/?v=cf88dc2&mobile=on&portraitlayout=1&resetcontrols=1
