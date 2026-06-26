@@ -22,7 +22,7 @@ Nothing — all **52** levels passed.
 
 - **levelsChecked:** 52, **levelsPassed:** 52, **levelsFailed:** 0
 - **districtCount:** 3
-- **minReachableCells:** 205, **maxReachableCells:** 205
+- **minReachableCells:** 277, **maxReachableCells:** 421
 - **totalUnreachablePickups:** 0, **totalUnreachableNpcs:** 0
 - Full Playwright + CR self-check: **pass**
 
@@ -43,5 +43,5 @@ Optional: expand seed matrix or add post-generation repair loop only if a future
 
 ## GITHUB PAGES URL
 
-- Play: `https://falloutmule.github.io/solidarity-not-charity-can-run/?v=COMMIT&mobile=on&portraitlayout=1`
-- Self-check: `?selfcheck=1&v=COMMIT&mobile=on&portraitlayout=1`
+- Play: `https://falloutmule.github.io/solidarity-not-charity-can-run/?v=ec44e53&mobile=on&portraitlayout=1`
+- Self-check: `?selfcheck=1&v=ec44e53&mobile=on&portraitlayout=1`
