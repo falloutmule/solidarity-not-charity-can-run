@@ -52,7 +52,7 @@
 ## GITHUB PAGES URL
 
 - **BUILD_ID:** `layoutguard2`
-- Commit: **PLACEHOLDER**
-- Play: https://falloutmule.github.io/solidarity-not-charity-can-run/?v=PLACEHOLDER&mobile=on&portraitlayout=1
-- Self-check: https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=PLACEHOLDER&mobile=on&portraitlayout=1
+- Commit: **16b9294**
+- Play: https://falloutmule.github.io/solidarity-not-charity-can-run/?v=16b9294&mobile=on&portraitlayout=1
+- Self-check: https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=16b9294&mobile=on&portraitlayout=1
 - Reset controls: add `&resetcontrols=1` to play URL
