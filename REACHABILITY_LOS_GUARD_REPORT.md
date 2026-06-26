@@ -57,5 +57,5 @@ Optional: level-bake / spatial-audio cards from Q1K3 report (no UI/control chang
 
 ## GITHUB PAGES URL
 
-- Play: `https://falloutmule.github.io/solidarity-not-charity-can-run/?v=COMMIT&mobile=on&portraitlayout=1`
-- Self-check: `?selfcheck=1&v=COMMIT&mobile=on&portraitlayout=1`
+- Play: `https://falloutmule.github.io/solidarity-not-charity-can-run/?v=5736c8c&mobile=on&portraitlayout=1`
+- Self-check: `?selfcheck=1&v=5736c8c&mobile=on&portraitlayout=1`
