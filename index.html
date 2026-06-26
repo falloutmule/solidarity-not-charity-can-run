@@ -440,7 +440,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'dock2';
+const BUILD_ID = 'menu1';
 let mobileMode = false; // true = show mobile overlay, hide desktop cursor
 let mobileOverride = null; // null=auto, 'on', 'off'
 let portHintShown = false;
@@ -1410,7 +1410,7 @@ function drawMobileMenu(){
       <div class="rpantit">OPTIONS</div>
       <div class="rdesc" style="margin-bottom:8px;color:#6a5a4a;">build ${BUILD_ID}</div>
       <div class="rit ctrlheight-row" data-action="option-ctrlheight" style="margin:8px 0 10px;">CONTROL DOCK HEIGHT: ${controlHeightMenuLabel(options.controlsYOffsetPx)}</div>
-      <div class="rdesc" style="margin:0 0 6px;color:#7a6a50;">Tap row — moves MOVE / GIVE / SPRINT / LOOK / MENU only</div>
+      <div class="rdesc" style="margin:0 0 6px;color:#7a6a50;">Tap row — moves MOVE / GIVE / SPRINT / LOOK only</div>
         <div class="rit" data-action="option-name">NAME: ${profile.name||'RUNNER'}</div>
         <div class="rit" data-action="option-look">LOOK SPEED: ${lookSpeedLabel(options.lookSpeed)}</div>
         <div class="rit" data-action="option-joy">JOY SIZE: ${options.joySizePx}</div>
@@ -3819,7 +3819,7 @@ function rectsOverlap(a,b){
 function portraitShiftY(rect, dy){
   return { left: rect.left, top: Math.round(rect.top + dy), width: rect.width, height: rect.height };
 }
-/** Portrait layout — FPV → minimap (fixed) → controls dock → stats (fixed). */
+/** Portrait layout — FPV (fixed) → minimap (fixed) → MENU (fixed below minimap) → dock controls → stats (fixed). */
 function portraitLayout(overrideYOffset){
   const { cw, ch } = layoutCssSize();
   const fpvH = portraitPlayH();
@@ -3872,7 +3872,7 @@ function portraitLayout(overrideYOffset){
   giveRect = portraitShiftY(giveRect, dy);
   lookRect = portraitShiftY(lookRect, dy);
   sprintRect = portraitShiftY(sprintRect, dy);
-  menuRect = portraitShiftY(menuRect, dy);
+  /* menuRect: fixed below minimap — not shifted by controlsYOffsetPx */
   return { fpvRect, minimapRect, statsRect, controlsRect, moveRect, giveRect, sprintRect, lookRect, menuRect, controlsYOffsetApplied: dy, dockDy: dy };
 }
 function drawPortraitDashboardChrome(){
@@ -4182,11 +4182,22 @@ function getControlDockRectProof(){
     isMobilePortrait: isMobilePortrait(),
     viewport: { cw, ch },
     layout: { low, mid, high, veryHigh },
+    moveRect: snap(options.controlsYOffsetPx).moveRect,
+    giveRect: snap(options.controlsYOffsetPx).giveRect,
+    sprintRect: snap(options.controlsYOffsetPx).sprintRect,
+    lookRect: snap(options.controlsYOffsetPx).lookRect,
+    menuRect: snap(options.controlsYOffsetPx).menuRect,
+    minimapRect: snap(options.controlsYOffsetPx).minimapRect,
+    statsRect: snap(options.controlsYOffsetPx).statsRect,
+    fpvRect: snap(options.controlsYOffsetPx).fpvRect,
     movement: {
       midToHigh_moveTop: mid.moveRect.top - high.moveRect.top,
       lowToVery_moveTop: low.moveRect.top - veryHigh.moveRect.top,
-      midToHigh_menuTop: mid.menuRect.top - high.menuRect.top,
-      lowToVery_menuTop: low.menuRect.top - veryHigh.menuRect.top,
+      menuYStable_lowToVery: low.menuRect.top === veryHigh.menuRect.top,
+      menuYStable_midToHigh: mid.menuRect.top === high.menuRect.top,
+      minimapYStable: low.minimapRect.top === veryHigh.minimapRect.top,
+      statsYStable: low.statsRect.top === veryHigh.statsRect.top,
+      fpvYStable: low.fpvRect.top === veryHigh.fpvRect.top,
     },
     domSample: domAt(options.controlsYOffsetPx),
   };
