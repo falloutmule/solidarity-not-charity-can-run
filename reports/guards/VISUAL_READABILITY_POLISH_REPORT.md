@@ -33,8 +33,9 @@
 | BUILD_ID | `visual1` |
 | Prior baseline | `onboard1` / `aaaf901` |
 | Backup | `index.before-visual-readability-polish.html` |
-| Gameplay commit | *(filled after push)* |
+| Gameplay commit | `4c85289` |
 | Local harness | PASS |
+| GitHub Actions | https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28260459756 — **success** |
 
 ## REMAINING BLOCKERS
 
@@ -68,10 +69,8 @@
 
 ## GITHUB PAGES URL
 
-- **Play:** `https://falloutmule.github.io/solidarity-not-charity-can-run/?v=<COMMIT>&mobile=on&portraitlayout=1`
-- **Self-check:** `https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=<COMMIT>&mobile=on&portraitlayout=1`
-
-*(Commit hash and Actions run URL updated in docs commit after CI.)*
+- **Play:** `https://falloutmule.github.io/solidarity-not-charity-can-run/?v=4c85289&mobile=on&portraitlayout=1`
+- **Self-check:** `https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=4c85289&mobile=on&portraitlayout=1`
 
 ## CONFIRMATIONS
 
