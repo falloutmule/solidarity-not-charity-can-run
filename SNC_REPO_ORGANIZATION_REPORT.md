@@ -28,7 +28,7 @@
 |------|--------|
 | Gameplay **before** this docs commit (unchanged `index.html`) | **BUILD_ID** `runprog1`, commit **`1437b6f`** |
 | Handoff reference baseline (cited in status) | **BUILD_ID** `multiseed1`, commit **`ec44e53`** |
-| Docs-only commit | (see git after push) |
+| Docs-only commit | **`6859bb5`** |
 | Reports location | Repo **root**; index at **`reports/README.md`** |
 
 ## REMAINING BLOCKERS
