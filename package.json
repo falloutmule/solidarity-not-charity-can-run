@@ -1,0 +1,10 @@
+{
+  "name": "solidarity-not-charity-can-run",
+  "private": true,
+  "scripts": {
+    "test:selfcheck": "node tests/run_selfcheck_playwright.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.52.0"
+  }
+}

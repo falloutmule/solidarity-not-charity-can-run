@@ -23,6 +23,7 @@ Reports were moved out of the repo root so GitHub shows only the game + core doc
 | 10 | Grid LOS / reachability | [guards/REACHABILITY_LOS_GUARD_REPORT.md](guards/REACHABILITY_LOS_GUARD_REPORT.md) | `reachlos1` / `5736c8c` | BFS + interaction LOS | Yes (hall doors) |
 | 11 | Procedural multi-seed validation | [guards/PROCEDURAL_LEVEL_VALIDATION_REPORT.md](guards/PROCEDURAL_LEVEL_VALIDATION_REPORT.md) | `multiseed1` / `ec44e53` | 52 seeds reachable | Harness only |
 | 12 | Full-run progression / save-load | [guards/FULL_RUN_PROGRESSION_E2E_REPORT.md](guards/FULL_RUN_PROGRESSION_E2E_REPORT.md) | `runprog1` / `1437b6f` | Run loop + SAVE | Yes (save fields) |
+| 13 | GitHub Actions harness CI | [guards/GITHUB_ACTIONS_CI_REPORT.md](guards/GITHUB_ACTIONS_CI_REPORT.md) | CI card | Playwright on push/PR | CI only |
 
 ---
 

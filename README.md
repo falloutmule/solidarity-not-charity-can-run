@@ -42,8 +42,12 @@ Requires Node.js and Playwright (see `tests/run_selfcheck_playwright.js`).
 
 ```bash
 cd /path/to/solidarity-not-charity-can-run
-node tests/run_selfcheck_playwright.js
+npm ci
+npx playwright install --with-deps chromium   # local; CI does this in workflow
+npm run test:selfcheck
 ```
+
+Or without npm: `node tests/run_selfcheck_playwright.js` (requires `playwright` installed).
 
 Exit `0` and `proof-playwright-summary.json` with `"pass": true` means the full guard suite passed against **root `index.html`**.
 

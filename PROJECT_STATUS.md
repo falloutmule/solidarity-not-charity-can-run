@@ -1,8 +1,10 @@
 # Project status — Solidarity Not Charity Can Run
 
-Last updated: structural repo cleanup (reports under `reports/`).
+Last updated: GitHub Actions selfcheck CI added.
 
 Reports were moved into **`reports/`** to keep the GitHub root readable. Index: **`reports/README.md`**; guard write-ups: **`reports/guards/`**.
+
+**CI:** `.github/workflows/selfcheck.yml` runs `npm run test:selfcheck` on push/PR to `main`.
 
 ## Gameplay baseline
 
@@ -27,11 +29,12 @@ Reports were moved into **`reports/`** to keep the GitHub root readable. Index: 
 6. **Grid LOS / reachability guard** — `reachlos1`  
 7. **Procedural multi-seed validation guard** — `multiseed1`  
 8. **Full-run progression / save-load E2E guard** — `runprog1`  
+9. **GitHub Actions harness CI** — `.github/workflows/selfcheck.yml`, proof artifact upload  
 
 ## Next likely work
 
 - New gameplay or reliability cards **only when explicitly requested** (no broad refactors).  
-- Optional: further docs, CI wiring, or modular `src/` **only after** proven build parity to single-file artifact.
+- Optional: modular `src/` **only after** proven build parity to single-file artifact.
 
 ## Blockers
 
