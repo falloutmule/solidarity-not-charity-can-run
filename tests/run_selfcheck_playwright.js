@@ -387,6 +387,85 @@ async function visualRegressionShots(page) {
   return index;
 }
 
+async function viewportSafeAreaSection(page) {
+  const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
+  const scenarios = [
+    { label: 'pixel7-portrait', viewport: { width: 412, height: 915 }, shot: 'proof-viewport-pixel7-portrait.png' },
+    { label: 'pixel7-landscape', viewport: { width: 915, height: 412 }, shot: 'proof-viewport-pixel7-landscape.png' },
+    { label: 'travislike-portrait', viewport: { width: 360, height: 800 }, shot: null },
+    { label: 'short-portrait-urlbar', viewport: { width: 390, height: 720 }, shot: 'proof-viewport-short-portrait.png' },
+    { label: 'tall-portrait-no-urlbar', viewport: { width: 390, height: 900 }, shot: 'proof-viewport-tall-portrait.png' },
+    { label: 'fullscreen-like', viewport: { width: 390, height: 844 }, shot: null },
+  ];
+  const results = [];
+  let optionsShotDone = false;
+
+  for (const sc of scenarios) {
+    const url = sc.label === 'pixel7-landscape'
+      ? `${BASE}/index.html?mobile=on`
+      : baseUrl;
+    await page.setViewportSize(sc.viewport);
+    await page.goto(url, { waitUntil: 'domcontentloaded' });
+    await waitGameReady(page);
+    await page.evaluate(() => {
+      window.__crRuntimeErrors = window.__crRuntimeErrors || [];
+      CR.setMobileMode(true);
+      CR.syncVisualViewportShell();
+      CR.startRun(77);
+      CR.state = 'play';
+      CR.paused = false;
+      CR.applyMobileControlSettings();
+    });
+    await page.waitForTimeout(350);
+
+    const check1 = await page.evaluate(() => CR.runViewportSafeAreaSelfCheck());
+    await page.setViewportSize({ width: sc.viewport.width, height: Math.max(400, sc.viewport.height - 40) });
+    await page.waitForTimeout(200);
+    await page.evaluate(() => {
+      CR.syncVisualViewportShell();
+      CR.applyMobileControlSettings();
+    });
+    const check2 = await page.evaluate(() => CR.runViewportSafeAreaSelfCheck());
+    const fp = await page.evaluate(() => CR.crPublicStateFingerprint());
+
+    if (sc.shot) {
+      await page.screenshot({ path: path.join(ROOT, sc.shot) });
+    }
+
+    if (!optionsShotDone && sc.label === 'travislike-portrait') {
+      await page.evaluate(() => {
+        CR.state = 'options';
+        if (typeof drawMobileMenu === 'function') drawMobileMenu();
+        const r = document.getElementById('rmenu');
+        if (r) r.scrollTop = r.scrollHeight;
+      });
+      await page.waitForTimeout(300);
+      await page.screenshot({ path: path.join(ROOT, 'proof-options-back-reachable.png') });
+      optionsShotDone = true;
+    }
+
+    results.push({
+      label: sc.label,
+      viewport: sc.viewport,
+      pass: check1.pass === true && check2.pass === true && fpIsPublicSafe(fp),
+      checkInitial: check1,
+      checkAfterResize: check2,
+      fingerprint: fp,
+      shot: sc.shot,
+    });
+  }
+
+  const pass = results.every((r) => r.pass);
+  const proof = {
+    pass,
+    build: results[0]?.checkInitial?.build || null,
+    scenarios: results,
+    timestamp: new Date().toISOString(),
+  };
+  writeProof('proof-viewport-safearea.json', proof);
+  return { pass, proof, results };
+}
+
 function fpIsPublicSafe(fp) {
   if (!fp) return false;
   if (fp.benchmark) return false;
@@ -600,6 +679,7 @@ async function main() {
   const resilience = await viewportResilience(page);
   const saveLoad = await saveLoadRoundtrip(page);
   const audio = await audioUnlock(page);
+  const viewportSafeArea = await viewportSafeAreaSection(page);
   const harnessIsolation = await harnessIsolationSection(page);
   const renderFailure = await renderFailureSection(page);
   const hallE2E = await hallE2ESection(page);
@@ -633,6 +713,7 @@ async function main() {
       resilience.pass &&
       (saveLoad.pass !== false) &&
       audio.pass &&
+      viewportSafeArea.pass &&
       harnessIsolation.pass &&
       renderFailure.pass &&
       hallE2E.pass &&
@@ -649,6 +730,7 @@ async function main() {
     resilience,
     saveLoad,
     audio,
+    viewportSafeArea,
     harnessIsolation,
     renderFailure,
     hallE2E,

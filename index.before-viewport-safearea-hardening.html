@@ -354,7 +354,7 @@ function showToast(msg, ms){
 }
 // Resize canvas on fullscreen transitions
 ['fullscreenchange','webkitfullscreenchange','msfullscreenchange'].forEach(ev=>{
-  document.addEventListener(ev, ()=>{ syncVisualViewportShell(); _debouncedResize(); updateFsBtnLabel(); });
+  document.addEventListener(ev, ()=>{ _debouncedResize(); updateFsBtnLabel(); });
 });
 // Resize on orientation change with debounce
 addEventListener('orientationchange', ()=>{ _debouncedResize(); });
@@ -414,7 +414,6 @@ function updateFsBtnLabel(){
 addEventListener('resize', _debouncedResize);
 // Also handle visual viewport resize (mobile address bar) — update immediately for responsiveness
 if(window.visualViewport){
-  window.__crVvResizeHooked = true;
   window.visualViewport.addEventListener('resize', ()=>{ syncVisualViewportShell(); _debouncedResize(); }, { passive: true });
   window.visualViewport.addEventListener('scroll', ()=>{ syncVisualViewportShell(); _debouncedResize(); }, { passive: true });
 }
@@ -500,7 +499,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'viewportfix1';
+const BUILD_ID = 'isofix1';
 const IS_FILE_ORIGIN = (typeof location !== 'undefined' && location.protocol === 'file:');
 const FILE_ORIGIN_SAVE_NOTE = 'Local file mode: saves may not persist. Use GitHub Pages for reliable saves.';
 function fileOriginMenuNoteHTML(){
@@ -735,7 +734,7 @@ function applyMobileControlSettings(){
     } else {
       mr.style.display = 'flex';
       mr.style.pointerEvents = 'auto';
-      mr.style.top = '0'; mr.style.right = '0'; mr.style.bottom = 'auto'; mr.style.width = '50vw'; mr.style.height = 'var(--app-vh-px)';
+      mr.style.top = '0'; mr.style.right = '0'; mr.style.bottom = 'auto'; mr.style.width = '50vw'; mr.style.height = '100%';
     }
   }
   {
@@ -4549,261 +4548,6 @@ function getViewportProof(){
   };
 }
 
-function crNormLayoutRect(r){
-  if(!r) return null;
-  if(r.x !== undefined) return { left:r.x, top:r.y, width:r.w, height:r.h };
-  return { left:r.left, top:r.top, width:r.width, height:r.height };
-}
-
-function crRectInsideLayoutBand(rect, cw, ch, sa, tol){
-  const t = tol === undefined ? 3 : tol;
-  const r = crNormLayoutRect(rect);
-  if(!r) return false;
-  return r.left >= sa.left - t && r.top >= sa.top - t &&
-    r.left + r.width <= cw - sa.right + t &&
-    r.top + r.height <= ch - sa.bottom + t;
-}
-
-function crElementCenterInVisibleBand(el, sa){
-  if(!el) return false;
-  const br = el.getBoundingClientRect();
-  if(br.width < 4 || br.height < 4) return false;
-  const vv = window.visualViewport;
-  const vTop = (vv && vv.offsetTop) || 0;
-  const vLeft = (vv && vv.offsetLeft) || 0;
-  const vW = (vv && vv.width) || innerWidth;
-  const vH = (vv && vv.height) || innerHeight;
-  const cx = (br.left + br.right) * 0.5;
-  const cy = (br.top + br.bottom) * 0.5;
-  return cx >= vLeft + sa.left && cx <= vLeft + vW - sa.right &&
-    cy >= vTop + sa.top && cy <= vTop + vH - sa.bottom;
-}
-
-function crElementPartiallyInVisibleBand(el, sa){
-  if(!el) return false;
-  const br = el.getBoundingClientRect();
-  if(br.width < 4 || br.height < 4) return false;
-  const vv = window.visualViewport;
-  const vTop = (vv && vv.offsetTop) || 0;
-  const vLeft = (vv && vv.offsetLeft) || 0;
-  const vW = (vv && vv.width) || innerWidth;
-  const vH = (vv && vv.height) || innerHeight;
-  const padL = vLeft + sa.left, padR = vLeft + vW - sa.right;
-  const padT = vTop + sa.top, padB = vTop + vH - sa.bottom;
-  const pts = [
-    [br.left, br.top], [br.right, br.top], [br.left, br.bottom], [br.right, br.bottom],
-    [(br.left + br.right) * 0.5, (br.top + br.bottom) * 0.5],
-  ];
-  return pts.some(([x, y]) => x >= padL && x <= padR && y >= padT && y <= padB);
-}
-
-function crCanvasInVisibleViewport(sa){
-  const vv = window.visualViewport;
-  const br = view.getBoundingClientRect();
-  const vTop = (vv && vv.offsetTop) || 0;
-  const vLeft = (vv && vv.offsetLeft) || 0;
-  const vBottom = vTop + ((vv && vv.height) || innerHeight);
-  const vRight = vLeft + ((vv && vv.width) || innerWidth);
-  const tol = 4;
-  return br.width > 8 && br.height > 8 &&
-    br.left >= vLeft + sa.left - tol && br.top >= vTop + sa.top - tol &&
-    br.right <= vRight - sa.right + tol && br.bottom <= vBottom - sa.bottom + tol;
-}
-
-function crShellUsesNoRaw100vh(){
-  const styleText = document.querySelector('style') ? document.querySelector('style').textContent : '';
-  if(/[^d]100vh|(^|[^d])100vh/.test(styleText.replace(/100dvh/g, ''))) return false;
-  const mob = document.getElementById('mob');
-  if(mob){
-    const h = getComputedStyle(mob).height || '';
-    if(h === '100vh') return false;
-  }
-  return true;
-}
-
-function crForceMobileOverlayVisible(){
-  mobileMode = true;
-  const mob = document.getElementById('mob');
-  if(mob) mob.classList.add('show');
-  applyMobileControlSettings();
-}
-
-function runViewportSafeAreaSelfCheck(){
-  if(_crHarnessDepth > 0) return runViewportSafeAreaSelfCheckBody();
-  return crWithTemporaryState('viewportSafeArea', () => runViewportSafeAreaSelfCheckBody());
-}
-
-function runViewportSafeAreaSelfCheckBody(){
-  const errors = [];
-  const warnings = [];
-  const savedOverride = mobileOverride;
-  const savedState = state;
-  const savedForcePortrait = _selfCheckForcePortrait;
-  syncVisualViewportShell();
-  const pre = layoutCssSize();
-  const wantPortraitUi = _forcePortraitLayout || pre.ch > pre.cw;
-  if(wantPortraitUi){
-    crPrepareSelfCheckPortrait();
-  } else {
-    _selfCheckForcePortrait = false;
-    if(mobileOverride === null) mobileOverride = true;
-    setMobileMode(true);
-  }
-  try {
-    crForceMobileOverlayVisible();
-    syncVisualViewportShell();
-    resize();
-    applyMobileControlSettings();
-    startRun(88);
-    state = STATE.PLAY;
-    paused = false;
-    applyMobileControlSettings();
-
-    const vv = window.visualViewport;
-    const sa = readSafeAreaInsets();
-    const { cw, ch } = layoutCssSize();
-    const portraitUi = isMobilePortrait();
-    const rootCS = getComputedStyle(document.documentElement);
-    const appVhPx = parseFloat(rootCS.getPropertyValue('--app-vh-px')) || 0;
-    const appVwPx = parseFloat(rootCS.getPropertyValue('--app-vw-px')) || 0;
-
-    let visualViewportUsed = true;
-    if(vv){
-      visualViewportUsed = Math.abs(appVhPx - Math.round(vv.height)) <= 4 &&
-        Math.abs(appVwPx - Math.round(vv.width)) <= 4;
-    } else {
-      visualViewportUsed = appVhPx > 0 && Math.abs(appVhPx - Math.round(innerHeight)) <= 6;
-    }
-    if(!visualViewportUsed) errors.push('CSS --app-vh-px does not track visualViewport');
-
-    const noRaw100vhShell = crShellUsesNoRaw100vh();
-    if(!noRaw100vhShell) errors.push('shell still uses raw 100vh');
-
-    const L = portraitUi ? portraitLayout() : null;
-    const canvasVisible = crCanvasInVisibleViewport(sa) && view.width > 0 && view.height > 0;
-    if(!canvasVisible) errors.push('canvas outside visible viewport band');
-
-    let fpvVisible = true, minimapVisible = true, menuVisible = true, statsVisible = true;
-    if(portraitUi && L){
-      fpvVisible = crRectInsideLayoutBand(L.fpvRect, cw, ch, sa);
-      minimapVisible = crRectInsideLayoutBand(L.minimapRect, cw, ch, sa);
-      menuVisible = crRectInsideLayoutBand(L.menuRect, cw, ch, sa);
-      statsVisible = crRectInsideLayoutBand(L.statsRect, cw, ch, sa);
-      if(!fpvVisible) errors.push('fpv rect clips safe viewport');
-      if(!minimapVisible) errors.push('minimap rect clips safe viewport');
-      if(!menuVisible) errors.push('menu rect clips safe viewport');
-      if(!statsVisible) errors.push('stats rect clips safe viewport');
-    }
-
-    let statsAboveSafe = true;
-    if(portraitUi && L){
-      const statsBottom = L.statsRect.y + L.statsRect.h;
-      statsAboveSafe = statsBottom <= ch - sa.bottom + 3;
-      if(!statsAboveSafe) errors.push('stats below bottom safe inset');
-    }
-
-    let controlsVisible = false;
-    if(portraitUi){
-      const lookEl = document.getElementById('mlookpad') || document.getElementById('mr');
-      controlsVisible = ['ml','mg','ms'].every(id => crElementCenterInVisibleBand(document.getElementById(id), sa)) &&
-        crElementCenterInVisibleBand(lookEl, sa);
-    } else {
-      const moveOk = crElementPartiallyInVisibleBand(document.getElementById('ml'), sa);
-      const rightOk = ['mlookpad', 'mr', 'mg', 'ms'].some(id => crElementPartiallyInVisibleBand(document.getElementById(id), sa));
-      controlsVisible = moveOk && rightOk;
-    }
-    if(!controlsVisible) errors.push('one or more controls not in visible safe band');
-
-    const menuBefore = portraitUi && L ? L.menuRect.top : view.height;
-    resize();
-    applyMobileControlSettings();
-    const menuAfter = portraitUi ? portraitLayout().menuRect.top : view.height;
-    const resizeReappliesLayout = Math.abs(menuBefore - menuAfter) < 4;
-    if(!resizeReappliesLayout) errors.push('resize did not stabilize layout');
-
-    const safeAreaAccountedFor = portraitUi && L
-      ? Math.abs(L.statsRect.y - (ch - L.statsRect.h - sa.bottom)) < 4
-      : true;
-    if(portraitUi && L && !safeAreaAccountedFor) warnings.push('statsRect may not account for safe bottom');
-
-    state = STATE.OPTIONS;
-    drawMobileMenu();
-    const rmenu = document.getElementById('rmenu');
-    const back = rmenu && rmenu.querySelector('[data-action="back-title-options"]');
-    if(rmenu && rmenu.classList.contains('options-tune')){
-      rmenu.scrollTop = rmenu.scrollHeight;
-    }
-    if(back && typeof back.scrollIntoView === 'function'){
-      try { back.scrollIntoView({ block: 'nearest', behavior: 'instant' }); } catch(_e){ back.scrollIntoView(false); }
-    }
-    let optionsBackReachable = false;
-    if(back){
-      const br = back.getBoundingClientRect();
-      const vTop = (vv && vv.offsetTop) || 0;
-      const vBottom = vTop + ((vv && vv.height) || innerHeight) - sa.bottom;
-      optionsBackReachable = br.height > 8 && br.top >= vTop + sa.top - 2 && br.bottom <= vBottom + 4 && br.width > 20;
-    }
-    if(!optionsBackReachable) errors.push('OPTIONS BACK not reachable in visible viewport');
-
-    state = STATE.PLAY;
-    drawMobileMenu();
-
-    const checks = {
-      visualViewportUsed,
-      noRaw100vhShell,
-      canvasVisible,
-      fpvVisible,
-      minimapVisible,
-      menuVisible,
-      controlsVisible,
-      statsVisible,
-      optionsBackReachable,
-      resizeReappliesLayout,
-      safeAreaAccountedFor: safeAreaAccountedFor || statsAboveSafe,
-      vvResizeHooked: !!window.__crVvResizeHooked || !window.visualViewport,
-    };
-    if(!checks.vvResizeHooked) warnings.push('visualViewport resize hook not flagged');
-
-    const pass = errors.length === 0 && Object.keys(checks).every(k => {
-      if(k === 'vvResizeHooked') return true;
-      return checks[k] === true;
-    });
-
-    return {
-      pass,
-      build: BUILD_ID,
-      errors,
-      warnings,
-      checks,
-      rects: portraitUi && L ? {
-        fpv: L.fpvRect,
-        minimap: L.minimapRect,
-        menu: L.menuRect,
-        stats: L.statsRect,
-        move: L.moveRect,
-        give: L.giveRect,
-        sprint: L.sprintRect,
-        look: L.lookRect,
-      } : { mode: 'landscape-mobile' },
-      safeArea: sa,
-      viewport: getViewportProof(),
-      layoutCss: { cw, ch },
-      timestamp: new Date().toISOString(),
-    };
-  } catch(e){
-    errors.push(String(e && e.message ? e.message : e));
-    return { pass: false, build: BUILD_ID, errors, warnings: [], checks: {}, rects: {}, safeArea: readSafeAreaInsets() };
-  } finally {
-    state = savedState;
-    _selfCheckForcePortrait = savedForcePortrait;
-    mobileOverride = savedOverride;
-    applyMobileControlSettings();
-    syncPortraitMenuLabel();
-    if(state === STATE.PLAY) drawMobileMenu();
-    else if(state === STATE.TITLE) drawMobileMenu();
-  }
-}
-
 
 /** Harness isolation — benchmark scenes must not leak into playable state or localStorage. */
 
@@ -5014,17 +4758,15 @@ function crGuardHarnessLeakOutsideCheck(){
 function runFullSelfCheckInner(){
   const err0 = window.__crRuntimeErrors.length;
   const layout = runLayoutSelfCheck();
-  const viewportSafeArea = runViewportSafeAreaSelfCheck();
   const input = runInputSelfCheck();
   const levels = runLevelSelfCheck();
   const renderFailure = runRenderFailureSelfCheck();
   const runtimeClean = window.__crRuntimeErrors.length === err0;
-  const pass = layout.pass && viewportSafeArea.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
+  const pass = layout.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
   return {
     pass,
     build: BUILD_ID,
     layout,
-    viewportSafeArea,
     input,
     levels,
     renderFailure,
@@ -6199,7 +5941,7 @@ globalThis.CR = window.CR = {
   set paused(v){ paused=!!v; },
   get mobileMode(){ return mobileMode; },
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
-  setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
+  setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
   editRunnerName,applyMobileControlSettings,mobileSprintCost,mobileSprintBurstSec,
   toggleFullscreen,isFullscreen,enterFullscreen,exitFullscreen,
   getAudioContext,resumeAudioContext,bindAudioUnlockGate,getAudioUnlockProof,
