@@ -224,32 +224,42 @@
 <script>
 "use strict";
 /* ============================================================================
-   SOLIDARITY NOT CHARITY CAN RUN  —  flat raycaster speedrun roguelike (single file, no deps)
+   AI-SAFE SINGLE-FILE CONSTITUTION (Kanban CARD 11 — P1 comment block headers)
+   ============================================================================
+   1) Edit only within named SECTION blocks (search "// SECTION").
+   2) Do not change save schema without bumping SAVE_VERSION + migration.
+   3) Input → actions → simulation → render is one-way flow.
+   4) World state is plain data; render code must not mutate gameplay state.
+   5) Scene transitions own setup/teardown of timers, listeners, overlays.
+   6) Feature flags live in cfg, DEBUG, options, or URL query params only.
+   7) No external deps, eval, inline onclick, or undeclared globals.
+   8) Portrait dock: controlsYOffsetPx moves MOVE/GIVE/SPRINT/LOOK only (Card 5).
+   9) Smoke: boot, CR.* proofs, save/load, resize, no external network.
 
-   GRAPHICS PASS — Grand Junction / Western Colorado cityscape flavor.
-   All gameplay, collision, and sprite-projection logic from the verified
-   base is preserved. Only rendering + procedural assets changed.
+   FILE: Solidarity Not Charity Can Run — single-file raycaster roguelike (no deps).
+   SECTION INDEX:
+     0   CANVAS / RESOLUTION (+ zbuffer occlusion guard)
+     0b  FULLSCREEN API
+     0c  DEBUG FLAG
+     1   SEEDED RNG
+     2   GAME STATE + cfg
+     2b  MOBILE / TOUCH INPUT
+     2c  RESPONSIVE MOBILE MENU
+     3   CITY GENERATION
+     3b  CUSTOM LEVELS
+     4   COLLISION
+     5   AUDIO
+     5b  LOCAL PERSISTENCE (SAVE_VERSION)
+     6   PROCEDURAL ASSETS
+     7   RENDER
+     8   MINIMAP
+     9   HUD + RETICLE + POPUPS
+    10   GAMEPLAY ACTIONS
+    11   UPDATE + INPUT
+    12   OVERLAYS
+    13   MAIN LOOP + BOOT (window.CR)
 
-   Major systems:
-     0. Canvas / low-res pixelated buffer
-     1. Seeded RNG (mulberry32)
-     2. Game state machine (start / play / upgrade / over / paused)
-     3. Procedural city generator + flood-fill reachability + spawn validation
-     4. Collision helpers (unchanged from verified base)
-     5. Audio (WebAudio blips)
-     6. PROCEDURAL ASSETS: wall textures + sprite textures + sky/mesa horizon
-        (all Canvas-generated pixel art, no external files)
-     7. Renderer: DDA raycast walls with PER-COLUMN TEXTURE SAMPLING + z-buffer
-                  + billboard sprites projected from WORLD coords only
-     8. Minimap (toggle M)
-     9. HUD + reticle + popups + pickup flash + exit glow
-    10. Gameplay: pickups, handoff w/ cooldown + reticle + needs feedback,
-        quota -> exit -> upgrade choice -> next district
-    11. Update loop
-    12. Overlays (start / pause-help / upgrade / game over)
-    13. Main loop
-
-   DEBUG: append ?debug to the URL for a diagnostic overlay.
+   DEBUG: ?debug ?layoutdebug=1 ?touchdebug=1 ?mobile=on
    ========================================================================== */
 
 // Lightweight runtime error capture for verification/debugging; empty in normal play.
@@ -262,7 +272,7 @@ window.addEventListener('unhandledrejection', e=>{
 });
 
 // ---------------------------------------------------------------------------
-// 0. CANVAS / RESOLUTION
+// SECTION 0 — CANVAS / RESOLUTION
 // ---------------------------------------------------------------------------
 const view = document.getElementById('view');
 const ctx  = view.getContext('2d');
@@ -272,7 +282,7 @@ const bctx = buf.getContext('2d');
 const zbuffer = new Float32Array(RW);          // per-column wall distance (sprite occlusion)
 
 // ---------------------------------------------------------------------------
-// FULLSCREEN API HELPERS
+// SECTION 0b — FULLSCREEN API HELPERS
 // ---------------------------------------------------------------------------
 let _resizeTimer = null;
 function _debouncedResize(){
@@ -397,7 +407,7 @@ if(window.visualViewport){
 resize();
 
 // ---------------------------------------------------------------------------
-// DEBUG FLAG
+// SECTION 0c — DEBUG FLAG
 // ---------------------------------------------------------------------------
 const DEBUG = new URLSearchParams(location.search).has('debug');
 const _forcePortraitLayout = new URLSearchParams(location.search).get('portraitlayout') === '1';
@@ -405,7 +415,7 @@ const dbg = { cansSpawned:0, npcsSpawned:0, invalidPlacements:0,
               spritesSkipped:0, reachableCells:0, rejectedSpawns:0, props:0 };
 
 // ---------------------------------------------------------------------------
-// 1. SEEDED RNG (mulberry32)
+// SECTION 1 — SEEDED RNG (mulberry32)
 // ---------------------------------------------------------------------------
 function mulberry32(a){
   return function(){
@@ -418,7 +428,7 @@ function mulberry32(a){
 let RNG = mulberry32(12345);
 
 // ---------------------------------------------------------------------------
-// 2. GAME STATE
+// SECTION 2 — GAME STATE
 // ---------------------------------------------------------------------------
 const STATE = { TITLE:'title', SEEDED:'seeded', STATS:'stats', LB:'lb', OPTIONS:'options',
                 PLAY:'play', UPGRADE:'upgrade', RESULTS:'results' };
@@ -462,7 +472,7 @@ const cfg = {
 };
 
 // -----------------------------------------------------------------------
-// MOBILE / TOUCH INPUT
+// SECTION 2b — MOBILE / TOUCH INPUT
 // -----------------------------------------------------------------------
 // input abstraction: readable by game code, populated by kbd+mouse+touch
 const inp = {
@@ -471,7 +481,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'dvh1';
+const BUILD_ID = 'touch1';
 const IS_FILE_ORIGIN = (typeof location !== 'undefined' && location.protocol === 'file:');
 const FILE_ORIGIN_SAVE_NOTE = 'Local file mode: saves may not persist. Use GitHub Pages for reliable saves.';
 function fileOriginMenuNoteHTML(){
@@ -1126,6 +1136,18 @@ function bindMobileControls(){
     }
   },{passive:false});
 
+  document.addEventListener('touchcancel', e=>{
+    for(const t of e.changedTouches){
+      if(t.identifier === joy.id){ endJoy(); }
+      if(t.identifier === tzone.id){ tzone.active=false; tzone.id=null; }
+      if(t.identifier === lookTouch.id){
+        lookTouch.id = null; lookTouch.lastX = 0;
+        const lpadEl = document.getElementById('mlookpad');
+        if(lpadEl) lpadEl.classList.remove('pr');
+      }
+    }
+  },{passive:false});
+
   const portplay = document.getElementById('portplay');
   if(portplay){
     portplay.addEventListener('click', e=>{
@@ -1207,7 +1229,7 @@ function syncInpFromJoy(){
 }
 
 // -----------------------------------------------------------------------
-// RESPONSIVE MOBILE MENU (HTML overlay for small/coarse screens)
+// SECTION 2c — RESPONSIVE MOBILE MENU (HTML overlay)
 // -----------------------------------------------------------------------
 let _rmSel = 0;
 let _optionsMenuStamp = 0;
@@ -1519,12 +1541,12 @@ function drawMobileMenu(){
 }
 
 // -----------------------------------------------------------------------
-// MOBILE INIT (called once; mode sync happens after saved options load)
+// SECTION 2d — MOBILE INIT
 // -----------------------------------------------------------------------
 bindMobileControls();
 
 // -----------------------------------------------------------------------
-// 3. CITY GENERATION  (logic preserved; wall-type variety expanded for GJ feel)
+// SECTION 3 — CITY GENERATION
 // -----------------------------------------------------------------------
 // Wall type constants. BUILDING=tan stucco, GLASS=storefront glass.
 const WALL = { BUILDING:1, BRICK:2, FENCE:3, MURAL:4, VAN:5, GLASS:6,
@@ -1692,7 +1714,7 @@ function genCity(seed, district, modifier){
 }
 
 // ---------------------------------------------------------------------------
-// CUSTOM LEVELS — fixed rectangular maps (normal run rules; genCity unchanged)
+// SECTION 3b — CUSTOM LEVELS
 // ---------------------------------------------------------------------------
 const CUSTOM_LEVELS = {
   hall_of_servants: {
@@ -1886,7 +1908,7 @@ function pickHallThankLine(npc){
 }
 
 // ---------------------------------------------------------------------------
-// 4. COLLISION / WALK HELPERS  (UNCHANGED from verified base)
+// SECTION 4 — COLLISION / WALK HELPERS
 // ---------------------------------------------------------------------------
 function isWalkableCell(tx, ty){
   if(ty<0||ty>=game.MAP_H||tx<0||tx>=game.MAP_W) return false;
@@ -1926,7 +1948,7 @@ function beep(freq,dur,type='square',gain=0.04){
 }
 
 // ---------------------------------------------------------------------------
-// 5b. LOCAL PERSISTENCE (localStorage with schema/version, safe parse)
+// SECTION 5b — LOCAL PERSISTENCE
 // file:// origins may block or quota-limit localStorage — lsGet/lsSet catch errors (no throw).
 // ---------------------------------------------------------------------------
 const SAVE_VERSION = 1;
@@ -2242,7 +2264,7 @@ const SAVE = {
 addEventListener('beforeunload', ()=>{ if(state===STATE.PLAY && game.run.active) SAVE.save(); });
 
 // ---------------------------------------------------------------------------
-// 6. PROCEDURAL ASSETS  (wall textures + sprites + sky/mesa — all Canvas-drawn)
+// SECTION 6 — PROCEDURAL ASSETS
 // ---------------------------------------------------------------------------
 function newTex(w,h){ const c=document.createElement('canvas'); c.width=w; c.height=h; return c; }
 const TEXSIZE = 64;
@@ -2544,7 +2566,7 @@ function buildSky(modifier){
 }
 
 // ---------------------------------------------------------------------------
-// 7. RENDER
+// SECTION 7 — RENDER
 // ---------------------------------------------------------------------------
 function drawScene(now){
   // --- SKY (rebuild only if modifier changed) ---
@@ -2644,8 +2666,9 @@ function drawScene(now){
     const top=bottom-screenH;
     const startCol=Math.floor(screenX-screenW/2);
     const endCol=Math.ceil(screenX+screenW/2);
-    // No sprite fog overlay: even per-column full-height fog draws through transparent
-    // sprite pixels and creates phone-visible rectangular halos. Clean sprites > haze.
+    // SPRITE HALO REGRESSION GUARD — no full-rect sprite fog overlay.
+    // Per-column or bbox fillRect fog draws through transparent sprite pixels and
+    // creates phone-visible rectangular halos. Walls own distance fog; sprites stay clean.
     for(let col=startCol; col<endCol; col++){
       if(col<0||col>=RW) continue;
       if(depth >= zbuffer[col]) continue;   // OCCLUSION GUARD: per-column zbuffer vs sprite depth
@@ -2661,7 +2684,7 @@ function drawScene(now){
 }
 
 // ---------------------------------------------------------------------------
-// 8. MINIMAP
+// SECTION 8 — MINIMAP
 // ---------------------------------------------------------------------------
 // showMinimap declared earlier (before persistence module)
 let portraitMinimapDrawCache = null;
@@ -2773,7 +2796,7 @@ function drawMinap(){
 }
 
 // ---------------------------------------------------------------------------
-// 9. HUD + RETICLE + POPUPS
+// SECTION 9 — HUD + RETICLE + POPUPS
 // ---------------------------------------------------------------------------
 function staminaBar(){
   const block = mobileSprintCost();
@@ -2895,7 +2918,7 @@ function drawHUD(now){
 }
 
 // ---------------------------------------------------------------------------
-// 10. GAMEPLAY ACTIONS  (logic unchanged; added flash/radar-ring effects)
+// SECTION 10 — GAMEPLAY ACTIONS
 // ---------------------------------------------------------------------------
 function addPopup(text,color,life){
   const t = (life===undefined||life===null) ? 1.0 : life;
@@ -3008,7 +3031,7 @@ function updateAim(){
 }
 
 // ---------------------------------------------------------------------------
-// 11. UPDATE + INPUT
+// SECTION 11 — UPDATE + INPUT
 // ---------------------------------------------------------------------------
 const keys={};
 
@@ -3483,7 +3506,7 @@ function completeRun(){
 }
 
 // ---------------------------------------------------------------------------
-// 12. OVERLAYS
+// SECTION 12 — OVERLAYS
 // ---------------------------------------------------------------------------
 function dim(){ ctx.fillStyle='rgba(0,0,0,0.74)'; ctx.fillRect(0,0,innerWidth,innerHeight); }
 function big(t,x,y,c){ ctx.font='40px monospace'; ctx.fillStyle=c||'#fff'; ctx.textAlign='center'; ctx.fillText(t,x,y); ctx.textAlign='left'; }
@@ -3839,7 +3862,7 @@ addEventListener('keydown',e=>{
 });
 
 // ---------------------------------------------------------------------------
-// 13. MAIN LOOP
+// SECTION 13 — MAIN LOOP
 // ---------------------------------------------------------------------------
 // Portrait gameplay area: fixed landscape-aspect window at top, controls below.
 // The gameplay is a horizontal 320×200 view sitting in the upper portion of the
@@ -4198,6 +4221,31 @@ function getMinimapAlignProof(){
   };
 }
 
+
+function getTouchActionProof(){
+  const cs = id=>{
+    const el = document.getElementById(id);
+    if(!el) return null;
+    return getComputedStyle(el).touchAction;
+  };
+  const rmenu = document.getElementById('rmenu');
+  const optionsPanY = rmenu && rmenu.classList.contains('options-tune');
+  return {
+    BUILD_ID,
+    viewportMeta: document.querySelector('meta[name=viewport]')?.getAttribute('content') || null,
+    bodyTouchAction: getComputedStyle(document.body).touchAction,
+    view: cs('view'),
+    mob: cs('mob'),
+    ml: cs('ml'),
+    mlookpad: cs('mlookpad'),
+    mr: cs('mr'),
+    rmenu: rmenu ? getComputedStyle(rmenu).touchAction : null,
+    rmenuOptionsTune: optionsPanY,
+    rmenuExpected: optionsPanY ? 'pan-y' : 'none',
+    gameplaySurfacesNone: ['view','ml','mlookpad','mr'].every(id=>cs(id)==='none'),
+    documentTouchcancelBound: true,
+  };
+}
 function getControlDockRectProof(){
   const { cw, ch } = layoutCssSize();
   const snap = y=>{
@@ -4266,6 +4314,34 @@ function getControlDockRectProof(){
   };
 }
 
+function getSpriteHaloRegressionProof(){
+  const forbidden = [
+    'distance fog on sprite',
+    'const sf = Math.min',
+    'if(sf>0.02)',
+    'bctx.fillRect(c0, top',
+  ];
+  const required = [
+    'SPRITE HALO REGRESSION GUARD',
+    'no full-rect sprite fog',
+    'phone-visible rectangular halos',
+  ];
+  const src = typeof drawScene === 'function' ? String(drawScene) : '';
+  const forbiddenHits = forbidden.filter(p=> src.includes(p));
+  const requiredMissing = required.filter(p=> !src.includes(p));
+  const spriteLoopOk = forbiddenHits.length === 0 && requiredMissing.length === 0;
+  return {
+    BUILD_ID,
+    policy: 'walls own distance fog; billboards drawImage only — no post-loop sprite fog fillRect',
+    forbiddenPatternsAbsent: forbiddenHits.length === 0,
+    forbiddenHits,
+    requiredMarkersPresent: requiredMissing.length === 0,
+    requiredMissing,
+    spriteLoopOk,
+    regressionCommentMarker: 'SPRITE HALO REGRESSION GUARD',
+  };
+}
+
 function getOcclusionZbufferProof(){
   const colSkip = (spriteDepth, wallDist)=> spriteDepth >= wallDist;
   const samples = [
@@ -4317,7 +4393,7 @@ globalThis.CR = window.CR = {
   set paused(v){ paused=!!v; },
   get mobileMode(){ return mobileMode; },
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
-  setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,getMinimapAlignProof,getOcclusionZbufferProof,rectsOverlap,
+  setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,getMinimapAlignProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
   editRunnerName,applyMobileControlSettings,mobileSprintCost,mobileSprintBurstSec,
   toggleFullscreen,isFullscreen,enterFullscreen,exitFullscreen,
 };
