@@ -14,12 +14,14 @@ Last updated: Community street punk decor props (`props1`).
 | **Prior** | `controledit1` / `controls1` |
 | **Sound baseline** | `sound1` / `d06b2ee` |
 
+**CI (props1 gameplay):** [SNC Can Run Selfcheck run 28292488544](https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28292488544) — `success` on `6adc981`, artifact `snc-can-run-proof-artifacts`.
+
 ## URLs
 
-- **Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=8ef75ad&mobile=on&portraitlayout=1  
-- **Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=8ef75ad&mobile=on&portraitlayout=1  
+- **Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=6adc981&mobile=on&portraitlayout=1  
+- **Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=6adc981&mobile=on&portraitlayout=1  
 
-*(Cache-bust with `8ef75ad` — see `reports/guards/OPTIONS_CLEANUP_PASS_REPORT.md`.)*
+*(Cache-bust with `6adc981` — see `reports/guards/COMMUNITY_STREET_PUNK_PROP_PASS_REPORT.md`.)*
 
 ## Completed cards (order)
 
@@ -49,4 +51,4 @@ Last updated: Community street punk decor props (`props1`).
 
 ## Blockers
 
-- None known after local harness + GitHub Actions CI pass on `8ef75ad`.
+- None known after local harness + GitHub Actions CI pass on verified `props1` commit `6adc981`.
