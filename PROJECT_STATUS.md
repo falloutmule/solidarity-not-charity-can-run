@@ -1,25 +1,26 @@
 # Project status — Solidarity Not Charity Can Run
 
-Last updated: sound / feedback pass (`sound1`).
+Last updated: sound / feedback pass closed (`sound1` / `d06b2ee`).
 
 Reports were moved into **`reports/`** to keep the GitHub root readable. Index: **`reports/README.md`**; guard write-ups: **`reports/guards/`**.
 
-**CI:** `.github/workflows/selfcheck.yml` runs `npm run test:selfcheck` on push/PR to `main`.
+**CI:** `.github/workflows/selfcheck.yml` runs `npm run test:selfcheck` on push/PR to `main`. Latest selfcheck: **success** — https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28268576866 (artifact **`snc-can-run-proof-artifacts`**).
 
 ## Gameplay baseline
 
 | | |
 |--|--|
 | **BUILD_ID** (root `index.html`) | `sound1` |
+| **Gameplay commit** | `d06b2ee` |
 | **Prior gameplay baseline** | `visualfix1` / `fd487c2` |
 | **Handoff reference baseline** | `onboard1` / `aaaf901` |
 
 ## URLs
 
-- **Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=<COMMIT>&mobile=on&portraitlayout=1  
-- **Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=<COMMIT>&mobile=on&portraitlayout=1  
+- **Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=d06b2ee&mobile=on&portraitlayout=1  
+- **Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=d06b2ee&mobile=on&portraitlayout=1  
 
-*(Cache-bust with gameplay commit short SHA — see `reports/guards/SOUND_FEEDBACK_PASS_REPORT.md`.)*
+*(Cache-bust with `d06b2ee` — see `reports/guards/SOUND_FEEDBACK_PASS_REPORT.md`.)*
 
 ## Completed cards (order)
 
@@ -35,7 +36,7 @@ Reports were moved into **`reports/`** to keep the GitHub root readable. Index: 
 10. **Onboarding / first-run help** — `onboard1`, `CR.runOnboardingSelfCheck`  
 11. **Visual readability polish** — `visual1`, `CR.runVisualReadabilitySelfCheck`  
 12. **Visual rectangle regression fix** — `visualfix1`, `CR.runVisualRectangleRegressionSelfCheck`  
-13. **Sound / feedback pass** — `sound1`, `CR.runSoundFeedbackSelfCheck`
+13. **Sound / feedback pass** — `sound1` / `d06b2ee`, `CR.runSoundFeedbackSelfCheck` — **closed**
 
 ## Next likely work
 
@@ -44,4 +45,4 @@ Reports were moved into **`reports/`** to keep the GitHub root readable. Index: 
 
 ## Blockers
 
-- None known after local harness pass; confirm GitHub Actions on latest push.
+- None known after local harness + GitHub Actions CI pass on `d06b2ee`.

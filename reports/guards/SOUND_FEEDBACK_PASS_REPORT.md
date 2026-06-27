@@ -1,8 +1,10 @@
 # Sound / feedback pass — SNC Can Run
 
+**Card closed:** 2026-06-26 — CI green on **`d06b2ee`**.
+
 ## WHAT WAS DONE
 
-- Backup: `index.before-sound-feedback-pass.html` (repo root, 2026-06-26).
+- Backup: `index.before-sound-feedback-pass.html` (repo root, local; gitignored).
 - **BUILD_ID** `visualfix1` → **`sound1`**.
 - Added **`CR_SOUND_FEEDBACK`** contract and procedural cue table (`_SOUND_CUE_DEFS`).
 - **`crTriggerSoundCue`**, **`crSoundEnabled`**, **`crSoundFeedbackCueIds`** — Web Audio oscillator beeps only; no external audio files.
@@ -16,21 +18,23 @@
 ## WHAT WAS VERIFIED
 
 - **Static:** single-file `index.html`; no external runtime assets; no `<audio>` tags; title **Solidarity Not Charity Can Run**.
-- **Gameplay:** layout/controls/MENU/minimap/Hall/map/movement/save unchanged; visual readability contract **`visualfix1`** retained; screen path stripe still off.
-- **Harness:** `npm run test:selfcheck` → **`pass: true`** (local).
+- **Gameplay unchanged:** portrait layout shell, control dock, MENU/minimap placement, Hall E2E, procedural map gen, movement/collision, reachability, full-run progression, **SAVE_VERSION** / save-load format — only additive sound/HUD feedback and options **`soundOn`** field.
+- **Visual:** **`CR_VISUAL_READABILITY`** style **`visualfix1`** retained; screen path stripe still off; rectangle regression still gated on **`BUILD_ID sound1`**.
+- **Harness (local):** `npm run test:selfcheck` → **`pass: true`**.
+- **Harness (CI):** workflow **SNC Can Run Selfcheck** — **success** on push **`d06b2ee`**.
 - Gates: full selfcheck, sound feedback, visual rectangle, visual readability, onboarding, full-run E2E, mobile controls, movement, reachability, multiseed, Hall, isolation, render guard, no external requests.
 
 ## WHAT FAILED
 
-- Nothing on local harness for this card.
+- Nothing for this card (local + CI).
 
 ## CURRENT EXACT STATE
 
 | Field | Value |
 |-------|--------|
 | **BUILD_ID** | `sound1` |
+| **Gameplay commit** | `d06b2ee` (`d06b2eec530dcaa82a3eff2caf5196a05fd3b21e`) |
 | **Prior baseline** | `visualfix1` / `fd487c2` |
-| **Gameplay commit** | *(set after push — see EVIDENCE)* |
 | **Web Audio** | Yes (generated tones only) |
 | **Sound toggle** | Yes — OPTIONS **SOUND ON/OFF** |
 | **Save format** | Unchanged |
@@ -38,22 +42,24 @@
 
 ## REMAINING BLOCKERS
 
-- None locally. Await GitHub Actions on pushed commit.
+- None.
 
 ## NEXT ACTIONABLE STEP
 
-- Confirm CI green + proof artifact **`snc-can-run-proof-artifacts`** on pushed SHA.
+- None for this card. New work only when explicitly requested.
 
 ## EVIDENCE
 
-- **Backup:** `index.before-sound-feedback-pass.html`
-- **Proof JSON:** `proof-sound-feedback.json`, `proof-sound-feedback-selfcheck.json`
+- **Gameplay commit:** `d06b2ee`
+- **Proof JSON (local / CI artifact):** `proof-sound-feedback.json`, `proof-sound-feedback-selfcheck.json`, `proof-playwright-summary.json` (includes `soundFeedback` section)
 - **Proof PNGs:** `proof-feedback-can.png`, `proof-feedback-exit-ready.png`, `proof-feedback-give-blocked.png`, `proof-feedback-district-complete.png`
 - **Local harness:** `npm run test:selfcheck` → `{"pass":true}`
-- **GitHub Actions:** *(URL after push)*
-- **Artifact:** `snc-can-run-proof-artifacts`
-- **Play URL:** `https://falloutmule.github.io/solidarity-not-charity-can-run/?v=<COMMIT>&mobile=on&portraitlayout=1`
-- **Self-check URL:** `https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=<COMMIT>&mobile=on&portraitlayout=1`
+- **GitHub Actions:** https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28268576866  
+  - Job: **selfcheck** — success (~1m47s)  
+  - **headSha:** `d06b2eec530dcaa82a3eff2caf5196a05fd3b21e`
+- **Artifact (confirmed on run):** **`snc-can-run-proof-artifacts`** — uploaded from `selfcheck` job (`actions/upload-artifact@v5`)
+- **Play URL:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=d06b2ee&mobile=on&portraitlayout=1
+- **Self-check URL:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=d06b2ee&mobile=on&portraitlayout=1
 
 ### Feedback cues added
 
