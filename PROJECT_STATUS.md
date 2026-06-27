@@ -9,16 +9,18 @@ Last updated: Prop readability polish (`propsread1`).
 | | |
 |--|--|
 | **BUILD_ID** (root `index.html`) | `propsread1` |
-| **Gameplay commit** | *(pending push)* |
+| **Gameplay commit** | `e6f6af6` |
 | **Prior BUILD_ID** | `props1` / `6adc981` |
 | **Prior** | `optionsclean1` / `8ef75ad` |
 
+**CI (propsread1):** [SNC Can Run Selfcheck run 28294528895](https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28294528895) — `success` on `4eabb49`, artifact `snc-can-run-proof-artifacts`.
+
 ## URLs
 
-- **Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=**COMMIT**&mobile=on&portraitlayout=1  
-- **Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=**COMMIT**&mobile=on&portraitlayout=1  
+- **Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=e6f6af6&mobile=on&portraitlayout=1  
+- **Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=e6f6af6&mobile=on&portraitlayout=1  
 
-*(Replace **COMMIT** with gameplay SHA after push; see `reports/guards/PROP_READABILITY_POLISH_REPORT.md`.)*
+*(Cache-bust with `e6f6af6` — see `reports/guards/PROP_READABILITY_POLISH_REPORT.md`.)*
 
 ## Completed cards (order)
 
