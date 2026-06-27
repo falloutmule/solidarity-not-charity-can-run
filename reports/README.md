@@ -1,7 +1,7 @@
 # Reports — SNC Can Run
 
 Main hub for guard cards, reference studies, history, proofs, and backups.  
-**Gameplay baseline:** `propsread1` — see **`../PROJECT_STATUS.md`**.
+**Gameplay baseline:** `street1` — see **`../PROJECT_STATUS.md`**.
 
 Reports were moved out of the repo root so GitHub shows only the game + core docs.
 
@@ -34,6 +34,7 @@ Reports were moved out of the repo root so GitHub shows only the game + core doc
 | 21 | OPTIONS cleanup | [guards/OPTIONS_CLEANUP_PASS_REPORT.md](guards/OPTIONS_CLEANUP_PASS_REPORT.md) | `optionsclean1` / `8ef75ad` | `CR.runOptionsCleanupSelfCheck` + `proof-options-cleanup.json` | Yes (menu only) |
 | 22 | Community street punk decor props | [guards/COMMUNITY_STREET_PUNK_PROP_PASS_REPORT.md](guards/COMMUNITY_STREET_PUNK_PROP_PASS_REPORT.md) | `props1` / `6adc981` | `CR.runDecorativePropsSelfCheck` + `proof-decorative-props.json` | Yes (decor only) |
 | 23 | Prop readability polish | [guards/PROP_READABILITY_POLISH_REPORT.md](guards/PROP_READABILITY_POLISH_REPORT.md) | `propsread1` | `CR.runDecorativePropsSelfCheck` + proof PNGs | Yes (decor art only) |
+| 24 | Street-block level grammar | [guards/STREET_BLOCK_LEVEL_GRAMMAR_REPORT.md](guards/STREET_BLOCK_LEVEL_GRAMMAR_REPORT.md) | `street1` / `3cb957a` | `CR.runStreetBlockLevelSelfCheck` + street proof PNGs | Yes (procedural layout) |
 
 ---
 

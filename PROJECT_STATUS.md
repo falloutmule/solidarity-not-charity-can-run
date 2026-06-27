@@ -1,6 +1,6 @@
 # Project status — Solidarity Not Charity Can Run
 
-Last updated: Prop readability polish (`propsread1`).
+Last updated: Street-block level grammar (`street1`).
 
 **CI:** `.github/workflows/selfcheck.yml` runs `npm run test:selfcheck` on push/PR to `main`.
 
@@ -8,19 +8,19 @@ Last updated: Prop readability polish (`propsread1`).
 
 | | |
 |--|--|
-| **BUILD_ID** (root `index.html`) | `propsread1` |
-| **Gameplay commit** | `e6f6af6` |
-| **Prior BUILD_ID** | `props1` / `6adc981` |
-| **Prior** | `optionsclean1` / `8ef75ad` |
+| **BUILD_ID** (root `index.html`) | `street1` |
+| **Gameplay commit** | `3cb957a` |
+| **Prior BUILD_ID** | `propsread1` / `e6f6af6` |
+| **Prior** | `props1` / `6adc981` |
 
-**CI (propsread1):** [SNC Can Run Selfcheck run 28294528895](https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28294528895) — `success` on `4eabb49`, artifact `snc-can-run-proof-artifacts`.
+**CI (street1):** [SNC Can Run Selfcheck run 28295099113](https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28295099113) — `success` on `3cb957a`, artifact `snc-can-run-proof-artifacts`.
 
 ## URLs
 
-- **Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=e6f6af6&mobile=on&portraitlayout=1  
-- **Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=e6f6af6&mobile=on&portraitlayout=1  
+- **Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=3cb957a&mobile=on&portraitlayout=1  
+- **Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=3cb957a&mobile=on&portraitlayout=1  
 
-*(Cache-bust with `e6f6af6` — see `reports/guards/PROP_READABILITY_POLISH_REPORT.md`.)*
+*(Cache-bust with `3cb957a` — see `reports/guards/STREET_BLOCK_LEVEL_GRAMMAR_REPORT.md`.)*
 
 ## Completed cards (order)
 
@@ -42,13 +42,14 @@ Last updated: Prop readability polish (`propsread1`).
 16. **EDIT CONTROLS resize** — `controlsresize1` — **closed**  
 17. **OPTIONS cleanup** — `optionsclean1`, `CR.runOptionsCleanupSelfCheck` — **closed**  
 18. **Community street punk decor props** — `props1`, `CR.runDecorativePropsSelfCheck` — **closed**  
-19. **Prop readability polish** — `propsread1`, `CR.runDecorativePropsSelfCheck` — **closed** (local harness)
+19. **Prop readability polish** — `propsread1`, `CR.runDecorativePropsSelfCheck` — **closed**  
+20. **Street-block level grammar** — `street1`, `CR.runStreetBlockLevelSelfCheck` — **closed**
 
 ## Next likely work
 
-- Level design card (explicit handoff only).  
+- Further level pressure (moving blockers, timers) — explicit handoff only.  
 - Optional: modular `src/` **only after** proven build parity to single-file artifact.
 
 ## Blockers
 
-- None known after local `npm run test:selfcheck` PASS on `propsread1` (await CI on push).
+- None known after local + CI `npm run test:selfcheck` PASS on `street1`.
