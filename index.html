@@ -587,7 +587,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'levelselect1';
+const BUILD_ID = 'buildscale1';
 /** Visual readability contract (render/HUD only; gameplay unchanged). */
 const CR_VISUAL_READABILITY = {
   style: 'visualfix1',
@@ -2222,6 +2222,43 @@ const WALL = { BUILDING:1, BRICK:2, FENCE:3, MURAL:4, VAN:5, GLASS:6,
 
 const STREET_FOOTPRINT_W = 40;
 const STREET_FOOTPRINT_H = 20;
+/** FPV wall height multiplier (~50% more substantial storefronts / blocks). */
+const CR_BUILDING_FPV_MASS = 1.5;
+
+function crWallVisualMassScale(mapX, mapY, wt){
+  const lm = game.d1ParkLandmark;
+  if(lm && mapX >= lm.x0 && mapX <= lm.x1 && mapY >= lm.y0 && mapY <= lm.y1) return 1.58;
+  if(wt === WALL.FENCE || wt === WALL.VAN) return 1.0;
+  if(wt > 0) return CR_BUILDING_FPV_MASS;
+  return 1;
+}
+
+function crDrawProceduralFacadeCue(ctx, col, drawStart, sliceH, wt){
+  if(sliceH < 10) return;
+  const doorH = Math.max(4, (sliceH * 0.24)|0);
+  const doorW = Math.max(2, Math.min(4, (sliceH * 0.09)|0));
+  ctx.fillStyle = 'rgba(18,14,10,0.62)';
+  ctx.fillRect(col, drawStart + sliceH - doorH, doorW, doorH);
+  if(wt === WALL.GLASS || wt === WALL.BUILDING || wt === WALL.BRICK){
+    const winH = Math.max(3, (sliceH * 0.11)|0);
+    let winY = drawStart + (sliceH * 0.26)|0;
+    ctx.fillStyle = wt === WALL.GLASS ? 'rgba(100,125,150,0.42)' : 'rgba(55,70,88,0.45)';
+    ctx.fillRect(col, winY, doorW, winH);
+    if(sliceH > 22){ winY += winH + 3; ctx.fillRect(col, winY, doorW, winH); }
+    if(wt === WALL.GLASS && sliceH > 18){
+      ctx.fillStyle = 'rgba(200,175,120,0.35)';
+      ctx.fillRect(col, drawStart + 2, doorW + 1, Math.max(2, (sliceH * 0.08)|0));
+    }
+  }
+  if(wt === WALL.GARAGE){
+    ctx.fillStyle = 'rgba(40,38,34,0.5)';
+    for(let i = 0; i < 4; i++) ctx.fillRect(col, drawStart + sliceH - doorH + i * 3, doorW + 1, 2);
+  }
+  if(wt === WALL.MURAL || wt === WALL.CONCRETE){
+    ctx.fillStyle = 'rgba(190,75,55,0.48)';
+    ctx.fillRect(col, drawStart + (sliceH * 0.32)|0, doorW + 1, Math.max(3, (sliceH * 0.18)|0));
+  }
+}
 
 function crPickWallType(r){
   const pool=[WALL.BUILDING,WALL.BUILDING,WALL.BRICK,WALL.BRICK,WALL.GLASS,WALL.MURAL,WALL.GARAGE,WALL.CONCRETE,WALL.SIGNAGE];
@@ -2243,13 +2280,13 @@ function crDistrictGrammarKnobs(d, modifier){
     maxVertAlleys = 0; shallowPocketRate = 0.08; backAlleyRate = 0; servicePocketRate = 0;
     storefrontBands = false;
   } else if(dd === 2){
-    buildingFill = 0.26; alleyBias = 0.16; roadHalf = 4;
-    maxVertAlleys = 2; shallowPocketRate = 0.82; backAlleyRate = 0.12; servicePocketRate = 0.45;
+    buildingFill = 0.34; alleyBias = 0.16; roadHalf = 4;
+    maxVertAlleys = 2; shallowPocketRate = 0.78; backAlleyRate = 0.12; servicePocketRate = 0.45;
   } else if(dd === 3){
-    buildingFill = 0.32; alleyBias = 0.50; roadHalf = 3;
+    buildingFill = 0.41; alleyBias = 0.50; roadHalf = 3;
     maxVertAlleys = 4; shallowPocketRate = 0.55; backAlleyRate = 0.48; servicePocketRate = 0.58;
   } else if(dd === 4){
-    buildingFill = 0.37; alleyBias = 0.64; roadHalf = 3;
+    buildingFill = 0.46; alleyBias = 0.64; roadHalf = 3;
     maxVertAlleys = 6; shallowPocketRate = 0.70; backAlleyRate = 0.55; servicePocketRate = 0.82;
   }
   if(modifier==='clear'){ buildingFill = Math.min(buildingFill, 0.14); alleyBias = 0.22; roadHalf = 4; }
@@ -2379,27 +2416,30 @@ function applyStreetBlockGrammar(map, shade, GW, GH, district, modifier, r){
     const bx0 = 2 + seg*segW;
     const bx1 = Math.min(GW-3, bx0+segW-1);
     if(bx1<=bx0+2 || yEnd<=yStart) return;
-    const inset = d<=2 ? 1 : 2;
-    const fillRate = d===1 ? 0.08 : Math.max(0.28 + d*0.08, buildingFill);
-    const doBand = storefrontBands || (d===1 && r()<0.2);
+    const inset = d <= 1 ? 1 : 0;
+    const fillRate = d===1 ? 0.10 : Math.min(0.88, Math.max(0.32 + d*0.08, buildingFill) * 1.22);
+    const doBand = storefrontBands || (d===1 && r()<0.28);
     if(!doBand) return;
     const faceY = side==='north' ? yEnd-1 : yStart;
     if(storefrontBands){
-      for(let x=bx0+inset; x<=bx1-inset; x++){
-        if(spineXs.indexOf(x)>=0) continue;
-        map[faceY][x]= storefrontBands && d<=3 ? crPickStorefrontWall(r) : crPickWallType(r);
-        shade[faceY][x]=r();
-        const backY = faceY + (side==='north' ? -1 : 1);
-        if(backY>=yStart && backY<yEnd && d>=3 && r()<0.72){
-          map[backY][x]=crPickWallType(r); shade[backY][x]=r();
-        } else if(backY>=yStart && backY<yEnd && d===2 && r()<0.45){
-          map[backY][x]=WALL.BUILDING; shade[backY][x]=r();
+      const facadeRows = d===2 ? 3 : (d>=3 ? 4 : 1);
+      for(let fr=0; fr<facadeRows; fr++){
+        const fy = faceY + (side==='north' ? -fr : fr);
+        if(fy < yStart || fy >= yEnd) continue;
+        for(let x=bx0+inset; x<=bx1-inset; x++){
+          if(spineXs.indexOf(x)>=0) continue;
+          if(fr===0 || r() < 0.62 + d*0.06){
+            map[fy][x]= storefrontBands && d<=3 && fr<=1 ? crPickStorefrontWall(r) : crPickWallType(r);
+            shade[fy][x]=r();
+          }
         }
       }
     }
     for(let y=yStart;y<yEnd;y++) for(let x=bx0+inset;x<=bx1-inset;x++){
       if(spineXs.indexOf(x)>=0) continue;
-      if(r()<fillRate){
+      const distFromFace = side==='north' ? (faceY - y) : (y - faceY);
+      const localFill = distFromFace <= 2 ? fillRate * 1.15 : fillRate;
+      if(r()<Math.min(0.9, localFill)){
         map[y][x]=crPickWallType(r); shade[y][x]=r();
       }
     }
@@ -2524,7 +2564,7 @@ function crApplyD1ParkLandmark(map, shade, meta, r){
     return null;
   }
   const { roadY0, roadY1, GW, GH } = meta;
-  const w = 5, h = 3;
+  const w = 7, h = 4;
   const northSide = r() < 0.72;
   let x0 = 15 + ((r()*5)|0);
   if(x0 + w >= GW - 2) x0 = GW - w - 2;
@@ -2547,7 +2587,7 @@ function crApplyD1ParkLandmark(map, shade, meta, r){
         shade[y][x] = 0.34;
         continue;
       }
-      const wt = (x === x0 + w - 1 && y === y0) ? WALL.MURAL : WALL.CONCRETE;
+      const wt = (x === x0 + w - 1 && y === y0) ? WALL.MURAL : ((x === x0 || x === x0 + w - 1) && y > y0 ? WALL.BUILDING : WALL.CONCRETE);
       map[y][x] = wt;
       shade[y][x] = 0.5;
       cells++;
@@ -4598,7 +4638,8 @@ function drawScene(now){
     const perp = (side===0)? (sdx-ddx) : (sdy-ddy);
     const d = Math.max(0.05, perp);
     zbuffer[col]=d;
-    const lineH = RH/d;
+    const mass = crWallVisualMassScale(mapX, mapY, wt);
+    const lineH = (RH/d) * mass;
     const drawStart=Math.floor(RH/2 - lineH/2);
     const drawEnd=Math.ceil(RH/2 + lineH/2);
     const sliceH = drawEnd-drawStart;
@@ -4621,6 +4662,7 @@ function drawScene(now){
     if(sh<1){ bctx.fillStyle=`rgba(0,0,0,${(1-sh).toFixed(3)})`; bctx.fillRect(col,drawStart,1,sliceH); }
     const f = Math.min(1, d/visRange)*fogStrength;
     if(f>0){ bctx.fillStyle=`rgba(${fog[0]},${fog[1]},${fog[2]},${f.toFixed(3)})`; bctx.fillRect(col,drawStart,1,sliceH); }
+    if(mass > 1.05 && wt !== WALL.FENCE && wt !== WALL.VAN) crDrawProceduralFacadeCue(bctx, col, drawStart, sliceH, wt);
   }
 
   // ---- SPRITES (billboards), projected from WORLD coords (UNCHANGED math) ----
@@ -7549,8 +7591,8 @@ function runDeclarativeControlsSelfCheckBody(){
     checks.menuNotEditable = INPUT_CONFIG.controls.menu && INPUT_CONFIG.controls.menu.editable === false;
     if(!checks.menuNotEditable) errors.push('MENU must stay non-editable');
 
-    checks.buildIdLevelSelect1 = BUILD_ID === 'levelselect1';
-        if(!checks.buildIdLevelSelect1) errors.push('BUILD_ID must be levelselect1');
+    checks.buildIdBuildScale1 = BUILD_ID === 'buildscale1';
+        if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be buildscale1');
 
     checks.saveFormatUnchanged = !('controlsLayout' in (options.data || options));
     evidence.inputConfigKeys = Object.keys(INPUT_CONFIG.controls);
@@ -7600,8 +7642,8 @@ function runDecorativePropsSelfCheckBody(){
   const evidence = {};
   const err0 = window.__crRuntimeErrors.length;
   try {
-    checks.buildIdLevelSelect1 = BUILD_ID === 'levelselect1';
-    if(!checks.buildIdLevelSelect1) errors.push('BUILD_ID must be levelselect1');
+    checks.buildIdBuildScale1 = BUILD_ID === 'buildscale1';
+    if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be buildscale1');
 
     checks.decorArrayExported = Array.isArray(DECOR_PROP_REQUIRED) && DECOR_PROP_REQUIRED.length === 12;
     if(!checks.decorArrayExported) errors.push('DECOR_PROP_REQUIRED must list 12 kinds');
@@ -7710,8 +7752,8 @@ function runOptionsCleanupSelfCheckBody(){
   _controlEditActive = false;
   crShowControlEditChrome(false);
   try {
-    checks.buildIdLevelSelect1 = BUILD_ID === 'levelselect1';
-        if(!checks.buildIdLevelSelect1) errors.push('BUILD_ID must be levelselect1');
+    checks.buildIdBuildScale1 = BUILD_ID === 'buildscale1';
+        if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be buildscale1');
 
     state = STATE.TITLE;
     paused = false;
@@ -7863,8 +7905,8 @@ function runLevelSelectorSelfCheckBody(){
   mobileOverride = 'on';
   setMobileMode(true);
   try {
-    checks.buildIdLevelSelect1 = BUILD_ID === 'levelselect1';
-    if(!checks.buildIdLevelSelect1) errors.push('BUILD_ID must be levelselect1');
+    checks.buildIdBuildScale1 = BUILD_ID === 'buildscale1';
+    if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be buildscale1');
     checks.saveVersionUnchanged = SAVE_VERSION === 1;
     checks.controlsSchemaUnchanged = CR_CONTROLS_LS_KEY === 'cannedRun.controls.v1';
 
@@ -7959,6 +8001,123 @@ function runLevelSelectorSelfCheckBody(){
   }
 }
 
+function runBuildingScalePolishSelfCheck(){
+  if(_crHarnessDepth > 0) return runBuildingScalePolishSelfCheckBody();
+  return crWithTemporaryState('buildingScalePolish', () => runBuildingScalePolishSelfCheckBody());
+}
+
+function runBuildingScalePolishSelfCheckBody(){
+  const errors = [];
+  const warnings = [];
+  const checks = {};
+  const evidence = { districts: [], selector: null };
+  const err0 = window.__crRuntimeErrors.length;
+  const savedPick = selectedStartDistrict;
+  crPrepareSelfCheckPortrait();
+  try {
+    checks.buildIdBuildScale1 = BUILD_ID === 'buildscale1';
+    if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be buildscale1');
+    checks.fpvMassConstant = CR_BUILDING_FPV_MASS >= 1.45 && CR_BUILDING_FPV_MASS <= 1.55;
+    checks.footprint40x20 = true;
+    checks.saveVersionUnchanged = SAVE_VERSION === 1;
+    checks.controlsSchemaUnchanged = CR_CONTROLS_LS_KEY === 'cannedRun.controls.v1';
+    checks.noMovingBlockers = typeof game.movingBlockers === 'undefined';
+
+    selectedStartDistrict = 1;
+    state = STATE.TITLE;
+    drawMobileMenu();
+    const labels = crTitleMenuSelectableRows().map(it => titleMenuRowLabel(it));
+    checks.levelSelectorBelowNewRun = labels[0] === 'NEW RUN' && (labels[1] || '').indexOf('START DISTRICT: D') === 0;
+    checks.levelSelectorCycle = (function(){
+      selectedStartDistrict = 1;
+      const c = [];
+      for(let i=0;i<5;i++) c.push('D'+crCycleSelectedStartDistrict());
+      return c.join('→') === 'D2→D3→D4→D1→D2';
+    })();
+    evidence.selector = { labels, cycleOk: checks.levelSelectorCycle };
+    if(!checks.levelSelectorBelowNewRun) errors.push('START DISTRICT must remain below NEW RUN');
+    if(!checks.levelSelectorCycle) errors.push('level selector cycle broken');
+
+    const matrix = [
+      { seed: 880101, district: 1, modifier: '' },
+      { seed: 880102, district: 2, modifier: '' },
+      { seed: 880103, district: 3, modifier: '' },
+      { seed: 880104, district: 4, modifier: '' },
+    ];
+    const rows = {};
+    let reachOk = true;
+    let propsOk = true;
+
+    for(const c of matrix){
+      game.run = game.run || { active: false, harnessOnly: false, customLevel: null };
+      game.run.active = true;
+      game.run.harnessOnly = true;
+      game.run.customLevel = null;
+      game.seed = c.seed;
+      game.district = c.district;
+      game.modifier = c.modifier || 'normal';
+      genCity(c.seed, c.district, c.modifier || '');
+      const meta = game.streetLayoutMeta || {};
+      const metrics = crStreetLayoutMetrics(game.map, meta);
+      const lm = game.d1ParkLandmark;
+      const landmarkCells = lm ? crD1LandmarkCellCount(game.map, lm) : 0;
+      const row = { ...c, MAP_W: game.MAP_W, MAP_H: game.MAP_H, metrics, landmarkCells, landmark: lm };
+      evidence.districts.push(row);
+      rows[c.district] = row;
+      if(game.MAP_W !== STREET_FOOTPRINT_W || game.MAP_H !== STREET_FOOTPRINT_H) checks.footprint40x20 = false;
+      const val = crHarnessValidateProceduralCase(c);
+      if(!val.ok){ reachOk = false; errors.push('reach d'+c.district+': '+val.reason); }
+      for(const p of game.props || []){ if(!canStand(p.x, p.y)) propsOk = false; }
+    }
+
+    const d1 = rows[1], d2 = rows[2], d3 = rows[3], d4 = rows[4];
+    checks.d1LandmarkSubstantial = !!(d1 && d1.landmark && d1.landmarkCells >= 14);
+    checks.d1OpenSimple = !!(d1 && d1.metrics.mainRoad >= 68 && d1.metrics.mainRoad >= d1.metrics.buildings);
+    checks.d2MoreMassThanD1 = !!(d2 && d1 && d2.metrics.buildings >= d1.metrics.buildings + 10);
+    checks.d2StorefrontBands = !!(d2 && d2.metrics.buildings >= 42 && d2.metrics.mainRoad >= 115);
+    checks.d3AlleysReadable = !!(d3 && d3.metrics.pockets >= 28 && d3.metrics.buildings >= 55);
+    checks.d4PocketsReachable = !!(d4 && d4.metrics.pockets >= 38 && d4.metrics.buildings >= 60);
+    checks.reachabilityD1D4 = reachOk;
+    checks.propsNonCollision = propsOk;
+    checks.runtimeClean = window.__crRuntimeErrors.length === err0;
+
+    state = STATE.TITLE;
+    paused = false;
+    game.run = game.run || {};
+    game.run.active = false;
+    game.run.harnessOnly = false;
+    drawMobileMenu();
+    rmenuAction('title-options');
+    drawMobileMenu();
+    checks.optionsOpens = state === STATE.OPTIONS && crOptionsMenuHtml().indexOf('EDIT CONTROLS') >= 0;
+    state = STATE.TITLE;
+    drawMobileMenu();
+
+    if(!checks.fpvMassConstant) errors.push('CR_BUILDING_FPV_MASS must be ~1.5');
+    if(!checks.footprint40x20) errors.push('map must remain 40x20');
+    if(!checks.d1LandmarkSubstantial) errors.push('D1 pavilion must be larger/more substantial');
+    if(!checks.d1OpenSimple) errors.push('D1 must stay open/simple');
+    if(!checks.d2MoreMassThanD1) errors.push('D2 building mass must exceed D1');
+    if(!checks.d2StorefrontBands) errors.push('D2 storefront bands insufficient');
+    if(!checks.d3AlleysReadable) errors.push('D3 alleys/pockets not readable');
+    if(!checks.d4PocketsReachable) errors.push('D4 pockets/building mass check failed');
+    if(!checks.reachabilityD1D4) errors.push('reachability failed after building scale');
+    if(!checks.propsNonCollision) errors.push('props became collision');
+    if(!checks.optionsOpens) errors.push('OPTIONS broken');
+    if(!checks.runtimeClean) errors.push('runtime errors during building scale check');
+
+    const pass = errors.length === 0;
+    return { pass, build: BUILD_ID, errors, warnings, checks, evidence };
+  } catch(e){
+    errors.push(String(e && e.message ? e.message : e));
+    return { pass: false, build: BUILD_ID, errors, warnings, checks, evidence };
+  } finally {
+    selectedStartDistrict = savedPick;
+    _selfCheckForcePortrait = false;
+    crForceSafeTitleAfterHarness();
+    drawMobileMenu();
+  }
+}
 function runEarlyDistrictProgressionSelfCheck(){
   if(_crHarnessDepth > 0) return runEarlyDistrictProgressionSelfCheckBody();
   return crWithTemporaryState('earlyDistrictProgression', () => runEarlyDistrictProgressionSelfCheckBody());
@@ -7972,8 +8131,8 @@ function runEarlyDistrictProgressionSelfCheckBody(){
   const err0 = window.__crRuntimeErrors.length;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdLevelSelect1 = BUILD_ID === 'levelselect1';
-    if(!checks.buildIdLevelSelect1) errors.push('BUILD_ID must be levelselect1');
+    checks.buildIdBuildScale1 = BUILD_ID === 'buildscale1';
+    if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be buildscale1');
     checks.footprintUnchanged = true;
     checks.saveVersionUnchanged = SAVE_VERSION === 1;
     checks.controlsSchemaUnchanged = CR_CONTROLS_LS_KEY === 'cannedRun.controls.v1';
@@ -8071,8 +8230,8 @@ function runD1ParkLandmarkSelfCheckBody(){
   const err0 = window.__crRuntimeErrors.length;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdLevelSelect1 = BUILD_ID === 'levelselect1';
-    if(!checks.buildIdLevelSelect1) errors.push('BUILD_ID must be levelselect1');
+    checks.buildIdBuildScale1 = BUILD_ID === 'buildscale1';
+    if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be buildscale1');
 
     const matrix = [
       { seed: 880101, district: 1, modifier: '' },
@@ -8111,7 +8270,7 @@ function runD1ParkLandmarkSelfCheckBody(){
       if(c.district === 1){
         const lm = game.d1ParkLandmark;
         const wallCells = crD1LandmarkCellCount(game.map, lm);
-        if(!lm || wallCells < 8) landmarkD1Ok = false;
+        if(!lm || wallCells < 12) landmarkD1Ok = false;
         if(propSum.parkish < 6 || propSum.total < 8) parkPropsOk = false;
         if(metrics.mainRoad < 70) openSpineOk = false;
         if(metrics.mainRoad < metrics.buildings) openSpineOk = false;
@@ -8187,8 +8346,8 @@ function runStreetBlockLevelSelfCheckBody(){
   const err0 = window.__crRuntimeErrors.length;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdLevelSelect1 = BUILD_ID === 'levelselect1';
-    if(!checks.buildIdLevelSelect1) errors.push('BUILD_ID must be levelselect1');
+    checks.buildIdBuildScale1 = BUILD_ID === 'buildscale1';
+    if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be buildscale1');
 
     const matrix = [
       { seed: 880101, district: 1, modifier: '' },
@@ -8271,6 +8430,7 @@ function runFullSelfCheckInner(){
   const reachability = runReachabilitySelfCheck();
   const streetBlockLevel = runStreetBlockLevelSelfCheck();
   const d1ParkLandmark = runD1ParkLandmarkSelfCheck();
+  const buildingScalePolish = runBuildingScalePolishSelfCheck();
   const earlyDistrictProgression = runEarlyDistrictProgressionSelfCheck();
   const levelSelector = runLevelSelectorSelfCheck();
   const proceduralLevelValidation = runProceduralLevelValidationSelfCheck();
@@ -8284,7 +8444,7 @@ function runFullSelfCheckInner(){
   const levels = runLevelSelfCheck();
   const renderFailure = runRenderFailureSelfCheck();
   const runtimeClean = window.__crRuntimeErrors.length === err0;
-  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && decorativeProps.pass && optionsCleanup.pass && mobileControlReliability.pass && movementCollision.pass && reachability.pass && streetBlockLevel.pass && d1ParkLandmark.pass && earlyDistrictProgression.pass && levelSelector.pass && proceduralLevelValidation.pass && fullRunProgression.pass && onboarding.pass && soundFeedback.pass && declarativeControls.pass && visualReadability.pass && visualRectangleRegression.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
+  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && decorativeProps.pass && optionsCleanup.pass && mobileControlReliability.pass && movementCollision.pass && reachability.pass && streetBlockLevel.pass && d1ParkLandmark.pass && buildingScalePolish.pass && earlyDistrictProgression.pass && levelSelector.pass && proceduralLevelValidation.pass && fullRunProgression.pass && onboarding.pass && soundFeedback.pass && declarativeControls.pass && visualReadability.pass && visualRectangleRegression.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
   return {
     pass,
     build: BUILD_ID,
@@ -8299,6 +8459,7 @@ function runFullSelfCheckInner(){
     reachability,
     streetBlockLevel,
     d1ParkLandmark,
+    buildingScalePolish,
     earlyDistrictProgression,
     levelSelector,
     proceduralLevelValidation,
@@ -8448,13 +8609,13 @@ function runSoundFeedbackSelfCheckBody(){
   try {
     checks.functionExists = typeof runSoundFeedbackSelfCheck === 'function';
     checks.contract = !!(CR_SOUND_FEEDBACK && CR_SOUND_FEEDBACK.style === 'sound1' && CR_SOUND_FEEDBACK.webAudio === true);
-    checks.buildIdOptionsClean1 = BUILD_ID === 'levelselect1';
+    checks.buildIdOptionsClean1 = BUILD_ID === 'buildscale1';
     checks.crTriggerExists = typeof crTriggerSoundCue === 'function';
     checks.crSoundEnabledFn = typeof crSoundEnabled === 'function';
     checks.noExternalAudioTags = document.querySelectorAll('audio,source[src]').length === 0;
     checks.harnessMuted = _crHarnessDepth > 0 && crSoundEnabled() === false;
     if(!checks.contract) errors.push('CR_SOUND_FEEDBACK contract missing');
-    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be levelselect1');
+    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be buildscale1');
     if(!checks.crTriggerExists) errors.push('crTriggerSoundCue missing');
     if(!checks.harnessMuted) errors.push('harness must mute gameplay sound');
     if(!checks.noExternalAudioTags) errors.push('external audio tags present');
@@ -8517,13 +8678,13 @@ function runVisualReadabilitySelfCheckBody(){
   mobileOverride = true;
   try {
     checks.functionExists = typeof runVisualReadabilitySelfCheck === 'function';
-    checks.buildIdOptionsClean1 = BUILD_ID === 'levelselect1';
+    checks.buildIdOptionsClean1 = BUILD_ID === 'buildscale1';
     checks.visualContract = !!(CR_VISUAL_READABILITY && CR_VISUAL_READABILITY.style === 'visualfix1');
     checks.noScreenPathStripe = CR_VISUAL_READABILITY.floorPathStripe === false;
     checks.pickupTex = !!TEX.can;
     checks.npcTex = !!TEX.hungry;
     checks.exitTex = !!TEX.exit;
-    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be levelselect1');
+    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be buildscale1');
     if(!checks.visualContract) errors.push('CR_VISUAL_READABILITY contract missing');
     if(!checks.noScreenPathStripe) errors.push('screen-space floor path stripe must stay disabled');
     if(!checks.pickupTex || !checks.npcTex || !checks.exitTex) errors.push('sprite textures missing');
@@ -8650,9 +8811,9 @@ function runVisualRectangleRegressionSelfCheckBody(){
   mobileOverride = true;
   try {
     checks.functionExists = typeof runVisualRectangleRegressionSelfCheck === 'function';
-    checks.buildIdOptionsClean1 = BUILD_ID === 'levelselect1';
+    checks.buildIdOptionsClean1 = BUILD_ID === 'buildscale1';
     checks.noScreenPathStripe = !!(CR_VISUAL_READABILITY && CR_VISUAL_READABILITY.floorPathStripe === false);
-    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be levelselect1');
+    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be buildscale1');
     if(!checks.noScreenPathStripe) errors.push('screen-space path stripe flag must be false');
 
     startRun(42);
@@ -10741,7 +10902,7 @@ globalThis.CR = window.CR = {
   get mobileMode(){ return mobileMode; },
   crGetSelectedStartDistrict,crCycleSelectedStartDistrict,crSetSelectedStartDistrict,crTitleMenuSelectableRows,titleMenuRowLabel,
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
-  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runDecorativePropsSelfCheck,runOptionsCleanupSelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runStreetBlockLevelSelfCheck,runD1ParkLandmarkSelfCheck,runEarlyDistrictProgressionSelfCheck,runLevelSelectorSelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
+  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runDecorativePropsSelfCheck,runOptionsCleanupSelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runStreetBlockLevelSelfCheck,runD1ParkLandmarkSelfCheck,runBuildingScalePolishSelfCheck,runEarlyDistrictProgressionSelfCheck,runLevelSelectorSelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
   CR_VISUAL_READABILITY,CR_SOUND_FEEDBACK,DECOR_PROP_REQUIRED,INPUT_CONFIG,CR_CONTROLS_LS_KEY,crTriggerSoundCue,crSoundEnabled,crSoundFeedbackCueIds,crLoadControlOverrides,crPersistControlOverrides,crResetControlLayoutOverrides,crClearControlOverrides,crEnterControlEditMode,crFinishControlEditMode,crControlHitTest,crSnapshotLayoutNorms,crPrepareSelfCheckPortrait,crStepEditControlSize,crSelectEditControl,
   getCrVisualHarnessSnapshot(){ return _crVisualHarnessSnapshot; },
   showOnboardingHelp,dismissOnboardingHelp,crOpenFirstRunHelpIfNeeded,

@@ -1234,6 +1234,41 @@ async function levelSelectorSection(page) {
   };
 }
 
+async function buildingScalePolishSection(page) {
+  const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await waitGameReady(page);
+
+  const bs = await page.evaluate(() => CR.runBuildingScalePolishSelfCheck());
+  writeProof('proof-building-scale-polish.json', bs);
+
+  const shots = [
+    { d: 1, seed: 880101, file: 'proof-building-scale-d1.png' },
+    { d: 2, seed: 880102, file: 'proof-building-scale-d2.png' },
+    { d: 3, seed: 880103, file: 'proof-building-scale-d3.png' },
+    { d: 4, seed: 880104, file: 'proof-building-scale-d4.png' },
+  ];
+  for (const s of shots) {
+    await page.evaluate(({ d, seed }) => {
+      CR.crSetSelectedStartDistrict(d);
+      CR.startRun(seed);
+      CR.state = CR.STATE.PLAY;
+      CR.paused = false;
+    }, s);
+    await page.waitForTimeout(140);
+    await page.screenshot({ path: path.join(ROOT, s.file) });
+  }
+  await page.evaluate(() => {
+    CR.crSetSelectedStartDistrict(1);
+    CR.state = CR.STATE.TITLE;
+    if (typeof drawMobileMenu === 'function') drawMobileMenu();
+  });
+  await page.screenshot({ path: path.join(ROOT, 'proof-building-scale-minimap.png') });
+
+  return { pass: bs.pass === true, buildingScalePolish: bs };
+}
+
 async function streetBlockLevelSection(page) {
   const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
   await page.setViewportSize({ width: 412, height: 915 });
@@ -1630,6 +1665,7 @@ async function main() {
   const d1ParkLandmark = await d1ParkLandmarkSection(page);
   const earlyDistrictProgression = await earlyDistrictProgressionSection(page);
   const levelSelector = await levelSelectorSection(page);
+  const buildingScalePolish = await buildingScalePolishSection(page);
   const settingsSafetyPass = portraitUsability.settingsSafety?.pass === true;
 
   const mobileControlReliability = await mobileControlReliabilitySection(page);
@@ -1681,6 +1717,7 @@ async function main() {
     d1ParkLandmark.pass &&
     earlyDistrictProgression.pass &&
     levelSelector.pass &&
+    buildingScalePolish.pass &&
     settingsSafetyPass &&
     mobileControlReliability.pass &&
     declarativeControls.pass &&
@@ -1731,6 +1768,7 @@ async function main() {
     d1ParkLandmark,
     earlyDistrictProgression,
     levelSelector,
+    buildingScalePolish,
     settingsSafety: portraitUsability.settingsSafety || { pass: settingsSafetyPass },
     mobileControlReliability,
     movementCollision,
