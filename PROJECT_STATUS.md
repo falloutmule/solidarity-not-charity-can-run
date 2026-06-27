@@ -16,10 +16,10 @@ Last updated: EDIT CONTROLS resize (`controlsresize1`).
 
 ## URLs
 
-- **Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=4e311e7&mobile=on&portraitlayout=1  
-- **Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=4e311e7&mobile=on&portraitlayout=1  
+- **Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=14b31e8&mobile=on&portraitlayout=1  
+- **Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=14b31e8&mobile=on&portraitlayout=1  
 
-*(Cache-bust with `4e311e7` — see `reports/guards/DECLARATIVE_CUSTOM_CONTROLS_REPORT.md`.)*
+*(Cache-bust with `14b31e8` — see `reports/guards/EDIT_CONTROLS_RESIZE_FIX_REPORT.md`.)*
 
 ## Completed cards (order)
 

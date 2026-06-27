@@ -3,7 +3,7 @@
 **Card:** EDIT CONTROLS resize (SIZE − / SIZE +)  
 **Previous baseline:** `controledit1` / `f543956` (handoff cited `controls1` / `4e311e7`)  
 **New BUILD_ID:** `controlsresize1`  
-**Backup:** `index.before-edit-controls-resize-fix.html` (local; gitignored)
+**Gameplay commit:** `14b31e84be3b62c06809feb2d83bd5105755a224`
 
 ## Problem
 
@@ -49,15 +49,15 @@ Result: **`{"pass":true}`** (after implementation).
 - `proof-full-selfcheck.json`
 - `proof-declarative-controls.json`
 
-## URLs (update `v=` after push)
+## URLs
 
-- Play: `https://falloutmule.github.io/solidarity-not-charity-can-run/?v=<commit>&mobile=on&portraitlayout=1`
-- Self-check: `https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=<commit>&mobile=on&portraitlayout=1`
+- Play: `https://falloutmule.github.io/solidarity-not-charity-can-run/?v=14b31e8&mobile=on&portraitlayout=1`
+- Self-check: `https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=14b31e8&mobile=on&portraitlayout=1`
 
 ## CI
 
-- Workflow: **SNC Can Run Selfcheck**
-- Artifact: **`snc-can-run-proof-artifacts`** (fill run URL after push)
+- Workflow: **SNC Can Run Selfcheck** (run URL after Actions completes)
+- Artifact: **`snc-can-run-proof-artifacts`**
 
 ## Unchanged
 
