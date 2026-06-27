@@ -587,7 +587,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'street1';
+const BUILD_ID = 'propsread1';
 /** Visual readability contract (render/HUD only; gameplay unchanged). */
 const CR_VISUAL_READABILITY = {
   style: 'visualfix1',
@@ -2217,192 +2217,73 @@ bindOnboardingHelp();
 const WALL = { BUILDING:1, BRICK:2, FENCE:3, MURAL:4, VAN:5, GLASS:6,
                GARAGE:7, CONCRETE:8, SIGNAGE:9 };
 
-// Splice into index.html — street-block level grammar (GW=40 GH=20 unchanged)
-
-const STREET_FOOTPRINT_W = 40;
-const STREET_FOOTPRINT_H = 20;
-
-function crPickWallType(r){
-  const pool=[WALL.BUILDING,WALL.BUILDING,WALL.BRICK,WALL.BRICK,WALL.GLASS,WALL.MURAL,WALL.GARAGE,WALL.CONCRETE,WALL.SIGNAGE];
-  return pool[(r()*pool.length)|0];
-}
-
-function applyStreetBlockGrammar(map, shade, GW, GH, district, modifier, r){
-  const d = Math.max(1, Math.min(5, district|0));
-  let buildingFill = 0.14 + d*0.11;
-  let alleyBias = 0.18 + d*0.14;
-  let roadHalf = Math.max(2, 5 - ((d-1)>>1));
-
-  if(modifier==='clear'){ buildingFill = 0.12; alleyBias = 0.22; roadHalf = 4; }
-  if(modifier==='maze'){ buildingFill = 0.42 + d*0.06; alleyBias = 0.92; roadHalf = 2; }
-  if(modifier==='shortage'){ buildingFill = 0.28 + d*0.09; alleyBias = 0.35 + d*0.08; }
-
-  const centerY = (GH/2)|0;
-  const roadY0 = Math.max(2, centerY - roadHalf);
-  const roadY1 = Math.min(GH-3, centerY + roadHalf);
-
-  for(let y=0;y<GH;y++) for(let x=0;x<GW;x++){ map[y][x]=1; shade[y][x]=0.42; }
-  for(let i=0;i<GW;i++){ map[0][i]=WALL.CONCRETE; map[GH-1][i]=WALL.CONCRETE; }
-  for(let i=0;i<GH;i++){ map[i][0]=WALL.CONCRETE; map[i][GW-1]=WALL.CONCRETE; }
-
-  for(let y=1;y<GH-1;y++) for(let x=1;x<GW-1;x++){
-    map[y][x]=0; shade[y][x]=0.32+r()*0.12;
-  }
-
-  function stampRoad(){
-    for(let y=roadY0;y<=roadY1;y++) for(let x=2;x<GW-2;x++){
-      map[y][x]=0; shade[y][x]=0.44+r()*0.06;
-    }
-  }
-  stampRoad();
-
-  const spineXs = [5, 12, 20, 28, 35];
-  for(const cx of spineXs){
-    if(cx<2||cx>=GW-2) continue;
-    for(let y=2;y<GH-2;y++) map[y][cx]=0;
-  }
-
-  if(d===1 || modifier==='clear'){
-    for(let y=2;y<=6;y++) for(let x=2;x<=11;x++) map[y][x]=0;
-  }
-
-  const segW = 9;
-  const segCount = Math.ceil((GW-4)/segW);
-  function carvePocket(bx0, bx1, py, yMin, yMax){
-    const px = bx0+2+((r()*(bx1-bx0-5))|0);
-    for(let dy=0;dy<2;dy++) for(let dx=0;dx<3;dx++){
-      const xx=px+dx, yy=py+dy;
-      if(xx>bx0&&xx<bx1&&yy>=yMin&&yy<yMax) map[yy][xx]=0;
-    }
-  }
-  function stampSideBand(yStart, yEnd, seg, side){
-    const bx0 = 2 + seg*segW;
-    const bx1 = Math.min(GW-3, bx0+segW-1);
-    if(bx1<=bx0+2 || yEnd<=yStart) return;
-    const inset = d<=2 ? 1 : 2;
-    const fillRate = Math.max(d===1 ? 0.1 : 0.28 + d*0.09, buildingFill);
-    const doBand = d>=2 || r()<0.35+buildingFill;
-    if(!doBand) return;
-    const faceY = side==='north' ? yEnd-1 : yStart;
-    if(d>=2){
-      for(let x=bx0+inset; x<=bx1-inset; x++){
-        if(spineXs.indexOf(x)>=0) continue;
-        map[faceY][x]=crPickWallType(r); shade[faceY][x]=r();
-        const backY = faceY + (side==='north' ? -1 : 1);
-        if(backY>=yStart && backY<yEnd && r()<0.78){
-          map[backY][x]=crPickWallType(r); shade[backY][x]=r();
-        }
-      }
-    }
-    for(let y=yStart;y<yEnd;y++) for(let x=bx0+inset;x<=bx1-inset;x++){
-      if(spineXs.indexOf(x)>=0) continue;
-      if(r()<fillRate){
-        map[y][x]=crPickWallType(r); shade[y][x]=r();
-      }
-    }
-    if(d>=2 && r()<0.5+alleyBias*0.22) carvePocket(bx0, bx1, yStart+((r()*Math.max(1,yEnd-yStart-3))|0), yStart, yEnd);
-    if(d>=3 && r()<0.38+alleyBias*0.28) carvePocket(bx0, bx1, yStart+((r()*Math.max(1,yEnd-yStart-3))|0), yStart, yEnd);
-  }
-  for(let seg=0; seg<segCount; seg++){
-    if(roadY0>3) stampSideBand(2, roadY0-1, seg, 'north');
-    const southY0 = roadY1+2;
-    if(southY0<GH-3) stampSideBand(southY0, GH-2, seg, 'south');
-  }
-
-  if(d>=2 || modifier==='maze'){
-    for(let x=3;x<GW-3;x++){
-      if(r()<0.28+alleyBias*0.38){ map[1][x]=0; map[GH-2][x]=0; }
-    }
-  }
-
-  const alleyCount = 2 + d + (modifier==='maze'?3:0);
-  for(let k=0;k<alleyCount;k++){
-    const ax = 4+((r()*(GW-9))|0);
-    if(spineXs.indexOf(ax)>=0) continue;
-    if(r()<0.55+alleyBias*0.2){
-      for(let y=2;y<roadY0;y++) map[y][ax]=0;
-    } else {
-      for(let y=roadY1+1;y<GH-2;y++) map[y][ax]=0;
-    }
-  }
-
-  stampRoad();
-  for(const cx of spineXs){
-    if(cx<2||cx>=GW-2) continue;
-    for(let y=2;y<GH-2;y++) if(map[y][cx]!==0) map[y][cx]=0;
-  }
-
-  return { roadY0, roadY1, district:d, GW, GH, buildingFill, alleyBias };
-}
-
-function crStreetZoneAt(tx, ty, meta){
-  const { roadY0, roadY1, GW, GH } = meta;
-  if(ty<0||tx<0||ty>=GH||tx>=GW) return 'VOID';
-  if(ty>=roadY0 && ty<=roadY1) return 'MAIN_ROAD';
-  if(ty<=1 || ty>=GH-2) return 'BACK_ALLEY';
-  if(ty<roadY0) return 'SIDE_N';
-  return 'SIDE_S';
-}
-
-function crStreetLayoutMetrics(map, meta){
-  const { roadY0, roadY1, GW, GH } = meta;
-  let mainRoad=0, buildings=0, alleys=0, pockets=0;
-  for(let y=1;y<GH-1;y++) for(let x=1;x<GW-1;x++){
-    const v = map[y][x];
-    if(v===0){
-      if(y>=roadY0&&y<=roadY1) mainRoad++;
-      else if(y<=1||y>=GH-2) alleys++;
-      else pockets++;
-    } else if(v>0) buildings++;
-  }
-  return { mainRoad, buildings, alleys, pockets, GW, GH };
-}
-
-function crStreetPropKindForZone(zone, r){
-  const roadKinds = ['mailbox','bench','utility_box','signboard'];
-  const alleyKinds = ['shopping_cart','crate_stack','cooler','tarp_bundle','sleeping_bag_pile'];
-  const edgeKinds = ['scrub_bush','agave'];
-  const wallKinds = ['mural_panel','signboard'];
-  if(zone==='MAIN_ROAD') return roadKinds[(r()*roadKinds.length)|0];
-  if(zone==='BACK_ALLEY' || zone==='SIDE_N' || zone==='SIDE_S') {
-    if(r()<0.55) return alleyKinds[(r()*alleyKinds.length)|0];
-    if(r()<0.75) return edgeKinds[(r()*edgeKinds.length)|0];
-    return wallKinds[(r()*wallKinds.length)|0];
-  }
-  return alleyKinds[(r()*alleyKinds.length)|0];
-}
-
 function genCity(seed, district, modifier){
   RNG = mulberry32((seed ^ 0x9e3779b9) + district*2654435761);
   const r = RNG;
 
-  let canMult = 1.0, peoMult = 1.0;
+  let spacing = 7, fill = 0.55, canMult = 1.0, peoMult = 1.0;
   game.scoreMult = 1;
+  if(modifier==='clear'){ spacing = 9; fill = 0.24; }
+  if(modifier==='maze'){  spacing = 5; fill = 0.80; }
   if(modifier==='shortage'){ canMult = 0.55; peoMult = 1.1; game.scoreMult = 1.5; }
 
-  const GW = STREET_FOOTPRINT_W, GH = STREET_FOOTPRINT_H;
+  const GW = 40, GH = 20;
   const map = [], shade = [];
   for(let y=0;y<GH;y++){ map.push(new Array(GW).fill(1)); shade.push(new Array(GW).fill(0)); }
 
-  const streetMeta = applyStreetBlockGrammar(map, shade, GW, GH, district, modifier, r);
-  game.streetLayoutMeta = streetMeta;
+  const isRoad = (v)=> (v % spacing) < 2;
+  for(let y=0;y<GH;y++) for(let x=0;x<GW;x++){
+    if(isRoad(x) || isRoad(y)) map[y][x]=0;
+  }
+  for(let i=0;i<GW;i++){ map[0][i]=1; map[GH-1][i]=1; }
+  for(let i=0;i<GH;i++){ map[i][0]=1; map[i][GW-1]=1; }
+
+  // process block regions — weighted toward stucco/brick (Grand Junction look)
+  for(let by=2; by<GH-2; by+=spacing){
+    for(let bx=2; bx<GW-2; bx+=spacing){
+      const x0=bx+2, y0=by+2;
+      const x1=Math.min(bx+spacing-1, GW-2), y1=Math.min(by+spacing-1, GH-2);
+      if(x1<=x0||y1<=y0) continue;
+      const roll = r();
+      if(roll < fill){
+        // weighted wall-type pool: lots of stucco + brick, some glass/mural/garage
+        const pool=[WALL.BUILDING,WALL.BUILDING,WALL.BUILDING,WALL.BRICK,WALL.BRICK,
+                    WALL.GLASS,WALL.MURAL,WALL.GARAGE,WALL.CONCRETE,WALL.SIGNAGE];
+        const wt = pool[(r()*pool.length)|0];
+        for(let y=y0;y<y1;y++) for(let x=x0;x<x1;x++){ map[y][x]=wt; shade[y][x]=r(); }
+        if(modifier === 'maze'){
+          const alleys = 1 + ((r()*2)|0);
+          for(let k=0;k<alleys;k++){
+            if(r()<0.5){ const ay=y0+((r()*(y1-y0))|0); for(let x=x0;x<x1;x++) map[ay][x]=0; }
+            else       { const ax=x0+((r()*(x1-x0))|0); for(let y=y0;y<y1;y++) map[y][ax]=0; }
+          }
+        }
+      } else {
+        // open lot / parking lot: floor + a few fence/van/dumpster-as-wall decor
+        for(let y=y0;y<y1;y++) for(let x=x0;x<x1;x++){ map[y][x]=0; shade[y][x]=r(); }
+        if(r()<0.7){
+          const posts=1+((r()*3)|0);
+          for(let k=0;k<posts;k++){
+            const px=x0+((r()*(x1-x0))|0), py=y0+((r()*(y1-y0))|0);
+            // parking-lot decor: fence, van, or concrete bumper
+            const pick=r();
+            map[py][px] = pick<0.5?WALL.FENCE : pick<0.8?WALL.VAN : WALL.CONCRETE;
+          }
+        }
+      }
+    }
+  }
 
   game.map = map; game.MAP_W = GW; game.MAP_H = GH; game.wallShade = shade;
 
-  const roadMidY = (streetMeta.roadY0 + streetMeta.roadY1) / 2;
-  let sx = 3.5, sy = roadMidY + 0.5, found = false;
-  for(let y=streetMeta.roadY0; y<=streetMeta.roadY1 && !found; y++){
-    for(let x=2; x<8 && !found; x++){
-      if(map[y][x]===0 && hasClearance(x+0.5, y+0.5, 0.22)){ sx=x+0.5; sy=y+0.5; found=true; }
-    }
-  }
-  if(!found){
-    for(let y=1;y<GH-1 && !found;y++) for(let x=1;x<GW-1 && !found;x++){
-      if(map[y][x]===0){ sx=x+0.5; sy=y+0.5; found=true; }
-    }
+  // player start: first floor cell from top-left
+  let sx=2.5, sy=2.5, found=false;
+  for(let y=1;y<GH-1 && !found;y++) for(let x=1;x<GW-1 && !found;x++){
+    if(map[y][x]===0){ sx=x+0.5; sy=y+0.5; found=true; }
   }
   player.x=sx; player.y=sy; player.angle=Math.PI/4;
 
+  // ---- FLOOD-FILL REACHABILITY from player start cell ----
   const reach = new Array(GH);
   for(let y=0;y<GH;y++) reach[y]=new Array(GW).fill(false);
   const stack=[[sx|0, sy|0]];
@@ -2420,71 +2301,47 @@ function genCity(seed, district, modifier){
   }
   dbg.reachableCells = reachCount;
 
-  const d = Math.max(1, Math.min(5, district|0));
+  // ---- candidate floor cells (reachable) ----
   const candidates=[];
-  const roadCands=[], pocketCands=[], alleyCands=[];
   for(let y=1;y<GH-1;y++) for(let x=1;x<GW-1;x++){
     if(!reach[y][x]) continue;
-    const pt=[x+0.5, y+0.5];
-    candidates.push(pt);
-    const z = crStreetZoneAt(x, y, streetMeta);
-    if(z==='MAIN_ROAD') roadCands.push(pt);
-    else if(z==='BACK_ALLEY') alleyCands.push(pt);
-    else pocketCands.push(pt);
+    candidates.push([x+0.5, y+0.5]);
   }
 
-  function takeFromPool(pool, radius, minDistFromStart, used){
-    for(let tries=0; tries<320; tries++){
-      if(!pool.length) return null;
-      const idx=(r()*pool.length)|0;
-      const [cx,cy]=pool[idx];
+  function takeCandidate(radius, minDistFromStart, used){
+    for(let tries=0; tries<300; tries++){
+      if(!candidates.length) return null;
+      const idx=(r()*candidates.length)|0;
+      const [cx,cy]=candidates[idx];
       if(!hasClearance(cx,cy,radius)){ dbg.rejectedSpawns++; continue; }
       if(Math.hypot(cx-sx, cy-sy) < minDistFromStart) continue;
       let overlap=false;
       if(used) for(const u of used){ if(Math.hypot(cx-u[0],cy-u[1])<0.9){ overlap=true; break; } }
       if(overlap) continue;
-      pool.splice(idx,1);
-      const gi = candidates.findIndex(p => p[0]===cx && p[1]===cy);
-      if(gi>=0) candidates.splice(gi,1);
+      candidates.splice(idx,1);
       return [cx,cy];
     }
     return null;
   }
 
-  function takeCandidate(radius, minDistFromStart, used, prefer){
-    const order = prefer || [candidates];
-    for(const pool of order){
-      const spot = takeFromPool(pool, radius, minDistFromStart, used);
-      if(spot) return spot;
-    }
-    return takeFromPool(candidates, radius, minDistFromStart, used);
-  }
-
+  // place CANS
   game.pickups=[];
   const canCount = Math.max(8, Math.floor((14 + district*2)*canMult));
   const used=[];
   for(let i=0;i<canCount;i++){
-    let prefer;
-    if(d<=1) prefer = [roadCands, pocketCands, candidates];
-    else if(d<=3) prefer = [roadCands, pocketCands, alleyCands, candidates];
-    else prefer = [pocketCands, alleyCands, roadCands, candidates];
-    const spot=takeCandidate(0.30, 1.2, used, prefer);
+    const spot=takeCandidate(0.30, 1.5, used);
     if(!spot){ dbg.invalidPlacements++; break; }
     used.push(spot);
     game.pickups.push({x:spot[0], y:spot[1], taken:false, amt: r()<0.3?2:1, wob:r()*6.28});
   }
   dbg.cansSpawned = game.pickups.length;
 
+  // place PEOPLE (static)
   game.npcs=[];
   const KINDS=['hungry','hungry','hungry','family','family','elder','volunteer'];
   const peoCount = Math.max(5, Math.floor((7+district)*peoMult));
   for(let i=0;i<peoCount;i++){
-    let prefer;
-    if(d<=1) prefer = [roadCands, pocketCands, candidates];
-    else if(d<=2) prefer = [roadCands, pocketCands, candidates];
-    else if(d<=3) prefer = [pocketCands, roadCands, alleyCands, candidates];
-    else prefer = [pocketCands, alleyCands, candidates];
-    const spot=takeCandidate(0.42, 1.8, used, prefer);
+    const spot=takeCandidate(0.42, 2.0, used);
     if(!spot){ dbg.invalidPlacements++; break; }
     used.push(spot);
     const kind=KINDS[(r()*KINDS.length)|0];
@@ -2493,36 +2350,48 @@ function genCity(seed, district, modifier){
   }
   dbg.npcsSpawned = game.npcs.length;
 
+  // place NON-BLOCKING DECOR PROPS (community street-punk southwest decor; no collision)
   game.props=[];
+  const PROP_KINDS=[
+    'scrub_bush','scrub_bush','agave','mailbox','signboard','utility_box',
+    'shopping_cart','crate_stack','tarp_bundle','bench','cooler',
+    'sleeping_bag_pile','mural_panel',
+  ];
+  function takePropCandidate(minDistFromStart, used){
+    for(let tries=0; tries<400; tries++){
+      if(!candidates.length) return null;
+      const idx=(r()*candidates.length)|0;
+      const [cx,cy]=candidates[idx];
+      const tx = Math.floor(cx), ty = Math.floor(cy);
+      const edge = tx <= 2 || tx >= GW-3 || ty <= 2 || ty >= GH-3;
+      if(tries < 280 && !edge && r() < 0.72) continue;
+      if(!hasClearance(cx,cy,0.30)){ dbg.rejectedSpawns++; continue; }
+      if(Math.hypot(cx-sx, cy-sy) < minDistFromStart) continue;
+      let overlap=false;
+      if(used) for(const u of used){ if(Math.hypot(cx-u[0],cy-u[1])<0.9){ overlap=true; break; } }
+      if(overlap) continue;
+      candidates.splice(idx,1);
+      return [cx,cy];
+    }
+    return null;
+  }
   const propCount = 8 + district + ((r()*5)|0);
   for(let i=0;i<propCount;i++){
-    const spot=takeCandidate(0.30, 0.8, used, [roadCands, pocketCands, alleyCands, candidates]);
+    const spot=takePropCandidate(1.0, used);
     if(!spot) break;
     used.push(spot);
-    const tx = Math.floor(spot[0]), ty = Math.floor(spot[1]);
-    const zone = crStreetZoneAt(tx, ty, streetMeta);
-    const kind = crStreetPropKindForZone(zone, r);
-    game.props.push({x:spot[0], y:spot[1], kind, wob:r()*6.28});
+    game.props.push({x:spot[0], y:spot[1], kind: PROP_KINDS[(r()*PROP_KINDS.length)|0], wob:r()*6.28});
   }
   dbg.props = game.props.length;
 
   game.quota = Math.max(3, Math.ceil(game.npcs.length*0.6));
   game.helped=0; game.delivered=0;
 
+  // EXIT: farthest reachable candidate from start
   let bestEx=[GW-2.5,GH-2.5], bestD=-1;
-  const exitPrefer = d<=2 ? [roadCands, candidates] : [roadCands, pocketCands, candidates];
-  for(const pool of exitPrefer){
-    for(const [cx,cy] of pool){
-      const dist=Math.hypot(cx-sx,cy-sy);
-      if(dist>bestD && hasClearance(cx,cy,0.5)){ bestD=dist; bestEx=[cx,cy]; }
-    }
-    if(bestD>8) break;
-  }
-  if(bestD<0){
-    for(const [cx,cy] of candidates){
-      const dist=Math.hypot(cx-sx,cy-sy);
-      if(dist>bestD && hasClearance(cx,cy,0.5)){ bestD=dist; bestEx=[cx,cy]; }
-    }
+  for(const [cx,cy] of candidates){
+    const d=Math.hypot(cx-sx,cy-sy);
+    if(d>bestD && hasClearance(cx,cy,0.5)){ bestD=d; bestEx=[cx,cy]; }
   }
   game.exit = {x:bestEx[0], y:bestEx[1], active:false};
 
@@ -2530,7 +2399,6 @@ function genCity(seed, district, modifier){
 }
 
 // ---------------------------------------------------------------------------
-// SECTION 3b// ---------------------------------------------------------------------------
 // SECTION 3b — CUSTOM LEVELS
 // ---------------------------------------------------------------------------
 const CUSTOM_LEVELS = {
@@ -7262,8 +7130,8 @@ function runDeclarativeControlsSelfCheckBody(){
     checks.menuNotEditable = INPUT_CONFIG.controls.menu && INPUT_CONFIG.controls.menu.editable === false;
     if(!checks.menuNotEditable) errors.push('MENU must stay non-editable');
 
-    checks.buildIdStreet1 = BUILD_ID === 'street1';
-        if(!checks.buildIdStreet1) errors.push('BUILD_ID must be street1');
+    checks.buildIdPropsRead1 = BUILD_ID === 'propsread1';
+        if(!checks.buildIdPropsRead1) errors.push('BUILD_ID must be propsread1');
 
     checks.saveFormatUnchanged = !('controlsLayout' in (options.data || options));
     evidence.inputConfigKeys = Object.keys(INPUT_CONFIG.controls);
@@ -7313,8 +7181,8 @@ function runDecorativePropsSelfCheckBody(){
   const evidence = {};
   const err0 = window.__crRuntimeErrors.length;
   try {
-    checks.buildIdStreet1 = BUILD_ID === 'street1';
-    if(!checks.buildIdStreet1) errors.push('BUILD_ID must be street1');
+    checks.buildIdPropsRead1 = BUILD_ID === 'propsread1';
+    if(!checks.buildIdPropsRead1) errors.push('BUILD_ID must be propsread1');
 
     checks.decorArrayExported = Array.isArray(DECOR_PROP_REQUIRED) && DECOR_PROP_REQUIRED.length === 12;
     if(!checks.decorArrayExported) errors.push('DECOR_PROP_REQUIRED must list 12 kinds');
@@ -7423,8 +7291,8 @@ function runOptionsCleanupSelfCheckBody(){
   _controlEditActive = false;
   crShowControlEditChrome(false);
   try {
-    checks.buildIdStreet1 = BUILD_ID === 'street1';
-        if(!checks.buildIdStreet1) errors.push('BUILD_ID must be street1');
+    checks.buildIdPropsRead1 = BUILD_ID === 'propsread1';
+        if(!checks.buildIdPropsRead1) errors.push('BUILD_ID must be propsread1');
 
     state = STATE.TITLE;
     paused = false;
@@ -7556,90 +7424,6 @@ function runOptionsCleanupSelfCheckBody(){
   }
 }
 
-function runStreetBlockLevelSelfCheck(){
-  if(_crHarnessDepth > 0) return runStreetBlockLevelSelfCheckBody();
-  return crWithTemporaryState('streetBlockLevel', () => runStreetBlockLevelSelfCheckBody());
-}
-
-function runStreetBlockLevelSelfCheckBody(){
-  const errors = [];
-  const warnings = [];
-  const checks = {};
-  const evidence = { seeds: [] };
-  const err0 = window.__crRuntimeErrors.length;
-  crPrepareSelfCheckPortrait();
-  try {
-    checks.buildIdStreet1 = BUILD_ID === 'street1';
-    if(!checks.buildIdStreet1) errors.push('BUILD_ID must be street1');
-
-    const matrix = [
-      { seed: 880101, district: 1, modifier: '' },
-      { seed: 880102, district: 2, modifier: '' },
-      { seed: 880103, district: 3, modifier: '' },
-      { seed: 880104, district: 4, modifier: '' },
-      { seed: 880105, district: 5, modifier: '' },
-      { seed: 42, district: 1, modifier: 'clear' },
-      { seed: 42, district: 3, modifier: 'maze' },
-    ];
-    let footprintOk = true, spineOk = true, buildingOk = true, alleyOk = true;
-    let d1OpenOk = true, reachOk = true, propsOk = true;
-
-    for(const c of matrix){
-      game.run = game.run || { active: false, harnessOnly: false, customLevel: null };
-      game.run.active = true;
-      game.run.harnessOnly = true;
-      game.run.customLevel = null;
-      game.seed = c.seed;
-      game.district = c.district;
-      game.modifier = c.modifier || 'normal';
-      genCity(c.seed, c.district, c.modifier || '');
-      const meta = game.streetLayoutMeta || {};
-      const metrics = crStreetLayoutMetrics(game.map, meta);
-      const row = { ...c, MAP_W: game.MAP_W, MAP_H: game.MAP_H, metrics };
-      evidence.seeds.push(row);
-
-      if(game.MAP_W !== STREET_FOOTPRINT_W || game.MAP_H !== STREET_FOOTPRINT_H) footprintOk = false;
-      if(metrics.mainRoad < 80) spineOk = false;
-      if(c.district >= 2 && metrics.buildings < 12) buildingOk = false;
-      if(c.district > 1 && metrics.alleys < 4) alleyOk = false;
-      if(c.district === 1 && metrics.mainRoad < metrics.buildings * 2) d1OpenOk = false;
-
-      const val = crHarnessValidateProceduralCase(c);
-      if(!val.ok){ reachOk = false; errors.push('reach seed '+c.seed+' d'+c.district+': '+val.reason); }
-
-      const standAtProps = (game.props||[]).map(p => ({ x:p.x, y:p.y, stand: canStand(p.x, p.y) }));
-      game.props = [];
-      if(!standAtProps.every(s => canStand(s.x, s.y) === s.stand)) propsOk = false;
-      game.props = standAtProps.map(s => ({ x:s.x, y:s.y, kind:'bench', wob:0 }));
-    }
-
-    checks.footprintUnchanged = footprintOk;
-    checks.mainRoadSpine = spineOk;
-    checks.sideBuildings = buildingOk;
-    checks.alleyServiceZones = alleyOk;
-    checks.d1SimpleOpen = d1OpenOk;
-    checks.reachabilityPasses = reachOk;
-    checks.propsNonCollision = propsOk;
-    checks.decorPropsUnchanged = DECOR_PROP_REQUIRED.length === 12;
-    checks.noRuntimeErrors = window.__crRuntimeErrors.length === err0;
-
-    if(!checks.footprintUnchanged) errors.push('map footprint must stay 40x20');
-    if(!checks.mainRoadSpine) errors.push('main road / central spine too small');
-    if(!checks.sideBuildings) errors.push('side building zones missing for D2+');
-    if(!checks.alleyServiceZones) errors.push('alley/service zones missing for districts above D1');
-    if(!checks.d1SimpleOpen) errors.push('D1 should read more open than building mass');
-    if(!checks.propsNonCollision) errors.push('props altered collision');
-    if(!checks.decorPropsUnchanged) errors.push('decor prop roster must remain 12 kinds');
-    if(!checks.noRuntimeErrors) errors.push('runtime errors during street-block check');
-
-    const pass = errors.length === 0;
-    return { pass, build: BUILD_ID, errors, warnings, checks, evidence };
-  } catch(e){
-    errors.push(String(e && e.message ? e.message : e));
-    return { pass: false, build: BUILD_ID, errors, warnings, checks, evidence };
-  }
-}
-
 function runFullSelfCheckInner(){
   const err0 = window.__crRuntimeErrors.length;
   const layout = runLayoutSelfCheck();
@@ -7651,7 +7435,6 @@ function runFullSelfCheckInner(){
   const mobileControlReliability = runMobileControlReliabilitySelfCheck();
   const movementCollision = runMovementCollisionSelfCheck();
   const reachability = runReachabilitySelfCheck();
-  const streetBlockLevel = runStreetBlockLevelSelfCheck();
   const proceduralLevelValidation = runProceduralLevelValidationSelfCheck();
   const fullRunProgression = runFullRunProgressionSelfCheck();
   const onboarding = runOnboardingSelfCheck();
@@ -7663,7 +7446,7 @@ function runFullSelfCheckInner(){
   const levels = runLevelSelfCheck();
   const renderFailure = runRenderFailureSelfCheck();
   const runtimeClean = window.__crRuntimeErrors.length === err0;
-  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && decorativeProps.pass && optionsCleanup.pass && mobileControlReliability.pass && movementCollision.pass && reachability.pass && streetBlockLevel.pass && proceduralLevelValidation.pass && fullRunProgression.pass && onboarding.pass && soundFeedback.pass && declarativeControls.pass && visualReadability.pass && visualRectangleRegression.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
+  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && decorativeProps.pass && optionsCleanup.pass && mobileControlReliability.pass && movementCollision.pass && reachability.pass && proceduralLevelValidation.pass && fullRunProgression.pass && onboarding.pass && soundFeedback.pass && declarativeControls.pass && visualReadability.pass && visualRectangleRegression.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
   return {
     pass,
     build: BUILD_ID,
@@ -7676,7 +7459,6 @@ function runFullSelfCheckInner(){
     mobileControlReliability,
     movementCollision,
     reachability,
-    streetBlockLevel,
     proceduralLevelValidation,
     fullRunProgression,
     onboarding,
@@ -7824,13 +7606,13 @@ function runSoundFeedbackSelfCheckBody(){
   try {
     checks.functionExists = typeof runSoundFeedbackSelfCheck === 'function';
     checks.contract = !!(CR_SOUND_FEEDBACK && CR_SOUND_FEEDBACK.style === 'sound1' && CR_SOUND_FEEDBACK.webAudio === true);
-    checks.buildIdOptionsClean1 = BUILD_ID === 'street1';
+    checks.buildIdOptionsClean1 = BUILD_ID === 'propsread1';
     checks.crTriggerExists = typeof crTriggerSoundCue === 'function';
     checks.crSoundEnabledFn = typeof crSoundEnabled === 'function';
     checks.noExternalAudioTags = document.querySelectorAll('audio,source[src]').length === 0;
     checks.harnessMuted = _crHarnessDepth > 0 && crSoundEnabled() === false;
     if(!checks.contract) errors.push('CR_SOUND_FEEDBACK contract missing');
-    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be street1');
+    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be propsread1');
     if(!checks.crTriggerExists) errors.push('crTriggerSoundCue missing');
     if(!checks.harnessMuted) errors.push('harness must mute gameplay sound');
     if(!checks.noExternalAudioTags) errors.push('external audio tags present');
@@ -7893,13 +7675,13 @@ function runVisualReadabilitySelfCheckBody(){
   mobileOverride = true;
   try {
     checks.functionExists = typeof runVisualReadabilitySelfCheck === 'function';
-    checks.buildIdOptionsClean1 = BUILD_ID === 'street1';
+    checks.buildIdOptionsClean1 = BUILD_ID === 'propsread1';
     checks.visualContract = !!(CR_VISUAL_READABILITY && CR_VISUAL_READABILITY.style === 'visualfix1');
     checks.noScreenPathStripe = CR_VISUAL_READABILITY.floorPathStripe === false;
     checks.pickupTex = !!TEX.can;
     checks.npcTex = !!TEX.hungry;
     checks.exitTex = !!TEX.exit;
-    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be street1');
+    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be propsread1');
     if(!checks.visualContract) errors.push('CR_VISUAL_READABILITY contract missing');
     if(!checks.noScreenPathStripe) errors.push('screen-space floor path stripe must stay disabled');
     if(!checks.pickupTex || !checks.npcTex || !checks.exitTex) errors.push('sprite textures missing');
@@ -8026,9 +7808,9 @@ function runVisualRectangleRegressionSelfCheckBody(){
   mobileOverride = true;
   try {
     checks.functionExists = typeof runVisualRectangleRegressionSelfCheck === 'function';
-    checks.buildIdOptionsClean1 = BUILD_ID === 'street1';
+    checks.buildIdOptionsClean1 = BUILD_ID === 'propsread1';
     checks.noScreenPathStripe = !!(CR_VISUAL_READABILITY && CR_VISUAL_READABILITY.floorPathStripe === false);
-    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be street1');
+    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be propsread1');
     if(!checks.noScreenPathStripe) errors.push('screen-space path stripe flag must be false');
 
     startRun(42);
@@ -10116,7 +9898,7 @@ globalThis.CR = window.CR = {
   set paused(v){ paused=!!v; },
   get mobileMode(){ return mobileMode; },
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
-  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runDecorativePropsSelfCheck,runOptionsCleanupSelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runStreetBlockLevelSelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
+  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runDecorativePropsSelfCheck,runOptionsCleanupSelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
   CR_VISUAL_READABILITY,CR_SOUND_FEEDBACK,DECOR_PROP_REQUIRED,INPUT_CONFIG,CR_CONTROLS_LS_KEY,crTriggerSoundCue,crSoundEnabled,crSoundFeedbackCueIds,crLoadControlOverrides,crPersistControlOverrides,crResetControlLayoutOverrides,crClearControlOverrides,crEnterControlEditMode,crFinishControlEditMode,crControlHitTest,crSnapshotLayoutNorms,crPrepareSelfCheckPortrait,crStepEditControlSize,crSelectEditControl,
   getCrVisualHarnessSnapshot(){ return _crVisualHarnessSnapshot; },
   showOnboardingHelp,dismissOnboardingHelp,crOpenFirstRunHelpIfNeeded,

@@ -1,0 +1,127 @@
+{
+  "pass": true,
+  "build": "street1",
+  "errors": [],
+  "warnings": [],
+  "checks": {
+    "buildIdStreet1": true,
+    "footprintUnchanged": true,
+    "mainRoadSpine": true,
+    "sideBuildings": true,
+    "alleyServiceZones": true,
+    "d1SimpleOpen": true,
+    "reachabilityPasses": true,
+    "propsNonCollision": true,
+    "decorPropsUnchanged": true,
+    "noRuntimeErrors": true
+  },
+  "evidence": {
+    "seeds": [
+      {
+        "seed": 880101,
+        "district": 1,
+        "modifier": "",
+        "MAP_W": 40,
+        "MAP_H": 20,
+        "metrics": {
+          "mainRoad": 418,
+          "buildings": 8,
+          "alleys": 76,
+          "pockets": 182,
+          "GW": 40,
+          "GH": 20
+        }
+      },
+      {
+        "seed": 880102,
+        "district": 2,
+        "modifier": "",
+        "MAP_W": 40,
+        "MAP_H": 20,
+        "metrics": {
+          "mainRoad": 418,
+          "buildings": 22,
+          "alleys": 76,
+          "pockets": 168,
+          "GW": 40,
+          "GH": 20
+        }
+      },
+      {
+        "seed": 880103,
+        "district": 3,
+        "modifier": "",
+        "MAP_W": 40,
+        "MAP_H": 20,
+        "metrics": {
+          "mainRoad": 342,
+          "buildings": 34,
+          "alleys": 76,
+          "pockets": 232,
+          "GW": 40,
+          "GH": 20
+        }
+      },
+      {
+        "seed": 880104,
+        "district": 4,
+        "modifier": "",
+        "MAP_W": 40,
+        "MAP_H": 20,
+        "metrics": {
+          "mainRoad": 342,
+          "buildings": 34,
+          "alleys": 76,
+          "pockets": 232,
+          "GW": 40,
+          "GH": 20
+        }
+      },
+      {
+        "seed": 880105,
+        "district": 5,
+        "modifier": "",
+        "MAP_W": 40,
+        "MAP_H": 20,
+        "metrics": {
+          "mainRoad": 266,
+          "buildings": 56,
+          "alleys": 76,
+          "pockets": 286,
+          "GW": 40,
+          "GH": 20
+        }
+      },
+      {
+        "seed": 42,
+        "district": 1,
+        "modifier": "clear",
+        "MAP_W": 40,
+        "MAP_H": 20,
+        "metrics": {
+          "mainRoad": 342,
+          "buildings": 7,
+          "alleys": 76,
+          "pockets": 259,
+          "GW": 40,
+          "GH": 20
+        }
+      },
+      {
+        "seed": 42,
+        "district": 3,
+        "modifier": "maze",
+        "MAP_W": 40,
+        "MAP_H": 20,
+        "metrics": {
+          "mainRoad": 190,
+          "buildings": 87,
+          "alleys": 76,
+          "pockets": 331,
+          "GW": 40,
+          "GH": 20
+        }
+      }
+    ]
+  }
+}

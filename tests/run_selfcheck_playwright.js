@@ -1099,6 +1099,65 @@ async function decorativePropsSection(page) {
   return { pass, proof, decorativeProps: dp };
 }
 
+async function streetBlockLevelSection(page) {
+  const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await waitGameReady(page);
+
+  const sb = await page.evaluate(() => CR.runStreetBlockLevelSelfCheck());
+  writeProof('proof-street-block-level.json', sb);
+
+  await page.evaluate(() => {
+    CR.startRun(880101);
+    CR.state = CR.STATE.PLAY;
+    CR.paused = false;
+  });
+  await page.waitForTimeout(120);
+  await page.screenshot({ path: path.join(ROOT, 'proof-street-block-d1.png') });
+
+  await page.evaluate(() => {
+    CR.startRun(880103);
+    CR.state = CR.STATE.PLAY;
+    CR.paused = false;
+  });
+  await page.waitForTimeout(120);
+  await page.screenshot({ path: path.join(ROOT, 'proof-street-block-d3.png') });
+
+  await page.evaluate(() => {
+    CR.startRun(880102);
+    CR.state = CR.STATE.PLAY;
+    CR.paused = false;
+  });
+  await page.waitForTimeout(80);
+  await page.screenshot({ path: path.join(ROOT, 'proof-street-block-d2.png') });
+
+  await page.evaluate(() => {
+    CR.startRun(880104);
+    CR.state = CR.STATE.PLAY;
+    CR.paused = false;
+  });
+  await page.waitForTimeout(80);
+  await page.screenshot({ path: path.join(ROOT, 'proof-street-block-minimap.png') });
+
+  const isoOk = await page.evaluate(() => CR.crFingerprintPublicSafe(CR.crPublicStateFingerprint()));
+  const pass = sb.pass === true && isoOk !== false;
+  const proof = {
+    pass,
+    build: sb.build,
+    streetBlockLevel: sb,
+    harnessStateOk: isoOk,
+    screenshots: [
+      'proof-street-block-d1.png',
+      'proof-street-block-d2.png',
+      'proof-street-block-d3.png',
+      'proof-street-block-minimap.png',
+    ],
+    timestamp: new Date().toISOString(),
+  };
+  return { pass, proof, streetBlockLevel: sb };
+}
+
 async function optionsCleanupSection(page) {
   const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
   await page.setViewportSize({ width: 390, height: 844 });
@@ -1432,6 +1491,7 @@ async function main() {
   const portraitUsability = await portraitUsabilitySection(page);
   const optionsCleanup = await optionsCleanupSection(page);
   const decorativeProps = await decorativePropsSection(page);
+  const streetBlockLevel = await streetBlockLevelSection(page);
   const settingsSafetyPass = portraitUsability.settingsSafety?.pass === true;
 
   const mobileControlReliability = await mobileControlReliabilitySection(page);
@@ -1479,6 +1539,7 @@ async function main() {
     portraitUsability.pass &&
     optionsCleanup.pass &&
     decorativeProps.pass &&
+    streetBlockLevel.pass &&
     settingsSafetyPass &&
     mobileControlReliability.pass &&
     declarativeControls.pass &&
