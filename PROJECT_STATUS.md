@@ -9,7 +9,7 @@ Last updated: Community street punk decor props (`props1`).
 | | |
 |--|--|
 | **BUILD_ID** (root `index.html`) | `props1` |
-| **Gameplay commit** | *(pending push)* |
+| **Gameplay commit** | `6adc981` |
 | **Prior BUILD_ID** | `optionsclean1` / `8ef75ad` |
 | **Prior** | `controledit1` / `controls1` |
 | **Sound baseline** | `sound1` / `d06b2ee` |
