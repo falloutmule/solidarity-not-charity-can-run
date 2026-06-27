@@ -2,7 +2,7 @@
 
 SNC Can Run uses **in-browser self-checks** (`window.CR`) plus a **Playwright** driver that loads root **`index.html`** and collects proofs.
 
-**Gameplay baseline:** `BUILD_ID` `props1`, commit `6adc981` — see `PROJECT_STATUS.md` for cache-busted Play / self-check URLs.
+**Gameplay baseline:** `BUILD_ID` `propsread1` — see `PROJECT_STATUS.md` for cache-busted Play / self-check URLs.
 
 ## In-browser (`window.CR`)
 

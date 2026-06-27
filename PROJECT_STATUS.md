@@ -1,6 +1,6 @@
 # Project status — Solidarity Not Charity Can Run
 
-Last updated: Community street punk decor props (`props1`).
+Last updated: Prop readability polish (`propsread1`).
 
 **CI:** `.github/workflows/selfcheck.yml` runs `npm run test:selfcheck` on push/PR to `main`.
 
@@ -8,20 +8,17 @@ Last updated: Community street punk decor props (`props1`).
 
 | | |
 |--|--|
-| **BUILD_ID** (root `index.html`) | `props1` |
-| **Gameplay commit** | `6adc981` |
-| **Prior BUILD_ID** | `optionsclean1` / `8ef75ad` |
-| **Prior** | `controledit1` / `controls1` |
-| **Sound baseline** | `sound1` / `d06b2ee` |
-
-**CI (props1 gameplay):** [SNC Can Run Selfcheck run 28292488544](https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28292488544) — `success` on `6adc981`, artifact `snc-can-run-proof-artifacts`.
+| **BUILD_ID** (root `index.html`) | `propsread1` |
+| **Gameplay commit** | *(pending push)* |
+| **Prior BUILD_ID** | `props1` / `6adc981` |
+| **Prior** | `optionsclean1` / `8ef75ad` |
 
 ## URLs
 
-- **Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=6adc981&mobile=on&portraitlayout=1  
-- **Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=6adc981&mobile=on&portraitlayout=1  
+- **Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=**COMMIT**&mobile=on&portraitlayout=1  
+- **Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=**COMMIT**&mobile=on&portraitlayout=1  
 
-*(Cache-bust with `6adc981` — see `reports/guards/COMMUNITY_STREET_PUNK_PROP_PASS_REPORT.md`.)*
+*(Replace **COMMIT** with gameplay SHA after push; see `reports/guards/PROP_READABILITY_POLISH_REPORT.md`.)*
 
 ## Completed cards (order)
 
@@ -42,13 +39,14 @@ Last updated: Community street punk decor props (`props1`).
 15. **EDIT CONTROLS visibility** — `controledit1` — **closed**  
 16. **EDIT CONTROLS resize** — `controlsresize1` — **closed**  
 17. **OPTIONS cleanup** — `optionsclean1`, `CR.runOptionsCleanupSelfCheck` — **closed**  
-18. **Community street punk decor props** — `props1`, `CR.runDecorativePropsSelfCheck` — **closed**
+18. **Community street punk decor props** — `props1`, `CR.runDecorativePropsSelfCheck` — **closed**  
+19. **Prop readability polish** — `propsread1`, `CR.runDecorativePropsSelfCheck` — **closed** (local harness)
 
 ## Next likely work
 
-- New gameplay or reliability cards **only when explicitly requested** (no broad refactors).  
+- Level design card (explicit handoff only).  
 - Optional: modular `src/` **only after** proven build parity to single-file artifact.
 
 ## Blockers
 
-- None known after local harness + GitHub Actions CI pass on verified `props1` commit `6adc981`.
+- None known after local `npm run test:selfcheck` PASS on `propsread1` (await CI on push).
