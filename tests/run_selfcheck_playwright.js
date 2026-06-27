@@ -1234,6 +1234,43 @@ async function levelSelectorSection(page) {
   };
 }
 
+async function streetReadabilityMinimapSection(page) {
+  const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await waitGameReady(page);
+
+  const sr = await page.evaluate(() => CR.runStreetReadabilityMinimapSelfCheck());
+  writeProof('proof-street-readability-minimap.json', sr);
+
+  const shots = [
+    { d: 1, seed: 890201, file: 'proof-street-readability-d1.png' },
+    { d: 2, seed: 890202, file: 'proof-street-readability-d2.png' },
+    { d: 3, seed: 890203, file: 'proof-street-readability-d3.png' },
+    { d: 4, seed: 890204, file: 'proof-street-readability-d4.png' },
+  ];
+  for (const s of shots) {
+    await page.evaluate(({ d, seed }) => {
+      CR.crSetSelectedStartDistrict(d);
+      CR.startRun(seed);
+      CR.state = CR.STATE.PLAY;
+      CR.paused = false;
+    }, s);
+    await page.waitForTimeout(140);
+    await page.screenshot({ path: path.join(ROOT, s.file) });
+  }
+  await page.evaluate(() => {
+    CR.crSetSelectedStartDistrict(2);
+    CR.startRun(890202);
+    CR.state = CR.STATE.PLAY;
+    CR.paused = false;
+  });
+  await page.waitForTimeout(80);
+  await page.screenshot({ path: path.join(ROOT, 'proof-street-readability-minimap.png') });
+
+  return { pass: sr.pass === true, streetReadabilityMinimap: sr };
+}
+
 async function buildingScalePolishSection(page) {
   const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
   await page.setViewportSize({ width: 412, height: 915 });
@@ -1663,6 +1700,7 @@ async function main() {
   const decorativeProps = await decorativePropsSection(page);
   const streetBlockLevel = await streetBlockLevelSection(page);
   const d1ParkLandmark = await d1ParkLandmarkSection(page);
+  const streetReadabilityMinimap = await streetReadabilityMinimapSection(page);
   const earlyDistrictProgression = await earlyDistrictProgressionSection(page);
   const levelSelector = await levelSelectorSection(page);
   const buildingScalePolish = await buildingScalePolishSection(page);
@@ -1715,6 +1753,7 @@ async function main() {
     decorativeProps.pass &&
     streetBlockLevel.pass &&
     d1ParkLandmark.pass &&
+    streetReadabilityMinimap.pass &&
     earlyDistrictProgression.pass &&
     levelSelector.pass &&
     buildingScalePolish.pass &&
@@ -1766,6 +1805,7 @@ async function main() {
     decorativeProps,
     streetBlockLevel,
     d1ParkLandmark,
+    streetReadabilityMinimap,
     earlyDistrictProgression,
     levelSelector,
     buildingScalePolish,
