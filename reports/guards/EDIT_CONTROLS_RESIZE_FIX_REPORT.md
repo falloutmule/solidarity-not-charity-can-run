@@ -3,7 +3,8 @@
 **Card:** EDIT CONTROLS resize (SIZE − / SIZE +)  
 **Previous baseline:** `controledit1` / `f543956` (handoff cited `controls1` / `4e311e7`)  
 **New BUILD_ID:** `controlsresize1`  
-**Gameplay commit:** `14b31e84be3b62c06809feb2d83bd5105755a224`
+**Gameplay commit:** `14b31e84be3b62c06809feb2d83bd5105755a224`  
+**Backup:** `index.before-edit-controls-resize-fix.html` (local; gitignored)
 
 ## Problem
 
@@ -56,7 +57,7 @@ Result: **`{"pass":true}`** (after implementation).
 
 ## CI
 
-- Workflow: **SNC Can Run Selfcheck** (run URL after Actions completes)
+- Workflow: **SNC Can Run Selfcheck** — https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28287339748 (success)
 - Artifact: **`snc-can-run-proof-artifacts`**
 
 ## Unchanged
