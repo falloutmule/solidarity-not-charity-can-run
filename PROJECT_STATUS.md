@@ -1,26 +1,26 @@
 # Project status — Solidarity Not Charity Can Run
 
-Last updated: sound / feedback pass closed (`sound1` / `d06b2ee`).
+Last updated: declarative custom controls card closed (`controls1` / `4e311e7`).
 
 Reports were moved into **`reports/`** to keep the GitHub root readable. Index: **`reports/README.md`**; guard write-ups: **`reports/guards/`**.
 
-**CI:** `.github/workflows/selfcheck.yml` runs `npm run test:selfcheck` on push/PR to `main`. Latest selfcheck: **success** — https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28268576866 (artifact **`snc-can-run-proof-artifacts`**).
+**CI:** `.github/workflows/selfcheck.yml` runs `npm run test:selfcheck` on push/PR to `main`. Latest selfcheck on gameplay baseline: **success** — https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28285372330 (artifact **`snc-can-run-proof-artifacts`**, **headSha** `4e311e7`).
 
 ## Gameplay baseline
 
 | | |
 |--|--|
-| **BUILD_ID** (root `index.html`) | `sound1` |
-| **Gameplay commit** | `d06b2ee` |
-| **Prior gameplay baseline** | `visualfix1` / `fd487c2` |
+| **BUILD_ID** (root `index.html`) | `controls1` |
+| **Gameplay commit** | `4e311e7` |
+| **Prior gameplay baseline** | `sound1` / `d06b2ee` |
 | **Handoff reference baseline** | `onboard1` / `aaaf901` |
 
 ## URLs
 
-- **Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=d06b2ee&mobile=on&portraitlayout=1  
-- **Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=d06b2ee&mobile=on&portraitlayout=1  
+- **Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=4e311e7&mobile=on&portraitlayout=1  
+- **Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=4e311e7&mobile=on&portraitlayout=1  
 
-*(Cache-bust with `d06b2ee` — see `reports/guards/SOUND_FEEDBACK_PASS_REPORT.md`.)*
+*(Cache-bust with `4e311e7` — see `reports/guards/DECLARATIVE_CUSTOM_CONTROLS_REPORT.md`.)*
 
 ## Completed cards (order)
 
@@ -36,7 +36,8 @@ Reports were moved into **`reports/`** to keep the GitHub root readable. Index: 
 10. **Onboarding / first-run help** — `onboard1`, `CR.runOnboardingSelfCheck`  
 11. **Visual readability polish** — `visual1`, `CR.runVisualReadabilitySelfCheck`  
 12. **Visual rectangle regression fix** — `visualfix1`, `CR.runVisualRectangleRegressionSelfCheck`  
-13. **Sound / feedback pass** — `sound1` / `d06b2ee`, `CR.runSoundFeedbackSelfCheck` — **closed**
+13. **Sound / feedback pass** — `sound1` / `d06b2ee`, `CR.runSoundFeedbackSelfCheck`  
+14. **Declarative custom mobile controls** — `controls1` / `4e311e7`, `CR.runDeclarativeControlsSelfCheck` — **closed**
 
 ## Next likely work
 
@@ -45,4 +46,4 @@ Reports were moved into **`reports/`** to keep the GitHub root readable. Index: 
 
 ## Blockers
 
-- None known after local harness + GitHub Actions CI pass on `d06b2ee`.
+- None known after local harness + GitHub Actions CI pass on `4e311e7`.

@@ -1,7 +1,7 @@
 # Reports — SNC Can Run
 
 Main hub for guard cards, reference studies, history, proofs, and backups.  
-**Gameplay baseline:** `sound1` — see **`../PROJECT_STATUS.md`**.
+**Gameplay baseline:** `controls1` / `4e311e7` — see **`../PROJECT_STATUS.md`**.
 
 Reports were moved out of the repo root so GitHub shows only the game + core docs.
 
@@ -28,6 +28,7 @@ Reports were moved out of the repo root so GitHub shows only the game + core doc
 | 15 | Visual readability polish | [guards/VISUAL_READABILITY_POLISH_REPORT.md](guards/VISUAL_READABILITY_POLISH_REPORT.md) | `visual1` | `CR.runVisualReadabilitySelfCheck` + proof PNGs | Yes (render/HUD) |
 | 16 | Visual rectangle regression fix | [guards/VISUAL_RECTANGLE_REGRESSION_FIX_REPORT.md](guards/VISUAL_RECTANGLE_REGRESSION_FIX_REPORT.md) | `visualfix1` | `CR.runVisualRectangleRegressionSelfCheck` | Yes (render fix) |
 | 17 | Sound / feedback pass | [guards/SOUND_FEEDBACK_PASS_REPORT.md](guards/SOUND_FEEDBACK_PASS_REPORT.md) | `sound1` | `CR.runSoundFeedbackSelfCheck` + feedback proof PNGs | Yes (audio/HUD) |
+| 18 | Declarative custom controls | [guards/DECLARATIVE_CUSTOM_CONTROLS_REPORT.md](guards/DECLARATIVE_CUSTOM_CONTROLS_REPORT.md) | `controls1` / `4e311e7` | `CR.runDeclarativeControlsSelfCheck` + edit proof PNGs | Yes (controls UI; layout frozen by default) |
 
 ---
 
