@@ -1,7 +1,7 @@
 # Reports — SNC Can Run
 
 Main hub for guard cards, reference studies, history, proofs, and backups.  
-**Gameplay baseline:** `districts1` — see **`../PROJECT_STATUS.md`**.
+**Gameplay baseline:** `levelselect1` — see **`../PROJECT_STATUS.md`**.
 
 Reports were moved out of the repo root so GitHub shows only the game + core docs.
 
@@ -37,6 +37,7 @@ Reports were moved out of the repo root so GitHub shows only the game + core doc
 | 24 | Street-block level grammar | [guards/STREET_BLOCK_LEVEL_GRAMMAR_REPORT.md](guards/STREET_BLOCK_LEVEL_GRAMMAR_REPORT.md) | `street1` / `3cb957a` | `CR.runStreetBlockLevelSelfCheck` + street proof PNGs | Yes (procedural layout) |
 | 25 | D1 park landmark / plaza | [guards/D1_PARK_LANDMARK_PASS_REPORT.md](guards/D1_PARK_LANDMARK_PASS_REPORT.md) | `park1` / `e801077` | `CR.runD1ParkLandmarkSelfCheck` + D1 park proof PNGs | Yes (D1 layout + decor) |
 | 26 | Early district progression (D1–D4) | [guards/EARLY_DISTRICT_PROGRESSION_REPORT.md](guards/EARLY_DISTRICT_PROGRESSION_REPORT.md) | `districts1` / `6b43a16` | `CR.runEarlyDistrictProgressionSelfCheck` + district PNGs | Yes (D1–D4 grammar) |
+| 27 | Level selector (START DISTRICT) | [guards/LEVEL_SELECTOR_PASS_REPORT.md](guards/LEVEL_SELECTOR_PASS_REPORT.md) | `levelselect1` / `9136c01` | `CR.runLevelSelectorSelfCheck` + selector proof PNGs | Yes (title menu testing) |
 
 ---
 

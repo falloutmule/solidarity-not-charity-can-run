@@ -2,11 +2,11 @@
 
 SNC Can Run uses **in-browser self-checks** (`window.CR`) plus a **Playwright** driver that loads root **`index.html`** and collects proofs.
 
-**Gameplay baseline:** `BUILD_ID` `districts1` — see `PROJECT_STATUS.md` for cache-busted Play / self-check URLs.
+**Gameplay baseline:** `BUILD_ID` `levelselect1` — see `PROJECT_STATUS.md` for cache-busted Play / self-check URLs.
 
 ## In-browser (`window.CR`)
 
-- Functions like `CR.runLayoutSelfCheck()`, `CR.runFullSelfCheck()`, `CR.runEarlyDistrictProgressionSelfCheck()`, `CR.runStreetBlockLevelSelfCheck()`, `CR.runD1ParkLandmarkSelfCheck()`, `CR.runOnboardingSelfCheck()`, `CR.runSoundFeedbackSelfCheck()`, `CR.runVisualReadabilitySelfCheck()`, `CR.runVisualRectangleRegressionSelfCheck()`, `CR.runDecorativePropsSelfCheck()`, `CR.runOptionsCleanupSelfCheck()`, `CR.runHallSelfCheck()`, etc.
+- Functions like `CR.runLayoutSelfCheck()`, `CR.runFullSelfCheck()`, `CR.runLevelSelectorSelfCheck()`, `CR.runEarlyDistrictProgressionSelfCheck()`, `CR.runStreetBlockLevelSelfCheck()`, `CR.runD1ParkLandmarkSelfCheck()`, `CR.runOnboardingSelfCheck()`, `CR.runSoundFeedbackSelfCheck()`, `CR.runVisualReadabilitySelfCheck()`, `CR.runVisualRectangleRegressionSelfCheck()`, `CR.runDecorativePropsSelfCheck()`, `CR.runOptionsCleanupSelfCheck()`, `CR.runHallSelfCheck()`, etc.
 - URL: `?selfcheck=1` runs full check and shows PASS/FAIL overlay.
 - **`crWithTemporaryState`** — snapshots public state + `localStorage`, runs harness, restores so benchmarks do not leak.
 - **`__crRuntimeErrors`** — uncaught errors fail runtime-clean checks.
@@ -47,6 +47,8 @@ SNC Can Run uses **in-browser self-checks** (`window.CR`) plus a **Playwright** 
 | `proof-d1-park-landmark.json` … `proof-d1-park-landmark-minimap.png` | D1 park landmark |
 | `proof-early-district-progression.json` | Early D1–D4 progression self-check |
 | `proof-d1-park-plaza.png` … `proof-d4-service-pockets.png` | District minimap progression shots |
+| `proof-level-selector.json` | START DISTRICT menu + direct-start self-check |
+| `proof-level-selector-menu.png` … `proof-level-selector-d4.png` | Selector menu + D1–D4 start shots |
 | `proof-options-cleanup-menu.png` / `proof-options-cleanup-edit-controls.png` | OPTIONS cleanup proof shots |
 | `proof-control-resize-move-before.png` … `proof-control-resize-button-after.png` | Resize proof shots |
 | `proof-control-edit-reset.png` | RESET CONTROLS |
