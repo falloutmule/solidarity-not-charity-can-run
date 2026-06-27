@@ -62,7 +62,7 @@
     "errors": [],
     "artifactPath": "C:\\Users\\fallo\\Documents\\HermesProjects\\canned-run\\index.html",
     "policyPath": "C:\\Users\\fallo\\Documents\\HermesProjects\\canned-run\\SOURCE_RELEASE_POLICY.md",
-    "timestamp": "2026-06-27T16:29:32.583Z"
+    "timestamp": "2026-06-27T16:58:20.761Z"
   },
   "aiSafeConstitution": {
     "pass": true,
@@ -83,17 +83,17 @@
     "pageErrorCount": 0,
     "fullSelfCheck": {
       "pass": true,
-      "build": "street1"
+      "build": "park1"
     },
     "playwrightSummaryPass": true,
-    "buildId": "street1",
-    "commitHash": "fcdd519",
+    "buildId": "park1",
+    "commitHash": "7e1e82e",
     "errors": [],
-    "timestamp": "2026-06-27T16:31:24.834Z"
+    "timestamp": "2026-06-27T17:00:17.146Z"
   },
   "fullSelfCheck": {
     "pass": true,
-    "build": "street1"
+    "build": "park1"
   },
   "dock": {
     "pass": true,
@@ -106,27 +106,27 @@
       "ml": {
         "top": 557,
         "left": 10,
-        "menuText": "MENUstreet1"
+        "menuText": "MENUpark1"
       },
       "mg": {
         "top": 484,
         "left": 35,
-        "menuText": "MENUstreet1"
+        "menuText": "MENUpark1"
       },
       "ms": {
         "top": 533,
         "left": 313,
-        "menuText": "MENUstreet1"
+        "menuText": "MENUpark1"
       },
       "mlookpad": {
         "top": 557,
         "left": 268,
-        "menuText": "MENUstreet1"
+        "menuText": "MENUpark1"
       },
       "mportmenu": {
         "top": 463,
         "left": 115,
-        "menuText": "MENUstreet1"
+        "menuText": "MENUpark1"
       },
       "canvas": {
         "top": 0,
@@ -213,27 +213,27 @@
       "ml": {
         "top": 437,
         "left": 10,
-        "menuText": "MENUstreet1"
+        "menuText": "MENUpark1"
       },
       "mg": {
         "top": 364,
         "left": 35,
-        "menuText": "MENUstreet1"
+        "menuText": "MENUpark1"
       },
       "ms": {
         "top": 413,
         "left": 313,
-        "menuText": "MENUstreet1"
+        "menuText": "MENUpark1"
       },
       "mlookpad": {
         "top": 437,
         "left": 268,
-        "menuText": "MENUstreet1"
+        "menuText": "MENUpark1"
       },
       "mportmenu": {
         "top": 463,
         "left": 115,
-        "menuText": "MENUstreet1"
+        "menuText": "MENUpark1"
       },
       "canvas": {
         "top": 0,
@@ -320,27 +320,27 @@
       "ml": {
         "top": 534,
         "left": 10,
-        "menuText": "MENUstreet1"
+        "menuText": "MENUpark1"
       },
       "mg": {
         "top": 461,
         "left": 35,
-        "menuText": "MENUstreet1"
+        "menuText": "MENUpark1"
       },
       "ms": {
         "top": 510,
         "left": 313,
-        "menuText": "MENUstreet1"
+        "menuText": "MENUpark1"
       },
       "mlookpad": {
         "top": 534,
         "left": 268,
-        "menuText": "MENUstreet1"
+        "menuText": "MENUpark1"
       },
       "mportmenu": {
         "top": 463,
         "left": 115,
-        "menuText": "MENUstreet1"
+        "menuText": "MENUpark1"
       },
       "canvas": {
         "top": 0,
@@ -469,7 +469,7 @@
   "audio": {
     "pass": true,
     "before": {
-      "BUILD_ID": "street1",
+      "BUILD_ID": "park1",
       "gateBound": true,
       "unlockAttempted": false,
       "hasContext": false,
@@ -484,7 +484,7 @@
       "harnessMuted": false
     },
     "after": {
-      "BUILD_ID": "street1",
+      "BUILD_ID": "park1",
       "gateBound": true,
       "unlockAttempted": false,
       "hasContext": true,
@@ -504,7 +504,7 @@
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "street1",
+      "build": "park1",
       "scenarios": [
         {
           "label": "pixel7-portrait",
@@ -515,7 +515,7 @@
           "pass": true,
           "checkInitial": {
             "pass": true,
-            "build": "street1",
+            "build": "park1",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -589,7 +589,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "street1",
+              "BUILD_ID": "park1",
               "inner": {
                 "w": 412,
                 "h": 915
@@ -633,11 +633,11 @@
               "cw": 412,
               "ch": 915
             },
-            "timestamp": "2026-06-27T16:29:50.517Z"
+            "timestamp": "2026-06-27T16:58:40.499Z"
           },
           "checkAfterResize": {
             "pass": true,
-            "build": "street1",
+            "build": "park1",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -711,7 +711,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "street1",
+              "BUILD_ID": "park1",
               "inner": {
                 "w": 412,
                 "h": 875
@@ -755,7 +755,7 @@
               "cw": 412,
               "ch": 875
             },
-            "timestamp": "2026-06-27T16:29:50.722Z"
+            "timestamp": "2026-06-27T16:58:40.716Z"
           },
           "fingerprint": {
             "state": "play",
@@ -763,7 +763,7 @@
             "benchmark": false,
             "mapW": 40,
             "mapH": 20,
-            "timeLeft": 94.43340000000003,
+            "timeLeft": 94.41670000000003,
             "seed": 77,
             "runActive": true,
             "harnessOnly": false,
@@ -782,7 +782,7 @@
           "pass": true,
           "checkInitial": {
             "pass": true,
-            "build": "street1",
+            "build": "park1",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -809,7 +809,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "street1",
+              "BUILD_ID": "park1",
               "inner": {
                 "w": 915,
                 "h": 412
@@ -853,11 +853,11 @@
               "cw": 915,
               "ch": 412
             },
-            "timestamp": "2026-06-27T16:29:51.531Z"
+            "timestamp": "2026-06-27T16:58:41.541Z"
           },
           "checkAfterResize": {
             "pass": true,
-            "build": "street1",
+            "build": "park1",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -884,7 +884,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "street1",
+              "BUILD_ID": "park1",
               "inner": {
                 "w": 915,
                 "h": 400
@@ -928,7 +928,7 @@
               "cw": 915,
               "ch": 400
             },
-            "timestamp": "2026-06-27T16:29:51.749Z"
+            "timestamp": "2026-06-27T16:58:41.758Z"
           },
           "fingerprint": {
             "state": "play",
@@ -936,7 +936,7 @@
             "benchmark": false,
             "mapW": 40,
             "mapH": 20,
-            "timeLeft": 94.41660000000003,
+            "timeLeft": 94.41670000000003,
             "seed": 77,
             "runActive": true,
             "harnessOnly": false,
@@ -955,7 +955,7 @@
           "pass": true,
           "checkInitial": {
             "pass": true,
-            "build": "street1",
+            "build": "park1",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -1029,7 +1029,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "street1",
+              "BUILD_ID": "park1",
               "inner": {
                 "w": 360,
                 "h": 800
@@ -1073,11 +1073,11 @@
               "cw": 360,
               "ch": 800
             },
-            "timestamp": "2026-06-27T16:29:52.571Z"
+            "timestamp": "2026-06-27T16:58:42.613Z"
           },
           "checkAfterResize": {
             "pass": true,
-            "build": "street1",
+            "build": "park1",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -1151,7 +1151,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "street1",
+              "BUILD_ID": "park1",
               "inner": {
                 "w": 360,
                 "h": 760
@@ -1195,7 +1195,7 @@
               "cw": 360,
               "ch": 760
             },
-            "timestamp": "2026-06-27T16:29:52.788Z"
+            "timestamp": "2026-06-27T16:58:42.830Z"
           },
           "fingerprint": {
             "state": "play",
@@ -1222,7 +1222,7 @@
           "pass": true,
           "checkInitial": {
             "pass": true,
-            "build": "street1",
+            "build": "park1",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -1296,7 +1296,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "street1",
+              "BUILD_ID": "park1",
               "inner": {
                 "w": 390,
                 "h": 720
@@ -1340,11 +1340,11 @@
               "cw": 390,
               "ch": 720
             },
-            "timestamp": "2026-06-27T16:29:53.909Z"
+            "timestamp": "2026-06-27T16:58:43.952Z"
           },
           "checkAfterResize": {
             "pass": true,
-            "build": "street1",
+            "build": "park1",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -1418,7 +1418,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "street1",
+              "BUILD_ID": "park1",
               "inner": {
                 "w": 390,
                 "h": 680
@@ -1462,7 +1462,7 @@
               "cw": 390,
               "ch": 680
             },
-            "timestamp": "2026-06-27T16:29:54.132Z"
+            "timestamp": "2026-06-27T16:58:44.168Z"
           },
           "fingerprint": {
             "state": "play",
@@ -1470,7 +1470,7 @@
             "benchmark": false,
             "mapW": 40,
             "mapH": 20,
-            "timeLeft": 94.41660000000003,
+            "timeLeft": 94.40000000000003,
             "seed": 77,
             "runActive": true,
             "harnessOnly": false,
@@ -1489,7 +1489,7 @@
           "pass": true,
           "checkInitial": {
             "pass": true,
-            "build": "street1",
+            "build": "park1",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -1563,7 +1563,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "street1",
+              "BUILD_ID": "park1",
               "inner": {
                 "w": 390,
                 "h": 900
@@ -1607,11 +1607,11 @@
               "cw": 390,
               "ch": 900
             },
-            "timestamp": "2026-06-27T16:29:54.954Z"
+            "timestamp": "2026-06-27T16:58:45.007Z"
           },
           "checkAfterResize": {
             "pass": true,
-            "build": "street1",
+            "build": "park1",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -1685,7 +1685,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "street1",
+              "BUILD_ID": "park1",
               "inner": {
                 "w": 390,
                 "h": 860
@@ -1729,7 +1729,7 @@
               "cw": 390,
               "ch": 860
             },
-            "timestamp": "2026-06-27T16:29:55.174Z"
+            "timestamp": "2026-06-27T16:58:45.224Z"
           },
           "fingerprint": {
             "state": "play",
@@ -1737,7 +1737,7 @@
             "benchmark": false,
             "mapW": 40,
             "mapH": 20,
-            "timeLeft": 94.43350000000004,
+            "timeLeft": 94.41660000000003,
             "seed": 77,
             "runActive": true,
             "harnessOnly": false,
@@ -1756,7 +1756,7 @@
           "pass": true,
           "checkInitial": {
             "pass": true,
-            "build": "street1",
+            "build": "park1",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -1830,7 +1830,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "street1",
+              "BUILD_ID": "park1",
               "inner": {
                 "w": 390,
                 "h": 844
@@ -1874,11 +1874,11 @@
               "cw": 390,
               "ch": 844
             },
-            "timestamp": "2026-06-27T16:29:55.983Z"
+            "timestamp": "2026-06-27T16:58:46.045Z"
           },
           "checkAfterResize": {
             "pass": true,
-            "build": "street1",
+            "build": "park1",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -1952,7 +1952,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "street1",
+              "BUILD_ID": "park1",
               "inner": {
                 "w": 390,
                 "h": 804
@@ -1996,7 +1996,7 @@
               "cw": 390,
               "ch": 804
             },
-            "timestamp": "2026-06-27T16:29:56.201Z"
+            "timestamp": "2026-06-27T16:58:46.263Z"
           },
           "fingerprint": {
             "state": "play",
@@ -2004,7 +2004,7 @@
             "benchmark": false,
             "mapW": 40,
             "mapH": 20,
-            "timeLeft": 94.41680000000004,
+            "timeLeft": 94.41670000000003,
             "seed": 77,
             "runActive": true,
             "harnessOnly": false,
@@ -2015,7 +2015,7 @@
           "shot": null
         }
       ],
-      "timestamp": "2026-06-27T16:29:56.202Z"
+      "timestamp": "2026-06-27T16:58:46.264Z"
     },
     "results": [
       {
@@ -2027,7 +2027,7 @@
         "pass": true,
         "checkInitial": {
           "pass": true,
-          "build": "street1",
+          "build": "park1",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -2101,7 +2101,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "street1",
+            "BUILD_ID": "park1",
             "inner": {
               "w": 412,
               "h": 915
@@ -2145,11 +2145,11 @@
             "cw": 412,
             "ch": 915
           },
-          "timestamp": "2026-06-27T16:29:50.517Z"
+          "timestamp": "2026-06-27T16:58:40.499Z"
         },
         "checkAfterResize": {
           "pass": true,
-          "build": "street1",
+          "build": "park1",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -2223,7 +2223,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "street1",
+            "BUILD_ID": "park1",
             "inner": {
               "w": 412,
               "h": 875
@@ -2267,7 +2267,7 @@
             "cw": 412,
             "ch": 875
           },
-          "timestamp": "2026-06-27T16:29:50.722Z"
+          "timestamp": "2026-06-27T16:58:40.716Z"
         },
         "fingerprint": {
           "state": "play",
@@ -2275,7 +2275,7 @@
           "benchmark": false,
           "mapW": 40,
           "mapH": 20,
-          "timeLeft": 94.43340000000003,
+          "timeLeft": 94.41670000000003,
           "seed": 77,
           "runActive": true,
           "harnessOnly": false,
@@ -2294,7 +2294,7 @@
         "pass": true,
         "checkInitial": {
           "pass": true,
-          "build": "street1",
+          "build": "park1",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -2321,7 +2321,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "street1",
+            "BUILD_ID": "park1",
             "inner": {
               "w": 915,
               "h": 412
@@ -2365,11 +2365,11 @@
             "cw": 915,
             "ch": 412
           },
-          "timestamp": "2026-06-27T16:29:51.531Z"
+          "timestamp": "2026-06-27T16:58:41.541Z"
         },
         "checkAfterResize": {
           "pass": true,
-          "build": "street1",
+          "build": "park1",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -2396,7 +2396,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "street1",
+            "BUILD_ID": "park1",
             "inner": {
               "w": 915,
               "h": 400
@@ -2440,7 +2440,7 @@
             "cw": 915,
             "ch": 400
           },
-          "timestamp": "2026-06-27T16:29:51.749Z"
+          "timestamp": "2026-06-27T16:58:41.758Z"
         },
         "fingerprint": {
           "state": "play",
@@ -2448,7 +2448,7 @@
           "benchmark": false,
           "mapW": 40,
           "mapH": 20,
-          "timeLeft": 94.41660000000003,
+          "timeLeft": 94.41670000000003,
           "seed": 77,
           "runActive": true,
           "harnessOnly": false,
@@ -2467,7 +2467,7 @@
         "pass": true,
         "checkInitial": {
           "pass": true,
-          "build": "street1",
+          "build": "park1",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -2541,7 +2541,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "street1",
+            "BUILD_ID": "park1",
             "inner": {
               "w": 360,
               "h": 800
@@ -2585,11 +2585,11 @@
             "cw": 360,
             "ch": 800
           },
-          "timestamp": "2026-06-27T16:29:52.571Z"
+          "timestamp": "2026-06-27T16:58:42.613Z"
         },
         "checkAfterResize": {
           "pass": true,
-          "build": "street1",
+          "build": "park1",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -2663,7 +2663,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "street1",
+            "BUILD_ID": "park1",
             "inner": {
               "w": 360,
               "h": 760
@@ -2707,7 +2707,7 @@
             "cw": 360,
             "ch": 760
           },
-          "timestamp": "2026-06-27T16:29:52.788Z"
+          "timestamp": "2026-06-27T16:58:42.830Z"
         },
         "fingerprint": {
           "state": "play",
@@ -2734,7 +2734,7 @@
         "pass": true,
         "checkInitial": {
           "pass": true,
-          "build": "street1",
+          "build": "park1",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -2808,7 +2808,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "street1",
+            "BUILD_ID": "park1",
             "inner": {
               "w": 390,
               "h": 720
@@ -2852,11 +2852,11 @@
             "cw": 390,
             "ch": 720
           },
-          "timestamp": "2026-06-27T16:29:53.909Z"
+          "timestamp": "2026-06-27T16:58:43.952Z"
         },
         "checkAfterResize": {
           "pass": true,
-          "build": "street1",
+          "build": "park1",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -2930,7 +2930,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "street1",
+            "BUILD_ID": "park1",
             "inner": {
               "w": 390,
               "h": 680
@@ -2974,7 +2974,7 @@
             "cw": 390,
             "ch": 680
           },
-          "timestamp": "2026-06-27T16:29:54.132Z"
+          "timestamp": "2026-06-27T16:58:44.168Z"
         },
         "fingerprint": {
           "state": "play",
@@ -2982,7 +2982,7 @@
           "benchmark": false,
           "mapW": 40,
           "mapH": 20,
-          "timeLeft": 94.41660000000003,
+          "timeLeft": 94.40000000000003,
           "seed": 77,
           "runActive": true,
           "harnessOnly": false,
@@ -3001,7 +3001,7 @@
         "pass": true,
         "checkInitial": {
           "pass": true,
-          "build": "street1",
+          "build": "park1",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -3075,7 +3075,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "street1",
+            "BUILD_ID": "park1",
             "inner": {
               "w": 390,
               "h": 900
@@ -3119,11 +3119,11 @@
             "cw": 390,
             "ch": 900
           },
-          "timestamp": "2026-06-27T16:29:54.954Z"
+          "timestamp": "2026-06-27T16:58:45.007Z"
         },
         "checkAfterResize": {
           "pass": true,
-          "build": "street1",
+          "build": "park1",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -3197,7 +3197,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "street1",
+            "BUILD_ID": "park1",
             "inner": {
               "w": 390,
               "h": 860
@@ -3241,7 +3241,7 @@
             "cw": 390,
             "ch": 860
           },
-          "timestamp": "2026-06-27T16:29:55.174Z"
+          "timestamp": "2026-06-27T16:58:45.224Z"
         },
         "fingerprint": {
           "state": "play",
@@ -3249,7 +3249,7 @@
           "benchmark": false,
           "mapW": 40,
           "mapH": 20,
-          "timeLeft": 94.43350000000004,
+          "timeLeft": 94.41660000000003,
           "seed": 77,
           "runActive": true,
           "harnessOnly": false,
@@ -3268,7 +3268,7 @@
         "pass": true,
         "checkInitial": {
           "pass": true,
-          "build": "street1",
+          "build": "park1",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -3342,7 +3342,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "street1",
+            "BUILD_ID": "park1",
             "inner": {
               "w": 390,
               "h": 844
@@ -3386,11 +3386,11 @@
             "cw": 390,
             "ch": 844
           },
-          "timestamp": "2026-06-27T16:29:55.983Z"
+          "timestamp": "2026-06-27T16:58:46.045Z"
         },
         "checkAfterResize": {
           "pass": true,
-          "build": "street1",
+          "build": "park1",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -3464,7 +3464,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "street1",
+            "BUILD_ID": "park1",
             "inner": {
               "w": 390,
               "h": 804
@@ -3508,7 +3508,7 @@
             "cw": 390,
             "ch": 804
           },
-          "timestamp": "2026-06-27T16:29:56.201Z"
+          "timestamp": "2026-06-27T16:58:46.263Z"
         },
         "fingerprint": {
           "state": "play",
@@ -3516,7 +3516,7 @@
           "benchmark": false,
           "mapW": 40,
           "mapH": 20,
-          "timeLeft": 94.41680000000004,
+          "timeLeft": 94.41670000000003,
           "seed": 77,
           "runActive": true,
           "harnessOnly": false,
@@ -3532,10 +3532,10 @@
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "street1",
+      "build": "park1",
       "usability": {
         "pass": true,
-        "build": "street1",
+        "build": "park1",
         "errors": [],
         "warnings": [],
         "thresholds": {
@@ -3659,7 +3659,7 @@
       },
       "settingsSafety": {
         "pass": true,
-        "build": "street1",
+        "build": "park1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -3694,11 +3694,11 @@
         "proof-usability-very-high.png",
         "proof-resetcontrols-safe.png"
       ],
-      "timestamp": "2026-06-27T16:30:10.207Z"
+      "timestamp": "2026-06-27T16:59:00.549Z"
     },
     "usability": {
       "pass": true,
-      "build": "street1",
+      "build": "park1",
       "errors": [],
       "warnings": [],
       "thresholds": {
@@ -3834,14 +3834,14 @@
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "street1",
+      "build": "park1",
       "optionsCleanup": {
         "pass": true,
-        "build": "street1",
+        "build": "park1",
         "errors": [],
         "warnings": [],
         "checks": {
-          "buildIdStreet1": true,
+          "buildIdPark1": true,
           "optionsOpens": true,
           "obsoleteAbsent": true,
           "sectionControls": true,
@@ -3865,22 +3865,22 @@
           "lsKeyUnchanged": true
         },
         "evidence": {
-          "htmlSample": "\n      <div class=\"options-scroll-body\">\n      <div class=\"rpantit\">OPTIONS</div>\n      <div class=\"rdesc\" style=\"margin-bottom:8px;color:#6a5a4a;\">build street1</div>\n      <div class=\"options-section-hdr\">CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-edit-controls\">EDIT CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-reset-controls\">RESET CONTROLS</div>\n      <div class=\"ri"
+          "htmlSample": "\n      <div class=\"options-scroll-body\">\n      <div class=\"rpantit\">OPTIONS</div>\n      <div class=\"rdesc\" style=\"margin-bottom:8px;color:#6a5a4a;\">build park1</div>\n      <div class=\"options-section-hdr\">CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-edit-controls\">EDIT CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-reset-controls\">RESET CONTROLS</div>\n      <div class=\"rit\""
         }
       },
       "screenshots": [
         "proof-options-cleanup-menu.png",
         "proof-options-cleanup-edit-controls.png"
       ],
-      "timestamp": "2026-06-27T16:30:11.100Z"
+      "timestamp": "2026-06-27T16:59:01.448Z"
     },
     "optionsCleanup": {
       "pass": true,
-      "build": "street1",
+      "build": "park1",
       "errors": [],
       "warnings": [],
       "checks": {
-        "buildIdStreet1": true,
+        "buildIdPark1": true,
         "optionsOpens": true,
         "obsoleteAbsent": true,
         "sectionControls": true,
@@ -3904,7 +3904,7 @@
         "lsKeyUnchanged": true
       },
       "evidence": {
-        "htmlSample": "\n      <div class=\"options-scroll-body\">\n      <div class=\"rpantit\">OPTIONS</div>\n      <div class=\"rdesc\" style=\"margin-bottom:8px;color:#6a5a4a;\">build street1</div>\n      <div class=\"options-section-hdr\">CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-edit-controls\">EDIT CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-reset-controls\">RESET CONTROLS</div>\n      <div class=\"ri"
+        "htmlSample": "\n      <div class=\"options-scroll-body\">\n      <div class=\"rpantit\">OPTIONS</div>\n      <div class=\"rdesc\" style=\"margin-bottom:8px;color:#6a5a4a;\">build park1</div>\n      <div class=\"options-section-hdr\">CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-edit-controls\">EDIT CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-reset-controls\">RESET CONTROLS</div>\n      <div class=\"rit\""
       }
     }
   },
@@ -3912,14 +3912,14 @@
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "street1",
+      "build": "park1",
       "decorativeProps": {
         "pass": true,
-        "build": "street1",
+        "build": "park1",
         "errors": [],
         "warnings": [],
         "checks": {
-          "buildIdStreet1": true,
+          "buildIdPark1": true,
           "decorArrayExported": true,
           "allKindsDefined": true,
           "propDimsReasonable": true,
@@ -3959,15 +3959,15 @@
         "proof-decorative-props-world.png",
         "proof-decorative-props-closeup.png"
       ],
-      "timestamp": "2026-06-27T16:30:11.836Z"
+      "timestamp": "2026-06-27T16:59:02.152Z"
     },
     "decorativeProps": {
       "pass": true,
-      "build": "street1",
+      "build": "park1",
       "errors": [],
       "warnings": [],
       "checks": {
-        "buildIdStreet1": true,
+        "buildIdPark1": true,
         "decorArrayExported": true,
         "allKindsDefined": true,
         "propDimsReasonable": true,
@@ -4003,6 +4003,638 @@
       ]
     }
   },
+  "streetBlockLevel": {
+    "pass": true,
+    "proof": {
+      "pass": true,
+      "build": "park1",
+      "streetBlockLevel": {
+        "pass": true,
+        "build": "park1",
+        "errors": [],
+        "warnings": [],
+        "checks": {
+          "buildIdPark1": true,
+          "footprintUnchanged": true,
+          "mainRoadSpine": true,
+          "sideBuildings": true,
+          "alleyServiceZones": true,
+          "d1SimpleOpen": true,
+          "reachabilityPasses": true,
+          "propsNonCollision": true,
+          "decorPropsUnchanged": true,
+          "noRuntimeErrors": true
+        },
+        "evidence": {
+          "seeds": [
+            {
+              "seed": 880101,
+              "district": 1,
+              "modifier": "",
+              "MAP_W": 40,
+              "MAP_H": 20,
+              "metrics": {
+                "mainRoad": 418,
+                "buildings": 19,
+                "alleys": 76,
+                "pockets": 171,
+                "GW": 40,
+                "GH": 20
+              }
+            },
+            {
+              "seed": 880102,
+              "district": 2,
+              "modifier": "",
+              "MAP_W": 40,
+              "MAP_H": 20,
+              "metrics": {
+                "mainRoad": 418,
+                "buildings": 22,
+                "alleys": 76,
+                "pockets": 168,
+                "GW": 40,
+                "GH": 20
+              }
+            },
+            {
+              "seed": 880103,
+              "district": 3,
+              "modifier": "",
+              "MAP_W": 40,
+              "MAP_H": 20,
+              "metrics": {
+                "mainRoad": 342,
+                "buildings": 34,
+                "alleys": 76,
+                "pockets": 232,
+                "GW": 40,
+                "GH": 20
+              }
+            },
+            {
+              "seed": 880104,
+              "district": 4,
+              "modifier": "",
+              "MAP_W": 40,
+              "MAP_H": 20,
+              "metrics": {
+                "mainRoad": 342,
+                "buildings": 34,
+                "alleys": 76,
+                "pockets": 232,
+                "GW": 40,
+                "GH": 20
+              }
+            },
+            {
+              "seed": 880105,
+              "district": 5,
+              "modifier": "",
+              "MAP_W": 40,
+              "MAP_H": 20,
+              "metrics": {
+                "mainRoad": 266,
+                "buildings": 56,
+                "alleys": 76,
+                "pockets": 286,
+                "GW": 40,
+                "GH": 20
+              }
+            },
+            {
+              "seed": 42,
+              "district": 1,
+              "modifier": "clear",
+              "MAP_W": 40,
+              "MAP_H": 20,
+              "metrics": {
+                "mainRoad": 342,
+                "buildings": 18,
+                "alleys": 76,
+                "pockets": 248,
+                "GW": 40,
+                "GH": 20
+              }
+            },
+            {
+              "seed": 42,
+              "district": 3,
+              "modifier": "maze",
+              "MAP_W": 40,
+              "MAP_H": 20,
+              "metrics": {
+                "mainRoad": 190,
+                "buildings": 87,
+                "alleys": 76,
+                "pockets": 331,
+                "GW": 40,
+                "GH": 20
+              }
+            }
+          ]
+        }
+      },
+      "harnessStateOk": true,
+      "screenshots": [
+        "proof-street-block-d1.png",
+        "proof-street-block-d2.png",
+        "proof-street-block-d3.png",
+        "proof-street-block-minimap.png"
+      ],
+      "timestamp": "2026-06-27T16:59:04.432Z"
+    },
+    "streetBlockLevel": {
+      "pass": true,
+      "build": "park1",
+      "errors": [],
+      "warnings": [],
+      "checks": {
+        "buildIdPark1": true,
+        "footprintUnchanged": true,
+        "mainRoadSpine": true,
+        "sideBuildings": true,
+        "alleyServiceZones": true,
+        "d1SimpleOpen": true,
+        "reachabilityPasses": true,
+        "propsNonCollision": true,
+        "decorPropsUnchanged": true,
+        "noRuntimeErrors": true
+      },
+      "evidence": {
+        "seeds": [
+          {
+            "seed": 880101,
+            "district": 1,
+            "modifier": "",
+            "MAP_W": 40,
+            "MAP_H": 20,
+            "metrics": {
+              "mainRoad": 418,
+              "buildings": 19,
+              "alleys": 76,
+              "pockets": 171,
+              "GW": 40,
+              "GH": 20
+            }
+          },
+          {
+            "seed": 880102,
+            "district": 2,
+            "modifier": "",
+            "MAP_W": 40,
+            "MAP_H": 20,
+            "metrics": {
+              "mainRoad": 418,
+              "buildings": 22,
+              "alleys": 76,
+              "pockets": 168,
+              "GW": 40,
+              "GH": 20
+            }
+          },
+          {
+            "seed": 880103,
+            "district": 3,
+            "modifier": "",
+            "MAP_W": 40,
+            "MAP_H": 20,
+            "metrics": {
+              "mainRoad": 342,
+              "buildings": 34,
+              "alleys": 76,
+              "pockets": 232,
+              "GW": 40,
+              "GH": 20
+            }
+          },
+          {
+            "seed": 880104,
+            "district": 4,
+            "modifier": "",
+            "MAP_W": 40,
+            "MAP_H": 20,
+            "metrics": {
+              "mainRoad": 342,
+              "buildings": 34,
+              "alleys": 76,
+              "pockets": 232,
+              "GW": 40,
+              "GH": 20
+            }
+          },
+          {
+            "seed": 880105,
+            "district": 5,
+            "modifier": "",
+            "MAP_W": 40,
+            "MAP_H": 20,
+            "metrics": {
+              "mainRoad": 266,
+              "buildings": 56,
+              "alleys": 76,
+              "pockets": 286,
+              "GW": 40,
+              "GH": 20
+            }
+          },
+          {
+            "seed": 42,
+            "district": 1,
+            "modifier": "clear",
+            "MAP_W": 40,
+            "MAP_H": 20,
+            "metrics": {
+              "mainRoad": 342,
+              "buildings": 18,
+              "alleys": 76,
+              "pockets": 248,
+              "GW": 40,
+              "GH": 20
+            }
+          },
+          {
+            "seed": 42,
+            "district": 3,
+            "modifier": "maze",
+            "MAP_W": 40,
+            "MAP_H": 20,
+            "metrics": {
+              "mainRoad": 190,
+              "buildings": 87,
+              "alleys": 76,
+              "pockets": 331,
+              "GW": 40,
+              "GH": 20
+            }
+          }
+        ]
+      }
+    }
+  },
+  "d1ParkLandmark": {
+    "pass": true,
+    "proof": {
+      "pass": true,
+      "build": "park1",
+      "d1ParkLandmark": {
+        "pass": true,
+        "build": "park1",
+        "errors": [],
+        "warnings": [],
+        "checks": {
+          "buildIdPark1": true,
+          "footprintUnchanged": true,
+          "d1LandmarkPresent": true,
+          "d1ParkCommunityProps": true,
+          "d1OpenSpine": true,
+          "d1Reachability": true,
+          "landmarkDoesNotBlockEssentials": true,
+          "decorPropsNonCollision": true,
+          "higherDistrictsUnchanged": true,
+          "decorRoster12": true,
+          "noRuntimeErrors": true
+        },
+        "evidence": {
+          "seeds": [
+            {
+              "seed": 880101,
+              "district": 1,
+              "modifier": "",
+              "MAP_W": 40,
+              "MAP_H": 20,
+              "metrics": {
+                "mainRoad": 418,
+                "buildings": 19,
+                "alleys": 76,
+                "pockets": 171,
+                "GW": 40,
+                "GH": 20
+              },
+              "landmark": {
+                "identity": "restroom_pavilion",
+                "x0": 15,
+                "y0": 2,
+                "x1": 19,
+                "y1": 4,
+                "cells": 13,
+                "northSide": true,
+                "doorY": 4,
+                "doorX0": 17,
+                "doorX1": 18
+              },
+              "propSummary": {
+                "kinds": {
+                  "bench": 2,
+                  "signboard": 2,
+                  "scrub_bush": 2,
+                  "mailbox": 1,
+                  "cooler": 1,
+                  "crate_stack": 1,
+                  "shopping_cart": 1,
+                  "agave": 1,
+                  "tarp_bundle": 1
+                },
+                "parkish": 11,
+                "total": 12
+              }
+            },
+            {
+              "seed": 42,
+              "district": 1,
+              "modifier": "clear",
+              "MAP_W": 40,
+              "MAP_H": 20,
+              "metrics": {
+                "mainRoad": 342,
+                "buildings": 18,
+                "alleys": 76,
+                "pockets": 248,
+                "GW": 40,
+                "GH": 20
+              },
+              "landmark": {
+                "identity": "restroom_pavilion",
+                "x0": 18,
+                "y0": 2,
+                "x1": 22,
+                "y1": 4,
+                "cells": 13,
+                "northSide": true,
+                "doorY": 4,
+                "doorX0": 20,
+                "doorX1": 21
+              },
+              "propSummary": {
+                "kinds": {
+                  "bench": 2,
+                  "signboard": 2,
+                  "scrub_bush": 2,
+                  "mailbox": 1,
+                  "cooler": 1,
+                  "crate_stack": 1,
+                  "shopping_cart": 1,
+                  "agave": 1,
+                  "tarp_bundle": 1
+                },
+                "parkish": 11,
+                "total": 12
+              }
+            },
+            {
+              "seed": 12345,
+              "district": 1,
+              "modifier": "",
+              "MAP_W": 40,
+              "MAP_H": 20,
+              "metrics": {
+                "mainRoad": 415,
+                "buildings": 20,
+                "alleys": 76,
+                "pockets": 173,
+                "GW": 40,
+                "GH": 20
+              },
+              "landmark": {
+                "identity": "restroom_pavilion",
+                "x0": 17,
+                "y0": 15,
+                "x1": 21,
+                "y1": 17,
+                "cells": 13,
+                "northSide": false,
+                "doorY": 15,
+                "doorX0": 19,
+                "doorX1": 20
+              },
+              "propSummary": {
+                "kinds": {
+                  "signboard": 3,
+                  "scrub_bush": 2,
+                  "bench": 1,
+                  "mailbox": 1,
+                  "cooler": 1,
+                  "crate_stack": 1,
+                  "shopping_cart": 1,
+                  "agave": 1,
+                  "tarp_bundle": 1
+                },
+                "parkish": 11,
+                "total": 12
+              }
+            },
+            {
+              "seed": 880101,
+              "district": 2,
+              "modifier": "",
+              "MAP_W": 40,
+              "MAP_H": 20,
+              "metrics": {
+                "mainRoad": 418,
+                "buildings": 33,
+                "alleys": 76,
+                "pockets": 157,
+                "GW": 40,
+                "GH": 20
+              },
+              "landmark": null,
+              "propSummary": {
+                "kinds": {
+                  "signboard": 1,
+                  "bench": 6,
+                  "mailbox": 5,
+                  "utility_box": 2
+                },
+                "parkish": 14,
+                "total": 14
+              }
+            }
+          ]
+        }
+      },
+      "harnessStateOk": true,
+      "screenshots": [
+        "proof-d1-park-landmark-fpv.png",
+        "proof-d1-park-landmark-minimap.png"
+      ],
+      "timestamp": "2026-06-27T16:59:05.616Z"
+    },
+    "d1ParkLandmark": {
+      "pass": true,
+      "build": "park1",
+      "errors": [],
+      "warnings": [],
+      "checks": {
+        "buildIdPark1": true,
+        "footprintUnchanged": true,
+        "d1LandmarkPresent": true,
+        "d1ParkCommunityProps": true,
+        "d1OpenSpine": true,
+        "d1Reachability": true,
+        "landmarkDoesNotBlockEssentials": true,
+        "decorPropsNonCollision": true,
+        "higherDistrictsUnchanged": true,
+        "decorRoster12": true,
+        "noRuntimeErrors": true
+      },
+      "evidence": {
+        "seeds": [
+          {
+            "seed": 880101,
+            "district": 1,
+            "modifier": "",
+            "MAP_W": 40,
+            "MAP_H": 20,
+            "metrics": {
+              "mainRoad": 418,
+              "buildings": 19,
+              "alleys": 76,
+              "pockets": 171,
+              "GW": 40,
+              "GH": 20
+            },
+            "landmark": {
+              "identity": "restroom_pavilion",
+              "x0": 15,
+              "y0": 2,
+              "x1": 19,
+              "y1": 4,
+              "cells": 13,
+              "northSide": true,
+              "doorY": 4,
+              "doorX0": 17,
+              "doorX1": 18
+            },
+            "propSummary": {
+              "kinds": {
+                "bench": 2,
+                "signboard": 2,
+                "scrub_bush": 2,
+                "mailbox": 1,
+                "cooler": 1,
+                "crate_stack": 1,
+                "shopping_cart": 1,
+                "agave": 1,
+                "tarp_bundle": 1
+              },
+              "parkish": 11,
+              "total": 12
+            }
+          },
+          {
+            "seed": 42,
+            "district": 1,
+            "modifier": "clear",
+            "MAP_W": 40,
+            "MAP_H": 20,
+            "metrics": {
+              "mainRoad": 342,
+              "buildings": 18,
+              "alleys": 76,
+              "pockets": 248,
+              "GW": 40,
+              "GH": 20
+            },
+            "landmark": {
+              "identity": "restroom_pavilion",
+              "x0": 18,
+              "y0": 2,
+              "x1": 22,
+              "y1": 4,
+              "cells": 13,
+              "northSide": true,
+              "doorY": 4,
+              "doorX0": 20,
+              "doorX1": 21
+            },
+            "propSummary": {
+              "kinds": {
+                "bench": 2,
+                "signboard": 2,
+                "scrub_bush": 2,
+                "mailbox": 1,
+                "cooler": 1,
+                "crate_stack": 1,
+                "shopping_cart": 1,
+                "agave": 1,
+                "tarp_bundle": 1
+              },
+              "parkish": 11,
+              "total": 12
+            }
+          },
+          {
+            "seed": 12345,
+            "district": 1,
+            "modifier": "",
+            "MAP_W": 40,
+            "MAP_H": 20,
+            "metrics": {
+              "mainRoad": 415,
+              "buildings": 20,
+              "alleys": 76,
+              "pockets": 173,
+              "GW": 40,
+              "GH": 20
+            },
+            "landmark": {
+              "identity": "restroom_pavilion",
+              "x0": 17,
+              "y0": 15,
+              "x1": 21,
+              "y1": 17,
+              "cells": 13,
+              "northSide": false,
+              "doorY": 15,
+              "doorX0": 19,
+              "doorX1": 20
+            },
+            "propSummary": {
+              "kinds": {
+                "signboard": 3,
+                "scrub_bush": 2,
+                "bench": 1,
+                "mailbox": 1,
+                "cooler": 1,
+                "crate_stack": 1,
+                "shopping_cart": 1,
+                "agave": 1,
+                "tarp_bundle": 1
+              },
+              "parkish": 11,
+              "total": 12
+            }
+          },
+          {
+            "seed": 880101,
+            "district": 2,
+            "modifier": "",
+            "MAP_W": 40,
+            "MAP_H": 20,
+            "metrics": {
+              "mainRoad": 418,
+              "buildings": 33,
+              "alleys": 76,
+              "pockets": 157,
+              "GW": 40,
+              "GH": 20
+            },
+            "landmark": null,
+            "propSummary": {
+              "kinds": {
+                "signboard": 1,
+                "bench": 6,
+                "mailbox": 5,
+                "utility_box": 2
+              },
+              "parkish": 14,
+              "total": 14
+            }
+          }
+        ]
+      }
+    }
+  },
   "settingsSafety": {
     "pass": true,
     "checks": {
@@ -4016,10 +4648,10 @@
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "street1",
+      "build": "park1",
       "reliability": {
         "pass": true,
-        "build": "street1",
+        "build": "park1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -4041,7 +4673,7 @@
             "joyActive": false
           },
           "sprint": {
-            "burstUntil": 1.1077000000476838,
+            "burstUntil": 1.1007000000476839,
             "stamBefore": 60,
             "stamAfter": 40
           },
@@ -4060,11 +4692,11 @@
         "proof-control-look-drag.png",
         "proof-control-menu-open.png"
       ],
-      "timestamp": "2026-06-27T16:30:15.150Z"
+      "timestamp": "2026-06-27T16:59:06.665Z"
     },
     "reliability": {
       "pass": true,
-      "build": "street1",
+      "build": "park1",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -4086,7 +4718,7 @@
           "joyActive": false
         },
         "sprint": {
-          "burstUntil": 1.1077000000476838,
+          "burstUntil": 1.1007000000476839,
           "stamBefore": 60,
           "stamAfter": 40
         },
@@ -4102,10 +4734,10 @@
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "street1",
+      "build": "park1",
       "movementCollision": {
         "pass": true,
-        "build": "street1",
+        "build": "park1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -4168,11 +4800,11 @@
       "screenshots": [
         "proof-collision-corridor.png"
       ],
-      "timestamp": "2026-06-27T16:30:16.621Z"
+      "timestamp": "2026-06-27T16:59:08.151Z"
     },
     "movementCollision": {
       "pass": true,
-      "build": "street1",
+      "build": "park1",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -4236,10 +4868,10 @@
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "street1",
+      "build": "park1",
       "reachability": {
         "pass": true,
-        "build": "street1",
+        "build": "park1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -4258,7 +4890,7 @@
           "harnessStateRestored": true
         },
         "measurements": {
-          "normalReachableCells": 681,
+          "normalReachableCells": 668,
           "hallReachableCells": 253,
           "unreachableNormalPickups": 0,
           "unreachableNormalNpcs": 0,
@@ -4270,11 +4902,11 @@
         "proof-reachability-hall.png",
         "proof-reachability-wallblocked.png"
       ],
-      "timestamp": "2026-06-27T16:30:17.336Z"
+      "timestamp": "2026-06-27T16:59:08.882Z"
     },
     "reachability": {
       "pass": true,
-      "build": "street1",
+      "build": "park1",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -4293,7 +4925,7 @@
         "harnessStateRestored": true
       },
       "measurements": {
-        "normalReachableCells": 681,
+        "normalReachableCells": 668,
         "hallReachableCells": 253,
         "unreachableNormalPickups": 0,
         "unreachableNormalNpcs": 0,
@@ -4305,10 +4937,10 @@
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "street1",
+      "build": "park1",
       "proceduralLevelValidation": {
         "pass": true,
-        "build": "street1",
+        "build": "park1",
         "seedCount": 52,
         "districtCount": 3,
         "errors": [],
@@ -4317,8 +4949,8 @@
           "levelsChecked": 52,
           "levelsPassed": 52,
           "levelsFailed": 0,
-          "minReachableCells": 605,
-          "maxReachableCells": 684,
+          "minReachableCells": 594,
+          "maxReachableCells": 671,
           "totalUnreachablePickups": 0,
           "totalUnreachableNpcs": 0
         },
@@ -4334,14 +4966,14 @@
           "harnessStateRestored": true
         },
         "cases": 52,
-        "timestamp": "2026-06-27T16:30:26.515Z"
+        "timestamp": "2026-06-27T16:59:17.870Z"
       },
       "harnessStateOk": true,
-      "timestamp": "2026-06-27T16:30:26.518Z"
+      "timestamp": "2026-06-27T16:59:17.873Z"
     },
     "proceduralLevelValidation": {
       "pass": true,
-      "build": "street1",
+      "build": "park1",
       "seedCount": 52,
       "districtCount": 3,
       "errors": [],
@@ -4350,8 +4982,8 @@
         "levelsChecked": 52,
         "levelsPassed": 52,
         "levelsFailed": 0,
-        "minReachableCells": 605,
-        "maxReachableCells": 684,
+        "minReachableCells": 594,
+        "maxReachableCells": 671,
         "totalUnreachablePickups": 0,
         "totalUnreachableNpcs": 0
       },
@@ -4367,17 +4999,17 @@
         "harnessStateRestored": true
       },
       "cases": 52,
-      "timestamp": "2026-06-27T16:30:26.515Z"
+      "timestamp": "2026-06-27T16:59:17.870Z"
     }
   },
   "fullRunProgression": {
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "street1",
+      "build": "park1",
       "fullRunProgression": {
         "pass": true,
-        "build": "street1",
+        "build": "park1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -4398,9 +5030,9 @@
         "measurements": {
           "seed": 880017,
           "district": 2,
-          "collectedCount": 9,
+          "collectedCount": 8,
           "quota": 5,
-          "reachableCells": 672,
+          "reachableCells": 662,
           "saveKeysTouched": [
             "cannedRun.save.v1"
           ],
@@ -4409,8 +5041,8 @@
             "seed": 880018,
             "helped": 0,
             "quota": 5,
-            "px": 35.5,
-            "py": 10.5,
+            "px": 6.5,
+            "py": 8.5,
             "cans": 2,
             "taken": true,
             "amt": 0,
@@ -4420,8 +5052,8 @@
             "district": 1,
             "seed": 880018,
             "helped": 0,
-            "px": 35.5,
-            "py": 10.5,
+            "px": 6.5,
+            "py": 8.5,
             "cans": 2,
             "taken": false,
             "amt": 0
@@ -4429,15 +5061,15 @@
         },
         "hallPass": true,
         "mobilePass": true,
-        "timestamp": "2026-06-27T16:30:27.196Z"
+        "timestamp": "2026-06-27T16:59:18.542Z"
       },
       "harnessStateOk": true,
-      "timestamp": "2026-06-27T16:30:27.199Z",
+      "timestamp": "2026-06-27T16:59:18.545Z",
       "screenshot": "proof-full-run-complete.png"
     },
     "fullRunProgression": {
       "pass": true,
-      "build": "street1",
+      "build": "park1",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -4458,9 +5090,9 @@
       "measurements": {
         "seed": 880017,
         "district": 2,
-        "collectedCount": 9,
+        "collectedCount": 8,
         "quota": 5,
-        "reachableCells": 672,
+        "reachableCells": 662,
         "saveKeysTouched": [
           "cannedRun.save.v1"
         ],
@@ -4469,8 +5101,8 @@
           "seed": 880018,
           "helped": 0,
           "quota": 5,
-          "px": 35.5,
-          "py": 10.5,
+          "px": 6.5,
+          "py": 8.5,
           "cans": 2,
           "taken": true,
           "amt": 0,
@@ -4480,8 +5112,8 @@
           "district": 1,
           "seed": 880018,
           "helped": 0,
-          "px": 35.5,
-          "py": 10.5,
+          "px": 6.5,
+          "py": 8.5,
           "cans": 2,
           "taken": false,
           "amt": 0
@@ -4489,7 +5121,7 @@
       },
       "hallPass": true,
       "mobilePass": true,
-      "timestamp": "2026-06-27T16:30:27.196Z"
+      "timestamp": "2026-06-27T16:59:18.542Z"
     }
   },
   "harnessIsolation": {
@@ -4511,7 +5143,7 @@
     },
     "iso": {
       "pass": true,
-      "build": "street1",
+      "build": "park1",
       "errors": [],
       "checks": {
         "renderCheckRestoresState": true,
@@ -4550,7 +5182,7 @@
         "lsHarness": false,
         "lsSavePresent": true
       },
-      "timestamp": "2026-06-27T16:30:38.192Z"
+      "timestamp": "2026-06-27T16:59:29.838Z"
     },
     "afterSelfcheck": {
       "state": "title",
@@ -4583,10 +5215,10 @@
   },
   "renderFailure": {
     "pass": true,
-    "build": "street1",
+    "build": "park1",
     "crRenderFailureSelfCheck": {
       "pass": true,
-      "build": "street1",
+      "build": "park1",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -4605,7 +5237,7 @@
       },
       "evidence": {
         "haloSource": {
-          "BUILD_ID": "street1",
+          "BUILD_ID": "park1",
           "policy": "walls own distance fog; billboards drawImage only — no post-loop sprite fog fillRect",
           "forbiddenPatternsAbsent": true,
           "forbiddenHits": [],
@@ -4615,7 +5247,7 @@
           "regressionCommentMarker": "SPRITE HALO REGRESSION GUARD"
         },
         "occlusionSource": {
-          "BUILD_ID": "street1",
+          "BUILD_ID": "park1",
           "renderWidth": 320,
           "zbufferLength": 320,
           "zbufferMatchesRenderWidth": true,
@@ -4692,9 +5324,9 @@
           "pass": true,
           "haloPass": true,
           "borderStats": {
-            "mean": 148.05368379446585,
+            "mean": 148.0459604743078,
             "brightRatio": 0.2134387351778656,
-            "variance": 4022.886186346666,
+            "variance": 4021.430171037961,
             "count": 506
           },
           "proj": {
@@ -4706,12 +5338,12 @@
             "screenW": 15.272727272727273,
             "screenH": 16.8
           },
-          "canvasVariance": 4681.326616633665
+          "canvasVariance": 4627.790647375245
         },
         "occludedSprite": {
           "pass": true,
           "occDiff": 0,
-          "visDiff": 139.92042440318303,
+          "visDiff": 138.59681697612731,
           "zPass": true,
           "proj": {
             "depth": 8,
@@ -4774,9 +5406,9 @@
         "hallStart": {
           "pass": true,
           "stats": {
-            "mean": 76.45471774712581,
-            "brightRatio": 0.0332089552238806,
-            "variance": 2041.4780469892578,
+            "mean": 76.48075305496194,
+            "brightRatio": 0.036287313432835824,
+            "variance": 2063.9001224416374,
             "count": 42880
           },
           "customLevel": "hall_of_servants"
@@ -4788,15 +5420,15 @@
             "h": 844
           },
           "stats": {
-            "mean": 114.27704429700196,
-            "brightRatio": 0.168359375,
-            "variance": 4368.752101327491,
+            "mean": 114.29448795325112,
+            "brightRatio": 0.170421875,
+            "variance": 4382.455522424368,
             "count": 64000
           }
         }
       },
       "runtimeErrors": [],
-      "timestamp": "2026-06-27T16:30:53.900Z"
+      "timestamp": "2026-06-27T16:59:45.882Z"
     },
     "imageHashes": {
       "proof-render-visible-sprite.png": 1255030,
@@ -4812,14 +5444,14 @@
       "proof-render-npc-near-wall.png",
       "proof-render-hall-start.png"
     ],
-    "timestamp": "2026-06-27T16:30:53.901Z"
+    "timestamp": "2026-06-27T16:59:45.884Z"
   },
   "hallE2E": {
     "pass": true,
-    "build": "street1",
+    "build": "park1",
     "crHallSelfCheck": {
       "pass": true,
-      "build": "street1",
+      "build": "park1",
       "errors": [],
       "warnings": [],
       "hall": {
@@ -4855,7 +5487,7 @@
       },
       "runtimeErrors": [],
       "runtimeClean": true,
-      "timestamp": "2026-06-27T16:30:56.609Z"
+      "timestamp": "2026-06-27T16:59:48.655Z"
     },
     "playwright": {
       "helpedSnap": {
@@ -4877,7 +5509,7 @@
       "proof-hall-helped.png",
       "proof-hall-exit.png"
     ],
-    "timestamp": "2026-06-27T16:30:56.609Z"
+    "timestamp": "2026-06-27T16:59:48.656Z"
   },
   "visual": {
     "pass": true,
@@ -4995,7 +5627,7 @@
     ],
     "visualReadabilitySelfCheck": {
       "pass": true,
-      "build": "street1",
+      "build": "park1",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -5028,9 +5660,9 @@
           "giveReady": false
         },
         "hallStats": {
-          "mean": 114.72439921887485,
-          "brightRatio": 0.171890625,
-          "variance": 4409.076170130362,
+          "mean": 113.7478619220023,
+          "brightRatio": 0.167015625,
+          "variance": 4341.4073406168045,
           "count": 64000
         },
         "exitReadySnapshot": {
@@ -5064,7 +5696,7 @@
         "giveTargetHighlight": true
       }
     },
-    "timestamp": "2026-06-27T16:31:06.389Z"
+    "timestamp": "2026-06-27T16:59:58.436Z"
   },
   "visualRectangle": {
     "pass": true,
@@ -5084,7 +5716,7 @@
     ],
     "crVisualRectangleRegression": {
       "pass": true,
-      "build": "street1",
+      "build": "park1",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -5105,21 +5737,21 @@
         "probes": {
           "probe0": {
             "center": {
-              "mean": 53.32166469595175,
+              "mean": 53.240703336154446,
               "brightRatio": 0,
-              "variance": 124.5103711595289,
+              "variance": 125.3685532082332,
               "count": 9472
             },
             "sideL": {
-              "mean": 53.11083547297438,
+              "mean": 53.16663513513656,
               "brightRatio": 0,
-              "variance": 105.81875513205246,
+              "variance": 106.86522827228113,
               "count": 2960
             },
             "sideR": {
-              "mean": 62.95766621621851,
+              "mean": 53.20862466216358,
               "brightRatio": 0,
-              "variance": 1338.8496925960346,
+              "variance": 109.35948947229757,
               "count": 2960
             },
             "roi": {
@@ -5132,21 +5764,21 @@
           },
           "probe1": {
             "center": {
-              "mean": 91.74898099660615,
+              "mean": 91.1869927153566,
               "brightRatio": 0,
-              "variance": 2197.8038274164737,
+              "variance": 2145.2153997980263,
               "count": 9472
             },
             "sideL": {
-              "mean": 57.598349324326854,
+              "mean": 74.93599358108531,
               "brightRatio": 0,
-              "variance": 1089.847395352977,
+              "variance": 1760.34474354761,
               "count": 2960
             },
             "sideR": {
-              "mean": 108.8398581081092,
+              "mean": 108.84567770270378,
               "brightRatio": 0,
-              "variance": 1875.1773069987864,
+              "variance": 1874.571840552204,
               "count": 2960
             },
             "roi": {
@@ -5159,21 +5791,21 @@
           },
           "probe2": {
             "center": {
-              "mean": 91.48800010555887,
+              "mean": 91.42363640201178,
               "brightRatio": 0,
-              "variance": 2153.925408770973,
+              "variance": 2148.3367900465837,
               "count": 9472
             },
             "sideL": {
-              "mean": 109.47808141891981,
+              "mean": 109.09200810810904,
               "brightRatio": 0,
-              "variance": 1880.4256267747921,
+              "variance": 1863.4617710411346,
               "count": 2960
             },
             "sideR": {
-              "mean": 75.19469729730162,
+              "mean": 75.15285777027457,
               "brightRatio": 0,
-              "variance": 1776.4764359016244,
+              "variance": 1771.7921556706763,
               "count": 2960
             },
             "roi": {
@@ -5184,8 +5816,8 @@
             },
             "angle": 3.9269908169872414
           },
-          "meanSpread": 38.4273163006544,
-          "pairDiff01": 38.4273163006544,
+          "meanSpread": 38.182933065857334,
+          "pairDiff01": 37.94628937920215,
           "stuckBrightBlock": false
         }
       }
@@ -5213,7 +5845,7 @@
     ],
     "crSoundFeedback": {
       "pass": true,
-      "build": "street1",
+      "build": "park1",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -5290,7 +5922,7 @@
           }
         },
         "audioProof": {
-          "BUILD_ID": "street1",
+          "BUILD_ID": "park1",
           "gateBound": true,
           "unlockAttempted": false,
           "hasContext": true,
@@ -5340,7 +5972,7 @@
       "layoutPass": true,
       "layout": {
         "pass": true,
-        "build": "street1",
+        "build": "park1",
         "errors": [],
         "warnings": [],
         "rects": {
@@ -5501,7 +6133,7 @@
       "layoutPass": true,
       "layout": {
         "pass": true,
-        "build": "street1",
+        "build": "park1",
         "errors": [],
         "warnings": [],
         "rects": {
@@ -5662,7 +6294,7 @@
       "layoutPass": true,
       "layout": {
         "pass": true,
-        "build": "street1",
+        "build": "park1",
         "errors": [],
         "warnings": [],
         "rects": {
@@ -5823,7 +6455,7 @@
       "layoutPass": true,
       "layout": {
         "pass": true,
-        "build": "street1",
+        "build": "park1",
         "errors": [],
         "warnings": [],
         "rects": {
@@ -5979,10 +6611,10 @@
   "selfcheckUrl": {
     "result": {
       "pass": true,
-      "build": "street1",
+      "build": "park1",
       "layout": {
         "pass": true,
-        "build": "street1",
+        "build": "park1",
         "errors": [],
         "warnings": [],
         "rects": {
@@ -6102,7 +6734,7 @@
       },
       "viewportSafeArea": {
         "pass": true,
-        "build": "street1",
+        "build": "park1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -6176,7 +6808,7 @@
           "left": 0
         },
         "viewport": {
-          "BUILD_ID": "street1",
+          "BUILD_ID": "park1",
           "inner": {
             "w": 390,
             "h": 844
@@ -6220,11 +6852,11 @@
           "cw": 390,
           "ch": 844
         },
-        "timestamp": "2026-06-27T16:31:14.255Z"
+        "timestamp": "2026-06-27T17:00:06.297Z"
       },
       "portraitUsability": {
         "pass": true,
-        "build": "street1",
+        "build": "park1",
         "errors": [],
         "warnings": [],
         "thresholds": {
@@ -6348,7 +6980,7 @@
       },
       "settingsSafety": {
         "pass": true,
-        "build": "street1",
+        "build": "park1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -6369,11 +7001,11 @@
       },
       "decorativeProps": {
         "pass": true,
-        "build": "street1",
+        "build": "park1",
         "errors": [],
         "warnings": [],
         "checks": {
-          "buildIdStreet1": true,
+          "buildIdPark1": true,
           "decorArrayExported": true,
           "allKindsDefined": true,
           "propDimsReasonable": true,
@@ -6410,11 +7042,11 @@
       },
       "optionsCleanup": {
         "pass": true,
-        "build": "street1",
+        "build": "park1",
         "errors": [],
         "warnings": [],
         "checks": {
-          "buildIdStreet1": true,
+          "buildIdPark1": true,
           "optionsOpens": true,
           "obsoleteAbsent": true,
           "sectionControls": true,
@@ -6438,12 +7070,12 @@
           "lsKeyUnchanged": true
         },
         "evidence": {
-          "htmlSample": "\n      <div class=\"options-scroll-body\">\n      <div class=\"rpantit\">OPTIONS</div>\n      <div class=\"rdesc\" style=\"margin-bottom:8px;color:#6a5a4a;\">build street1</div>\n      <div class=\"options-section-hdr\">CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-edit-controls\">EDIT CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-reset-controls\">RESET CONTROLS</div>\n      <div class=\"ri"
+          "htmlSample": "\n      <div class=\"options-scroll-body\">\n      <div class=\"rpantit\">OPTIONS</div>\n      <div class=\"rdesc\" style=\"margin-bottom:8px;color:#6a5a4a;\">build park1</div>\n      <div class=\"options-section-hdr\">CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-edit-controls\">EDIT CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-reset-controls\">RESET CONTROLS</div>\n      <div class=\"rit\""
         }
       },
       "mobileControlReliability": {
         "pass": true,
-        "build": "street1",
+        "build": "park1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -6465,7 +7097,7 @@
             "joyActive": false
           },
           "sprint": {
-            "burstUntil": 1.6093000000715256,
+            "burstUntil": 1.6066000000238418,
             "stamBefore": 60,
             "stamAfter": 40
           },
@@ -6478,7 +7110,7 @@
       },
       "movementCollision": {
         "pass": true,
-        "build": "street1",
+        "build": "park1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -6498,7 +7130,7 @@
             {
               "scene": "normalSpawn",
               "x": 2.5,
-              "y": 5.5,
+              "y": 8.5,
               "pathOk": true
             },
             {
@@ -6539,7 +7171,7 @@
       },
       "reachability": {
         "pass": true,
-        "build": "street1",
+        "build": "park1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -6558,7 +7190,7 @@
           "harnessStateRestored": true
         },
         "measurements": {
-          "normalReachableCells": 669,
+          "normalReachableCells": 659,
           "hallReachableCells": 253,
           "unreachableNormalPickups": 0,
           "unreachableNormalNpcs": 0,
@@ -6567,11 +7199,11 @@
       },
       "streetBlockLevel": {
         "pass": true,
-        "build": "street1",
+        "build": "park1",
         "errors": [],
         "warnings": [],
         "checks": {
-          "buildIdStreet1": true,
+          "buildIdPark1": true,
           "footprintUnchanged": true,
           "mainRoadSpine": true,
           "sideBuildings": true,
@@ -6592,9 +7224,9 @@
               "MAP_H": 20,
               "metrics": {
                 "mainRoad": 418,
-                "buildings": 8,
+                "buildings": 19,
                 "alleys": 76,
-                "pockets": 182,
+                "pockets": 171,
                 "GW": 40,
                 "GH": 20
               }
@@ -6667,9 +7299,9 @@
               "MAP_H": 20,
               "metrics": {
                 "mainRoad": 342,
-                "buildings": 7,
+                "buildings": 18,
                 "alleys": 76,
-                "pockets": 259,
+                "pockets": 248,
                 "GW": 40,
                 "GH": 20
               }
@@ -6692,9 +7324,184 @@
           ]
         }
       },
+      "d1ParkLandmark": {
+        "pass": true,
+        "build": "park1",
+        "errors": [],
+        "warnings": [],
+        "checks": {
+          "buildIdPark1": true,
+          "footprintUnchanged": true,
+          "d1LandmarkPresent": true,
+          "d1ParkCommunityProps": true,
+          "d1OpenSpine": true,
+          "d1Reachability": true,
+          "landmarkDoesNotBlockEssentials": true,
+          "decorPropsNonCollision": true,
+          "higherDistrictsUnchanged": true,
+          "decorRoster12": true,
+          "noRuntimeErrors": true
+        },
+        "evidence": {
+          "seeds": [
+            {
+              "seed": 880101,
+              "district": 1,
+              "modifier": "",
+              "MAP_W": 40,
+              "MAP_H": 20,
+              "metrics": {
+                "mainRoad": 418,
+                "buildings": 19,
+                "alleys": 76,
+                "pockets": 171,
+                "GW": 40,
+                "GH": 20
+              },
+              "landmark": {
+                "identity": "restroom_pavilion",
+                "x0": 15,
+                "y0": 2,
+                "x1": 19,
+                "y1": 4,
+                "cells": 13,
+                "northSide": true,
+                "doorY": 4,
+                "doorX0": 17,
+                "doorX1": 18
+              },
+              "propSummary": {
+                "kinds": {
+                  "bench": 2,
+                  "signboard": 2,
+                  "scrub_bush": 2,
+                  "mailbox": 1,
+                  "cooler": 1,
+                  "crate_stack": 1,
+                  "shopping_cart": 1,
+                  "agave": 1,
+                  "tarp_bundle": 1
+                },
+                "parkish": 11,
+                "total": 12
+              }
+            },
+            {
+              "seed": 42,
+              "district": 1,
+              "modifier": "clear",
+              "MAP_W": 40,
+              "MAP_H": 20,
+              "metrics": {
+                "mainRoad": 342,
+                "buildings": 18,
+                "alleys": 76,
+                "pockets": 248,
+                "GW": 40,
+                "GH": 20
+              },
+              "landmark": {
+                "identity": "restroom_pavilion",
+                "x0": 18,
+                "y0": 2,
+                "x1": 22,
+                "y1": 4,
+                "cells": 13,
+                "northSide": true,
+                "doorY": 4,
+                "doorX0": 20,
+                "doorX1": 21
+              },
+              "propSummary": {
+                "kinds": {
+                  "bench": 2,
+                  "signboard": 2,
+                  "scrub_bush": 2,
+                  "mailbox": 1,
+                  "cooler": 1,
+                  "crate_stack": 1,
+                  "shopping_cart": 1,
+                  "agave": 1,
+                  "tarp_bundle": 1
+                },
+                "parkish": 11,
+                "total": 12
+              }
+            },
+            {
+              "seed": 12345,
+              "district": 1,
+              "modifier": "",
+              "MAP_W": 40,
+              "MAP_H": 20,
+              "metrics": {
+                "mainRoad": 415,
+                "buildings": 20,
+                "alleys": 76,
+                "pockets": 173,
+                "GW": 40,
+                "GH": 20
+              },
+              "landmark": {
+                "identity": "restroom_pavilion",
+                "x0": 17,
+                "y0": 15,
+                "x1": 21,
+                "y1": 17,
+                "cells": 13,
+                "northSide": false,
+                "doorY": 15,
+                "doorX0": 19,
+                "doorX1": 20
+              },
+              "propSummary": {
+                "kinds": {
+                  "signboard": 3,
+                  "scrub_bush": 2,
+                  "bench": 1,
+                  "mailbox": 1,
+                  "cooler": 1,
+                  "crate_stack": 1,
+                  "shopping_cart": 1,
+                  "agave": 1,
+                  "tarp_bundle": 1
+                },
+                "parkish": 11,
+                "total": 12
+              }
+            },
+            {
+              "seed": 880101,
+              "district": 2,
+              "modifier": "",
+              "MAP_W": 40,
+              "MAP_H": 20,
+              "metrics": {
+                "mainRoad": 418,
+                "buildings": 33,
+                "alleys": 76,
+                "pockets": 157,
+                "GW": 40,
+                "GH": 20
+              },
+              "landmark": null,
+              "propSummary": {
+                "kinds": {
+                  "signboard": 1,
+                  "bench": 6,
+                  "mailbox": 5,
+                  "utility_box": 2
+                },
+                "parkish": 14,
+                "total": 14
+              }
+            }
+          ]
+        }
+      },
       "proceduralLevelValidation": {
         "pass": true,
-        "build": "street1",
+        "build": "park1",
         "seedCount": 52,
         "districtCount": 3,
         "errors": [],
@@ -6703,8 +7510,8 @@
           "levelsChecked": 52,
           "levelsPassed": 52,
           "levelsFailed": 0,
-          "minReachableCells": 605,
-          "maxReachableCells": 684,
+          "minReachableCells": 594,
+          "maxReachableCells": 671,
           "totalUnreachablePickups": 0,
           "totalUnreachableNpcs": 0
         },
@@ -6720,11 +7527,11 @@
           "harnessStateRestored": true
         },
         "cases": 52,
-        "timestamp": "2026-06-27T16:31:24.287Z"
+        "timestamp": "2026-06-27T17:00:16.575Z"
       },
       "fullRunProgression": {
         "pass": true,
-        "build": "street1",
+        "build": "park1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -6745,9 +7552,9 @@
         "measurements": {
           "seed": 880017,
           "district": 2,
-          "collectedCount": 9,
+          "collectedCount": 8,
           "quota": 5,
-          "reachableCells": 672,
+          "reachableCells": 662,
           "saveKeysTouched": [
             "cannedRun.save.v1"
           ],
@@ -6756,8 +7563,8 @@
             "seed": 880018,
             "helped": 0,
             "quota": 5,
-            "px": 35.5,
-            "py": 10.5,
+            "px": 6.5,
+            "py": 8.5,
             "cans": 2,
             "taken": true,
             "amt": 0,
@@ -6767,8 +7574,8 @@
             "district": 1,
             "seed": 880018,
             "helped": 0,
-            "px": 35.5,
-            "py": 10.5,
+            "px": 6.5,
+            "py": 8.5,
             "cans": 2,
             "taken": false,
             "amt": 0
@@ -6776,11 +7583,11 @@
         },
         "hallPass": true,
         "mobilePass": true,
-        "timestamp": "2026-06-27T16:31:24.510Z"
+        "timestamp": "2026-06-27T17:00:16.790Z"
       },
       "onboarding": {
         "pass": true,
-        "build": "street1",
+        "build": "park1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -6810,7 +7617,7 @@
       },
       "soundFeedback": {
         "pass": true,
-        "build": "street1",
+        "build": "park1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -6887,7 +7694,7 @@
             }
           },
           "audioProof": {
-            "BUILD_ID": "street1",
+            "BUILD_ID": "park1",
             "gateBound": true,
             "unlockAttempted": true,
             "hasContext": true,
@@ -6905,7 +7712,7 @@
       },
       "declarativeControls": {
         "pass": true,
-        "build": "street1",
+        "build": "park1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -6945,7 +7752,7 @@
           "noStuckAfterEdit": true,
           "inSafeViewport": true,
           "menuNotEditable": true,
-          "buildIdStreet1": true,
+          "buildIdPark1": true,
           "saveFormatUnchanged": true
         },
         "evidence": {
@@ -6987,7 +7794,7 @@
       },
       "visualReadability": {
         "pass": true,
-        "build": "street1",
+        "build": "park1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -7020,9 +7827,9 @@
             "giveReady": false
           },
           "hallStats": {
-            "mean": 114.22324284387786,
-            "brightRatio": 0.170390625,
-            "variance": 4393.191666755522,
+            "mean": 114.90496618762643,
+            "brightRatio": 0.172015625,
+            "variance": 4419.629924819885,
             "count": 64000
           },
           "exitReadySnapshot": {
@@ -7058,7 +7865,7 @@
       },
       "visualRectangleRegression": {
         "pass": true,
-        "build": "street1",
+        "build": "park1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -7079,21 +7886,21 @@
           "probes": {
             "probe0": {
               "center": {
-                "mean": 38.93013925254225,
+                "mean": 53.240703336154446,
                 "brightRatio": 0,
-                "variance": 57.99900513759714,
+                "variance": 125.3685532082332,
                 "count": 9472
               },
               "sideL": {
-                "mean": 38.84987162161982,
+                "mean": 53.16663513513656,
                 "brightRatio": 0,
-                "variance": 45.60418199027536,
+                "variance": 106.86522827228113,
                 "count": 2960
               },
               "sideR": {
-                "mean": 38.84987162161982,
+                "mean": 53.20862466216358,
                 "brightRatio": 0,
-                "variance": 45.60418199027536,
+                "variance": 109.35948947229757,
                 "count": 2960
               },
               "roi": {
@@ -7106,21 +7913,21 @@
             },
             "probe1": {
               "center": {
-                "mean": 75.17149429897204,
-                "brightRatio": 0.00390625,
-                "variance": 1755.9220632015426,
+                "mean": 91.38269309542424,
+                "brightRatio": 0,
+                "variance": 2161.9071172641866,
                 "count": 9472
               },
               "sideL": {
-                "mean": 79.96432195946649,
-                "brightRatio": 0.14358108108108109,
-                "variance": 4618.214350239219,
+                "mean": 75.0494807432475,
+                "brightRatio": 0,
+                "variance": 1774.4034770989936,
                 "count": 2960
               },
               "sideR": {
-                "mean": 94.16454831081705,
+                "mean": 108.82443378378491,
                 "brightRatio": 0,
-                "variance": 1604.3375317267253,
+                "variance": 1871.9552399442475,
                 "count": 2960
               },
               "roi": {
@@ -7133,21 +7940,21 @@
             },
             "probe2": {
               "center": {
-                "mean": 74.88183076434332,
+                "mean": 91.57233308697785,
                 "brightRatio": 0,
-                "variance": 1690.196081595421,
+                "variance": 2160.729020707395,
                 "count": 9472
               },
               "sideL": {
-                "mean": 94.50779662162803,
+                "mean": 109.16502601351448,
                 "brightRatio": 0,
-                "variance": 1601.404090441734,
+                "variance": 1865.9064809861495,
                 "count": 2960
               },
               "sideR": {
-                "mean": 56.56196554054468,
+                "mean": 75.31041722973406,
                 "brightRatio": 0,
-                "variance": 1067.7276414271903,
+                "variance": 1790.8921667891086,
                 "count": 2960
               },
               "roi": {
@@ -7158,8 +7965,8 @@
               },
               "angle": 3.9269908169872414
             },
-            "meanSpread": 36.24135504642979,
-            "pairDiff01": 36.24135504642979,
+            "meanSpread": 38.3316297508234,
+            "pairDiff01": 38.1419897592698,
             "stuckBrightBlock": false
           }
         }
@@ -7216,7 +8023,7 @@
       },
       "renderFailure": {
         "pass": true,
-        "build": "street1",
+        "build": "park1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -7235,7 +8042,7 @@
         },
         "evidence": {
           "haloSource": {
-            "BUILD_ID": "street1",
+            "BUILD_ID": "park1",
             "policy": "walls own distance fog; billboards drawImage only — no post-loop sprite fog fillRect",
             "forbiddenPatternsAbsent": true,
             "forbiddenHits": [],
@@ -7245,7 +8052,7 @@
             "regressionCommentMarker": "SPRITE HALO REGRESSION GUARD"
           },
           "occlusionSource": {
-            "BUILD_ID": "street1",
+            "BUILD_ID": "park1",
             "renderWidth": 320,
             "zbufferLength": 320,
             "zbufferMatchesRenderWidth": true,
@@ -7322,9 +8129,9 @@
             "pass": true,
             "haloPass": true,
             "borderStats": {
-              "mean": 148.11969367588884,
+              "mean": 147.9899486166003,
               "brightRatio": 0.2134387351778656,
-              "variance": 4025.741815670981,
+              "variance": 4018.8766842977575,
               "count": 506
             },
             "proj": {
@@ -7336,12 +8143,12 @@
               "screenW": 15.272727272727273,
               "screenH": 16.8
             },
-            "canvasVariance": 4643.582222950206
+            "canvasVariance": 4652.637339447819
           },
           "occludedSprite": {
             "pass": true,
             "occDiff": 0,
-            "visDiff": 140.0397877984085,
+            "visDiff": 139.91379310344828,
             "zPass": true,
             "proj": {
               "depth": 8,
@@ -7404,9 +8211,9 @@
           "hallStart": {
             "pass": true,
             "stats": {
-              "mean": 75.98887569955158,
-              "brightRatio": 0.03430503731343284,
-              "variance": 2008.3840914108155,
+              "mean": 76.60422574619372,
+              "brightRatio": 0.036940298507462686,
+              "variance": 2077.62995442668,
               "count": 42880
             },
             "customLevel": "hall_of_servants"
@@ -7418,19 +8225,19 @@
               "h": 844
             },
             "stats": {
-              "mean": 113.96493012512694,
-              "brightRatio": 0.16909375,
-              "variance": 4370.236899997301,
+              "mean": 114.37721465637615,
+              "brightRatio": 0.170859375,
+              "variance": 4385.401469393214,
               "count": 64000
             }
           }
         },
         "runtimeErrors": [],
-        "timestamp": "2026-06-27T16:31:24.796Z"
+        "timestamp": "2026-06-27T17:00:17.079Z"
       },
       "render": {
         "pass": true,
-        "build": "street1",
+        "build": "park1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -7449,7 +8256,7 @@
         },
         "evidence": {
           "haloSource": {
-            "BUILD_ID": "street1",
+            "BUILD_ID": "park1",
             "policy": "walls own distance fog; billboards drawImage only — no post-loop sprite fog fillRect",
             "forbiddenPatternsAbsent": true,
             "forbiddenHits": [],
@@ -7459,7 +8266,7 @@
             "regressionCommentMarker": "SPRITE HALO REGRESSION GUARD"
           },
           "occlusionSource": {
-            "BUILD_ID": "street1",
+            "BUILD_ID": "park1",
             "renderWidth": 320,
             "zbufferLength": 320,
             "zbufferMatchesRenderWidth": true,
@@ -7536,9 +8343,9 @@
             "pass": true,
             "haloPass": true,
             "borderStats": {
-              "mean": 148.11969367588884,
+              "mean": 147.9899486166003,
               "brightRatio": 0.2134387351778656,
-              "variance": 4025.741815670981,
+              "variance": 4018.8766842977575,
               "count": 506
             },
             "proj": {
@@ -7550,12 +8357,12 @@
               "screenW": 15.272727272727273,
               "screenH": 16.8
             },
-            "canvasVariance": 4643.582222950206
+            "canvasVariance": 4652.637339447819
           },
           "occludedSprite": {
             "pass": true,
             "occDiff": 0,
-            "visDiff": 140.0397877984085,
+            "visDiff": 139.91379310344828,
             "zPass": true,
             "proj": {
               "depth": 8,
@@ -7618,9 +8425,9 @@
           "hallStart": {
             "pass": true,
             "stats": {
-              "mean": 75.98887569955158,
-              "brightRatio": 0.03430503731343284,
-              "variance": 2008.3840914108155,
+              "mean": 76.60422574619372,
+              "brightRatio": 0.036940298507462686,
+              "variance": 2077.62995442668,
               "count": 42880
             },
             "customLevel": "hall_of_servants"
@@ -7632,22 +8439,22 @@
               "h": 844
             },
             "stats": {
-              "mean": 113.96493012512694,
-              "brightRatio": 0.16909375,
-              "variance": 4370.236899997301,
+              "mean": 114.37721465637615,
+              "brightRatio": 0.170859375,
+              "variance": 4385.401469393214,
               "count": 64000
             }
           }
         },
         "runtimeErrors": [],
-        "timestamp": "2026-06-27T16:31:24.796Z"
+        "timestamp": "2026-06-27T17:00:17.079Z"
       },
       "runtimeErrors": [],
       "runtimeClean": true,
-      "timestamp": "2026-06-27T16:31:24.796Z"
+      "timestamp": "2026-06-27T17:00:17.079Z"
     },
-    "overlayText": "SELF-CHECK PASS\nbuild street1",
+    "overlayText": "SELF-CHECK PASS\nbuild park1",
     "overlayVisible": true
   },
-  "timestamp": "2026-06-27T16:31:24.835Z"
+  "timestamp": "2026-06-27T17:00:17.146Z"
 }

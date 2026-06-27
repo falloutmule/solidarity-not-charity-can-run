@@ -1,13 +1,13 @@
 {
   "pass": true,
-  "build": "propsread1",
+  "build": "park1",
   "decorativeProps": {
     "pass": true,
-    "build": "propsread1",
+    "build": "park1",
     "errors": [],
     "warnings": [],
     "checks": {
-      "buildIdPropsRead1": true,
+      "buildIdPark1": true,
       "decorArrayExported": true,
       "allKindsDefined": true,
       "propDimsReasonable": true,
@@ -24,7 +24,7 @@
     "evidence": {
       "placementSig": {
         "count": 13,
-        "kinds": "bench|crate_stack|mailbox|mailbox|mural_panel|scrub_bush|shopping_cart|signboard|signboard|sleeping_bag_pile|tarp_bundle|tarp_bundle|utility_box"
+        "kinds": "bench|bench|bench|bench|bench|bench|mailbox|mailbox|mailbox|mailbox|mailbox|signboard|signboard"
       }
     },
     "requiredKinds": [
@@ -47,5 +47,5 @@
     "proof-decorative-props-world.png",
     "proof-decorative-props-closeup.png"
   ],
-  "timestamp": "2026-06-27T16:07:51.546Z"
+  "timestamp": "2026-06-27T16:59:02.152Z"
 }

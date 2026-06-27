@@ -1,10 +1,10 @@
 {
   "pass": true,
-  "build": "street1",
+  "build": "park1",
   "errors": [],
   "warnings": [],
   "checks": {
-    "buildIdStreet1": true,
+    "buildIdPark1": true,
     "footprintUnchanged": true,
     "mainRoadSpine": true,
     "sideBuildings": true,
@@ -25,9 +25,9 @@
         "MAP_H": 20,
         "metrics": {
           "mainRoad": 418,
-          "buildings": 8,
+          "buildings": 19,
           "alleys": 76,
-          "pockets": 182,
+          "pockets": 171,
           "GW": 40,
           "GH": 20
         }
@@ -100,9 +100,9 @@
         "MAP_H": 20,
         "metrics": {
           "mainRoad": 342,
-          "buildings": 7,
+          "buildings": 18,
           "alleys": 76,
-          "pockets": 259,
+          "pockets": 248,
           "GW": 40,
           "GH": 20
         }

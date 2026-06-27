@@ -1099,6 +1099,37 @@ async function decorativePropsSection(page) {
   return { pass, proof, decorativeProps: dp };
 }
 
+async function d1ParkLandmarkSection(page) {
+  const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await waitGameReady(page);
+
+  const d1 = await page.evaluate(() => CR.runD1ParkLandmarkSelfCheck());
+  writeProof('proof-d1-park-landmark.json', d1);
+
+  await page.evaluate(() => {
+    CR.startRun(880101);
+    CR.state = CR.STATE.PLAY;
+    CR.paused = false;
+  });
+  await page.waitForTimeout(150);
+  await page.screenshot({ path: path.join(ROOT, 'proof-d1-park-landmark-fpv.png') });
+  await page.screenshot({ path: path.join(ROOT, 'proof-d1-park-landmark-minimap.png') });
+
+  const isoOk = await page.evaluate(() => CR.crFingerprintPublicSafe(CR.crPublicStateFingerprint()));
+  const pass = d1.pass === true && isoOk !== false;
+  const proof = {
+    pass,
+    build: d1.build,
+    d1ParkLandmark: d1,
+    harnessStateOk: isoOk,
+    screenshots: ['proof-d1-park-landmark-fpv.png', 'proof-d1-park-landmark-minimap.png'],
+    timestamp: new Date().toISOString(),
+  };
+  return { pass, proof, d1ParkLandmark: d1 };
+}
+
 async function streetBlockLevelSection(page) {
   const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
   await page.setViewportSize({ width: 412, height: 915 });
@@ -1492,6 +1523,7 @@ async function main() {
   const optionsCleanup = await optionsCleanupSection(page);
   const decorativeProps = await decorativePropsSection(page);
   const streetBlockLevel = await streetBlockLevelSection(page);
+  const d1ParkLandmark = await d1ParkLandmarkSection(page);
   const settingsSafetyPass = portraitUsability.settingsSafety?.pass === true;
 
   const mobileControlReliability = await mobileControlReliabilitySection(page);
@@ -1540,6 +1572,7 @@ async function main() {
     optionsCleanup.pass &&
     decorativeProps.pass &&
     streetBlockLevel.pass &&
+    d1ParkLandmark.pass &&
     settingsSafetyPass &&
     mobileControlReliability.pass &&
     declarativeControls.pass &&
@@ -1586,6 +1619,8 @@ async function main() {
     portraitUsability,
     optionsCleanup,
     decorativeProps,
+    streetBlockLevel,
+    d1ParkLandmark,
     settingsSafety: portraitUsability.settingsSafety || { pass: settingsSafetyPass },
     mobileControlReliability,
     movementCollision,
