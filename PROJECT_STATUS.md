@@ -1,17 +1,15 @@
 # Project status — Solidarity Not Charity Can Run
 
-Last updated: declarative custom controls card closed (`controls1` / `4e311e7`).
+Last updated: EDIT CONTROLS visibility (`controledit1`).
 
-Reports were moved into **`reports/`** to keep the GitHub root readable. Index: **`reports/README.md`**; guard write-ups: **`reports/guards/`**.
-
-**CI:** `.github/workflows/selfcheck.yml` runs `npm run test:selfcheck` on push/PR to `main`. Latest selfcheck on gameplay baseline: **success** — https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28285372330 (artifact **`snc-can-run-proof-artifacts`**, **headSha** `4e311e7`).
+**CI:** `.github/workflows/selfcheck.yml` runs `npm run test:selfcheck` on push/PR to `main`. Re-run after push for latest **headSha**.
 
 ## Gameplay baseline
 
 | | |
 |--|--|
-| **BUILD_ID** (root `index.html`) | `controls1` |
-| **Gameplay commit** | `4e311e7` |
+| **BUILD_ID** (root `index.html`) | `controledit1` |
+| **Prior BUILD_ID** | `controls1` / `4e311e7` |
 | **Prior gameplay baseline** | `sound1` / `d06b2ee` |
 | **Handoff reference baseline** | `onboard1` / `aaaf901` |
 
@@ -38,6 +36,7 @@ Reports were moved into **`reports/`** to keep the GitHub root readable. Index: 
 12. **Visual rectangle regression fix** — `visualfix1`, `CR.runVisualRectangleRegressionSelfCheck`  
 13. **Sound / feedback pass** — `sound1` / `d06b2ee`, `CR.runSoundFeedbackSelfCheck`  
 14. **Declarative custom mobile controls** — `controls1` / `4e311e7`, `CR.runDeclarativeControlsSelfCheck` — **closed**
+15. **EDIT CONTROLS visibility** — `controledit1`, OPTIONS path + `CR.runDeclarativeControlsSelfCheck` — **closed**
 
 ## Next likely work
 

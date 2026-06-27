@@ -1,7 +1,7 @@
 # Reports — SNC Can Run
 
 Main hub for guard cards, reference studies, history, proofs, and backups.  
-**Gameplay baseline:** `controls1` / `4e311e7` — see **`../PROJECT_STATUS.md`**.
+**Gameplay baseline:** `controledit1` — see **`../PROJECT_STATUS.md`**.
 
 Reports were moved out of the repo root so GitHub shows only the game + core docs.
 
@@ -29,6 +29,7 @@ Reports were moved out of the repo root so GitHub shows only the game + core doc
 | 16 | Visual rectangle regression fix | [guards/VISUAL_RECTANGLE_REGRESSION_FIX_REPORT.md](guards/VISUAL_RECTANGLE_REGRESSION_FIX_REPORT.md) | `visualfix1` | `CR.runVisualRectangleRegressionSelfCheck` | Yes (render fix) |
 | 17 | Sound / feedback pass | [guards/SOUND_FEEDBACK_PASS_REPORT.md](guards/SOUND_FEEDBACK_PASS_REPORT.md) | `sound1` | `CR.runSoundFeedbackSelfCheck` + feedback proof PNGs | Yes (audio/HUD) |
 | 18 | Declarative custom controls | [guards/DECLARATIVE_CUSTOM_CONTROLS_REPORT.md](guards/DECLARATIVE_CUSTOM_CONTROLS_REPORT.md) | `controls1` / `4e311e7` | `CR.runDeclarativeControlsSelfCheck` + edit proof PNGs | Yes (controls UI; layout frozen by default) |
+| 19 | EDIT CONTROLS visibility | [guards/EDIT_CONTROLS_VISIBILITY_REPORT.md](guards/EDIT_CONTROLS_VISIBILITY_REPORT.md) | `controledit1` | OPTIONS→edit harness checks + `optionsEditPath` proof | Yes (edit overlay only) |
 
 ---
 

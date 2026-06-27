@@ -778,6 +778,39 @@ async function declarativeControlsSection(page) {
   });
   await page.screenshot({ path: path.join(ROOT, 'proof-control-edit-default.png') });
 
+  const optionsEdit = await page.evaluate(() => {
+    CR.crPrepareSelfCheckPortrait();
+    CR.options.mobileControls = 'on';
+    CR.state = CR.STATE.OPTIONS;
+    CR.paused = false;
+    CR.drawMobileMenu();
+    const rmenu = document.getElementById('rmenu');
+    const beforeVisible = !!(rmenu && !rmenu.classList.contains('in'));
+    CR.rmenuAction('option-edit-controls');
+    CR.drawMobileMenu();
+    const ml = document.getElementById('ml');
+    const bar = document.getElementById('crCtrlEditBar');
+    const mbr0 = ml.getBoundingClientRect();
+    const x0 = mbr0.left + 12;
+    const y0 = mbr0.top + 12;
+    CR.crDispatchPointer(ml, 'pointerdown', x0, y0, 211, 'touch');
+    CR.crDispatchPointer(ml, 'pointermove', x0 + 36, y0 - 28, 211, 'touch');
+    CR.crDispatchPointer(ml, 'pointerup', x0 + 36, y0 - 28, 211, 'touch');
+    CR.applyMobileControlSettings();
+    const mbr1 = ml.getBoundingClientRect();
+    CR.crFinishControlEditMode(false);
+    CR.state = CR.STATE.PLAY;
+    CR.paused = false;
+    CR.applyMobileControlSettings();
+    return {
+      beforeVisible,
+      optionsHidden: !!(rmenu && rmenu.classList.contains('in')),
+      editBarDisplay: bar ? bar.style.display : '',
+      moveSize: ml ? { w: ml.offsetWidth, h: ml.offsetHeight, display: ml.style.display } : null,
+      moved: Math.abs(mbr1.left - mbr0.left) > 6 || Math.abs(mbr1.top - mbr0.top) > 6,
+    };
+  });
+
   const decl = await page.evaluate(() => CR.runDeclarativeControlsSelfCheck());
 
   await page.evaluate(() => {
@@ -835,6 +868,7 @@ async function declarativeControlsSection(page) {
     pass,
     build: decl.build,
     declarative: decl,
+    optionsEditPath: optionsEdit,
     hitTest: hit,
     stuckAfterCancel: stuck,
     screenshots: [

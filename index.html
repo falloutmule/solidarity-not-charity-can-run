@@ -574,7 +574,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'controls1';
+const BUILD_ID = 'controledit1';
 /** Visual readability contract (render/HUD only; gameplay unchanged). */
 const CR_VISUAL_READABILITY = {
   style: 'visualfix1',
@@ -818,7 +818,9 @@ function crEnterControlEditMode(){
   if(!isMobilePortrait()){ showToast('EDIT CONTROLS: portrait layout only', 2600); return; }
   clearInputState();
   paused = true;
-  rmenuHide();
+  rmenuClearForGameplay();
+  const r = document.getElementById('rmenu');
+  if(r) r.classList.remove('options-tune');
   _controlEditActive = true;
   const loaded = crLoadControlOverrides();
   _controlEditDraft = loaded ? JSON.parse(JSON.stringify(loaded)) : { v: INPUT_CONFIG.version, overrides: {} };
@@ -1918,12 +1920,13 @@ function drawMobileMenu(){
   }
   const playControls = mobileInputActive() && state===STATE.PLAY && !paused;
   const portraitPlay = playControls && isMobilePortrait();
-  const optionsTunePreview = mobileMode && state===STATE.OPTIONS;
-  const pauseTunePreview = mobileInputActive() && paused && state===STATE.PLAY;
-  const showPortraitControls = portraitPlay || (optionsTunePreview && isMobilePortrait()) || (pauseTunePreview && isMobilePortrait());
+  const optionsTunePreview = mobileMode && state===STATE.OPTIONS && !_controlEditActive;
+  const pauseTunePreview = mobileInputActive() && paused && state===STATE.PLAY && !_controlEditActive;
+  const controlEditOverlay = _controlEditActive && mobileInputActive() && isMobilePortrait();
+  const showPortraitControls = portraitPlay || controlEditOverlay || (optionsTunePreview && isMobilePortrait()) || (pauseTunePreview && isMobilePortrait());
   const showLandscapeControlsPreview = optionsTunePreview && !isMobilePortrait();
   const mob = document.getElementById('mob');
-  if(mob) mob.style.pointerEvents = (playControls || pauseTunePreview) ? 'auto' : 'none';
+  if(mob) mob.style.pointerEvents = (playControls || pauseTunePreview || controlEditOverlay) ? 'auto' : 'none';
   ['ml','mlookpad','mg','ms'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.style.display = (showPortraitControls || showLandscapeControlsPreview) ? 'flex' : (playControls ? 'flex' : 'none');
@@ -1934,7 +1937,7 @@ function drawMobileMenu(){
     mpEl.style.pointerEvents = 'none';
   }
   const viewEl = document.getElementById('view');
-  if(viewEl) viewEl.classList.toggle('mob-touch-through', !!((mobileInputActive()) && (playControls || pauseTunePreview)));
+  if(viewEl) viewEl.classList.toggle('mob-touch-through', !!((mobileInputActive()) && (playControls || pauseTunePreview || controlEditOverlay)));
   if(showPortraitControls || showLandscapeControlsPreview || playControls || pauseTunePreview) applyMobileControlSettings();
   const menuEl = document.getElementById('mportmenu');
   if(menuEl){
@@ -1953,6 +1956,14 @@ function drawMobileMenu(){
   }
   const r = document.getElementById('rmenu');
   if(!r) return;
+
+  // Control edit mode: hide all menu panels; gameplay overlay + edit chrome only.
+  if(_controlEditActive){
+    rmenuClearForGameplay();
+    r.classList.remove('options-tune');
+    syncLookHintUI();
+    return;
+  }
 
   // During active gameplay, never keep title/menu HTML over the world.
   if(state === STATE.PLAY && !paused){
@@ -6333,6 +6344,43 @@ function runDeclarativeControlsSelfCheckBody(){
 
     _controlEditActive = false;
     _controlEditDraft = null;
+    crShowControlEditChrome(false);
+    state = STATE.OPTIONS;
+    paused = false;
+    drawMobileMenu();
+    const rmenuEl = document.getElementById('rmenu');
+    checks.optionsPanelBeforeEdit = !!(rmenuEl && !rmenuEl.classList.contains('in') && (rmenuEl.innerHTML || '').indexOf('EDIT CONTROLS') >= 0);
+    if(!checks.optionsPanelBeforeEdit) errors.push('options panel not visible before edit');
+
+    rmenuAction('option-edit-controls');
+    drawMobileMenu();
+    const editBar = document.getElementById('crCtrlEditBar');
+    checks.optionsHiddenInEdit = !!(rmenuEl && rmenuEl.classList.contains('in'));
+    checks.editBarVisibleFromOptions = !!(editBar && editBar.style.display === 'flex');
+    checks.moveVisibleInEdit = !!(ml && ml.style.display !== 'none' && ml.offsetWidth > 20 && ml.offsetHeight > 20);
+    if(!checks.optionsHiddenInEdit) errors.push('options panel still visible in edit mode');
+    if(!checks.editBarVisibleFromOptions) errors.push('edit bar not visible from options');
+    if(!checks.moveVisibleInEdit) errors.push('move control not visible in edit mode');
+
+    const mbrOptBefore = ml.getBoundingClientRect();
+    const optDragX = mbrOptBefore.left + 14;
+    const optDragY = mbrOptBefore.top + 14;
+    crDispatchPointer(ml, 'pointerdown', optDragX, optDragY, 170, 'touch');
+    crDispatchPointer(ml, 'pointermove', optDragX + 44, optDragY - 36, 170, 'touch');
+    crDispatchPointer(ml, 'pointerup', optDragX + 44, optDragY - 36, 170, 'touch');
+    applyMobileControlSettings();
+    const mbrOptAfter = ml.getBoundingClientRect();
+    checks.dragFromOptionsEdit = (Math.abs(mbrOptAfter.left - mbrOptBefore.left) > 8 || Math.abs(mbrOptAfter.top - mbrOptBefore.top) > 8);
+    if(!checks.dragFromOptionsEdit) errors.push('control not draggable from options edit path');
+
+    crFinishControlEditMode(false);
+    state = STATE.PLAY;
+    paused = false;
+    startRun(77);
+    applyMobileControlSettings();
+
+    _controlEditActive = false;
+    _controlEditDraft = null;
     crEnterControlEditMode();
     checks.editOpens = _controlEditActive === true && document.getElementById('crCtrlEditBar').style.display === 'flex';
     if(!checks.editOpens) errors.push('edit mode did not open');
@@ -6370,8 +6418,8 @@ function runDeclarativeControlsSelfCheckBody(){
     checks.inSafeViewport = bandOk;
     if(!bandOk) errors.push('controls clip safe viewport');
 
-    checks.buildIdControls1 = BUILD_ID === 'controls1';
-    if(!checks.buildIdControls1) errors.push('BUILD_ID must be controls1');
+    checks.buildIdControlEdit1 = BUILD_ID === 'controledit1';
+    if(!checks.buildIdControlEdit1) errors.push('BUILD_ID must be controledit1');
 
     checks.saveFormatUnchanged = !('controlsLayout' in (options.data || options));
     evidence.inputConfigKeys = Object.keys(INPUT_CONFIG.controls);
@@ -6574,13 +6622,13 @@ function runSoundFeedbackSelfCheckBody(){
   try {
     checks.functionExists = typeof runSoundFeedbackSelfCheck === 'function';
     checks.contract = !!(CR_SOUND_FEEDBACK && CR_SOUND_FEEDBACK.style === 'sound1' && CR_SOUND_FEEDBACK.webAudio === true);
-    checks.buildIdControls1 = BUILD_ID === 'controls1';
+    checks.buildIdControlEdit1 = BUILD_ID === 'controledit1';
     checks.crTriggerExists = typeof crTriggerSoundCue === 'function';
     checks.crSoundEnabledFn = typeof crSoundEnabled === 'function';
     checks.noExternalAudioTags = document.querySelectorAll('audio,source[src]').length === 0;
     checks.harnessMuted = _crHarnessDepth > 0 && crSoundEnabled() === false;
     if(!checks.contract) errors.push('CR_SOUND_FEEDBACK contract missing');
-    if(!checks.buildIdControls1) errors.push('BUILD_ID must be controls1');
+    if(!checks.buildIdControlEdit1) errors.push('BUILD_ID must be controledit1');
     if(!checks.crTriggerExists) errors.push('crTriggerSoundCue missing');
     if(!checks.harnessMuted) errors.push('harness must mute gameplay sound');
     if(!checks.noExternalAudioTags) errors.push('external audio tags present');
@@ -6643,13 +6691,13 @@ function runVisualReadabilitySelfCheckBody(){
   mobileOverride = true;
   try {
     checks.functionExists = typeof runVisualReadabilitySelfCheck === 'function';
-    checks.buildIdControls1 = BUILD_ID === 'controls1';
+    checks.buildIdControlEdit1 = BUILD_ID === 'controledit1';
     checks.visualContract = !!(CR_VISUAL_READABILITY && CR_VISUAL_READABILITY.style === 'visualfix1');
     checks.noScreenPathStripe = CR_VISUAL_READABILITY.floorPathStripe === false;
     checks.pickupTex = !!TEX.can;
     checks.npcTex = !!TEX.hungry;
     checks.exitTex = !!TEX.exit;
-    if(!checks.buildIdControls1) errors.push('BUILD_ID must be controls1');
+    if(!checks.buildIdControlEdit1) errors.push('BUILD_ID must be controledit1');
     if(!checks.visualContract) errors.push('CR_VISUAL_READABILITY contract missing');
     if(!checks.noScreenPathStripe) errors.push('screen-space floor path stripe must stay disabled');
     if(!checks.pickupTex || !checks.npcTex || !checks.exitTex) errors.push('sprite textures missing');
@@ -6776,9 +6824,9 @@ function runVisualRectangleRegressionSelfCheckBody(){
   mobileOverride = true;
   try {
     checks.functionExists = typeof runVisualRectangleRegressionSelfCheck === 'function';
-    checks.buildIdControls1 = BUILD_ID === 'controls1';
+    checks.buildIdControlEdit1 = BUILD_ID === 'controledit1';
     checks.noScreenPathStripe = !!(CR_VISUAL_READABILITY && CR_VISUAL_READABILITY.floorPathStripe === false);
-    if(!checks.buildIdControls1) errors.push('BUILD_ID must be controls1');
+    if(!checks.buildIdControlEdit1) errors.push('BUILD_ID must be controledit1');
     if(!checks.noScreenPathStripe) errors.push('screen-space path stripe flag must be false');
 
     startRun(42);
@@ -8867,11 +8915,11 @@ globalThis.CR = window.CR = {
   get mobileMode(){ return mobileMode; },
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
   crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
-  CR_VISUAL_READABILITY,CR_SOUND_FEEDBACK,INPUT_CONFIG,CR_CONTROLS_LS_KEY,crTriggerSoundCue,crSoundEnabled,crSoundFeedbackCueIds,crLoadControlOverrides,crPersistControlOverrides,crResetControlLayoutOverrides,crClearControlOverrides,crEnterControlEditMode,crFinishControlEditMode,crControlHitTest,crSnapshotLayoutNorms,
+  CR_VISUAL_READABILITY,CR_SOUND_FEEDBACK,INPUT_CONFIG,CR_CONTROLS_LS_KEY,crTriggerSoundCue,crSoundEnabled,crSoundFeedbackCueIds,crLoadControlOverrides,crPersistControlOverrides,crResetControlLayoutOverrides,crClearControlOverrides,crEnterControlEditMode,crFinishControlEditMode,crControlHitTest,crSnapshotLayoutNorms,crPrepareSelfCheckPortrait,
   getCrVisualHarnessSnapshot(){ return _crVisualHarnessSnapshot; },
   showOnboardingHelp,dismissOnboardingHelp,crOpenFirstRunHelpIfNeeded,
   get onboardingOpen(){ return onboardingOpen; },
-  editRunnerName,applyMobileControlSettings,mobileSprintCost,mobileSprintBurstSec,triggerMobileSprintBurst,crDispatchPointer,crDispatchTouch,
+  editRunnerName,applyMobileControlSettings,drawMobileMenu,mobileSprintCost,mobileSprintBurstSec,triggerMobileSprintBurst,crDispatchPointer,crDispatchTouch,
   toggleFullscreen,isFullscreen,enterFullscreen,exitFullscreen,
   getAudioContext,resumeAudioContext,bindAudioUnlockGate,getAudioUnlockProof,
 };
