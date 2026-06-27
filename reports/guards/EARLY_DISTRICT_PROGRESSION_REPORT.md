@@ -41,10 +41,14 @@
 | D4 pockets | `proof-d4-service-pockets.png` |
 | Full harness | `proof-full-selfcheck.json` |
 
+**Gameplay commit:** `6b43a16` (proofs/docs: `a0614bd`)
+
 ## GitHub Actions
 
-*(Fill after push.)*
+- **Run:** https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28296558894 — **success**
+- **Artifact:** `snc-can-run-proof-artifacts`
 
 ## Play URLs
 
-*(Fill with commit hash after push.)*
+- **Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=6b43a16&mobile=on&portraitlayout=1
+- **Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=6b43a16&mobile=on&portraitlayout=1
