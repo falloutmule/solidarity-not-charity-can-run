@@ -1130,6 +1130,47 @@ async function d1ParkLandmarkSection(page) {
   return { pass, proof, d1ParkLandmark: d1 };
 }
 
+async function earlyDistrictProgressionSection(page) {
+  const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await waitGameReady(page);
+
+  const ed = await page.evaluate(() => CR.runEarlyDistrictProgressionSelfCheck());
+  writeProof('proof-early-district-progression.json', ed);
+
+  const shots = [
+    { seed: 880101, file: 'proof-d1-park-plaza.png' },
+    { seed: 880102, file: 'proof-d2-storefront-street.png' },
+    { seed: 880103, file: 'proof-d3-alley-street.png' },
+    { seed: 880104, file: 'proof-d4-service-pockets.png' },
+  ];
+  for (const s of shots) {
+    await page.evaluate((seed) => {
+      CR.startRun(seed);
+      CR.state = CR.STATE.PLAY;
+      CR.paused = false;
+    }, s.seed);
+    await page.waitForTimeout(120);
+    await page.screenshot({ path: path.join(ROOT, s.file) });
+  }
+
+  const isoOk = await page.evaluate(() => CR.crFingerprintPublicSafe(CR.crPublicStateFingerprint()));
+  const pass = ed.pass === true && isoOk !== false;
+  return {
+    pass,
+    proof: {
+      pass,
+      build: ed.build,
+      earlyDistrictProgression: ed,
+      harnessStateOk: isoOk,
+      screenshots: shots.map((s) => s.file),
+      timestamp: new Date().toISOString(),
+    },
+    earlyDistrictProgression: ed,
+  };
+}
+
 async function streetBlockLevelSection(page) {
   const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
   await page.setViewportSize({ width: 412, height: 915 });
@@ -1524,6 +1565,7 @@ async function main() {
   const decorativeProps = await decorativePropsSection(page);
   const streetBlockLevel = await streetBlockLevelSection(page);
   const d1ParkLandmark = await d1ParkLandmarkSection(page);
+  const earlyDistrictProgression = await earlyDistrictProgressionSection(page);
   const settingsSafetyPass = portraitUsability.settingsSafety?.pass === true;
 
   const mobileControlReliability = await mobileControlReliabilitySection(page);
@@ -1573,6 +1615,7 @@ async function main() {
     decorativeProps.pass &&
     streetBlockLevel.pass &&
     d1ParkLandmark.pass &&
+    earlyDistrictProgression.pass &&
     settingsSafetyPass &&
     mobileControlReliability.pass &&
     declarativeControls.pass &&
@@ -1621,6 +1664,7 @@ async function main() {
     decorativeProps,
     streetBlockLevel,
     d1ParkLandmark,
+    earlyDistrictProgression,
     settingsSafety: portraitUsability.settingsSafety || { pass: settingsSafetyPass },
     mobileControlReliability,
     movementCollision,
