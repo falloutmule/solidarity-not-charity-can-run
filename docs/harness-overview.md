@@ -35,6 +35,10 @@ SNC Can Run uses **in-browser self-checks** (`window.CR`) plus a **Playwright** 
 | `proof-harness-isolation.json` | State isolation |
 | `proof-release-artifact.json` | Single-file artifact |
 | `proof-no-external-requests.json` | No external fetches |
+| `proof-declarative-controls.json` | Declarative custom controls + edit path |
+| `proof-edit-controls-resize.json` | EDIT CONTROLS SIZE −/+ |
+| `proof-control-resize-move-before.png` … `proof-control-resize-button-after.png` | Resize proof shots |
+| `proof-control-edit-reset.png` | RESET CONTROLS |
 
 ## Other gates
 

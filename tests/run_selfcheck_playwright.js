@@ -778,6 +778,36 @@ async function declarativeControlsSection(page) {
   });
   await page.screenshot({ path: path.join(ROOT, 'proof-control-edit-default.png') });
 
+  const resizeProof = await page.evaluate(() => {
+    CR.crPrepareSelfCheckPortrait();
+    localStorage.removeItem(CR.CR_CONTROLS_LS_KEY);
+    CR.crEnterControlEditMode();
+    const ml = document.getElementById('ml');
+    const mg = document.getElementById('mg');
+    return { moveW0: ml.offsetWidth, giveW0: mg.offsetWidth };
+  });
+  await page.screenshot({ path: path.join(ROOT, 'proof-control-resize-move-before.png') });
+  const moveResize = await page.evaluate(() => {
+    const ml = document.getElementById('ml');
+    const w0 = ml.offsetWidth;
+    CR.crStepEditControlSize('move', 1);
+    CR.crStepEditControlSize('move', 1);
+    return { moveWAfter: ml.offsetWidth, moveGrew: ml.offsetWidth > w0 + 4 };
+  });
+  await page.screenshot({ path: path.join(ROOT, 'proof-control-resize-move-after.png') });
+  await page.screenshot({ path: path.join(ROOT, 'proof-control-resize-button-before.png') });
+  const giveResize = await page.evaluate(() => {
+    const mg = document.getElementById('mg');
+    const w0 = mg.offsetWidth;
+    CR.crSelectEditControl('give');
+    CR.crStepEditControlSize('give', 1);
+    CR.crStepEditControlSize('give', 1);
+    return { giveWAfter: mg.offsetWidth, giveGrew: mg.offsetWidth > w0 + 3 };
+  });
+  await page.screenshot({ path: path.join(ROOT, 'proof-control-resize-button-after.png') });
+  await page.evaluate(() => CR.crFinishControlEditMode(false));
+  Object.assign(resizeProof, moveResize, giveResize);
+
   const optionsEdit = await page.evaluate(() => {
     CR.crPrepareSelfCheckPortrait();
     CR.options.mobileControls = 'on';
@@ -869,16 +899,28 @@ async function declarativeControlsSection(page) {
     build: decl.build,
     declarative: decl,
     optionsEditPath: optionsEdit,
+    resizeProof,
     hitTest: hit,
     stuckAfterCancel: stuck,
     screenshots: [
       'proof-control-edit-default.png',
+      'proof-control-resize-move-before.png',
+      'proof-control-resize-move-after.png',
+      'proof-control-resize-button-before.png',
+      'proof-control-resize-button-after.png',
       'proof-control-edit-moved.png',
       'proof-control-edit-reset.png',
     ],
     timestamp: new Date().toISOString(),
   };
   writeProof('proof-declarative-controls.json', proof);
+  writeProof('proof-edit-controls-resize.json', {
+    pass: decl.pass === true && resizeProof.moveGrew === true && resizeProof.giveGrew === true,
+    build: decl.build,
+    resizeProof,
+    declarativeChecks: decl.checks,
+    timestamp: new Date().toISOString(),
+  });
   writeProof('proof-control-hit-test.json', hit);
   return { pass, proof, declarative: decl };
 }

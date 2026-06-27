@@ -1,6 +1,6 @@
 # Project status — Solidarity Not Charity Can Run
 
-Last updated: EDIT CONTROLS visibility (`controledit1`).
+Last updated: EDIT CONTROLS resize (`controlsresize1`).
 
 **CI:** `.github/workflows/selfcheck.yml` runs `npm run test:selfcheck` on push/PR to `main`. Re-run after push for latest **headSha**.
 
@@ -8,9 +8,10 @@ Last updated: EDIT CONTROLS visibility (`controledit1`).
 
 | | |
 |--|--|
-| **BUILD_ID** (root `index.html`) | `controledit1` |
-| **Prior BUILD_ID** | `controls1` / `4e311e7` |
-| **Prior gameplay baseline** | `sound1` / `d06b2ee` |
+| **BUILD_ID** (root `index.html`) | `controlsresize1` |
+| **Prior BUILD_ID** | `controledit1` / `f543956` |
+| **Prior gameplay baseline** | `controls1` / `4e311e7` |
+| **Sound baseline** | `sound1` / `d06b2ee` |
 | **Handoff reference baseline** | `onboard1` / `aaaf901` |
 
 ## URLs
@@ -37,6 +38,7 @@ Last updated: EDIT CONTROLS visibility (`controledit1`).
 13. **Sound / feedback pass** — `sound1` / `d06b2ee`, `CR.runSoundFeedbackSelfCheck`  
 14. **Declarative custom mobile controls** — `controls1` / `4e311e7`, `CR.runDeclarativeControlsSelfCheck` — **closed**
 15. **EDIT CONTROLS visibility** — `controledit1`, OPTIONS path + `CR.runDeclarativeControlsSelfCheck` — **closed**
+16. **EDIT CONTROLS resize** — `controlsresize1`, SIZE −/+ + `CR.runDeclarativeControlsSelfCheck` — **closed**
 
 ## Next likely work
 
