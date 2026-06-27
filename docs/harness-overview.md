@@ -2,11 +2,11 @@
 
 SNC Can Run uses **in-browser self-checks** (`window.CR`) plus a **Playwright** driver that loads root **`index.html`** and collects proofs.
 
-**Gameplay baseline:** `BUILD_ID` `buildscale1` — see `PROJECT_STATUS.md` for cache-busted Play / self-check URLs.
+**Gameplay baseline:** `BUILD_ID` `streetread1` — see `PROJECT_STATUS.md` for cache-busted Play / self-check URLs.
 
 ## In-browser (`window.CR`)
 
-- Functions like `CR.runLayoutSelfCheck()`, `CR.runFullSelfCheck()`, `CR.runBuildingScalePolishSelfCheck()`, `CR.runLevelSelectorSelfCheck()`, `CR.runEarlyDistrictProgressionSelfCheck()`, `CR.runStreetBlockLevelSelfCheck()`, `CR.runD1ParkLandmarkSelfCheck()`, `CR.runOnboardingSelfCheck()`, `CR.runSoundFeedbackSelfCheck()`, `CR.runVisualReadabilitySelfCheck()`, `CR.runVisualRectangleRegressionSelfCheck()`, `CR.runDecorativePropsSelfCheck()`, `CR.runOptionsCleanupSelfCheck()`, `CR.runHallSelfCheck()`, etc.
+- Functions like `CR.runLayoutSelfCheck()`, `CR.runFullSelfCheck()`, `CR.runStreetReadabilityMinimapSelfCheck()`, `CR.runBuildingScalePolishSelfCheck()`, `CR.runLevelSelectorSelfCheck()`, `CR.runEarlyDistrictProgressionSelfCheck()`, `CR.runStreetBlockLevelSelfCheck()`, `CR.runD1ParkLandmarkSelfCheck()`, `CR.runOnboardingSelfCheck()`, `CR.runSoundFeedbackSelfCheck()`, `CR.runVisualReadabilitySelfCheck()`, `CR.runVisualRectangleRegressionSelfCheck()`, `CR.runDecorativePropsSelfCheck()`, `CR.runOptionsCleanupSelfCheck()`, `CR.runHallSelfCheck()`, etc.
 - URL: `?selfcheck=1` runs full check and shows PASS/FAIL overlay.
 - **`crWithTemporaryState`** — snapshots public state + `localStorage`, runs harness, restores so benchmarks do not leak.
 - **`__crRuntimeErrors`** — uncaught errors fail runtime-clean checks.
@@ -51,6 +51,8 @@ SNC Can Run uses **in-browser self-checks** (`window.CR`) plus a **Playwright** 
 | `proof-level-selector-menu.png` … `proof-level-selector-d4.png` | Selector menu + D1–D4 start shots |
 | `proof-building-scale-polish.json` | Building mass / FPV scale self-check |
 | `proof-building-scale-d1.png` … `proof-building-scale-d4.png` / `proof-building-scale-minimap.png` | Building scale proof shots |
+| `proof-street-readability-minimap.json` | Street readability / minimap self-check |
+| `proof-street-readability-d1.png` … `proof-street-readability-d4.png` / `proof-street-readability-minimap.png` | Minimap nav + FPV readability shots |
 | `proof-options-cleanup-menu.png` / `proof-options-cleanup-edit-controls.png` | OPTIONS cleanup proof shots |
 | `proof-control-resize-move-before.png` … `proof-control-resize-button-after.png` | Resize proof shots |
 | `proof-control-edit-reset.png` | RESET CONTROLS |
