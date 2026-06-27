@@ -587,7 +587,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'districts1';
+const BUILD_ID = 'levelselect1';
 /** Visual readability contract (render/HUD only; gameplay unchanged). */
 const CR_VISUAL_READABILITY = {
   style: 'visualfix1',
@@ -1902,6 +1902,7 @@ function rmenuAction(action){
     case 'noop': break;
     case 'toggle-fs': toggleFullscreen(); break;
     case 'title-start': startRun(); break;
+    case 'title-cycle-district': crCycleSelectedStartDistrict(); drawMobileMenu(); break;
     case 'title-seeded': seedInput=''; state=STATE.SEEDED; _rmSel=0; break;
     case 'title-continue': if(SAVE.hasValid()) continueRun(); else setMsg('No saved run'); break;
     case 'title-stats': state=STATE.STATS; _rmSel=0; break;
@@ -1916,10 +1917,10 @@ function rmenuAction(action){
       break;
     }
     case 'seed-random': startRun(); _rmSel=0; break;
-    case 'back-title-seeded': state=STATE.TITLE; _rmSel=2; break;
-    case 'back-title-stats': state=STATE.TITLE; _rmSel=3; break;
-    case 'back-title-lb': state=STATE.TITLE; _rmSel=4; break;
-    case 'back-title-options': state=STATE.TITLE; _rmSel=5; break;
+    case 'back-title-seeded': state=STATE.TITLE; _rmSel=3; break;
+    case 'back-title-stats': state=STATE.TITLE; _rmSel=4; break;
+    case 'back-title-lb': state=STATE.TITLE; _rmSel=5; break;
+    case 'back-title-options': state=STATE.TITLE; _rmSel=6; break;
     case 'option-name': editRunnerName(); break;
     case 'option-mobile': {
       const vals=['auto','on','off'];
@@ -5086,6 +5087,7 @@ const keys={};
 
 // --- MENU STATE ---
 let menuSel = 0;           // selected menu item index
+let selectedStartDistrict = 1; // 1–4 testing start (title menu below NEW RUN)
 let seedInput = '';         // text input for seed entry
 let nameInput = '';         // text input for name entry
 let confirmAction = null;   // {msg, onYes, onNo} for confirmations
@@ -5102,9 +5104,24 @@ function specialLevelMenuItems(){
     rmenu: 'custom-level-' + level.id,
   }));
 }
+function crGetSelectedStartDistrict(){
+  return Math.max(1, Math.min(4, selectedStartDistrict|0 || 1));
+}
+function crCycleSelectedStartDistrict(){
+  selectedStartDistrict = (crGetSelectedStartDistrict() % 4) + 1;
+  return selectedStartDistrict;
+}
+function crSetSelectedStartDistrict(d){
+  selectedStartDistrict = Math.max(1, Math.min(4, d|0 || 1));
+  return selectedStartDistrict;
+}
+function crTitleMenuSelectableRows(){
+  return titleMenuItems().filter(it => !it.header && it.action);
+}
 function titleMenuItems(){
   const items = [
     {label:'START NEW RUN', rmenu:'title-start', action:()=>startRun(), enabled:true},
+    {label:'START DISTRICT: D'+crGetSelectedStartDistrict(), rmenu:'title-cycle-district', action:()=>{ crCycleSelectedStartDistrict(); beep(520,0.03,'sine',0.02); drawMobileMenu(); }, enabled:true},
     {label: SAVE.hasValid() ? 'CONTINUE SAVED RUN' : 'CONTINUE (no save)', rmenu:'title-continue', action:()=>{ if(SAVE.hasValid()) continueRun(); }, enabled:SAVE.hasValid()},
     {label:'SEEDED RUN', rmenu:'title-seeded', action:()=>{ seedInput=''; state=STATE.SEEDED; menuSel=0; }, enabled:true},
   ];
@@ -5122,6 +5139,7 @@ function titleMenuItems(){
 }
 function titleMenuRowLabel(it){
   if(it.rmenu === 'title-start') return 'NEW RUN';
+  if(it.rmenu === 'title-cycle-district') return 'START DISTRICT: D'+crGetSelectedStartDistrict();
   return it.label;
 }
 function buildTitleRmenuBody(){
@@ -5184,7 +5202,7 @@ addEventListener('keydown',e=>{
   if(state===STATE.SEEDED && menuSel===0){
     if(e.code==='Backspace'){ seedInput=seedInput.slice(0,-1); e.preventDefault(); return; }
     if(e.code==='Enter'){ const s=parseInt(seedInput); if(s&&!isNaN(s)) startRun(s); return; }
-    if(e.code==='Escape'){ state=STATE.TITLE; menuSel=1; return; }
+    if(e.code==='Escape'){ state=STATE.TITLE; menuSel=3; return; }
     if(e.code.length===1 && /[0-9]/.test(e.key) && seedInput.length<10){ seedInput+=e.key; e.preventDefault(); return; }
   }
   if(state===STATE.OPTIONS && menuSel===0){
@@ -5287,7 +5305,7 @@ function activateOption(idx){
   else if(idx===6){ options.soundOn = options.soundOn === false; options.save(); }
   else if(idx===7){ confirmAction={msg:'Clear active save? Stats will be kept.', onYes:()=>{ SAVE.clear(); }, onNo:()=>{}}; }
   else if(idx===8){ confirmAction={msg:'Reset ALL local data? This cannot be undone.', onYes:()=>{ SAVE.clear(); stats.reset(); leaderboards.reset(); profile.name='RUNNER'; profile.save(); options.mouseSens=0.0022; options.lookSpeed=1; options.mobileLook='med'; options.mobileTurnSens=lookSensFromSpeed(1); options.joySizePx=110; options.buttonSizePx=85; options.lookSizePx=112; options.controlsYOffsetPx=0; options.controlOpacityValue=0.60; options.minimapSizePx=68; options.touchDeadzonePx=8; options.minimapDefault=true; options.reduceFx=false; options.mobileControls='auto'; options.save(); applyMobileControlSettings(); }, onNo:()=>{}}; }
-  else if(idx===9){ state=STATE.TITLE; menuSel=5; }
+  else if(idx===9){ state=STATE.TITLE; menuSel=6; }
 }
 function isMenuState(s){
   return s===STATE.TITLE || s===STATE.SEEDED || s===STATE.STATS || s===STATE.LB || s===STATE.OPTIONS || s===STATE.RESULTS;
@@ -5374,13 +5392,15 @@ function startRun(useSeed){
   else { const h = parseInt((location.hash||'').replace('#','')); seed = (h && !isNaN(h)) ? h : ((Math.random()*1e9)|0); }
   SAVE.clear();
   game.seed = seed;
-  game.district=1; game.totalScore=0;
+  game.district = crGetSelectedStartDistrict();
+  game.totalScore=0;
   game.modifier = pickModifier();
   resetPlayerUpgrades();
   genCity(game.seed, game.district, game.modifier);
   player.cans=0; player.stamina=player.maxStamina;
   sharedEnterPlay();
   initRunTracking(seed);
+  game.run.highestDistrict = game.district;
   game.run.customLevel = null;
   game.run.harnessOnly = false;
   onboardingOpen = false;
@@ -5847,10 +5867,11 @@ function drawMenuList(items, cx, startY, count){
     menuHit.count++;
     const sel=i===menuSel;
     const en=items[i].enabled!==false;
+    const rowLabel = (state===STATE.TITLE && typeof titleMenuRowLabel==='function') ? titleMenuRowLabel(items[i]) : items[i].label;
     ctx.font='16px monospace'; ctx.textAlign='center';
-    const tw=ctx.measureText(items[i].label).width;
-    if(sel){ ctx.fillStyle='rgba(255,210,74,0.15)'; ctx.fillRect(cx-tw/2-16, y-4, tw+32, 24); ctx.fillStyle=en?'#ffd24a':'#555'; ctx.fillText('▶ '+items[i].label, cx, y+12); }
-    else { ctx.fillStyle=en?'#d8c8a0':'#555'; ctx.fillText('  '+items[i].label, cx, y+12); }
+    const tw=ctx.measureText(rowLabel).width;
+    if(sel){ ctx.fillStyle='rgba(255,210,74,0.15)'; ctx.fillRect(cx-tw/2-16, y-4, tw+32, 24); ctx.fillStyle=en?'#ffd24a':'#555'; ctx.fillText('▶ '+rowLabel, cx, y+12); }
+    else { ctx.fillStyle=en?'#d8c8a0':'#555'; ctx.fillText('  '+rowLabel, cx, y+12); }
     ctx.textAlign='left';
     row++;
   }
@@ -7528,8 +7549,8 @@ function runDeclarativeControlsSelfCheckBody(){
     checks.menuNotEditable = INPUT_CONFIG.controls.menu && INPUT_CONFIG.controls.menu.editable === false;
     if(!checks.menuNotEditable) errors.push('MENU must stay non-editable');
 
-    checks.buildIdDistricts1 = BUILD_ID === 'districts1';
-        if(!checks.buildIdDistricts1) errors.push('BUILD_ID must be districts1');
+    checks.buildIdLevelSelect1 = BUILD_ID === 'levelselect1';
+        if(!checks.buildIdLevelSelect1) errors.push('BUILD_ID must be levelselect1');
 
     checks.saveFormatUnchanged = !('controlsLayout' in (options.data || options));
     evidence.inputConfigKeys = Object.keys(INPUT_CONFIG.controls);
@@ -7579,8 +7600,8 @@ function runDecorativePropsSelfCheckBody(){
   const evidence = {};
   const err0 = window.__crRuntimeErrors.length;
   try {
-    checks.buildIdDistricts1 = BUILD_ID === 'districts1';
-    if(!checks.buildIdDistricts1) errors.push('BUILD_ID must be districts1');
+    checks.buildIdLevelSelect1 = BUILD_ID === 'levelselect1';
+    if(!checks.buildIdLevelSelect1) errors.push('BUILD_ID must be levelselect1');
 
     checks.decorArrayExported = Array.isArray(DECOR_PROP_REQUIRED) && DECOR_PROP_REQUIRED.length === 12;
     if(!checks.decorArrayExported) errors.push('DECOR_PROP_REQUIRED must list 12 kinds');
@@ -7689,8 +7710,8 @@ function runOptionsCleanupSelfCheckBody(){
   _controlEditActive = false;
   crShowControlEditChrome(false);
   try {
-    checks.buildIdDistricts1 = BUILD_ID === 'districts1';
-        if(!checks.buildIdDistricts1) errors.push('BUILD_ID must be districts1');
+    checks.buildIdLevelSelect1 = BUILD_ID === 'levelselect1';
+        if(!checks.buildIdLevelSelect1) errors.push('BUILD_ID must be levelselect1');
 
     state = STATE.TITLE;
     paused = false;
@@ -7823,6 +7844,121 @@ function runOptionsCleanupSelfCheckBody(){
 }
 
 
+function runLevelSelectorSelfCheck(){
+  if(_crHarnessDepth > 0) return runLevelSelectorSelfCheckBody();
+  return crWithTemporaryState('levelSelector', () => runLevelSelectorSelfCheckBody());
+}
+
+function runLevelSelectorSelfCheckBody(){
+  const errors = [];
+  const warnings = [];
+  const checks = {};
+  const evidence = { starts: [], menuLabels: [] };
+  const err0 = window.__crRuntimeErrors.length;
+  const savedState = state;
+  const savedPaused = paused;
+  const savedOverride = mobileOverride;
+  const savedDistrictPick = selectedStartDistrict;
+  crPrepareSelfCheckPortrait();
+  mobileOverride = 'on';
+  setMobileMode(true);
+  try {
+    checks.buildIdLevelSelect1 = BUILD_ID === 'levelselect1';
+    if(!checks.buildIdLevelSelect1) errors.push('BUILD_ID must be levelselect1');
+    checks.saveVersionUnchanged = SAVE_VERSION === 1;
+    checks.controlsSchemaUnchanged = CR_CONTROLS_LS_KEY === 'cannedRun.controls.v1';
+
+    selectedStartDistrict = 1;
+    checks.defaultDistrictD1 = crGetSelectedStartDistrict() === 1;
+    if(!checks.defaultDistrictD1) errors.push('default start district must be D1');
+
+    const cycle = [];
+    for(let i=0;i<5;i++) cycle.push('D'+crCycleSelectedStartDistrict());
+    checks.cyclePattern = cycle.join('→') === 'D2→D3→D4→D1→D2';
+    if(!checks.cyclePattern) errors.push('district cycle must be D1→D2→D3→D4→D1 (got '+cycle.join('→')+')');
+    selectedStartDistrict = 1;
+
+    state = STATE.TITLE;
+    paused = false;
+    drawMobileMenu();
+    const labels = crTitleMenuSelectableRows().map(it => titleMenuRowLabel(it));
+    evidence.menuLabels = labels;
+    checks.newRunFirst = labels[0] === 'NEW RUN';
+    checks.districtRowBelowNewRun = !!(labels[1] && labels[1].indexOf('START DISTRICT: D') === 0);
+    checks.selectorInRmenu = ((document.getElementById('rmenu') || {}).innerHTML || '').indexOf('title-cycle-district') >= 0;
+    if(!checks.newRunFirst || !checks.districtRowBelowNewRun) errors.push('START DISTRICT must appear directly below NEW RUN');
+    if(!checks.selectorInRmenu) errors.push('rmenu missing title-cycle-district action');
+
+    rmenuAction('title-options');
+    drawMobileMenu();
+    checks.optionsStillOpens = state === STATE.OPTIONS && crOptionsMenuHtml().indexOf('EDIT CONTROLS') >= 0;
+    if(!checks.optionsStillOpens) errors.push('OPTIONS broken after selector work');
+    state = STATE.TITLE;
+    drawMobileMenu();
+
+    const seeds = [881001, 881002, 881003, 881004];
+    for(let d=1; d<=4; d++){
+      selectedStartDistrict = d;
+      SAVE.clear();
+      startRun(seeds[d-1]);
+      const got = game.district|0;
+      if(state !== STATE.PLAY) errors.push('NEW RUN D'+d+' did not enter PLAY');
+      if(got !== d) errors.push('NEW RUN from D'+d+' started at district '+got);
+      const reach = crHarnessValidateProceduralCase({ seed: seeds[d-1], district: d, modifier: '' });
+      const meta = game.streetLayoutMeta || { roadY0: 9, roadY1: 10, GW: game.MAP_W, GH: game.MAP_H };
+      const metrics = crStreetLayoutMetrics(game.map, meta);
+      const lm = game.d1ParkLandmark;
+      const propSum = d === 1 ? crD1ParkPropSummary(game.props) : null;
+      evidence.starts.push({ district: d, started: got, state, MAP_W: game.MAP_W, MAP_H: game.MAP_H, reachOk: !!(reach && reach.ok), metrics, landmark: lm, propSum });
+      if(!reach || !reach.ok) errors.push('D'+d+' start unreachable cans/people/exit');
+      if(d===1 && (!lm || crD1LandmarkCellCount(game.map, lm) < 8 || !propSum || propSum.parkish < 6)) errors.push('D1 park landmark missing when starting D1');
+      if(d===2 && !(metrics.buildings >= 32 && metrics.pockets >= 6)) errors.push('D2 storefront identity missing when starting D2');
+      if(d===3 && !(metrics.pockets >= 30)) errors.push('D3 alley pockets missing when starting D3');
+      if(d===4 && !(metrics.pockets >= 40)) errors.push('D4 pockets missing when starting D4');
+      state = STATE.TITLE;
+      paused = false;
+      game.run.harnessOnly = false;
+    }
+
+    selectedStartDistrict = 3;
+    game.run.harnessOnly = false;
+    startRun(881030);
+    const wroteSave = crHarnessWriteSaveToStorage();
+    const snapOk = wroteSave && SAVE.hasValid();
+    checks.saveAfterDistrictStart = snapOk;
+    if(snapOk){
+      const savedDist = game.district|0;
+      state = STATE.TITLE;
+      paused = false;
+      continueRun();
+      checks.continueStillWorks = state === STATE.PLAY && (game.district|0) === savedDist;
+      if(!checks.continueStillWorks) errors.push('continue/save regression after district start');
+    } else {
+      errors.push('could not save after district start');
+    }
+    SAVE.clear();
+
+    checks.runtimeClean = window.__crRuntimeErrors.length === err0;
+    if(!checks.runtimeClean) errors.push('runtime errors during level selector self-check');
+
+    const pass = errors.length === 0;
+    return { pass, build: BUILD_ID, errors, warnings, checks, evidence };
+  } catch(e){
+    errors.push(String(e && e.message ? e.message : e));
+    return { pass: false, build: BUILD_ID, errors, warnings, checks, evidence };
+  } finally {
+    selectedStartDistrict = savedDistrictPick;
+    _selfCheckForcePortrait = false;
+    mobileOverride = savedOverride;
+    state = savedState;
+    paused = savedPaused;
+    SAVE.clear();
+    state = STATE.TITLE;
+    paused = false;
+    drawMobileMenu();
+  }
+}
+
 function runEarlyDistrictProgressionSelfCheck(){
   if(_crHarnessDepth > 0) return runEarlyDistrictProgressionSelfCheckBody();
   return crWithTemporaryState('earlyDistrictProgression', () => runEarlyDistrictProgressionSelfCheckBody());
@@ -7836,8 +7972,8 @@ function runEarlyDistrictProgressionSelfCheckBody(){
   const err0 = window.__crRuntimeErrors.length;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdDistricts1 = BUILD_ID === 'districts1';
-    if(!checks.buildIdDistricts1) errors.push('BUILD_ID must be districts1');
+    checks.buildIdLevelSelect1 = BUILD_ID === 'levelselect1';
+    if(!checks.buildIdLevelSelect1) errors.push('BUILD_ID must be levelselect1');
     checks.footprintUnchanged = true;
     checks.saveVersionUnchanged = SAVE_VERSION === 1;
     checks.controlsSchemaUnchanged = CR_CONTROLS_LS_KEY === 'cannedRun.controls.v1';
@@ -7935,8 +8071,8 @@ function runD1ParkLandmarkSelfCheckBody(){
   const err0 = window.__crRuntimeErrors.length;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdDistricts1 = BUILD_ID === 'districts1';
-    if(!checks.buildIdDistricts1) errors.push('BUILD_ID must be districts1');
+    checks.buildIdLevelSelect1 = BUILD_ID === 'levelselect1';
+    if(!checks.buildIdLevelSelect1) errors.push('BUILD_ID must be levelselect1');
 
     const matrix = [
       { seed: 880101, district: 1, modifier: '' },
@@ -8051,8 +8187,8 @@ function runStreetBlockLevelSelfCheckBody(){
   const err0 = window.__crRuntimeErrors.length;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdDistricts1 = BUILD_ID === 'districts1';
-    if(!checks.buildIdDistricts1) errors.push('BUILD_ID must be districts1');
+    checks.buildIdLevelSelect1 = BUILD_ID === 'levelselect1';
+    if(!checks.buildIdLevelSelect1) errors.push('BUILD_ID must be levelselect1');
 
     const matrix = [
       { seed: 880101, district: 1, modifier: '' },
@@ -8136,6 +8272,7 @@ function runFullSelfCheckInner(){
   const streetBlockLevel = runStreetBlockLevelSelfCheck();
   const d1ParkLandmark = runD1ParkLandmarkSelfCheck();
   const earlyDistrictProgression = runEarlyDistrictProgressionSelfCheck();
+  const levelSelector = runLevelSelectorSelfCheck();
   const proceduralLevelValidation = runProceduralLevelValidationSelfCheck();
   const fullRunProgression = runFullRunProgressionSelfCheck();
   const onboarding = runOnboardingSelfCheck();
@@ -8147,7 +8284,7 @@ function runFullSelfCheckInner(){
   const levels = runLevelSelfCheck();
   const renderFailure = runRenderFailureSelfCheck();
   const runtimeClean = window.__crRuntimeErrors.length === err0;
-  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && decorativeProps.pass && optionsCleanup.pass && mobileControlReliability.pass && movementCollision.pass && reachability.pass && streetBlockLevel.pass && d1ParkLandmark.pass && earlyDistrictProgression.pass && proceduralLevelValidation.pass && fullRunProgression.pass && onboarding.pass && soundFeedback.pass && declarativeControls.pass && visualReadability.pass && visualRectangleRegression.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
+  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && decorativeProps.pass && optionsCleanup.pass && mobileControlReliability.pass && movementCollision.pass && reachability.pass && streetBlockLevel.pass && d1ParkLandmark.pass && earlyDistrictProgression.pass && levelSelector.pass && proceduralLevelValidation.pass && fullRunProgression.pass && onboarding.pass && soundFeedback.pass && declarativeControls.pass && visualReadability.pass && visualRectangleRegression.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
   return {
     pass,
     build: BUILD_ID,
@@ -8163,6 +8300,7 @@ function runFullSelfCheckInner(){
     streetBlockLevel,
     d1ParkLandmark,
     earlyDistrictProgression,
+    levelSelector,
     proceduralLevelValidation,
     fullRunProgression,
     onboarding,
@@ -8310,13 +8448,13 @@ function runSoundFeedbackSelfCheckBody(){
   try {
     checks.functionExists = typeof runSoundFeedbackSelfCheck === 'function';
     checks.contract = !!(CR_SOUND_FEEDBACK && CR_SOUND_FEEDBACK.style === 'sound1' && CR_SOUND_FEEDBACK.webAudio === true);
-    checks.buildIdOptionsClean1 = BUILD_ID === 'districts1';
+    checks.buildIdOptionsClean1 = BUILD_ID === 'levelselect1';
     checks.crTriggerExists = typeof crTriggerSoundCue === 'function';
     checks.crSoundEnabledFn = typeof crSoundEnabled === 'function';
     checks.noExternalAudioTags = document.querySelectorAll('audio,source[src]').length === 0;
     checks.harnessMuted = _crHarnessDepth > 0 && crSoundEnabled() === false;
     if(!checks.contract) errors.push('CR_SOUND_FEEDBACK contract missing');
-    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be districts1');
+    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be levelselect1');
     if(!checks.crTriggerExists) errors.push('crTriggerSoundCue missing');
     if(!checks.harnessMuted) errors.push('harness must mute gameplay sound');
     if(!checks.noExternalAudioTags) errors.push('external audio tags present');
@@ -8379,13 +8517,13 @@ function runVisualReadabilitySelfCheckBody(){
   mobileOverride = true;
   try {
     checks.functionExists = typeof runVisualReadabilitySelfCheck === 'function';
-    checks.buildIdOptionsClean1 = BUILD_ID === 'districts1';
+    checks.buildIdOptionsClean1 = BUILD_ID === 'levelselect1';
     checks.visualContract = !!(CR_VISUAL_READABILITY && CR_VISUAL_READABILITY.style === 'visualfix1');
     checks.noScreenPathStripe = CR_VISUAL_READABILITY.floorPathStripe === false;
     checks.pickupTex = !!TEX.can;
     checks.npcTex = !!TEX.hungry;
     checks.exitTex = !!TEX.exit;
-    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be districts1');
+    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be levelselect1');
     if(!checks.visualContract) errors.push('CR_VISUAL_READABILITY contract missing');
     if(!checks.noScreenPathStripe) errors.push('screen-space floor path stripe must stay disabled');
     if(!checks.pickupTex || !checks.npcTex || !checks.exitTex) errors.push('sprite textures missing');
@@ -8512,9 +8650,9 @@ function runVisualRectangleRegressionSelfCheckBody(){
   mobileOverride = true;
   try {
     checks.functionExists = typeof runVisualRectangleRegressionSelfCheck === 'function';
-    checks.buildIdOptionsClean1 = BUILD_ID === 'districts1';
+    checks.buildIdOptionsClean1 = BUILD_ID === 'levelselect1';
     checks.noScreenPathStripe = !!(CR_VISUAL_READABILITY && CR_VISUAL_READABILITY.floorPathStripe === false);
-    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be districts1');
+    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be levelselect1');
     if(!checks.noScreenPathStripe) errors.push('screen-space path stripe flag must be false');
 
     startRun(42);
@@ -10601,8 +10739,9 @@ globalThis.CR = window.CR = {
   get paused(){ return paused; },
   set paused(v){ paused=!!v; },
   get mobileMode(){ return mobileMode; },
+  crGetSelectedStartDistrict,crCycleSelectedStartDistrict,crSetSelectedStartDistrict,crTitleMenuSelectableRows,titleMenuRowLabel,
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
-  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runDecorativePropsSelfCheck,runOptionsCleanupSelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runStreetBlockLevelSelfCheck,runD1ParkLandmarkSelfCheck,runEarlyDistrictProgressionSelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
+  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runDecorativePropsSelfCheck,runOptionsCleanupSelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runStreetBlockLevelSelfCheck,runD1ParkLandmarkSelfCheck,runEarlyDistrictProgressionSelfCheck,runLevelSelectorSelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
   CR_VISUAL_READABILITY,CR_SOUND_FEEDBACK,DECOR_PROP_REQUIRED,INPUT_CONFIG,CR_CONTROLS_LS_KEY,crTriggerSoundCue,crSoundEnabled,crSoundFeedbackCueIds,crLoadControlOverrides,crPersistControlOverrides,crResetControlLayoutOverrides,crClearControlOverrides,crEnterControlEditMode,crFinishControlEditMode,crControlHitTest,crSnapshotLayoutNorms,crPrepareSelfCheckPortrait,crStepEditControlSize,crSelectEditControl,
   getCrVisualHarnessSnapshot(){ return _crVisualHarnessSnapshot; },
   showOnboardingHelp,dismissOnboardingHelp,crOpenFirstRunHelpIfNeeded,

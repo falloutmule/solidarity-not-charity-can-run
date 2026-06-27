@@ -1171,6 +1171,69 @@ async function earlyDistrictProgressionSection(page) {
   };
 }
 
+async function levelSelectorSection(page) {
+  const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await waitGameReady(page);
+
+  const menuProof = await page.evaluate(() => {
+    CR.crSetSelectedStartDistrict(1);
+    CR.state = CR.STATE.TITLE;
+    CR.paused = false;
+    if (typeof drawMobileMenu === 'function') drawMobileMenu();
+    const labels = CR.crTitleMenuSelectableRows().map((it) => CR.titleMenuRowLabel(it));
+    const cycle = [];
+    for (let i = 0; i < 5; i++) cycle.push('D' + CR.crCycleSelectedStartDistrict());
+    return {
+      labels,
+      cycle: cycle.join('→'),
+      rmenuHtml: document.getElementById('rmenu')?.innerHTML || '',
+    };
+  });
+  await page.screenshot({ path: path.join(ROOT, 'proof-level-selector-menu.png') });
+
+  const ls = await page.evaluate(() => CR.runLevelSelectorSelfCheck());
+  writeProof('proof-level-selector.json', ls);
+
+  const districtShots = [
+    { d: 1, seed: 881101, file: 'proof-level-selector-d1.png' },
+    { d: 2, seed: 881102, file: 'proof-level-selector-d2.png' },
+    { d: 3, seed: 881103, file: 'proof-level-selector-d3.png' },
+    { d: 4, seed: 881104, file: 'proof-level-selector-d4.png' },
+  ];
+  for (const s of districtShots) {
+    await page.evaluate(({ d, seed }) => {
+      CR.crSetSelectedStartDistrict(d);
+      CR.startRun(seed);
+      CR.state = CR.STATE.PLAY;
+      CR.paused = false;
+    }, s);
+    await page.waitForTimeout(120);
+    await page.screenshot({ path: path.join(ROOT, s.file) });
+  }
+
+  const pass =
+    ls.pass === true &&
+    menuProof.labels[0] === 'NEW RUN' &&
+    (menuProof.labels[1] || '').indexOf('START DISTRICT: D') === 0 &&
+    menuProof.cycle === 'D2→D3→D4→D1→D2' &&
+    menuProof.rmenuHtml.indexOf('title-cycle-district') >= 0;
+
+  return {
+    pass,
+    proof: {
+      pass,
+      build: ls.build,
+      levelSelector: ls,
+      menuProof,
+      screenshots: ['proof-level-selector-menu.png', ...districtShots.map((s) => s.file)],
+      timestamp: new Date().toISOString(),
+    },
+    levelSelector: ls,
+  };
+}
+
 async function streetBlockLevelSection(page) {
   const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
   await page.setViewportSize({ width: 412, height: 915 });
@@ -1566,6 +1629,7 @@ async function main() {
   const streetBlockLevel = await streetBlockLevelSection(page);
   const d1ParkLandmark = await d1ParkLandmarkSection(page);
   const earlyDistrictProgression = await earlyDistrictProgressionSection(page);
+  const levelSelector = await levelSelectorSection(page);
   const settingsSafetyPass = portraitUsability.settingsSafety?.pass === true;
 
   const mobileControlReliability = await mobileControlReliabilitySection(page);
@@ -1616,6 +1680,7 @@ async function main() {
     streetBlockLevel.pass &&
     d1ParkLandmark.pass &&
     earlyDistrictProgression.pass &&
+    levelSelector.pass &&
     settingsSafetyPass &&
     mobileControlReliability.pass &&
     declarativeControls.pass &&
@@ -1665,6 +1730,7 @@ async function main() {
     streetBlockLevel,
     d1ParkLandmark,
     earlyDistrictProgression,
+    levelSelector,
     settingsSafety: portraitUsability.settingsSafety || { pass: settingsSafetyPass },
     mobileControlReliability,
     movementCollision,
