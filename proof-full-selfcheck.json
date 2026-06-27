@@ -1,0 +1,1544 @@
+{
+  "pass": true,
+  "build": "propsread1",
+  "layout": {
+    "pass": true,
+    "build": "propsread1",
+    "errors": [],
+    "warnings": [
+      "intentional SPRINT/LOOK overlap"
+    ],
+    "rects": {
+      "portrait": true,
+      "fpvRect": {
+        "x": 0,
+        "y": 0,
+        "w": 390,
+        "h": 256
+      },
+      "minimapRect": {
+        "x": 18,
+        "y": 256,
+        "w": 355,
+        "h": 201
+      },
+      "statsRect": {
+        "x": 0,
+        "y": 775,
+        "w": 390,
+        "h": 69
+      },
+      "controlsRect": {
+        "x": 0,
+        "y": 457,
+        "w": 390,
+        "h": 318
+      },
+      "menuRect": {
+        "left": 115,
+        "top": 463,
+        "width": 160,
+        "height": 44
+      },
+      "menuDom": {
+        "left": 115,
+        "top": 463,
+        "width": 160,
+        "height": 44
+      },
+      "moveRect": {
+        "left": 10,
+        "top": 557,
+        "width": 114,
+        "height": 114
+      },
+      "giveRect": {
+        "left": 35,
+        "top": 484,
+        "width": 65,
+        "height": 65
+      },
+      "sprintRect": {
+        "left": 313,
+        "top": 533,
+        "width": 62,
+        "height": 62
+      },
+      "lookRect": {
+        "left": 268,
+        "top": 557,
+        "width": 116,
+        "height": 116
+      },
+      "mapButtonHidden": true,
+      "overlap": {
+        "giveLook": false,
+        "sprintLook": true,
+        "giveMove": false,
+        "sprintMove": false,
+        "giveSprint": false
+      },
+      "controlsYOffsetPx": 0,
+      "controlsYOffsetApplied": 0,
+      "dockDy": 0,
+      "mapSize": {
+        "w": 40,
+        "h": 20,
+        "aspect": "2.00"
+      },
+      "safeAreaInsets": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      }
+    },
+    "checks": {
+      "canvasOk": true,
+      "minimapRect": true,
+      "statsRect": true,
+      "menuRect": true,
+      "moveRect": true,
+      "giveRect": true,
+      "sprintRect": true,
+      "lookRect": true,
+      "menuNoDockText": true,
+      "controlsMoveWithHeight": true,
+      "menuFixedWithHeight": true,
+      "minimapFixedWithHeight": true,
+      "statsFixedWithHeight": true,
+      "fpvFixedWithHeight": true
+    },
+    "dockSummary": {
+      "pass": true,
+      "movementPx": {
+        "midToHigh": {
+          "move": 120,
+          "give": 120,
+          "sprint": 120,
+          "look": 120,
+          "menu": 0
+        },
+        "lowToVery_menu": 0
+      }
+    }
+  },
+  "viewportSafeArea": {
+    "pass": true,
+    "build": "propsread1",
+    "errors": [],
+    "warnings": [],
+    "checks": {
+      "visualViewportUsed": true,
+      "noRaw100vhShell": true,
+      "canvasVisible": true,
+      "fpvVisible": true,
+      "minimapVisible": true,
+      "menuVisible": true,
+      "controlsVisible": true,
+      "statsVisible": true,
+      "optionsBackReachable": true,
+      "resizeReappliesLayout": true,
+      "safeAreaAccountedFor": true,
+      "vvResizeHooked": true
+    },
+    "rects": {
+      "fpv": {
+        "x": 0,
+        "y": 0,
+        "w": 390,
+        "h": 256
+      },
+      "minimap": {
+        "x": 18,
+        "y": 256,
+        "w": 355,
+        "h": 201
+      },
+      "menu": {
+        "left": 115,
+        "top": 463,
+        "width": 160,
+        "height": 44
+      },
+      "stats": {
+        "x": 0,
+        "y": 775,
+        "w": 390,
+        "h": 69
+      },
+      "move": {
+        "left": 10,
+        "top": 557,
+        "width": 110,
+        "height": 110
+      },
+      "give": {
+        "left": 35,
+        "top": 484,
+        "width": 61,
+        "height": 61
+      },
+      "sprint": {
+        "left": 313,
+        "top": 533,
+        "width": 58,
+        "height": 58
+      },
+      "look": {
+        "left": 268,
+        "top": 557,
+        "width": 112,
+        "height": 112
+      }
+    },
+    "safeArea": {
+      "top": 0,
+      "right": 0,
+      "bottom": 0,
+      "left": 0
+    },
+    "viewport": {
+      "BUILD_ID": "propsread1",
+      "inner": {
+        "w": 390,
+        "h": 844
+      },
+      "visual": {
+        "w": 390,
+        "h": 844,
+        "offsetX": 0,
+        "offsetY": 0,
+        "scale": 1
+      },
+      "cssVars": {
+        "appVwPx": "390px",
+        "appVhPx": "844px",
+        "vvOffX": "0px",
+        "vvOffY": "0px",
+        "appVh": "100dvh",
+        "safeTop": "0px",
+        "safeBottom": "0px"
+      },
+      "safeAreaInsetsPx": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "canvas": {
+        "w": 390,
+        "h": 844,
+        "cssW": "390px",
+        "cssH": "844px"
+      },
+      "mob": {
+        "w": "",
+        "h": "",
+        "top": "",
+        "left": ""
+      }
+    },
+    "layoutCss": {
+      "cw": 390,
+      "ch": 844
+    },
+    "timestamp": "2026-06-27T16:07:31.706Z"
+  },
+  "portraitUsability": {
+    "pass": true,
+    "build": "propsread1",
+    "errors": [],
+    "warnings": [],
+    "thresholds": {
+      "singleControlMax": 0.15,
+      "totalMax": 0.25
+    },
+    "overlapBeforeClamp": {
+      "perControl": {
+        "move": 0.15724195921799453,
+        "give": 0.041889145820194804,
+        "look": 0.16480975404666806,
+        "sprint": 0.04714455889566253
+      },
+      "totalFraction": 0.41108541798051995,
+      "miniArea": 71355,
+      "totalArea": 29333
+    },
+    "presets": [
+      {
+        "key": "low",
+        "label": "LOW",
+        "requestedYOffset": 120,
+        "overlap": {
+          "perControl": {
+            "move": 0,
+            "give": 0,
+            "look": 0,
+            "sprint": 0
+          },
+          "totalFraction": 0,
+          "miniArea": 71355,
+          "totalArea": 0
+        },
+        "overlapPass": true,
+        "fpvVisible": true,
+        "minimapVisible": true,
+        "menuLockedBelowMinimap": true,
+        "statsVisible": true,
+        "controlsVisible": true,
+        "labelObscures": false
+      },
+      {
+        "key": "mid",
+        "label": "MID",
+        "requestedYOffset": 0,
+        "overlap": {
+          "perControl": {
+            "move": 0,
+            "give": 0,
+            "look": 0,
+            "sprint": 0
+          },
+          "totalFraction": 0,
+          "miniArea": 71355,
+          "totalArea": 0
+        },
+        "overlapPass": true,
+        "fpvVisible": true,
+        "minimapVisible": true,
+        "menuLockedBelowMinimap": true,
+        "statsVisible": true,
+        "controlsVisible": true,
+        "labelObscures": false
+      },
+      {
+        "key": "high",
+        "label": "HIGH",
+        "requestedYOffset": -120,
+        "overlap": {
+          "perControl": {
+            "move": 0.02858944713054446,
+            "give": 0.052147712143507816,
+            "look": 0.029430313222619298,
+            "sprint": 0.035764837782916406
+          },
+          "totalFraction": 0.14593231027958797,
+          "miniArea": 71355,
+          "totalArea": 10413
+        },
+        "overlapPass": true,
+        "fpvVisible": true,
+        "minimapVisible": true,
+        "menuLockedBelowMinimap": true,
+        "statsVisible": true,
+        "controlsVisible": true,
+        "labelObscures": true
+      },
+      {
+        "key": "veryHigh",
+        "label": "VERY HIGH",
+        "requestedYOffset": -240,
+        "overlap": {
+          "perControl": {
+            "move": 0,
+            "give": 0,
+            "look": 0,
+            "sprint": 0
+          },
+          "totalFraction": 0,
+          "miniArea": 71355,
+          "totalArea": 0
+        },
+        "overlapPass": true,
+        "fpvVisible": true,
+        "minimapVisible": true,
+        "menuLockedBelowMinimap": true,
+        "statsVisible": true,
+        "controlsVisible": true,
+        "labelObscures": false
+      }
+    ],
+    "checks": {
+      "fpvVisible": true,
+      "minimapVisible": true,
+      "menuBelowMinimap": true,
+      "statsVisible": true,
+      "controlsVisible": true,
+      "overlapAllPresetsPass": true,
+      "intentionalLookSprintOverlapAllowed": true
+    }
+  },
+  "settingsSafety": {
+    "pass": true,
+    "build": "propsread1",
+    "errors": [],
+    "warnings": [],
+    "checks": {
+      "migrateAdjustsUnsafe": true,
+      "midSafe": true,
+      "resetcontrolsSafe": true,
+      "harnessRestoresSafeY": true
+    },
+    "migrationSample": {
+      "changed": true,
+      "from": -240,
+      "to": -120
+    },
+    "thresholds": {
+      "singleControlMax": 0.15,
+      "totalMax": 0.25
+    }
+  },
+  "decorativeProps": {
+    "pass": true,
+    "build": "propsread1",
+    "errors": [],
+    "warnings": [],
+    "checks": {
+      "buildIdPropsRead1": true,
+      "decorArrayExported": true,
+      "allKindsDefined": true,
+      "propDimsReasonable": true,
+      "deterministicPlacement": true,
+      "propsNonCollision": true,
+      "propsOnReachableTiles": true,
+      "hallPropsKinds": true,
+      "propRenderNoThrow": true,
+      "optionsUnchanged": true,
+      "saveLoadOk": true,
+      "noExternalAssetTags": true,
+      "runtimeClean": true
+    },
+    "evidence": {
+      "placementSig": {
+        "count": 13,
+        "kinds": "bench|crate_stack|mailbox|mailbox|mural_panel|scrub_bush|shopping_cart|signboard|signboard|sleeping_bag_pile|tarp_bundle|tarp_bundle|utility_box"
+      }
+    },
+    "requiredKinds": [
+      "mailbox",
+      "shopping_cart",
+      "bench",
+      "sleeping_bag_pile",
+      "crate_stack",
+      "cooler",
+      "tarp_bundle",
+      "scrub_bush",
+      "agave",
+      "utility_box",
+      "signboard",
+      "mural_panel"
+    ]
+  },
+  "optionsCleanup": {
+    "pass": true,
+    "build": "propsread1",
+    "errors": [],
+    "warnings": [],
+    "checks": {
+      "buildIdPropsRead1": true,
+      "optionsOpens": true,
+      "obsoleteAbsent": true,
+      "sectionControls": true,
+      "sectionAudio": true,
+      "sectionDisplay": true,
+      "sectionHelp": true,
+      "sectionSystem": true,
+      "requiredPresent": true,
+      "lookSpeedCycles": true,
+      "deadzoneCycles": true,
+      "soundToggles": true,
+      "soundPersists": true,
+      "editOpensFromOptions": true,
+      "resizeStillWorks": true,
+      "resetClearsOverrides": true,
+      "helpOpens": true,
+      "backExits": true,
+      "noStuckAfterOptions": true,
+      "optionsPanY": true,
+      "runtimeClean": true,
+      "lsKeyUnchanged": true
+    },
+    "evidence": {
+      "htmlSample": "\n      <div class=\"options-scroll-body\">\n      <div class=\"rpantit\">OPTIONS</div>\n      <div class=\"rdesc\" style=\"margin-bottom:8px;color:#6a5a4a;\">build propsread1</div>\n      <div class=\"options-section-hdr\">CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-edit-controls\">EDIT CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-reset-controls\">RESET CONTROLS</div>\n      <div class="
+    }
+  },
+  "mobileControlReliability": {
+    "pass": true,
+    "build": "propsread1",
+    "errors": [],
+    "warnings": [],
+    "checks": {
+      "moveStarts": true,
+      "moveChangesPosition": true,
+      "moveDriftReleaseClears": true,
+      "moveStopsOnRelease": true,
+      "lookChangesAngle": true,
+      "lookReleaseClears": true,
+      "pointerCancelClears": true,
+      "sprintBurstWorks": true,
+      "giveSafe": true,
+      "menuSafe": true,
+      "touchActionSafe": true
+    },
+    "evidence": {
+      "moveRelease": {
+        "driftDist": 0,
+        "joyActive": false
+      },
+      "sprint": {
+        "burstUntil": 1.549100000023842,
+        "stamBefore": 60,
+        "stamAfter": 40
+      },
+      "touchAction": {
+        "gameplayTouchNone": true,
+        "bad": [],
+        "optionsPanY": true
+      }
+    }
+  },
+  "movementCollision": {
+    "pass": true,
+    "build": "propsread1",
+    "errors": [],
+    "warnings": [],
+    "checks": {
+      "normalSpawnSafe": true,
+      "hallSpawnSafe": true,
+      "wallCollisionSafe": true,
+      "cornerCollisionSafe": true,
+      "highSpeedNoTunnel": true,
+      "corridorMoveWorks": true,
+      "releaseStops": true,
+      "noNaN": true,
+      "harnessStateRestored": true
+    },
+    "measurements": {
+      "attemptedSteps": 63,
+      "finalPositions": [
+        {
+          "scene": "normalSpawn",
+          "x": 1.5,
+          "y": 1.5,
+          "pathOk": true
+        },
+        {
+          "scene": "hallSpawn",
+          "x": 12.5,
+          "y": 7
+        },
+        {
+          "scene": "corridor",
+          "x": 3.5,
+          "y": 3.700000000000004,
+          "advanced": true,
+          "corridorStopped": true
+        }
+      ],
+      "collisionResults": [
+        {
+          "test": "wall",
+          "steps": 21,
+          "x": 4,
+          "y": 2
+        },
+        {
+          "test": "corner",
+          "x": 3.1000000000000023,
+          "y": 3.7250000000000028,
+          "jitter": 0
+        },
+        {
+          "test": "highSpeed",
+          "steps": 42,
+          "x": 6.499999999999991,
+          "dx": 4.999999999999991
+        }
+      ]
+    },
+    "mobileControlReliabilityPass": true
+  },
+  "reachability": {
+    "pass": true,
+    "build": "propsread1",
+    "errors": [],
+    "warnings": [],
+    "checks": {
+      "clearTracePasses": true,
+      "wallTraceBlocks": true,
+      "diagonalWallBlocks": true,
+      "outOfBoundsSafe": true,
+      "normalSpawnReachable": true,
+      "normalPickupsReachabilityMeasured": true,
+      "normalNpcsReachabilityMeasured": true,
+      "normalExitReachabilityMeasured": true,
+      "hallAllPickupsReachable": true,
+      "hallAllNpcsReachable": true,
+      "hallExitReachable": true,
+      "giveDoesNotPassThroughWalls": true,
+      "harnessStateRestored": true
+    },
+    "measurements": {
+      "normalReachableCells": 306,
+      "hallReachableCells": 253,
+      "unreachableNormalPickups": 0,
+      "unreachableNormalNpcs": 0,
+      "traceSamples": 39
+    }
+  },
+  "proceduralLevelValidation": {
+    "pass": true,
+    "build": "propsread1",
+    "seedCount": 52,
+    "districtCount": 3,
+    "errors": [],
+    "warnings": [],
+    "summary": {
+      "levelsChecked": 52,
+      "levelsPassed": 52,
+      "levelsFailed": 0,
+      "minReachableCells": 277,
+      "maxReachableCells": 421,
+      "totalUnreachablePickups": 0,
+      "totalUnreachableNpcs": 0
+    },
+    "failures": [],
+    "checks": {
+      "allMapsRectangular": true,
+      "allSpawnsValid": true,
+      "allReachableAreasLargeEnough": true,
+      "allQuotasReachable": true,
+      "allExitsReachable": true,
+      "requiredNpcsReachable": true,
+      "noRuntimeErrors": true,
+      "harnessStateRestored": true
+    },
+    "cases": 52,
+    "timestamp": "2026-06-27T16:07:33.764Z"
+  },
+  "fullRunProgression": {
+    "pass": true,
+    "build": "propsread1",
+    "errors": [],
+    "warnings": [],
+    "checks": {
+      "normalRunStarted": true,
+      "spawnValid": true,
+      "collectedQuota": true,
+      "giveIfNeededPassed": true,
+      "exitReachable": true,
+      "exitCompleted": true,
+      "progressionAdvanced": true,
+      "midRunSaveLoadPassed": true,
+      "postCompletionSaveLoadPassed": true,
+      "hallE2EStillPasses": true,
+      "mobileControlsStillPass": true,
+      "noRuntimeErrors": true,
+      "harnessStateRestored": true
+    },
+    "measurements": {
+      "seed": 880017,
+      "district": 2,
+      "collectedCount": 8,
+      "quota": 5,
+      "reachableCells": 434,
+      "saveKeysTouched": [
+        "cannedRun.save.v1"
+      ],
+      "beforeLoadState": {
+        "district": 1,
+        "seed": 880018,
+        "helped": 0,
+        "quota": 5,
+        "px": 19.5,
+        "py": 15.5,
+        "cans": 1,
+        "taken": true,
+        "amt": 0,
+        "runCans": 1
+      },
+      "afterLoadState": {
+        "district": 1,
+        "seed": 880018,
+        "helped": 0,
+        "px": 19.5,
+        "py": 15.5,
+        "cans": 1,
+        "taken": false,
+        "amt": 0
+      }
+    },
+    "hallPass": true,
+    "mobilePass": true,
+    "timestamp": "2026-06-27T16:07:33.847Z"
+  },
+  "onboarding": {
+    "pass": true,
+    "build": "propsread1",
+    "errors": [],
+    "warnings": [],
+    "checks": {
+      "domExists": true,
+      "firstRunVisible": true,
+      "readableTitle": true,
+      "portraitVisible": true,
+      "dismissed": true,
+      "helpDismissedSaved": true,
+      "timerResumes": true,
+      "moveAfterDismiss": true,
+      "reopenFromApi": true,
+      "reopenFromPauseMenu": true,
+      "reopenFromOptions": true,
+      "saveWritten": true,
+      "saveLoadOk": true,
+      "runtimeClean": true
+    },
+    "evidence": {
+      "panelRect": {
+        "top": 10,
+        "left": 14,
+        "width": 362,
+        "height": 300.5
+      }
+    }
+  },
+  "soundFeedback": {
+    "pass": true,
+    "build": "propsread1",
+    "errors": [],
+    "warnings": [],
+    "checks": {
+      "functionExists": true,
+      "contract": true,
+      "buildIdOptionsClean1": true,
+      "crTriggerExists": true,
+      "crSoundEnabledFn": true,
+      "noExternalAudioTags": true,
+      "harnessMuted": true,
+      "requiredCueCount": 9,
+      "allRequiredCues": true,
+      "cueCallsNoThrow": true,
+      "soundOffPersist": true,
+      "soundOnPersist": true,
+      "resumeHookSafe": true,
+      "audioProof": true
+    },
+    "evidence": {
+      "cueResults": {
+        "canCollect": {
+          "ok": true,
+          "id": "canCollect",
+          "played": false,
+          "hud": "+CAN"
+        },
+        "giveSuccess": {
+          "ok": true,
+          "id": "giveSuccess",
+          "played": false,
+          "hud": "HELPED"
+        },
+        "giveBlocked": {
+          "ok": true,
+          "id": "giveBlocked",
+          "played": false,
+          "hud": "NO LINE OF SIGHT"
+        },
+        "giveUnavailable": {
+          "ok": true,
+          "id": "giveUnavailable",
+          "played": false,
+          "hud": null
+        },
+        "quotaExitReady": {
+          "ok": true,
+          "id": "quotaExitReady",
+          "played": false,
+          "hud": "EXIT READY"
+        },
+        "districtComplete": {
+          "ok": true,
+          "id": "districtComplete",
+          "played": false,
+          "hud": "DISTRICT COMPLETE"
+        },
+        "upgradeChosen": {
+          "ok": true,
+          "id": "upgradeChosen",
+          "played": false,
+          "hud": "UPGRADE"
+        },
+        "menuHelp": {
+          "ok": true,
+          "id": "menuHelp",
+          "played": false,
+          "hud": null
+        },
+        "sprintDenied": {
+          "ok": true,
+          "id": "sprintDenied",
+          "played": false,
+          "hud": null
+        }
+      },
+      "audioProof": {
+        "BUILD_ID": "propsread1",
+        "gateBound": true,
+        "unlockAttempted": false,
+        "hasContext": true,
+        "state": "running",
+        "gestureEvents": [
+          "pointerdown",
+          "keydown",
+          "touchstart"
+        ],
+        "resumeEntry": "resumeAudioContext",
+        "soundOn": true,
+        "harnessMuted": true
+      }
+    }
+  },
+  "declarativeControls": {
+    "pass": true,
+    "build": "propsread1",
+    "errors": [],
+    "warnings": [],
+    "checks": {
+      "configExists": true,
+      "requiredControls": true,
+      "lsKey": true,
+      "defaultLayoutParity": true,
+      "domRendered": true,
+      "hitMove": true,
+      "movePointer": true,
+      "pointerCancelClears": true,
+      "lookPointer": true,
+      "lookCancelClears": true,
+      "sprintTap": true,
+      "giveTap": true,
+      "pointerCaptureSafe": true,
+      "optionsPanelBeforeEdit": true,
+      "optionsHiddenInEdit": true,
+      "editBarVisibleFromOptions": true,
+      "moveVisibleInEdit": true,
+      "dragFromOptionsEdit": true,
+      "editOpens": true,
+      "moveSelectedOnOpen": true,
+      "moveResizeLarger": true,
+      "moveResizeSmaller": true,
+      "giveSelected": true,
+      "giveResizeLarger": true,
+      "giveResizeSmaller": true,
+      "editMoveApplied": true,
+      "persisted": true,
+      "sizeWHInStorage": true,
+      "reloadPreservesCustomSize": true,
+      "resetRestores": true,
+      "resetRestoresDefaultSize": true,
+      "resetcontrolsClearsSizes": true,
+      "corruptRecovers": true,
+      "noStuckAfterEdit": true,
+      "inSafeViewport": true,
+      "menuNotEditable": true,
+      "buildIdPropsRead1": true,
+      "saveFormatUnchanged": true
+    },
+    "evidence": {
+      "defaultNorms": {
+        "move": {
+          "x": 0.02564102564102564,
+          "y": 0.659952606635071,
+          "w": 0.28205128205128205,
+          "h": 0.13033175355450238
+        },
+        "give": {
+          "x": 0.08974358974358974,
+          "y": 0.5734597156398105,
+          "w": 0.1564102564102564,
+          "h": 0.07227488151658767
+        },
+        "look": {
+          "x": 0.6871794871794872,
+          "y": 0.659952606635071,
+          "w": 0.28717948717948716,
+          "h": 0.13270142180094788
+        },
+        "sprint": {
+          "x": 0.8025641025641026,
+          "y": 0.6315165876777251,
+          "w": 0.14871794871794872,
+          "h": 0.06872037914691943
+        }
+      },
+      "inputConfigKeys": [
+        "move",
+        "give",
+        "look",
+        "sprint",
+        "menu"
+      ]
+    },
+    "lsKey": "cannedRun.controls.v1"
+  },
+  "visualReadability": {
+    "pass": true,
+    "build": "propsread1",
+    "errors": [],
+    "warnings": [],
+    "checks": {
+      "functionExists": true,
+      "buildIdOptionsClean1": true,
+      "visualContract": true,
+      "noScreenPathStripe": true,
+      "pickupTex": true,
+      "npcTex": true,
+      "exitTex": true,
+      "normalRunRendered": true,
+      "pickupMarkerPresent": true,
+      "npcMarkerPresent": true,
+      "exitMarkerPresent": true,
+      "hallRendered": true,
+      "onboardingOverlayRenders": true,
+      "exitReadyVisualState": true,
+      "giveTargetVisualState": true,
+      "minimapPresent": true,
+      "saveLoadUnchanged": true,
+      "runtimeClean": true
+    },
+    "evidence": {
+      "normalSnapshot": {
+        "hasLivePickup": true,
+        "hasLiveNpc": true,
+        "hasExit": true,
+        "exitReady": false,
+        "aimNpc": false,
+        "giveReady": false
+      },
+      "hallStats": {
+        "mean": 114.15186557825153,
+        "brightRatio": 0.170375,
+        "variance": 4377.981090921888,
+        "count": 64000
+      },
+      "exitReadySnapshot": {
+        "hasLivePickup": true,
+        "hasLiveNpc": true,
+        "hasExit": true,
+        "exitReady": true,
+        "aimNpc": false,
+        "giveReady": false
+      },
+      "giveSnapshot": {
+        "hasLivePickup": true,
+        "hasLiveNpc": true,
+        "hasExit": true,
+        "exitReady": true,
+        "aimNpc": true,
+        "giveReady": true
+      },
+      "layoutMinimap": {
+        "x": 18,
+        "y": 256,
+        "w": 355,
+        "h": 201
+      }
+    },
+    "visualStyle": {
+      "style": "visualfix1",
+      "floorPathStripe": false,
+      "entityOutlines": true,
+      "exitReadyCue": true,
+      "giveTargetHighlight": true
+    }
+  },
+  "visualRectangleRegression": {
+    "pass": true,
+    "build": "propsread1",
+    "errors": [],
+    "warnings": [],
+    "checks": {
+      "functionExists": true,
+      "buildIdOptionsClean1": true,
+      "noScreenPathStripe": true,
+      "normalFpvRendered": true,
+      "twoAnglesSampled": true,
+      "noStuckLowerCenterRectangle": true,
+      "viewChangesWithHeading": true,
+      "visualReadabilityStillPasses": true,
+      "onboardingStillPasses": true,
+      "fullRunStillPasses": true,
+      "saveLoadUnchanged": true,
+      "runtimeClean": true
+    },
+    "evidence": {
+      "probes": {
+        "probe0": {
+          "center": {
+            "mean": 147.7407471494877,
+            "brightRatio": 0,
+            "variance": 662.9180966044347,
+            "count": 9472
+          },
+          "sideL": {
+            "mean": 122.6680462837888,
+            "brightRatio": 0,
+            "variance": 14.790868696844422,
+            "count": 2960
+          },
+          "sideR": {
+            "mean": 176.41696486485955,
+            "brightRatio": 0,
+            "variance": 30.49180385687406,
+            "count": 2960
+          },
+          "roi": {
+            "x0": 96,
+            "y0": 110,
+            "x1": 224,
+            "y1": 184
+          },
+          "angle": 0.7853981633974483
+        },
+        "probe1": {
+          "center": {
+            "mean": 176.45086929900978,
+            "brightRatio": 0,
+            "variance": 27.342578020923835,
+            "count": 9472
+          },
+          "sideL": {
+            "mean": 176.69213445945343,
+            "brightRatio": 0,
+            "variance": 33.80923828867666,
+            "count": 2960
+          },
+          "sideR": {
+            "mean": 173.765542567562,
+            "brightRatio": 0,
+            "variance": 38.555985311025346,
+            "count": 2960
+          },
+          "roi": {
+            "x0": 96,
+            "y0": 110,
+            "x1": 224,
+            "y1": 184
+          },
+          "angle": 2.356194490192345
+        },
+        "probe2": {
+          "center": {
+            "mean": 149.6381693412043,
+            "brightRatio": 0,
+            "variance": 840.5831873435691,
+            "count": 9472
+          },
+          "sideL": {
+            "mean": 178.34379662161638,
+            "brightRatio": 0,
+            "variance": 14.687081895799185,
+            "count": 2960
+          },
+          "sideR": {
+            "mean": 119.513411148653,
+            "brightRatio": 0,
+            "variance": 17.936324933997692,
+            "count": 2960
+          },
+          "roi": {
+            "x0": 96,
+            "y0": 110,
+            "x1": 224,
+            "y1": 184
+          },
+          "angle": 3.9269908169872414
+        },
+        "meanSpread": 28.71012214952208,
+        "pairDiff01": 28.71012214952208,
+        "stuckBrightBlock": false
+      }
+    }
+  },
+  "input": {
+    "pass": true,
+    "errors": [],
+    "checks": {
+      "startRunWorks": true,
+      "joyStarts": true,
+      "moveIntent": true,
+      "moveAfterJoy": true,
+      "joyClears": true,
+      "inpClears": true,
+      "moveStopsOnRelease": true,
+      "giveSafe": true,
+      "sprintSafe": true,
+      "lookChangesAngle": true,
+      "runtimeClean": true
+    }
+  },
+  "levels": {
+    "pass": true,
+    "errors": [],
+    "normal": {
+      "mapExists": true,
+      "MAP_W": 40,
+      "MAP_H": 20,
+      "wideMap": true,
+      "spawnCanStand": true,
+      "pickups": 16,
+      "npcs": 8,
+      "exitExists": true,
+      "pathNotBlockedImmediately": true
+    },
+    "hall": {
+      "mapExists": true,
+      "MAP_W": 30,
+      "MAP_H": 14,
+      "wideMap": true,
+      "spawnCanStand": true,
+      "pickups": 7,
+      "npcs": 7,
+      "exitExists": true,
+      "pathNotBlockedImmediately": true,
+      "customLevel": "hall_of_servants",
+      "hallIdOk": true,
+      "customNpcs": 7,
+      "thankTextExists": true,
+      "movementStarts": true,
+      "movementStopsOnRelease": true
+    },
+    "runtimeClean": true
+  },
+  "renderFailure": {
+    "pass": true,
+    "build": "propsread1",
+    "errors": [],
+    "warnings": [],
+    "checks": {
+      "zbufferExists": true,
+      "zbufferLengthMatches": true,
+      "spriteDepthCheckPresent": true,
+      "noSpriteFullRectFog": true,
+      "visibleSpriteSceneRendered": true,
+      "occludedSpriteHidden": true,
+      "canNearWallClean": true,
+      "npcNearWallClean": true,
+      "exitNearWallClean": true,
+      "hallStartRendered": true,
+      "canvasNotBlank": true,
+      "runtimeClean": true
+    },
+    "evidence": {
+      "haloSource": {
+        "BUILD_ID": "propsread1",
+        "policy": "walls own distance fog; billboards drawImage only — no post-loop sprite fog fillRect",
+        "forbiddenPatternsAbsent": true,
+        "forbiddenHits": [],
+        "requiredMarkersPresent": true,
+        "requiredMissing": [],
+        "spriteLoopOk": true,
+        "regressionCommentMarker": "SPRITE HALO REGRESSION GUARD"
+      },
+      "occlusionSource": {
+        "BUILD_ID": "propsread1",
+        "renderWidth": 320,
+        "zbufferLength": 320,
+        "zbufferMatchesRenderWidth": true,
+        "billboardKinds": [
+          "props",
+          "pickups",
+          "npcs",
+          "exit"
+        ],
+        "perColumnGuard": "depth >= zbuffer[col] => skip column",
+        "wallPassFillsZbufferPerColumn": true,
+        "noPostLoopSpriteFog": true,
+        "predicateTests": [
+          {
+            "spriteDepth": 3,
+            "wallDist": 2,
+            "expectSkip": true,
+            "label": "sprite behind wall",
+            "pass": true
+          },
+          {
+            "spriteDepth": 2,
+            "wallDist": 2,
+            "expectSkip": true,
+            "label": "sprite flush with wall (skip)",
+            "pass": true
+          },
+          {
+            "spriteDepth": 1.2,
+            "wallDist": 2,
+            "expectSkip": false,
+            "label": "sprite in front of wall",
+            "pass": true
+          }
+        ],
+        "predicateOk": true,
+        "regressionCommentMarker": "OCCLUSION REGRESSION GUARD"
+      },
+      "textures": {
+        "can": {
+          "ok": true,
+          "width": 20,
+          "height": 22,
+          "transparent": 264,
+          "opaque": 176,
+          "hasTransparency": true
+        },
+        "exit": {
+          "ok": true,
+          "width": 48,
+          "height": 80,
+          "transparent": 1780,
+          "opaque": 2060,
+          "hasTransparency": true
+        },
+        "hungry": {
+          "ok": true,
+          "width": 28,
+          "height": 46,
+          "transparent": 700,
+          "opaque": 588,
+          "hasTransparency": true
+        },
+        "hall_volunteer": {
+          "ok": true,
+          "width": 28,
+          "height": 46,
+          "transparent": 764,
+          "opaque": 524,
+          "hasTransparency": true
+        }
+      },
+      "visibleSprite": {
+        "pass": true,
+        "haloPass": true,
+        "borderStats": {
+          "mean": 148.0626541501971,
+          "brightRatio": 0.2134387351778656,
+          "variance": 4024.0631653922537,
+          "count": 506
+        },
+        "proj": {
+          "depth": 5,
+          "startCol": 152,
+          "endCol": 168,
+          "top": 103,
+          "bottom": 120,
+          "screenW": 15.272727272727273,
+          "screenH": 16.8
+        },
+        "canvasVariance": 4652.239452299425
+      },
+      "occludedSprite": {
+        "pass": true,
+        "occDiff": 0,
+        "visDiff": 139.87267904509284,
+        "zPass": true,
+        "proj": {
+          "depth": 8,
+          "startCol": 155,
+          "endCol": 165,
+          "top": 102,
+          "bottom": 113,
+          "screenW": 9.545454545454545,
+          "screenH": 10.5
+        },
+        "visProj": {
+          "depth": 3,
+          "startCol": 147,
+          "endCol": 173,
+          "top": 105,
+          "bottom": 134,
+          "screenW": 25.454545454545453,
+          "screenH": 28
+        }
+      },
+      "canNearWall": {
+        "pass": true,
+        "haloPass": true,
+        "proj": {
+          "depth": 3.9000000000000004,
+          "startCol": 150,
+          "endCol": 170,
+          "top": 104,
+          "bottom": 126,
+          "screenW": 19.580419580419576,
+          "screenH": 21.538461538461537
+        }
+      },
+      "npcNearWall": {
+        "pass": true,
+        "haloPass": true,
+        "proj": {
+          "depth": 3.8499999999999996,
+          "startCol": 146,
+          "endCol": 174,
+          "top": 81,
+          "bottom": 126,
+          "screenW": 27.19367588932807,
+          "screenH": 44.67532467532468
+        }
+      },
+      "exitNearWall": {
+        "pass": true,
+        "haloPass": true,
+        "proj": {
+          "depth": 3.8,
+          "startCol": 140,
+          "endCol": 180,
+          "top": 60,
+          "bottom": 127,
+          "screenW": 39.47368421052632,
+          "screenH": 65.78947368421053
+        }
+      },
+      "hallStart": {
+        "pass": true,
+        "stats": {
+          "mean": 76.46120454749861,
+          "brightRatio": 0.03551772388059701,
+          "variance": 2053.824639650685,
+          "count": 42880
+        },
+        "customLevel": "hall_of_servants"
+      },
+      "canvas": {
+        "pass": true,
+        "viewSize": {
+          "w": 390,
+          "h": 844
+        },
+        "stats": {
+          "mean": 114.28139045325157,
+          "brightRatio": 0.16990625,
+          "variance": 4376.695564231521,
+          "count": 64000
+        }
+      }
+    },
+    "runtimeErrors": [],
+    "timestamp": "2026-06-27T16:07:33.998Z"
+  },
+  "render": {
+    "pass": true,
+    "build": "propsread1",
+    "errors": [],
+    "warnings": [],
+    "checks": {
+      "zbufferExists": true,
+      "zbufferLengthMatches": true,
+      "spriteDepthCheckPresent": true,
+      "noSpriteFullRectFog": true,
+      "visibleSpriteSceneRendered": true,
+      "occludedSpriteHidden": true,
+      "canNearWallClean": true,
+      "npcNearWallClean": true,
+      "exitNearWallClean": true,
+      "hallStartRendered": true,
+      "canvasNotBlank": true,
+      "runtimeClean": true
+    },
+    "evidence": {
+      "haloSource": {
+        "BUILD_ID": "propsread1",
+        "policy": "walls own distance fog; billboards drawImage only — no post-loop sprite fog fillRect",
+        "forbiddenPatternsAbsent": true,
+        "forbiddenHits": [],
+        "requiredMarkersPresent": true,
+        "requiredMissing": [],
+        "spriteLoopOk": true,
+        "regressionCommentMarker": "SPRITE HALO REGRESSION GUARD"
+      },
+      "occlusionSource": {
+        "BUILD_ID": "propsread1",
+        "renderWidth": 320,
+        "zbufferLength": 320,
+        "zbufferMatchesRenderWidth": true,
+        "billboardKinds": [
+          "props",
+          "pickups",
+          "npcs",
+          "exit"
+        ],
+        "perColumnGuard": "depth >= zbuffer[col] => skip column",
+        "wallPassFillsZbufferPerColumn": true,
+        "noPostLoopSpriteFog": true,
+        "predicateTests": [
+          {
+            "spriteDepth": 3,
+            "wallDist": 2,
+            "expectSkip": true,
+            "label": "sprite behind wall",
+            "pass": true
+          },
+          {
+            "spriteDepth": 2,
+            "wallDist": 2,
+            "expectSkip": true,
+            "label": "sprite flush with wall (skip)",
+            "pass": true
+          },
+          {
+            "spriteDepth": 1.2,
+            "wallDist": 2,
+            "expectSkip": false,
+            "label": "sprite in front of wall",
+            "pass": true
+          }
+        ],
+        "predicateOk": true,
+        "regressionCommentMarker": "OCCLUSION REGRESSION GUARD"
+      },
+      "textures": {
+        "can": {
+          "ok": true,
+          "width": 20,
+          "height": 22,
+          "transparent": 264,
+          "opaque": 176,
+          "hasTransparency": true
+        },
+        "exit": {
+          "ok": true,
+          "width": 48,
+          "height": 80,
+          "transparent": 1780,
+          "opaque": 2060,
+          "hasTransparency": true
+        },
+        "hungry": {
+          "ok": true,
+          "width": 28,
+          "height": 46,
+          "transparent": 700,
+          "opaque": 588,
+          "hasTransparency": true
+        },
+        "hall_volunteer": {
+          "ok": true,
+          "width": 28,
+          "height": 46,
+          "transparent": 764,
+          "opaque": 524,
+          "hasTransparency": true
+        }
+      },
+      "visibleSprite": {
+        "pass": true,
+        "haloPass": true,
+        "borderStats": {
+          "mean": 148.0626541501971,
+          "brightRatio": 0.2134387351778656,
+          "variance": 4024.0631653922537,
+          "count": 506
+        },
+        "proj": {
+          "depth": 5,
+          "startCol": 152,
+          "endCol": 168,
+          "top": 103,
+          "bottom": 120,
+          "screenW": 15.272727272727273,
+          "screenH": 16.8
+        },
+        "canvasVariance": 4652.239452299425
+      },
+      "occludedSprite": {
+        "pass": true,
+        "occDiff": 0,
+        "visDiff": 139.87267904509284,
+        "zPass": true,
+        "proj": {
+          "depth": 8,
+          "startCol": 155,
+          "endCol": 165,
+          "top": 102,
+          "bottom": 113,
+          "screenW": 9.545454545454545,
+          "screenH": 10.5
+        },
+        "visProj": {
+          "depth": 3,
+          "startCol": 147,
+          "endCol": 173,
+          "top": 105,
+          "bottom": 134,
+          "screenW": 25.454545454545453,
+          "screenH": 28
+        }
+      },
+      "canNearWall": {
+        "pass": true,
+        "haloPass": true,
+        "proj": {
+          "depth": 3.9000000000000004,
+          "startCol": 150,
+          "endCol": 170,
+          "top": 104,
+          "bottom": 126,
+          "screenW": 19.580419580419576,
+          "screenH": 21.538461538461537
+        }
+      },
+      "npcNearWall": {
+        "pass": true,
+        "haloPass": true,
+        "proj": {
+          "depth": 3.8499999999999996,
+          "startCol": 146,
+          "endCol": 174,
+          "top": 81,
+          "bottom": 126,
+          "screenW": 27.19367588932807,
+          "screenH": 44.67532467532468
+        }
+      },
+      "exitNearWall": {
+        "pass": true,
+        "haloPass": true,
+        "proj": {
+          "depth": 3.8,
+          "startCol": 140,
+          "endCol": 180,
+          "top": 60,
+          "bottom": 127,
+          "screenW": 39.47368421052632,
+          "screenH": 65.78947368421053
+        }
+      },
+      "hallStart": {
+        "pass": true,
+        "stats": {
+          "mean": 76.46120454749861,
+          "brightRatio": 0.03551772388059701,
+          "variance": 2053.824639650685,
+          "count": 42880
+        },
+        "customLevel": "hall_of_servants"
+      },
+      "canvas": {
+        "pass": true,
+        "viewSize": {
+          "w": 390,
+          "h": 844
+        },
+        "stats": {
+          "mean": 114.28139045325157,
+          "brightRatio": 0.16990625,
+          "variance": 4376.695564231521,
+          "count": 64000
+        }
+      }
+    },
+    "runtimeErrors": [],
+    "timestamp": "2026-06-27T16:07:33.998Z"
+  },
+  "runtimeErrors": [],
+  "runtimeClean": true,
+  "timestamp": "2026-06-27T16:07:33.998Z"
+}

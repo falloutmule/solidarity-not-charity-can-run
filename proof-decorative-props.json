@@ -1,0 +1,51 @@
+{
+  "pass": true,
+  "build": "propsread1",
+  "decorativeProps": {
+    "pass": true,
+    "build": "propsread1",
+    "errors": [],
+    "warnings": [],
+    "checks": {
+      "buildIdPropsRead1": true,
+      "decorArrayExported": true,
+      "allKindsDefined": true,
+      "propDimsReasonable": true,
+      "deterministicPlacement": true,
+      "propsNonCollision": true,
+      "propsOnReachableTiles": true,
+      "hallPropsKinds": true,
+      "propRenderNoThrow": true,
+      "optionsUnchanged": true,
+      "saveLoadOk": true,
+      "noExternalAssetTags": true,
+      "runtimeClean": true
+    },
+    "evidence": {
+      "placementSig": {
+        "count": 13,
+        "kinds": "bench|crate_stack|mailbox|mailbox|mural_panel|scrub_bush|shopping_cart|signboard|signboard|sleeping_bag_pile|tarp_bundle|tarp_bundle|utility_box"
+      }
+    },
+    "requiredKinds": [
+      "mailbox",
+      "shopping_cart",
+      "bench",
+      "sleeping_bag_pile",
+      "crate_stack",
+      "cooler",
+      "tarp_bundle",
+      "scrub_bush",
+      "agave",
+      "utility_box",
+      "signboard",
+      "mural_panel"
+    ]
+  },
+  "harnessStateOk": true,
+  "screenshots": [
+    "proof-decorative-props-world.png",
+    "proof-decorative-props-closeup.png"
+  ],
+  "timestamp": "2026-06-27T16:07:51.546Z"
+}
