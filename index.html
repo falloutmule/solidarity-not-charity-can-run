@@ -221,6 +221,22 @@
     color:#ffd24a;padding:12px;font:13px monospace;letter-spacing:2px;border-radius:4px;cursor:pointer;
   }
   #view.onboard-dim{filter:brightness(0.72);}
+  /* CONTROL EDIT MODE */
+  #crCtrlEditBar{
+    display:none;position:fixed;left:var(--vv-off-x);top:calc(var(--vv-off-y) + var(--safe-top) + 6px);
+    width:var(--app-vw-px);z-index:56;gap:8px;justify-content:center;align-items:center;
+    padding:8px 10px;box-sizing:border-box;pointer-events:auto;
+    background:rgba(12,8,6,0.92);border-bottom:1px solid rgba(220,180,100,0.45);
+  }
+  #crCtrlEditBar button{
+    flex:1;max-width:120px;background:rgba(40,30,20,0.95);border:1px solid rgba(200,160,80,0.5);
+    color:#ffd24a;padding:10px 6px;font:11px monospace;border-radius:4px;cursor:pointer;touch-action:manipulation;
+  }
+  #mob.ctrl-edit-mode .mbtn{outline:2px dashed rgba(255,210,74,0.85);outline-offset:2px;}
+  #mob.ctrl-edit-mode .mbtn::after{
+    content:'';position:absolute;right:2px;bottom:2px;width:22px;height:22px;
+    border-right:3px solid rgba(255,210,74,0.9);border-bottom:3px solid rgba(255,210,74,0.9);pointer-events:none;
+  }
 </style>
 </head>
 <body>
@@ -272,6 +288,11 @@
 <!-- touch debug overlay (gated by ?touchdebug=1) -->
 <div id="touchdebug" aria-hidden="true"></div>
 <div id="crselfcheck" aria-hidden="true"></div>
+<div id="crCtrlEditBar" aria-hidden="true">
+  <button id="crCtrlEditDone" type="button">DONE</button>
+  <button id="crCtrlEditReset" type="button">RESET</button>
+  <button id="crCtrlEditCancel" type="button">CANCEL</button>
+</div>
 <script>
 "use strict";
 /* ============================================================================
@@ -553,7 +574,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'sound1';
+const BUILD_ID = 'controls1';
 /** Visual readability contract (render/HUD only; gameplay unchanged). */
 const CR_VISUAL_READABILITY = {
   style: 'visualfix1',
@@ -628,6 +649,296 @@ const CONTROL_Y_STEPS = [120, 0, -120, -240];
 const CR_MINIMAP_OVERLAP_SINGLE_MAX = 0.15;
 const CR_MINIMAP_OVERLAP_TOTAL_MAX = 0.25;
 const CR_MINIMAP_USABILITY_GAP_PX = 4;
+
+/* SECTION: INPUT_CONFIG */
+/* MOBILE LAYOUT ZONES — FPV / minimap / MENU band / control dock / stats (portrait). */
+const CR_CONTROLS_LS_KEY = 'cannedRun.controls.v1';
+// DEFAULT MOBILE CONTROL SCHEMA — normalized viewport fractions; legacy portraitLayout() is authoritative until user overrides.
+const INPUT_CONFIG = {
+  version: 1,
+  controls: {
+    move: { id: 'move', domId: 'ml', type: 'stick', action: 'move', zone: 'bottom-left', editable: true, minW: 0.12, minH: 0.08, sizeSteps: JOY_SIZE_STEPS },
+    give: { id: 'give', domId: 'mg', type: 'button', action: 'give', zone: 'bottom-left', editable: true, minW: 0.08, minH: 0.06, sizeSteps: BTN_SIZE_STEPS },
+    look: { id: 'look', domId: 'mlookpad', type: 'stick', action: 'look', zone: 'bottom-right', editable: true, minW: 0.14, minH: 0.10, sizeSteps: LOOK_PAD_SIZE_STEPS },
+    sprint: { id: 'sprint', domId: 'ms', type: 'button', action: 'sprint', zone: 'bottom-right', editable: true, minW: 0.08, minH: 0.06, sizeSteps: BTN_SIZE_STEPS },
+    menu: { id: 'menu', domId: 'mportmenu', type: 'button', action: 'menu', zone: 'center-band', editable: false },
+  },
+};
+let _controlEditActive = false;
+let _controlEditDraft = null;
+let _controlEditDrag = null;
+
+function crClamp(n, lo, hi){ return Math.max(lo, Math.min(hi, n)); }
+
+function crRectToNorm(rect, cw, ch){
+  return {
+    x: rect.left / cw,
+    y: rect.top / ch,
+    w: rect.width / cw,
+    h: rect.height / ch,
+  };
+}
+
+function crNormToRect(norm, cw, ch){
+  return {
+    left: Math.round(norm.x * cw),
+    top: Math.round(norm.y * ch),
+    width: Math.round(norm.w * cw),
+    height: Math.round(norm.h * ch),
+  };
+}
+
+function crSanitizeControlNorm(norm, cfg, cw, ch, sa){
+  if(!norm || typeof norm !== 'object') return null;
+  const minW = Math.round((cfg.minW || 0.08) * cw);
+  const minH = Math.round((cfg.minH || 0.06) * ch);
+  let w = crClamp(Number(norm.w) || 0, (cfg.minW || 0.08), 0.45) * cw;
+  let h = crClamp(Number(norm.h) || 0, (cfg.minH || 0.06), 0.35) * ch;
+  w = Math.max(minW, Math.round(w));
+  h = Math.max(minH, Math.round(h));
+  const padL = sa.left + 4;
+  const padR = sa.right + 4;
+  const padT = sa.top + 4;
+  const padB = sa.bottom + 8;
+  let left = Math.round((Number(norm.x) || 0) * cw);
+  let top = Math.round((Number(norm.y) || 0) * ch);
+  left = crClamp(left, padL, cw - padR - w);
+  top = crClamp(top, padT, ch - padB - h);
+  return { x: left / cw, y: top / ch, w: w / cw, h: h / ch };
+}
+
+// USER CONTROL OVERRIDES — localStorage only (not game save).
+function crLoadControlOverrides(){
+  try {
+    const raw = localStorage.getItem(CR_CONTROLS_LS_KEY);
+    if(!raw) return null;
+    const parsed = JSON.parse(raw);
+    if(!parsed || parsed.v !== INPUT_CONFIG.version || typeof parsed.overrides !== 'object') return null;
+    return parsed;
+  } catch(_e){
+    return null;
+  }
+}
+
+function crPersistControlOverrides(bundle){
+  try {
+    const payload = {
+      v: INPUT_CONFIG.version,
+      overrides: (bundle && bundle.overrides) ? bundle.overrides : {},
+      ts: Date.now(),
+    };
+    localStorage.setItem(CR_CONTROLS_LS_KEY, JSON.stringify(payload));
+    return true;
+  } catch(_e){
+    return false;
+  }
+}
+
+function crClearControlOverrides(){
+  try { localStorage.removeItem(CR_CONTROLS_LS_KEY); } catch(_e){}
+  _controlEditDraft = null;
+}
+
+function crGetActiveControlOverrides(){
+  if(_controlEditActive && _controlEditDraft) return _controlEditDraft;
+  return crLoadControlOverrides();
+}
+
+function crMergedNormForControl(id, legacyRect, cw, ch, sa){
+  const cfg = INPUT_CONFIG.controls[id];
+  const ov = crGetActiveControlOverrides();
+  const custom = ov && ov.overrides ? ov.overrides[id] : null;
+  if(!custom) return crRectToNorm(legacyRect, cw, ch);
+  const clean = crSanitizeControlNorm(custom, cfg, cw, ch, sa);
+  return clean || crRectToNorm(legacyRect, cw, ch);
+}
+
+function crApplyUserControlOverrides(L, cw, ch, sa){
+  const map = { move: 'moveRect', give: 'giveRect', look: 'lookRect', sprint: 'sprintRect' };
+  const ov = crGetActiveControlOverrides();
+  if(!ov || !ov.overrides || Object.keys(ov.overrides).length === 0) return L;
+  const out = Object.assign({}, L);
+  for(const id of Object.keys(map)){
+    if(!ov.overrides[id]) continue;
+    const cfg = INPUT_CONFIG.controls[id];
+    const clean = crSanitizeControlNorm(ov.overrides[id], cfg, cw, ch, sa);
+    if(!clean) continue;
+    out[map[id]] = crNormToRect(clean, cw, ch);
+  }
+  return out;
+}
+
+// CONTROL HIT TESTS — schema coordinates
+function crControlHitTest(clientX, clientY, layout){
+  const hits = [];
+  const pairs = [
+    ['move', layout.moveRect], ['give', layout.giveRect], ['look', layout.lookRect],
+    ['sprint', layout.sprintRect], ['menu', layout.menuRect],
+  ];
+  for(const [id, r] of pairs){
+    if(!r) continue;
+    if(clientX >= r.left && clientX <= r.left + r.width && clientY >= r.top && clientY <= r.top + r.height){
+      hits.push(id);
+    }
+  }
+  return hits;
+}
+
+// CONTROL RESET PATH
+function crResetControlLayoutOverrides(){
+  crClearControlOverrides();
+  if(_controlEditActive){
+    _controlEditDraft = { v: INPUT_CONFIG.version, overrides: {} };
+  }
+  applyMobileControlSettings();
+  showToast('Controls reset to defaults', 2200);
+}
+
+function crShowControlEditChrome(show){
+  const bar = document.getElementById('crCtrlEditBar');
+  if(bar) bar.style.display = show ? 'flex' : 'none';
+  const mob = document.getElementById('mob');
+  if(mob) mob.classList.toggle('ctrl-edit-mode', !!show);
+}
+
+function crSnapshotLayoutNorms(){
+  const { cw, ch } = layoutCssSize();
+  const sa = readSafeAreaInsets();
+  const L0 = portraitLayout(undefined, { skipMinimapClamp: true, skipUserOverrides: true });
+  const norms = {};
+  for(const id of ['move','give','look','sprint']){
+    const key = id + 'Rect';
+    norms[id] = crRectToNorm(L0[key], cw, ch);
+  }
+  return { cw, ch, sa, norms, layout: L0 };
+}
+
+function crEnterControlEditMode(){
+  if(!mobileInputActive()){ showToast('Enable mobile controls first', 2400); return; }
+  if(!isMobilePortrait()){ showToast('EDIT CONTROLS: portrait layout only', 2600); return; }
+  clearInputState();
+  paused = true;
+  rmenuHide();
+  _controlEditActive = true;
+  const loaded = crLoadControlOverrides();
+  _controlEditDraft = loaded ? JSON.parse(JSON.stringify(loaded)) : { v: INPUT_CONFIG.version, overrides: {} };
+  if(!_controlEditDraft.overrides) _controlEditDraft.overrides = {};
+  crShowControlEditChrome(true);
+  applyMobileControlSettings();
+  setMsg('CONTROL EDIT — drag controls · tap corner to resize');
+}
+
+function crFinishControlEditMode(save){
+  if(save && _controlEditDraft){
+    crPersistControlOverrides(_controlEditDraft);
+  }
+  _controlEditActive = false;
+  _controlEditDraft = null;
+  _controlEditDrag = null;
+  crShowControlEditChrome(false);
+  paused = false;
+  clearInputState();
+  applyMobileControlSettings();
+  drawMobileMenu();
+}
+
+function crCycleEditControlSize(id){
+  if(!_controlEditActive || !_controlEditDraft) return;
+  const cfg = INPUT_CONFIG.controls[id];
+  if(!cfg || !cfg.editable) return;
+  const snap = crSnapshotLayoutNorms();
+  const legacy = snap.layout[id + 'Rect'];
+  const cur = _controlEditDraft.overrides[id] || crRectToNorm(legacy, snap.cw, snap.ch);
+  const rect = crNormToRect(cur, snap.cw, snap.ch);
+  const steps = cfg.sizeSteps || BTN_SIZE_STEPS;
+  const curPx = Math.max(rect.width, rect.height);
+  const next = cycleStepValue(curPx, steps);
+  const scale = next / Math.max(1, Math.max(rect.width, rect.height));
+  const w = rect.width * scale;
+  const h = rect.height * scale;
+  _controlEditDraft.overrides[id] = crSanitizeControlNorm({
+    x: rect.left / snap.cw,
+    y: rect.top / snap.ch,
+    w: w / snap.cw,
+    h: h / snap.ch,
+  }, cfg, snap.cw, snap.ch, snap.sa);
+  applyMobileControlSettings();
+}
+
+function crInstallControlEditPointerHandlers(){
+  if(window._crCtrlEditHandlersInstalled) return;
+  window._crCtrlEditHandlersInstalled = true;
+  const editable = ['move','give','look','sprint'];
+  editable.forEach(id => {
+    const cfg = INPUT_CONFIG.controls[id];
+    const el = document.getElementById(cfg.domId);
+    if(!el) return;
+    el.addEventListener('pointerdown', e => {
+      if(!_controlEditActive || !cfg.editable) return;
+      if(e.button !== 0 && e.pointerType === 'mouse') return;
+      e.preventDefault();
+      e.stopPropagation();
+      const r = el.getBoundingClientRect();
+      const nearResize = (e.clientX > r.right - 28 && e.clientY > r.bottom - 28);
+      if(nearResize){
+        crCycleEditControlSize(id);
+        return;
+      }
+      _controlEditDrag = {
+        id,
+        pid: e.pointerId,
+        offX: e.clientX - r.left,
+        offY: e.clientY - r.top,
+        w: r.width,
+        h: r.height,
+      };
+      try { el.setPointerCapture(e.pointerId); } catch(_e){}
+    }, { passive: false });
+    el.addEventListener('pointermove', e => {
+      if(!_controlEditActive || !_controlEditDraft || !_controlEditDrag || _controlEditDrag.id !== id) return;
+      if(_controlEditDrag.pid !== e.pointerId) return;
+      e.preventDefault();
+      const { cw, ch } = layoutCssSize();
+      const sa = readSafeAreaInsets();
+      const cfg = INPUT_CONFIG.controls[id];
+      const left = e.clientX - _controlEditDrag.offX;
+      const top = e.clientY - _controlEditDrag.offY;
+      _controlEditDraft.overrides[id] = crSanitizeControlNorm({
+        x: left / cw,
+        y: top / ch,
+        w: _controlEditDrag.w / cw,
+        h: _controlEditDrag.h / ch,
+      }, cfg, cw, ch, sa);
+      applyMobileControlSettings();
+    }, { passive: false });
+    const endDrag = e => {
+      if(!_controlEditDrag || _controlEditDrag.id !== id) return;
+      if(e.pointerId !== undefined && _controlEditDrag.pid !== e.pointerId) return;
+      _controlEditDrag = null;
+      try { el.releasePointerCapture(e.pointerId); } catch(_e){}
+    };
+    el.addEventListener('pointerup', endDrag);
+    el.addEventListener('pointercancel', endDrag);
+  });
+  document.addEventListener('DOMContentLoaded', () => {
+    crWireControlEditBarButtons();
+  });
+  crWireControlEditBarButtons();
+}
+function crWireControlEditBarButtons(){
+  const done = document.getElementById('crCtrlEditDone');
+  const cancel = document.getElementById('crCtrlEditCancel');
+  const reset = document.getElementById('crCtrlEditReset');
+  if(!done || done._crCtrlEditWired) return;
+  done._crCtrlEditWired = true;
+  if(done) done.addEventListener('click', () => crFinishControlEditMode(true));
+  if(cancel) cancel.addEventListener('click', () => crFinishControlEditMode(false));
+  if(reset) reset.addEventListener('click', () => {
+    _controlEditDraft = { v: INPUT_CONFIG.version, overrides: {} };
+    applyMobileControlSettings();
+  });
+}
+crInstallControlEditPointerHandlers();
 
 function crDomRectToXYWH(r){
   return { x: r.left, y: r.top, w: r.width, h: r.height };
@@ -1111,6 +1422,7 @@ function bindMobileControls(){
     updateJoyDot(0,0);
   };
   ml.addEventListener('pointerdown', e=>{
+    if(_controlEditActive) return;
     e.preventDefault(); e.stopPropagation();
     try{ ml.setPointerCapture(e.pointerId); }catch(_e){}
     beginJoy(e.pointerId, e.pointerId, e.clientX, e.clientY);
@@ -1176,6 +1488,7 @@ function bindMobileControls(){
   };
 
   lpad.addEventListener('pointerdown', e=>{
+    if(_controlEditActive) return;
     e.preventDefault(); e.stopPropagation();
     if(e.pointerType === 'touch' || e.pointerType === 'pen'){
       try{ lpad.setPointerCapture(e.pointerId); }catch(_e){}
@@ -1266,6 +1579,7 @@ function bindMobileControls(){
 
   // ---- GIVE button ----
   mg.addEventListener('touchstart', e=>{
+    if(_controlEditActive) return;
     e.preventDefault(); e.stopPropagation();
     inp.give = true; mg.classList.add('pr');
   },{passive:false});
@@ -1273,14 +1587,15 @@ function bindMobileControls(){
     e.preventDefault(); e.stopPropagation();
     inp.give = false; mg.classList.remove('pr');
   },{passive:false});
-  const givePtrDown = e=>{ e.preventDefault(); e.stopPropagation(); inp.give = true; mg.classList.add('pr'); };
-  const givePtrUp = e=>{ e.preventDefault(); e.stopPropagation(); inp.give = false; mg.classList.remove('pr'); };
+  const givePtrDown = e=>{ if(_controlEditActive) return; e.preventDefault(); e.stopPropagation(); inp.give = true; mg.classList.add('pr'); };
+  const givePtrUp = e=>{ if(_controlEditActive) return; e.preventDefault(); e.stopPropagation(); inp.give = false; mg.classList.remove('pr'); };
   mg.addEventListener('pointerdown', givePtrDown, {passive:false});
   mg.addEventListener('pointerup', givePtrUp, {passive:false});
   mg.addEventListener('pointercancel', givePtrUp, {passive:false});
 
   // ---- SPRINT button (mobile: burst tap; desktop: Shift still works as hold) ----
   const sprintTap = e=>{
+    if(_controlEditActive) return;
     e.preventDefault(); e.stopPropagation();
     triggerMobileSprintBurst();
   };
@@ -1558,6 +1873,15 @@ function rmenuAction(action){
     case 'option-minimap': options.minimapDefault=!options.minimapDefault; showMinimap=options.minimapDefault; options.save(); drawMobileMenu(); break;
     case 'option-fx': options.reduceFx=!options.reduceFx; options.save(); drawMobileMenu(); break;
     case 'option-sound': options.soundOn = options.soundOn === false; options.save(); drawMobileMenu(); break;
+    case 'option-edit-controls':
+      rmenuHide();
+      crEnterControlEditMode();
+      break;
+    case 'option-reset-controls':
+      crResetControlLayoutOverrides();
+      options.save();
+      drawMobileMenu();
+      break;
     case 'option-mouse': options.mouseSens=options.mouseSens>0.003?0.0015:parseFloat((options.mouseSens+0.0005).toFixed(4)); options.save(); drawMobileMenu(); break;
     case 'result-new': SAVE.clear(); startRun(); _rmSel=0; break;
     case 'result-retry':
@@ -1746,6 +2070,8 @@ function drawMobileMenu(){
         <div class="rit" data-action="option-minimap">MINIMAP DEFAULT: ${options.minimapDefault?'ON':'OFF'}</div>
         <div class="rit" data-action="option-fx">REDUCE FX: ${options.reduceFx?'ON':'OFF'}</div>
         <div class="rit" data-action="option-sound">SOUND: ${options.soundOn !== false?'ON':'OFF'}</div>
+        <div class="rit" data-action="option-edit-controls">EDIT CONTROLS</div>
+        <div class="rit" data-action="option-reset-controls">RESET CONTROLS</div>
         <div class="rit" data-action="option-mouse">MOUSE: ${options.mouseSens.toFixed(4)}</div>
         <div class="rit" data-action="show-onboarding" style="margin-top:8px;">HOW TO PLAY</div>
       <div class="rdesc" style="margin-top:10px;">Tap rows to cycle. SPRINT is a burst: block charge → burst.</div>
@@ -2635,6 +2961,7 @@ crMigrateUnsafeControlsYOffset({ quiet: true });
     options.minimapDefault = true;
     options.soundOn = true;
     options.mobileTurnSens = lookSensFromSpeed(options.lookSpeed);
+    crClearControlOverrides();
     options.save();
   }
   // ?clearsave=1 — wipe only the active game save (not stats/profile/settings)
@@ -4615,7 +4942,11 @@ function portraitLayout(overrideYOffset, layoutOpts){
   const overlap = crMinimapOverlapMetrics({
     minimapRect, moveRect, giveRect, lookRect, sprintRect,
   });
-  return { fpvRect, minimapRect, statsRect, controlsRect, moveRect, giveRect, sprintRect, lookRect, menuRect, controlsYOffsetApplied: dy, dockDy: dy, safeAreaInsets: sa, minimapOverlap: overlap };
+  let layoutOut = { fpvRect, minimapRect, statsRect, controlsRect, moveRect, giveRect, sprintRect, lookRect, menuRect, controlsYOffsetApplied: dy, dockDy: dy, safeAreaInsets: sa, minimapOverlap: overlap };
+  if(!(layoutOpts && layoutOpts.skipUserOverrides)){
+    layoutOut = crApplyUserControlOverrides(layoutOut, cw, ch, sa);
+  }
+  return layoutOut;
 }
 function drawPortraitDashboardChrome(){
   if(!mobileMode || !isMobilePortrait()) return;
@@ -5893,6 +6224,178 @@ function runMobileControlReliabilitySelfCheckBody(){
   }
 }
 
+function runDeclarativeControlsSelfCheck(){
+  if(_crHarnessDepth > 0) return runDeclarativeControlsSelfCheckBody();
+  return crWithTemporaryState('declarativeControls', () => runDeclarativeControlsSelfCheckBody());
+}
+
+/* SECTION: INPUT_SELF_CHECKS */
+function runDeclarativeControlsSelfCheckBody(){
+  const errors = [];
+  const warnings = [];
+  const checks = {};
+  const evidence = {};
+  const savedOverride = mobileOverride;
+  const savedState = state;
+  const savedPaused = paused;
+  const savedEdit = _controlEditActive;
+  const savedDraft = _controlEditDraft;
+  crPrepareSelfCheckPortrait();
+  mobileOverride = 'on';
+  setMobileMode(true);
+  try {
+    checks.configExists = !!(INPUT_CONFIG && INPUT_CONFIG.version === 1 && INPUT_CONFIG.controls);
+    checks.requiredControls = !!(INPUT_CONFIG.controls.move && INPUT_CONFIG.controls.look && INPUT_CONFIG.controls.give && INPUT_CONFIG.controls.sprint && INPUT_CONFIG.controls.menu);
+    checks.lsKey = CR_CONTROLS_LS_KEY === 'cannedRun.controls.v1';
+    if(!checks.configExists) errors.push('INPUT_CONFIG missing');
+    if(!checks.requiredControls) errors.push('INPUT_CONFIG controls incomplete');
+    if(!checks.lsKey) errors.push('localStorage key wrong');
+
+    crClearControlOverrides();
+    applyMobileControlSettings();
+    const { cw, ch } = layoutCssSize();
+    const sa = readSafeAreaInsets();
+    const legacy = portraitLayout(undefined, { skipMinimapClamp: true, skipUserOverrides: true });
+    const merged = portraitLayout(undefined, { skipMinimapClamp: true });
+    const ids = ['move','give','look','sprint'];
+    checks.defaultLayoutParity = true;
+    for(const id of ids){
+      const a = legacy[id + 'Rect'];
+      const b = merged[id + 'Rect'];
+      const dx = Math.abs(a.left - b.left) + Math.abs(a.top - b.top);
+      if(dx > 2 || Math.abs(a.width - b.width) > 2 || Math.abs(a.height - b.height) > 2){
+        checks.defaultLayoutParity = false;
+        errors.push('default layout drift '+id);
+      }
+    }
+    evidence.defaultNorms = crSnapshotLayoutNorms().norms;
+
+    const ml = document.getElementById('ml');
+    const lpad = document.getElementById('mlookpad');
+    const mg = document.getElementById('mg');
+    const ms = document.getElementById('ms');
+    const mportmenu = document.getElementById('mportmenu');
+    checks.domRendered = !!(ml && lpad && mg && ms && mportmenu);
+    if(!checks.domRendered) errors.push('control DOM missing');
+
+    state = STATE.PLAY;
+    paused = false;
+    startRun(77);
+    applyMobileControlSettings();
+
+    const L = portraitLayout(undefined, { skipMinimapClamp: true });
+    const mbr = ml.getBoundingClientRect();
+    const cx = mbr.left + mbr.width * 0.5;
+    const cy = mbr.top + mbr.height * 0.5;
+    checks.hitMove = crControlHitTest(cx, cy, L).includes('move');
+    if(!checks.hitMove) errors.push('hit test MOVE failed');
+
+    crDispatchPointer(ml, 'pointerdown', cx, cy, 91, 'touch');
+    crDispatchPointer(ml, 'pointermove', cx, cy - 30, 91, 'touch');
+    checks.movePointer = joy.active === true;
+    crDispatchPointer(ml, 'pointercancel', cx, cy - 30, 91, 'touch');
+    checks.pointerCancelClears = !joy.active && !inp.f && !inp.b;
+    if(!checks.movePointer) errors.push('MOVE pointer path failed');
+    if(!checks.pointerCancelClears) errors.push('pointercancel stuck input');
+
+    const lbr = lpad.getBoundingClientRect();
+    const lx = lbr.left + lbr.width * 0.5;
+    const ly = lbr.top + lbr.height * 0.5;
+    crDispatchPointer(lpad, 'pointerdown', lx, ly, 92, 'touch');
+    crDispatchPointer(lpad, 'pointermove', lx + 25, ly, 92, 'touch');
+    checks.lookPointer = lookTouch.id !== null || lpad.classList.contains('pr');
+    crDispatchPointer(lpad, 'pointercancel', lx + 25, ly, 92, 'touch');
+    checks.lookCancelClears = lookTouch.id === null;
+    if(!checks.lookPointer) errors.push('LOOK pointer path failed');
+
+    const sbr = ms.getBoundingClientRect();
+    crDispatchPointer(ms, 'pointerdown', sbr.left + 10, sbr.top + 10, 93, 'touch');
+    checks.sprintTap = true;
+    crDispatchPointer(ms, 'pointerup', sbr.left + 10, sbr.top + 10, 93, 'touch');
+
+    const gbr = mg.getBoundingClientRect();
+    crDispatchPointer(mg, 'pointerdown', gbr.left + 10, gbr.top + 10, 94, 'touch');
+    checks.giveTap = inp.give === true;
+    crDispatchPointer(mg, 'pointerup', gbr.left + 10, gbr.top + 10, 94, 'touch');
+    if(!checks.giveTap) errors.push('GIVE tap failed');
+
+    let captureOk = true;
+    try {
+      const capId = 95;
+      crDispatchPointer(ml, 'pointerdown', cx, cy, capId, 'touch');
+      captureOk = joy.active === true;
+      if(typeof ml.hasPointerCapture === 'function' && ml.hasPointerCapture(capId)) captureOk = true;
+      crDispatchPointer(ml, 'pointercancel', cx, cy, capId, 'touch');
+      captureOk = captureOk && !joy.active;
+    } catch(_e){ captureOk = false; }
+    checks.pointerCaptureSafe = captureOk;
+    if(!captureOk) errors.push('pointer capture path failed');
+
+    _controlEditActive = false;
+    _controlEditDraft = null;
+    crEnterControlEditMode();
+    checks.editOpens = _controlEditActive === true && document.getElementById('crCtrlEditBar').style.display === 'flex';
+    if(!checks.editOpens) errors.push('edit mode did not open');
+
+    const draftBefore = JSON.stringify(_controlEditDraft && _controlEditDraft.overrides ? _controlEditDraft.overrides : {});
+    _controlEditDraft.overrides.move = crSanitizeControlNorm({
+      x: 0.05, y: 0.70, w: 0.22, h: 0.18,
+    }, INPUT_CONFIG.controls.move, cw, ch, sa);
+    applyMobileControlSettings();
+    const mbr2 = ml.getBoundingClientRect();
+    checks.editMoveApplied = mbr2.left < mbr.left - 5 || Math.abs(mbr2.top - mbr.top) > 5;
+    if(!checks.editMoveApplied) warnings.push('edit move delta subtle');
+
+    crFinishControlEditMode(true);
+    checks.persisted = !!(crLoadControlOverrides() && crLoadControlOverrides().overrides && crLoadControlOverrides().overrides.move);
+    if(!checks.persisted) errors.push('custom layout did not persist');
+
+    crResetControlLayoutOverrides();
+    applyMobileControlSettings();
+    checks.resetRestores = !crLoadControlOverrides();
+    if(!checks.resetRestores) errors.push('reset controls failed');
+
+    try {
+      localStorage.setItem(CR_CONTROLS_LS_KEY, '{not-json');
+    } catch(_e){}
+    checks.corruptRecovers = crLoadControlOverrides() === null;
+    crClearControlOverrides();
+    if(!checks.corruptRecovers) errors.push('corrupt localStorage not ignored');
+
+    clearInputState();
+    checks.noStuckAfterEdit = !joy.active && lookTouch.id === null && !inp.give;
+    if(!checks.noStuckAfterEdit) errors.push('stuck input after edit mode');
+
+    const bandOk = crElementPartiallyInVisibleBand(ml, sa) && crElementPartiallyInVisibleBand(lpad, sa);
+    checks.inSafeViewport = bandOk;
+    if(!bandOk) errors.push('controls clip safe viewport');
+
+    checks.buildIdControls1 = BUILD_ID === 'controls1';
+    if(!checks.buildIdControls1) errors.push('BUILD_ID must be controls1');
+
+    checks.saveFormatUnchanged = !('controlsLayout' in (options.data || options));
+    evidence.inputConfigKeys = Object.keys(INPUT_CONFIG.controls);
+
+    const pass = errors.length === 0;
+    return { pass, build: BUILD_ID, errors, warnings, checks, evidence, lsKey: CR_CONTROLS_LS_KEY };
+  } catch(e){
+    errors.push(String(e && e.message ? e.message : e));
+    return { pass: false, build: BUILD_ID, errors, warnings, checks, evidence: {} };
+  } finally {
+    _controlEditActive = savedEdit;
+    _controlEditDraft = savedDraft;
+    _selfCheckForcePortrait = false;
+    mobileOverride = savedOverride;
+    state = savedState;
+    paused = savedPaused;
+    clearInputState();
+    crClearControlOverrides();
+    crShowControlEditChrome(false);
+    applyMobileControlSettings();
+    drawMobileMenu();
+  }
+}
+
 function runFullSelfCheckInner(){
   const err0 = window.__crRuntimeErrors.length;
   const layout = runLayoutSelfCheck();
@@ -5906,13 +6409,14 @@ function runFullSelfCheckInner(){
   const fullRunProgression = runFullRunProgressionSelfCheck();
   const onboarding = runOnboardingSelfCheck();
   const soundFeedback = runSoundFeedbackSelfCheck();
+  const declarativeControls = runDeclarativeControlsSelfCheck();
   const visualReadability = runVisualReadabilitySelfCheck();
   const visualRectangleRegression = runVisualRectangleRegressionSelfCheck();
   const input = runInputSelfCheck();
   const levels = runLevelSelfCheck();
   const renderFailure = runRenderFailureSelfCheck();
   const runtimeClean = window.__crRuntimeErrors.length === err0;
-  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && mobileControlReliability.pass && movementCollision.pass && reachability.pass && proceduralLevelValidation.pass && fullRunProgression.pass && onboarding.pass && soundFeedback.pass && visualReadability.pass && visualRectangleRegression.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
+  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && mobileControlReliability.pass && movementCollision.pass && reachability.pass && proceduralLevelValidation.pass && fullRunProgression.pass && onboarding.pass && soundFeedback.pass && declarativeControls.pass && visualReadability.pass && visualRectangleRegression.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
   return {
     pass,
     build: BUILD_ID,
@@ -5927,6 +6431,7 @@ function runFullSelfCheckInner(){
     fullRunProgression,
     onboarding,
     soundFeedback,
+    declarativeControls,
     visualReadability,
     visualRectangleRegression,
     input,
@@ -6069,13 +6574,13 @@ function runSoundFeedbackSelfCheckBody(){
   try {
     checks.functionExists = typeof runSoundFeedbackSelfCheck === 'function';
     checks.contract = !!(CR_SOUND_FEEDBACK && CR_SOUND_FEEDBACK.style === 'sound1' && CR_SOUND_FEEDBACK.webAudio === true);
-    checks.buildIdSound1 = BUILD_ID === 'sound1';
+    checks.buildIdControls1 = BUILD_ID === 'controls1';
     checks.crTriggerExists = typeof crTriggerSoundCue === 'function';
     checks.crSoundEnabledFn = typeof crSoundEnabled === 'function';
     checks.noExternalAudioTags = document.querySelectorAll('audio,source[src]').length === 0;
     checks.harnessMuted = _crHarnessDepth > 0 && crSoundEnabled() === false;
     if(!checks.contract) errors.push('CR_SOUND_FEEDBACK contract missing');
-    if(!checks.buildIdSound1) errors.push('BUILD_ID must be sound1');
+    if(!checks.buildIdControls1) errors.push('BUILD_ID must be controls1');
     if(!checks.crTriggerExists) errors.push('crTriggerSoundCue missing');
     if(!checks.harnessMuted) errors.push('harness must mute gameplay sound');
     if(!checks.noExternalAudioTags) errors.push('external audio tags present');
@@ -6138,13 +6643,13 @@ function runVisualReadabilitySelfCheckBody(){
   mobileOverride = true;
   try {
     checks.functionExists = typeof runVisualReadabilitySelfCheck === 'function';
-    checks.buildIdSound1 = BUILD_ID === 'sound1';
+    checks.buildIdControls1 = BUILD_ID === 'controls1';
     checks.visualContract = !!(CR_VISUAL_READABILITY && CR_VISUAL_READABILITY.style === 'visualfix1');
     checks.noScreenPathStripe = CR_VISUAL_READABILITY.floorPathStripe === false;
     checks.pickupTex = !!TEX.can;
     checks.npcTex = !!TEX.hungry;
     checks.exitTex = !!TEX.exit;
-    if(!checks.buildIdSound1) errors.push('BUILD_ID must be sound1');
+    if(!checks.buildIdControls1) errors.push('BUILD_ID must be controls1');
     if(!checks.visualContract) errors.push('CR_VISUAL_READABILITY contract missing');
     if(!checks.noScreenPathStripe) errors.push('screen-space floor path stripe must stay disabled');
     if(!checks.pickupTex || !checks.npcTex || !checks.exitTex) errors.push('sprite textures missing');
@@ -6271,9 +6776,9 @@ function runVisualRectangleRegressionSelfCheckBody(){
   mobileOverride = true;
   try {
     checks.functionExists = typeof runVisualRectangleRegressionSelfCheck === 'function';
-    checks.buildIdSound1 = BUILD_ID === 'sound1';
+    checks.buildIdControls1 = BUILD_ID === 'controls1';
     checks.noScreenPathStripe = !!(CR_VISUAL_READABILITY && CR_VISUAL_READABILITY.floorPathStripe === false);
-    if(!checks.buildIdSound1) errors.push('BUILD_ID must be sound1');
+    if(!checks.buildIdControls1) errors.push('BUILD_ID must be controls1');
     if(!checks.noScreenPathStripe) errors.push('screen-space path stripe flag must be false');
 
     startRun(42);
@@ -8361,8 +8866,8 @@ globalThis.CR = window.CR = {
   set paused(v){ paused=!!v; },
   get mobileMode(){ return mobileMode; },
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
-  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runMobileControlReliabilitySelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
-  CR_VISUAL_READABILITY,CR_SOUND_FEEDBACK,crTriggerSoundCue,crSoundEnabled,crSoundFeedbackCueIds,
+  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
+  CR_VISUAL_READABILITY,CR_SOUND_FEEDBACK,INPUT_CONFIG,CR_CONTROLS_LS_KEY,crTriggerSoundCue,crSoundEnabled,crSoundFeedbackCueIds,crLoadControlOverrides,crPersistControlOverrides,crResetControlLayoutOverrides,crClearControlOverrides,crEnterControlEditMode,crFinishControlEditMode,crControlHitTest,crSnapshotLayoutNorms,
   getCrVisualHarnessSnapshot(){ return _crVisualHarnessSnapshot; },
   showOnboardingHelp,dismissOnboardingHelp,crOpenFirstRunHelpIfNeeded,
   get onboardingOpen(){ return onboardingOpen; },

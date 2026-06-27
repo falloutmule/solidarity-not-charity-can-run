@@ -762,6 +762,93 @@ async function mobileControlReliabilitySection(page) {
   return { pass, proof, reliability: rel };
 }
 
+async function declarativeControlsSection(page) {
+  const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await waitGameReady(page);
+
+  await page.evaluate(() => {
+    CR.setMobileMode(true);
+    localStorage.removeItem(CR.CR_CONTROLS_LS_KEY);
+    CR.startRun(88);
+    CR.state = CR.STATE.PLAY;
+    CR.paused = false;
+    CR.applyMobileControlSettings();
+  });
+  await page.screenshot({ path: path.join(ROOT, 'proof-control-edit-default.png') });
+
+  const decl = await page.evaluate(() => CR.runDeclarativeControlsSelfCheck());
+
+  await page.evaluate(() => {
+    const cw = window.innerWidth;
+    const ch = window.innerHeight;
+    const ml = document.getElementById('ml');
+    const r = ml.getBoundingClientRect();
+    CR.crPersistControlOverrides({
+      v: 1,
+      overrides: {
+        move: { x: 0.04, y: 0.68, w: r.width / cw, h: r.height / ch },
+      },
+    });
+    CR.applyMobileControlSettings();
+  });
+  await page.waitForTimeout(120);
+  await page.screenshot({ path: path.join(ROOT, 'proof-control-edit-moved.png') });
+
+  const hit = await page.evaluate(() => {
+    const L = CR.portraitLayout(undefined, { skipMinimapClamp: true });
+    const ml = document.getElementById('ml');
+    const br = ml.getBoundingClientRect();
+    const cx = br.left + br.width * 0.5;
+    const cy = br.top + br.height * 0.5;
+    return { hits: CR.crControlHitTest(cx, cy, L), left: br.left };
+  });
+
+  await page.evaluate(() => {
+    CR.crResetControlLayoutOverrides();
+    CR.applyMobileControlSettings();
+  });
+  await page.waitForTimeout(80);
+  await page.screenshot({ path: path.join(ROOT, 'proof-control-edit-reset.png') });
+
+  await page.evaluate(() => {
+    CR.startRun(88);
+    CR.state = CR.STATE.PLAY;
+    CR.paused = false;
+    const ml = document.getElementById('ml');
+    const mbr = ml.getBoundingClientRect();
+    const cx = mbr.left + mbr.width * 0.5;
+    const cy = mbr.top + mbr.height * 0.5;
+    CR.crDispatchPointer(ml, 'pointerdown', cx, cy, 201, 'touch');
+    CR.crDispatchPointer(ml, 'pointercancel', cx, cy, 201, 'touch');
+  });
+
+  const stuck = await page.evaluate(() => ({
+    joyActive: CR.getDebugState().joy.active,
+    build: typeof BUILD_ID !== 'undefined' ? BUILD_ID : CR.runDeclarativeControlsSelfCheck().build,
+  }));
+
+  const pass = decl.pass === true && stuck.joyActive === false;
+
+  const proof = {
+    pass,
+    build: decl.build,
+    declarative: decl,
+    hitTest: hit,
+    stuckAfterCancel: stuck,
+    screenshots: [
+      'proof-control-edit-default.png',
+      'proof-control-edit-moved.png',
+      'proof-control-edit-reset.png',
+    ],
+    timestamp: new Date().toISOString(),
+  };
+  writeProof('proof-declarative-controls.json', proof);
+  writeProof('proof-control-hit-test.json', hit);
+  return { pass, proof, declarative: decl };
+}
+
 async function movementCollisionSection(page) {
   const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
   await page.setViewportSize({ width: 412, height: 915 });
@@ -1195,6 +1282,7 @@ async function main() {
   const settingsSafetyPass = portraitUsability.settingsSafety?.pass === true;
 
   const mobileControlReliability = await mobileControlReliabilitySection(page);
+  const declarativeControls = await declarativeControlsSection(page);
   const movementCollision = await movementCollisionSection(page);
   const reachability = await reachabilitySection(page);
   const proceduralLevelValidation = await proceduralLevelValidationSection(page);
@@ -1238,6 +1326,7 @@ async function main() {
     portraitUsability.pass &&
     settingsSafetyPass &&
     mobileControlReliability.pass &&
+    declarativeControls.pass &&
     movementCollision.pass &&
     reachability.pass &&
     proceduralLevelValidation.pass &&
