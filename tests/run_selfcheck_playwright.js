@@ -1060,6 +1060,45 @@ async function fullRunProgressionSection(page) {
   return { pass: proof.pass, proof, fullRunProgression: fr };
 }
 
+async function decorativePropsSection(page) {
+  const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await waitGameReady(page);
+
+  const dp = await page.evaluate(() => CR.runDecorativePropsSelfCheck());
+
+  await page.evaluate(() => {
+    CR.startRun(424242);
+    CR.state = CR.STATE.PLAY;
+    CR.paused = false;
+  });
+  await page.waitForTimeout(120);
+  await page.screenshot({ path: path.join(ROOT, 'proof-decorative-props-world.png') });
+
+  await page.evaluate(() => {
+    CR.player.x = 12.5;
+    CR.player.y = 8.5;
+    CR.player.angle = 0.4;
+    CR.player.dir = 0.4;
+  });
+  await page.waitForTimeout(80);
+  await page.screenshot({ path: path.join(ROOT, 'proof-decorative-props-closeup.png') });
+
+  const isoOk = await page.evaluate(() => CR.crFingerprintPublicSafe(CR.crPublicStateFingerprint()));
+  const pass = dp.pass === true && isoOk !== false;
+  const proof = {
+    pass,
+    build: dp.build,
+    decorativeProps: dp,
+    harnessStateOk: isoOk,
+    screenshots: ['proof-decorative-props-world.png', 'proof-decorative-props-closeup.png'],
+    timestamp: new Date().toISOString(),
+  };
+  writeProof('proof-decorative-props.json', proof);
+  return { pass, proof, decorativeProps: dp };
+}
+
 async function optionsCleanupSection(page) {
   const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
   await page.setViewportSize({ width: 390, height: 844 });
@@ -1392,6 +1431,7 @@ async function main() {
   const viewportSafeArea = await viewportSafeAreaSection(page);
   const portraitUsability = await portraitUsabilitySection(page);
   const optionsCleanup = await optionsCleanupSection(page);
+  const decorativeProps = await decorativePropsSection(page);
   const settingsSafetyPass = portraitUsability.settingsSafety?.pass === true;
 
   const mobileControlReliability = await mobileControlReliabilitySection(page);
@@ -1438,6 +1478,7 @@ async function main() {
     viewportSafeArea.pass &&
     portraitUsability.pass &&
     optionsCleanup.pass &&
+    decorativeProps.pass &&
     settingsSafetyPass &&
     mobileControlReliability.pass &&
     declarativeControls.pass &&
@@ -1483,6 +1524,7 @@ async function main() {
     viewportSafeArea,
     portraitUsability,
     optionsCleanup,
+    decorativeProps,
     settingsSafety: portraitUsability.settingsSafety || { pass: settingsSafetyPass },
     mobileControlReliability,
     movementCollision,

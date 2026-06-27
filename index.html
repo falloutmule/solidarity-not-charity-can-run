@@ -587,7 +587,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'optionsclean1';
+const BUILD_ID = 'props1';
 /** Visual readability contract (render/HUD only; gameplay unchanged). */
 const CR_VISUAL_READABILITY = {
   style: 'visualfix1',
@@ -2350,12 +2350,14 @@ function genCity(seed, district, modifier){
   }
   dbg.npcsSpawned = game.npcs.length;
 
-  // place NON-BLOCKING DECOR PROPS (GJ flavor: grass, poles, signs, carts, crates, bus stops)
-  // These are billboard sprites with NO collision. Spawn-validated for clearance
-  // so they don't visually sit inside walls, but they never block movement.
+  // place NON-BLOCKING DECOR PROPS (community street-punk southwest decor; no collision)
   game.props=[];
-  const PROP_KINDS=['grass','grass','grass','pole','sign','cart','crate','busstop'];
-  const propCount = 8 + district + ((r()*6)|0);
+  const PROP_KINDS=[
+    'dry_bush','dry_bush','scrub_tree','mailbox','poster_pole','utility_pole',
+    'shopping_cart','crate_stack','donation_bin','folding_chair','cooler',
+    'flyer_wall','mural_patch','bus_stop_sign','dumpster','old_sedan','old_van',
+  ];
+  const propCount = 12 + district + ((r()*8)|0);
   for(let i=0;i<propCount;i++){
     const spot=takeCandidate(0.30, 1.0, used);
     if(!spot) break;
@@ -2483,13 +2485,14 @@ function genHallOfServants(){
   ];
 
   game.props = [
-    {x:4.5,y:2.8,kind:'crate',wob:0},
-    {x:7.2,y:2.8,kind:'crate',wob:0.5},
-    {x:23.5,y:3.2,kind:'cart',wob:0.2},
-    {x:13.5,y:6.2,kind:'sign',wob:0},
-    {x:18.5,y:6.2,kind:'sign',wob:0.7},
-    {x:8.5,y:11.2,kind:'crate',wob:0.3},
-    {x:15.5,y:11.2,kind:'crate',wob:0.9},
+    {x:4.5,y:2.8,kind:'crate_stack',wob:0},
+    {x:7.2,y:2.8,kind:'donation_bin',wob:0.5},
+    {x:23.5,y:3.2,kind:'shopping_cart',wob:0.2},
+    {x:13.5,y:6.2,kind:'poster_pole',wob:0},
+    {x:18.5,y:6.2,kind:'bus_stop_sign',wob:0.7},
+    {x:8.5,y:11.2,kind:'crate_stack',wob:0.3},
+    {x:15.5,y:11.2,kind:'folding_chair',wob:0.9},
+    {x:12.5,y:7.4,kind:'cooler',wob:0.4},
   ];
 
   game.quota = 5;
@@ -3362,6 +3365,601 @@ const WALL_MINI = {
 };
 const MINIMAP_FLOOR = '#343840';
 
+// --- COMMUNITY STREET PUNK SOUTHWEST DECOR PROPS ---
+const DECOR_PROP_REQUIRED = [
+  "mailbox","old_sedan","old_van","dumpster","shopping_cart","utility_pole","poster_pole",
+  "flyer_wall","mural_patch","dry_bush","scrub_tree","crate_stack","donation_bin",
+  "folding_chair","cooler","bus_stop_sign"
+];
+globalThis.DECOR_PROP_REQUIRED = DECOR_PROP_REQUIRED;
+const _decorPropTexCache = {};
+const _decorPropLab = (function(){
+
+  const PALETTE = {
+    skyDust: '#d5b08b',
+    groundDust: '#a77d5a',
+    ink: '#241913',
+    outline: '#2e211a',
+    paper: '#eadfc6',
+    paperDirty: '#ccb28c',
+    rust: '#9a573f',
+    clay: '#b46843',
+    sand: '#c79b74',
+    stucco: '#d2a47d',
+    concrete: '#918170',
+    asphalt: '#5e5149',
+    fadedTeal: '#4e9d93',
+    fadedBlue: '#628ea3',
+    mustard: '#c6a13b',
+    sage: '#7b8f63',
+    bushDark: '#566446',
+    bushLight: '#798b59',
+    wood: '#7b5840',
+    shadow: 'rgba(0,0,0,0.16)',
+    shadowDeep: 'rgba(0,0,0,0.28)',
+    white: '#f7f1e7',
+    warning: '#d0a237',
+    red: '#b44e4b',
+    flyerPink: '#d88795',
+    flyerLime: '#96af59',
+    flyerAqua: '#73b6af',
+    metal: '#8e9186',
+    chain: '#a2a59c'
+  };
+
+  function rand(rng, a=0, b=1){ return a + (b-a) * rng(); }
+  function irand(rng, a, b){ return Math.floor(rand(rng, a, b+1)); }
+  function pick(rng, arr){ return arr[Math.floor(rng() * arr.length)] }
+
+  function drawRoundedRect(ctx, x, y, w, h, r, fill, stroke, lw=2){
+    ctx.beginPath();
+    ctx.moveTo(x+r, y);
+    ctx.arcTo(x+w, y, x+w, y+h, r);
+    ctx.arcTo(x+w, y+h, x, y+h, r);
+    ctx.arcTo(x, y+h, x, y, r);
+    ctx.arcTo(x, y, x+w, y, r);
+    ctx.closePath();
+    if(fill){ ctx.fillStyle = fill; ctx.fill(); }
+    if(stroke){ ctx.lineWidth = lw; ctx.strokeStyle = stroke; ctx.stroke(); }
+  }
+
+  function drawShadowBlob(ctx, x, y, w, h, alpha=.18){
+    ctx.save();
+    ctx.fillStyle = `rgba(0,0,0,${alpha})`;
+    ctx.beginPath();
+    ctx.ellipse(x+w/2, y+h/2, w/2, h/2, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function stickerCluster(ctx, rng, x, y, w, h, count=6){
+    const colors = [PALETTE.flyerPink, PALETTE.flyerAqua, PALETTE.flyerLime, PALETTE.mustard, PALETTE.paper];
+    for(let i=0;i<count;i++){
+      const sw = rand(rng, 8, 20), sh = rand(rng, 5, 14);
+      const sx = rand(rng, x, x + w - sw), sy = rand(rng, y, y + h - sh);
+      const rot = rand(rng, -0.5, 0.5);
+      ctx.save();
+      ctx.translate(sx + sw/2, sy + sh/2);
+      ctx.rotate(rot);
+      drawRoundedRect(ctx, -sw/2, -sh/2, sw, sh, 3, pick(rng, colors), PALETTE.outline, 1.5);
+      if(rng() < 0.6){
+        ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(-sw*0.25, 0);
+        ctx.lineTo(sw*0.25, 0);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+  }
+
+  function flyerCluster(ctx, rng, x, y, w, h, count=5){
+    const colors = [PALETTE.paper, PALETTE.paperDirty, PALETTE.flyerPink, PALETTE.flyerAqua, PALETTE.flyerLime];
+    for(let i=0;i<count;i++){
+      const fw = rand(rng, w*0.25, w*0.5);
+      const fh = rand(rng, h*0.22, h*0.42);
+      const fx = rand(rng, x, x + w - fw);
+      const fy = rand(rng, y, y + h - fh);
+      const rot = rand(rng, -0.12, 0.12);
+      ctx.save();
+      ctx.translate(fx + fw/2, fy + fh/2);
+      ctx.rotate(rot);
+      drawRoundedRect(ctx, -fw/2, -fh/2, fw, fh, 2, pick(rng, colors), 'rgba(0,0,0,0.25)', 1);
+      ctx.strokeStyle = 'rgba(0,0,0,.28)';
+      ctx.lineWidth = 1;
+      for(let k=0;k<3;k++){
+        const ly = -fh/2 + 7 + k*6;
+        ctx.beginPath();
+        ctx.moveTo(-fw*0.34, ly);
+        ctx.lineTo(fw*0.3, ly);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+  }
+
+  function roughTag(ctx, rng, x, y, scale=1, color='rgba(20,16,14,.55)'){
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2.5 * scale;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.bezierCurveTo(x+10*scale, y-10*scale, x+18*scale, y+7*scale, x+28*scale, y-2*scale);
+    ctx.bezierCurveTo(x+36*scale, y+10*scale, x+46*scale, y-6*scale, x+56*scale, y+5*scale);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function muralMarks(ctx, rng, x, y, w, h){
+    const accents = [PALETTE.fadedTeal, PALETTE.mustard, PALETTE.flyerPink, PALETTE.clay];
+    for(let i=0;i<5;i++){
+      ctx.save();
+      ctx.globalAlpha = rand(rng, .55, .95);
+      ctx.fillStyle = pick(rng, accents);
+      const px = rand(rng, x+10, x+w-45);
+      const py = rand(rng, y+10, y+h-24);
+      const pw = rand(rng, 18, 52);
+      const ph = rand(rng, 10, 26);
+      if(rng() < .45){
+        ctx.beginPath();
+        ctx.ellipse(px, py, pw/2, ph/2, rand(rng,-0.5,0.5), 0, Math.PI*2);
+        ctx.fill();
+      } else {
+        ctx.fillRect(px, py, pw, ph);
+      }
+      ctx.restore();
+    }
+    roughTag(ctx, rng, x+18, y+h*0.68, 0.9, 'rgba(30,20,16,0.55)');
+  }
+
+  function drawGroundPatch(ctx, x, y, w, h, rng){
+    ctx.save();
+    const g = ctx.createLinearGradient(x, y, x, y+h);
+    g.addColorStop(0, 'rgba(255,255,255,0.08)');
+    g.addColorStop(1, 'rgba(0,0,0,0.1)');
+    ctx.fillStyle = g;
+    ctx.fillRect(x, y, w, h);
+    ctx.strokeStyle = 'rgba(68,48,35,.45)';
+    ctx.lineWidth = 1;
+    for(let i=0;i<5;i++){
+      const gy = y + rand(rng, 8, h-8);
+      ctx.beginPath();
+      ctx.moveTo(x+8, gy);
+      ctx.lineTo(x+w-8, gy + rand(rng,-2,2));
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function drawMailbox(ctx, x, y, s, rng){
+    drawShadowBlob(ctx, x+14*s, y+52*s, 42*s, 10*s, .18);
+    ctx.fillStyle = PALETTE.metal;
+    ctx.strokeStyle = PALETTE.outline;
+    ctx.lineWidth = 2*s;
+    drawRoundedRect(ctx, x+12*s, y+18*s, 32*s, 22*s, 6*s, PALETTE.flyerAqua, PALETTE.outline, 2*s);
+    ctx.fillStyle = PALETTE.white;
+    ctx.fillRect(x+16*s, y+23*s, 19*s, 8*s);
+    ctx.strokeRect(x+16*s, y+23*s, 19*s, 8*s);
+    ctx.fillStyle = PALETTE.rust;
+    ctx.fillRect(x+14*s, y+26*s, 4*s, 2*s);
+    ctx.fillStyle = PALETTE.metal;
+    ctx.fillRect(x+26*s, y+40*s, 4*s, 13*s);
+    ctx.fillRect(x+18*s, y+52*s, 20*s, 3*s);
+    if(rng() < 0.65) stickerCluster(ctx, rng, x+19*s, y+10*s, 20*s, 10*s, 3);
+  }
+
+  function drawOldSedan(ctx, x, y, s, rng){
+    drawShadowBlob(ctx, x+12*s, y+58*s, 78*s, 12*s, .2);
+    ctx.fillStyle = pick(rng, [PALETTE.rust, PALETTE.fadedBlue, PALETTE.mustard, PALETTE.clay]);
+    ctx.strokeStyle = PALETTE.outline;
+    ctx.lineWidth = 2.5*s;
+
+    ctx.beginPath();
+    ctx.moveTo(x+10*s, y+45*s);
+    ctx.lineTo(x+18*s, y+33*s);
+    ctx.lineTo(x+42*s, y+28*s);
+    ctx.lineTo(x+58*s, y+30*s);
+    ctx.lineTo(x+73*s, y+39*s);
+    ctx.lineTo(x+88*s, y+42*s);
+    ctx.lineTo(x+87*s, y+54*s);
+    ctx.lineTo(x+10*s, y+54*s);
+    ctx.closePath();
+    ctx.fill(); ctx.stroke();
+
+    ctx.fillStyle = '#9fb8c4';
+    ctx.fillRect(x+23*s, y+34*s, 16*s, 9*s);
+    ctx.fillRect(x+41*s, y+33*s, 16*s, 10*s);
+    ctx.strokeRect(x+23*s, y+34*s, 16*s, 9*s);
+    ctx.strokeRect(x+41*s, y+33*s, 16*s, 10*s);
+
+    ctx.fillStyle = '#2b2521';
+    ctx.beginPath(); ctx.arc(x+28*s, y+56*s, 8*s, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x+71*s, y+56*s, 8*s, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#777a75';
+    ctx.beginPath(); ctx.arc(x+28*s, y+56*s, 4*s, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x+71*s, y+56*s, 4*s, 0, Math.PI*2); ctx.fill();
+
+    if(rng() < 0.7){
+      ctx.fillStyle = 'rgba(255,255,255,0.45)';
+      ctx.fillRect(x+12*s, y+49*s, 8*s, 2*s);
+      ctx.fillRect(x+79*s, y+47*s, 6*s, 3*s);
+    }
+    if(rng() < 0.65) roughTag(ctx, rng, x+35*s, y+48*s, 0.4*s, 'rgba(255,255,255,.55)');
+  }
+
+  function drawOldVan(ctx, x, y, s, rng){
+    drawShadowBlob(ctx, x+12*s, y+60*s, 92*s, 12*s, .22);
+    const body = pick(rng, [PALETTE.paperDirty, PALETTE.fadedTeal, PALETTE.rust, PALETTE.stucco]);
+    drawRoundedRect(ctx, x+10*s, y+22*s, 88*s, 34*s, 7*s, body, PALETTE.outline, 2.5*s);
+    ctx.fillStyle = '#a7c0c8';
+    ctx.fillRect(x+17*s, y+29*s, 15*s, 12*s);
+    ctx.fillRect(x+35*s, y+29*s, 18*s, 12*s);
+    ctx.fillRect(x+56*s, y+29*s, 18*s, 12*s);
+    ctx.strokeStyle = PALETTE.outline;
+    ctx.lineWidth = 2*s;
+    ctx.strokeRect(x+17*s, y+29*s, 15*s, 12*s);
+    ctx.strokeRect(x+35*s, y+29*s, 18*s, 12*s);
+    ctx.strokeRect(x+56*s, y+29*s, 18*s, 12*s);
+    ctx.beginPath(); ctx.arc(x+28*s, y+58*s, 8*s, 0, Math.PI*2); ctx.fillStyle='#25211d'; ctx.fill();
+    ctx.beginPath(); ctx.arc(x+78*s, y+58*s, 8*s, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#787b74';
+    ctx.beginPath(); ctx.arc(x+28*s, y+58*s, 4*s, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x+78*s, y+58*s, 4*s, 0, Math.PI*2); ctx.fill();
+
+    ctx.fillStyle = PALETTE.paper;
+    ctx.fillRect(x+42*s, y+43*s, 34*s, 8*s);
+    ctx.strokeRect(x+42*s, y+43*s, 34*s, 8*s);
+    ctx.strokeStyle = 'rgba(0,0,0,.35)';
+    ctx.beginPath(); ctx.moveTo(x+46*s, y+47*s); ctx.lineTo(x+72*s, y+47*s); ctx.stroke();
+
+    if(rng() < 0.7) stickerCluster(ctx, rng, x+59*s, y+15*s, 26*s, 12*s, 4);
+  }
+
+  function drawDumpster(ctx, x, y, s, rng){
+    drawShadowBlob(ctx, x+12*s, y+58*s, 74*s, 12*s, .2);
+    const body = pick(rng, [PALETTE.sage, '#5f7353', '#596965', '#6a7b5f']);
+    ctx.fillStyle = body;
+    ctx.strokeStyle = PALETTE.outline;
+    ctx.lineWidth = 2*s;
+    ctx.beginPath();
+    ctx.moveTo(x+18*s, y+20*s);
+    ctx.lineTo(x+78*s, y+20*s);
+    ctx.lineTo(x+72*s, y+54*s);
+    ctx.lineTo(x+24*s, y+54*s);
+    ctx.closePath();
+    ctx.fill(); ctx.stroke();
+
+    ctx.fillStyle = '#78896b';
+    ctx.fillRect(x+16*s, y+14*s, 28*s, 7*s);
+    ctx.fillRect(x+52*s, y+14*s, 28*s, 7*s);
+    ctx.strokeRect(x+16*s, y+14*s, 28*s, 7*s);
+    ctx.strokeRect(x+52*s, y+14*s, 28*s, 7*s);
+
+    ctx.fillStyle = '#2a241f';
+    ctx.fillRect(x+18*s, y+48*s, 8*s, 8*s);
+    ctx.fillRect(x+70*s, y+48*s, 8*s, 8*s);
+
+    flyerCluster(ctx, rng, x+33*s, y+26*s, 28*s, 18*s, 2);
+    if(rng()<0.8) roughTag(ctx, rng, x+30*s, y+39*s, 0.45*s, 'rgba(255,255,255,0.55)');
+  }
+
+  function drawShoppingCart(ctx, x, y, s, rng){
+    drawShadowBlob(ctx, x+14*s, y+58*s, 56*s, 10*s, .18);
+    ctx.strokeStyle = PALETTE.chain;
+    ctx.lineWidth = 2*s;
+    ctx.beginPath();
+    ctx.moveTo(x+18*s, y+18*s);
+    ctx.lineTo(x+48*s, y+18*s);
+    ctx.lineTo(x+56*s, y+40*s);
+    ctx.lineTo(x+24*s, y+40*s);
+    ctx.closePath();
+    ctx.stroke();
+
+    for(let i=0;i<4;i++){
+      ctx.beginPath();
+      ctx.moveTo(x+24*s+i*8*s, y+18*s);
+      ctx.lineTo(x+30*s+i*8*s, y+40*s);
+      ctx.stroke();
+    }
+    for(let i=0;i<3;i++){
+      ctx.beginPath();
+      ctx.moveTo(x+22*s, y+22*s+i*6*s);
+      ctx.lineTo(x+53*s, y+22*s+i*6*s);
+      ctx.stroke();
+    }
+
+    ctx.beginPath();
+    ctx.moveTo(x+16*s, y+14*s);
+    ctx.lineTo(x+22*s, y+18*s);
+    ctx.stroke();
+
+    ctx.beginPath(); ctx.moveTo(x+28*s, y+40*s); ctx.lineTo(x+24*s, y+54*s); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x+51*s, y+40*s); ctx.lineTo(x+56*s, y+54*s); ctx.stroke();
+
+    ctx.fillStyle = '#2b2521';
+    ctx.beginPath(); ctx.arc(x+23*s, y+56*s, 3.5*s, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x+57*s, y+56*s, 3.5*s, 0, Math.PI*2); ctx.fill();
+
+    if(rng() < 0.75){
+      ctx.fillStyle = pick(rng, [PALETTE.paperDirty, PALETTE.flyerPink, PALETTE.flyerAqua]);
+      ctx.fillRect(x+30*s, y+25*s, 12*s, 7*s);
+      ctx.strokeStyle = PALETTE.outline; ctx.strokeRect(x+30*s, y+25*s, 12*s, 7*s);
+    }
+  }
+
+  function drawUtilityPole(ctx, x, y, s, rng){
+    drawShadowBlob(ctx, x+18*s, y+67*s, 30*s, 8*s, .14);
+    ctx.fillStyle = PALETTE.wood;
+    ctx.strokeStyle = PALETTE.outline;
+    ctx.lineWidth = 2*s;
+    ctx.fillRect(x+24*s, y+8*s, 8*s, 56*s);
+    ctx.strokeRect(x+24*s, y+8*s, 8*s, 56*s);
+
+    ctx.strokeStyle = '#574031';
+    for(let i=0;i<4;i++){
+      ctx.beginPath();
+      ctx.moveTo(x+24*s, y+16*s+i*10*s);
+      ctx.lineTo(x+32*s, y+15*s+i*10*s);
+      ctx.stroke();
+    }
+
+    ctx.fillStyle = PALETTE.concrete;
+    ctx.fillRect(x+8*s, y+16*s, 40*s, 4*s);
+    ctx.strokeRect(x+8*s, y+16*s, 40*s, 4*s);
+
+    ctx.fillStyle = '#2a211a';
+    ctx.beginPath(); ctx.arc(x+16*s, y+18*s, 2*s, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x+40*s, y+18*s, 2*s, 0, Math.PI*2); ctx.fill();
+
+    ctx.strokeStyle = '#3a322c';
+    ctx.lineWidth = 1.5*s;
+    ctx.beginPath();
+    ctx.moveTo(x+48*s, y+18*s);
+    ctx.bezierCurveTo(x+62*s, y+16*s, x+70*s, y+22*s, x+82*s, y+17*s);
+    ctx.stroke();
+
+    if(rng() < 0.8) stickerCluster(ctx, rng, x+19*s, y+30*s, 18*s, 16*s, 3);
+  }
+
+  function drawPosterPole(ctx, x, y, s, rng){
+    drawShadowBlob(ctx, x+18*s, y+67*s, 30*s, 8*s, .14);
+    ctx.fillStyle = '#6e685e';
+    ctx.strokeStyle = PALETTE.outline;
+    ctx.lineWidth = 2*s;
+    ctx.fillRect(x+26*s, y+6*s, 6*s, 58*s);
+    ctx.strokeRect(x+26*s, y+6*s, 6*s, 58*s);
+
+    flyerCluster(ctx, rng, x+8*s, y+16*s, 42*s, 32*s, 4);
+    stickerCluster(ctx, rng, x+12*s, y+44*s, 34*s, 16*s, 5);
+    roughTag(ctx, rng, x+12*s, y+60*s, 0.45*s, 'rgba(25,18,16,.55)');
+  }
+
+  function drawFlyerWall(ctx, x, y, s, rng){
+    drawShadowBlob(ctx, x+10*s, y+62*s, 92*s, 10*s, .14);
+    drawRoundedRect(ctx, x+8*s, y+12*s, 96*s, 50*s, 4*s, PALETTE.stucco, PALETTE.outline, 2*s);
+    ctx.fillStyle = 'rgba(0,0,0,.08)';
+    ctx.fillRect(x+8*s, y+42*s, 96*s, 20*s);
+    ctx.fillStyle = 'rgba(255,255,255,.08)';
+    ctx.fillRect(x+8*s, y+12*s, 96*s, 11*s);
+    flyerCluster(ctx, rng, x+14*s, y+18*s, 78*s, 32*s, 6);
+    stickerCluster(ctx, rng, x+20*s, y+46*s, 68*s, 8*s, 4);
+    roughTag(ctx, rng, x+63*s, y+55*s, 0.5*s, 'rgba(25,18,16,.55)');
+  }
+
+  function drawMuralPatch(ctx, x, y, s, rng){
+    drawShadowBlob(ctx, x+10*s, y+62*s, 92*s, 10*s, .14);
+    drawRoundedRect(ctx, x+8*s, y+12*s, 96*s, 50*s, 4*s, PALETTE.stucco, PALETTE.outline, 2*s);
+    ctx.fillStyle = 'rgba(255,255,255,.06)';
+    ctx.fillRect(x+8*s, y+12*s, 96*s, 11*s);
+    muralMarks(ctx, rng, x+12*s, y+16*s, 88*s, 36*s);
+    stickerCluster(ctx, rng, x+74*s, y+47*s, 18*s, 10*s, 3);
+  }
+
+  function drawDryBush(ctx, x, y, s, rng){
+    drawShadowBlob(ctx, x+12*s, y+60*s, 66*s, 10*s, .15);
+    const cols = [PALETTE.bushLight, PALETTE.sage, '#8d8554', '#7d7040'];
+    for(let i=0;i<9;i++){
+      const bx = x + rand(rng, 16, 62) * s;
+      const by = y + rand(rng, 34, 54) * s;
+      const r = rand(rng, 8, 14) * s;
+      ctx.fillStyle = pick(rng, cols);
+      ctx.beginPath();
+      ctx.arc(bx, by, r, 0, Math.PI*2);
+      ctx.fill();
+      ctx.strokeStyle = PALETTE.outline;
+      ctx.lineWidth = 1.4*s;
+      ctx.stroke();
+    }
+    for(let i=0;i<10;i++){
+      ctx.strokeStyle = '#6a5736';
+      ctx.lineWidth = 1.2*s;
+      ctx.beginPath();
+      ctx.moveTo(x+37*s, y+54*s);
+      ctx.lineTo(x+rand(rng, 18, 62)*s, y+rand(rng, 28, 50)*s);
+      ctx.stroke();
+    }
+  }
+
+  function drawScrubTree(ctx, x, y, s, rng){
+    drawShadowBlob(ctx, x+18*s, y+62*s, 72*s, 12*s, .18);
+    ctx.fillStyle = PALETTE.wood;
+    ctx.strokeStyle = PALETTE.outline;
+    ctx.lineWidth = 2*s;
+    ctx.beginPath();
+    ctx.moveTo(x+44*s, y+56*s);
+    ctx.lineTo(x+48*s, y+34*s);
+    ctx.lineTo(x+54*s, y+30*s);
+    ctx.lineTo(x+53*s, y+56*s);
+    ctx.closePath();
+    ctx.fill(); ctx.stroke();
+
+    const leafCols = [PALETTE.bushDark, PALETTE.bushLight, PALETTE.sage];
+    for(let i=0;i<11;i++){
+      const bx = x + rand(rng, 28, 68) * s;
+      const by = y + rand(rng, 10, 36) * s;
+      const rx = rand(rng, 8, 18) * s;
+      const ry = rand(rng, 8, 16) * s;
+      ctx.fillStyle = pick(rng, leafCols);
+      ctx.beginPath();
+      ctx.ellipse(bx, by, rx, ry, rand(rng,-0.5,0.5), 0, Math.PI*2);
+      ctx.fill();
+      ctx.strokeStyle = PALETTE.outline;
+      ctx.lineWidth = 1.5*s;
+      ctx.stroke();
+    }
+  }
+
+  function drawCrateStack(ctx, x, y, s, rng){
+    drawShadowBlob(ctx, x+12*s, y+58*s, 64*s, 10*s, .18);
+    const count = rng() < 0.5 ? 2 : 3;
+    for(let i=0;i<count;i++){
+      const ox = x + (i % 2) * 20*s + (i===2 ? 10*s : 0);
+      const oy = y + 40*s - Math.floor(i/2)*16*s;
+      drawRoundedRect(ctx, ox+8*s, oy, 24*s, 16*s, 2*s, PALETTE.wood, PALETTE.outline, 2*s);
+      ctx.strokeStyle = '#9b7356';
+      ctx.lineWidth = 1.5*s;
+      ctx.beginPath(); ctx.moveTo(ox+12*s, oy+8*s); ctx.lineTo(ox+28*s, oy+8*s); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(ox+16*s, oy+2*s); ctx.lineTo(ox+16*s, oy+14*s); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(ox+24*s, oy+2*s); ctx.lineTo(ox+24*s, oy+14*s); ctx.stroke();
+    }
+    if(rng()<0.7) stickerCluster(ctx, rng, x+28*s, y+25*s, 16*s, 8*s, 2);
+  }
+
+  function drawDonationBin(ctx, x, y, s, rng){
+    drawShadowBlob(ctx, x+12*s, y+60*s, 60*s, 10*s, .18);
+    drawRoundedRect(ctx, x+16*s, y+14*s, 44*s, 42*s, 4*s, PALETTE.fadedTeal, PALETTE.outline, 2*s);
+    ctx.fillStyle = PALETTE.paper;
+    ctx.fillRect(x+22*s, y+20*s, 32*s, 18*s);
+    ctx.strokeStyle = PALETTE.outline; ctx.strokeRect(x+22*s, y+20*s, 32*s, 18*s);
+    ctx.fillStyle = PALETTE.outline;
+    ctx.font = `${8*s}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('DONATE', x+38*s, y+31*s);
+    ctx.fillStyle = '#335f57';
+    ctx.fillRect(x+30*s, y+9*s, 16*s, 6*s);
+    ctx.strokeRect(x+30*s, y+9*s, 16*s, 6*s);
+    if(rng()<0.7) roughTag(ctx, rng, x+18*s, y+49*s, 0.35*s, 'rgba(255,255,255,.65)');
+  }
+
+  function drawFoldingChair(ctx, x, y, s, rng){
+    drawShadowBlob(ctx, x+12*s, y+60*s, 52*s, 10*s, .14);
+    ctx.strokeStyle = PALETTE.outline;
+    ctx.lineWidth = 2.2*s;
+    ctx.fillStyle = pick(rng, [PALETTE.flyerAqua, PALETTE.flyerPink, PALETTE.mustard, PALETTE.paperDirty]);
+    ctx.fillRect(x+20*s, y+22*s, 22*s, 12*s);
+    ctx.strokeRect(x+20*s, y+22*s, 22*s, 12*s);
+    ctx.fillRect(x+18*s, y+11*s, 26*s, 13*s);
+    ctx.strokeRect(x+18*s, y+11*s, 26*s, 13*s);
+    ctx.beginPath(); ctx.moveTo(x+22*s, y+34*s); ctx.lineTo(x+18*s, y+56*s); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x+40*s, y+34*s); ctx.lineTo(x+46*s, y+56*s); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x+22*s, y+24*s); ctx.lineTo(x+18*s, y+9*s); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x+40*s, y+24*s); ctx.lineTo(x+46*s, y+9*s); ctx.stroke();
+  }
+
+  function drawCooler(ctx, x, y, s, rng){
+    drawShadowBlob(ctx, x+12*s, y+60*s, 54*s, 10*s, .16);
+    drawRoundedRect(ctx, x+16*s, y+24*s, 36*s, 24*s, 4*s, pick(rng,[PALETTE.paperDirty, PALETTE.flyerAqua, PALETTE.red]), PALETTE.outline, 2*s);
+    ctx.fillStyle = 'rgba(255,255,255,.28)';
+    ctx.fillRect(x+16*s, y+24*s, 36*s, 6*s);
+    ctx.fillStyle = '#f1ece0';
+    ctx.fillRect(x+24*s, y+19*s, 20*s, 6*s);
+    ctx.strokeStyle = PALETTE.outline;
+    ctx.strokeRect(x+24*s, y+19*s, 20*s, 6*s);
+  }
+
+  function drawBusStopSign(ctx, x, y, s, rng){
+    drawShadowBlob(ctx, x+18*s, y+67*s, 28*s, 8*s, .14);
+    ctx.fillStyle = '#6f6d66';
+    ctx.strokeStyle = PALETTE.outline;
+    ctx.lineWidth = 2*s;
+    ctx.fillRect(x+26*s, y+16*s, 6*s, 48*s);
+    ctx.strokeRect(x+26*s, y+16*s, 6*s, 48*s);
+    drawRoundedRect(ctx, x+14*s, y+10*s, 30*s, 16*s, 3*s, PALETTE.mustard, PALETTE.outline, 2*s);
+    ctx.fillStyle = PALETTE.outline;
+    ctx.font = `${8*s}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('BUS', x+29*s, y+21*s);
+    if(rng()<0.75) stickerCluster(ctx, rng, x+14*s, y+34*s, 30*s, 18*s, 4);
+  }
+
+  const DRAWERS = {
+    'Mailbox': drawMailbox,
+    'Old Sedan': drawOldSedan,
+    'Old Van': drawOldVan,
+    'Dumpster': drawDumpster,
+    'Shopping Cart': drawShoppingCart,
+    'Utility Pole': drawUtilityPole,
+    'Poster Pole': drawPosterPole,
+    'Flyer Wall': drawFlyerWall,
+    'Mural Patch': drawMuralPatch,
+    'Dry Bush': drawDryBush,
+    'Scrub Tree': drawScrubTree,
+    'Crate Stack': drawCrateStack,
+    'Donation Bin': drawDonationBin,
+    'Folding Chair': drawFoldingChair,
+    'Cooler': drawCooler,
+    'Bus Stop Sign': drawBusStopSign
+  };
+
+return { DRAWERS, PALETTE };
+})();
+function _decorPropVariantSeed(kind, variant){
+  let h = 0; const s = String(kind)+":"+String(variant);
+  for(let i=0;i<s.length;i++) h = ((h<<5)-h + s.charCodeAt(i))|0;
+  return h;
+}
+function _decorRng(seed, offset){
+  let a = (seed + offset) | 0;
+  return function(){
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ (a>>>15), 1 | a);
+    t = t + Math.imul(t ^ (t>>>7), 61 | t) ^ t;
+    return ((t ^ (t>>>14)) >>> 0) / 4294967296;
+  };
+}
+function decorPropVariantFromProp(prop){
+  const v = (((prop.x*1000)|0) ^ ((prop.y*1000)|0) ^ (prop.kind||"").length) & 7;
+  return v;
+}
+function bakeDecorPropTexture(kind, variant){
+  const key = kind+":"+variant;
+  if(_decorPropTexCache[key]) return _decorPropTexCache[key];
+  const sizes = {
+    mailbox:[40,52], old_sedan:[90,58], old_van:[98,62], dumpster:[76,56], shopping_cart:[56,32],
+    utility_pole:[16,62], poster_pole:[48,66], flyer_wall:[96,52], mural_patch:[96,52],
+    dry_bush:[68,30], scrub_tree:[88,56], crate_stack:[50,36], donation_bin:[48,56],
+    folding_chair:[46,56], cooler:[50,46], bus_stop_sign:[40,66]
+  };
+  const nameMap = {
+    mailbox:"Mailbox", old_sedan:"Old Sedan", old_van:"Old Van", dumpster:"Dumpster",
+    shopping_cart:"Shopping Cart", utility_pole:"Utility Pole", poster_pole:"Poster Pole",
+    flyer_wall:"Flyer Wall", mural_patch:"Mural Patch", dry_bush:"Dry Bush", scrub_tree:"Scrub Tree",
+    crate_stack:"Crate Stack", donation_bin:"Donation Bin", folding_chair:"Folding Chair",
+    cooler:"Cooler", bus_stop_sign:"Bus Stop Sign"
+  };
+  const sz = sizes[kind] || [48,48];
+  const c = newTex(sz[0], sz[1]);
+  const ctx = c.getContext("2d");
+  ctx.clearRect(0,0,sz[0],sz[1]);
+  const drawers = _decorPropLab.DRAWERS || {};
+  const drawName = nameMap[kind];
+  const fn = drawName && drawers[drawName];
+  const rng = _decorRng(_decorPropVariantSeed(kind, variant), 17);
+  const scale = Math.min(sz[0]/100, sz[1]/70) * 2.0;
+  const px = 4, py = 6;
+  if(fn){ fn(ctx, px, py, scale, rng); }
+  else { ctx.fillStyle="#8a6a52"; ctx.fillRect(4,4,sz[0]-8,sz[1]-8); }
+  _decorPropTexCache[key] = c;
+  return c;
+}
+function initDecorPropTextureCache(){
+  for(const k of DECOR_PROP_REQUIRED){
+    for(let v=0;v<3;v++) bakeDecorPropTexture(k, v);
+  }
+}
+
 // --- SPRITE TEXTURES (billboards) ---
 function makePerson(body, head, legs, opts){
   opts=opts||{};
@@ -3435,51 +4033,6 @@ const TEX = {
     x.strokeStyle='#5a3a1a'; x.lineWidth=2; x.strokeRect(3,4,22,16);
     x.beginPath(); x.moveTo(3,4); x.lineTo(25,20); x.moveTo(25,4); x.lineTo(3,20); x.stroke();
     return c; })(),
-  // shopping cart (decor)
-  cart:(()=>{ const c=newTex(34,30),x=c.getContext('2d');
-    x.fillStyle='rgba(0,0,0,0.22)'; x.beginPath(); x.ellipse(17,28,14,3,0,0,7); x.fill();
-    x.strokeStyle='#9a9488'; x.lineWidth=2;
-    x.beginPath(); x.moveTo(4,4); x.lineTo(8,4); x.lineTo(28,24); x.stroke(); // handle
-    x.strokeRect(8,6,20,16);
-    for(let i=12;i<28;i+=4){ x.beginPath(); x.moveTo(i,6); x.lineTo(i,22); x.stroke(); }
-    x.beginPath(); x.moveTo(8,22); x.lineTo(28,22); x.stroke();
-    x.fillStyle='#3a3a3a'; x.beginPath(); x.arc(11,26,3,0,7); x.fill();
-    x.beginPath(); x.arc(25,26,3,0,7); x.fill();
-    return c; })(),
-  // dry grass clump (decor)
-  grass:(()=>{ const c=newTex(20,14),x=c.getContext('2d');
-    x.fillStyle='rgba(120,100,50,0.3)'; x.beginPath(); x.ellipse(10,12,9,2,0,0,7); x.fill();
-    const cols=['#9a8a3a','#8a7a32','#a89a44'];
-    for(let i=0;i<18;i++){ x.strokeStyle=cols[i%3]; x.lineWidth=1;
-      const bx=2+((Math.random()*16)|0), bh=4+((Math.random()*8)|0);
-      x.beginPath(); x.moveTo(bx,12); x.lineTo(bx+((Math.random()*4-2)|0),12-bh); x.stroke(); }
-    return c; })(),
-  // utility pole (tall thin decor)
-  pole:(()=>{ const c=newTex(14,60),x=c.getContext('2d');
-    x.fillStyle='rgba(0,0,0,0.2)'; x.beginPath(); x.ellipse(7,58,6,2,0,0,7); x.fill();
-    x.fillStyle='#6a5a3a'; x.fillRect(6,6,2,52);
-    x.fillRect(2,10,10,2); x.fillRect(3,16,8,2);              // crossbars
-    x.strokeStyle='#3a3a3a'; x.lineWidth=1;
-    x.beginPath(); x.moveTo(2,10); x.lineTo(0,4); x.moveTo(12,10); x.lineTo(14,4); x.stroke();
-    return c; })(),
-  // faded sign post (decor)
-  sign:(()=>{ const c=newTex(22,34),x=c.getContext('2d');
-    x.fillStyle='rgba(0,0,0,0.22)'; x.beginPath(); x.ellipse(11,32,8,2,0,0,7); x.fill();
-    x.fillStyle='#6a6258'; x.fillRect(10,10,2,22);
-    x.fillStyle='#7a6a4a'; x.fillRect(2,4,18,12);
-    x.fillStyle='rgba(230,210,160,0.5)'; x.fillRect(5,8,12,4);
-    return c; })(),
-  // bus stop shelter (decor)
-  busstop:(()=>{ const c=newTex(40,46),x=c.getContext('2d');
-    x.fillStyle='rgba(0,0,0,0.22)'; x.beginPath(); x.ellipse(20,44,18,3,0,0,7); x.fill();
-    x.fillStyle='#4a6a7a'; x.fillRect(4,8,32,4);             // roof
-    x.fillStyle='#8a9aa6'; x.fillRect(4,12,32,28);          // back glass
-    x.strokeStyle='#3a4650'; x.lineWidth=2;
-    x.strokeRect(4,12,32,28);
-    x.beginPath(); x.moveTo(6,12); x.lineTo(6,44); x.moveTo(34,12); x.lineTo(34,44); x.stroke();
-    x.fillStyle='#2a3340'; x.fillRect(16,18,12,14);         // bench
-    x.fillStyle='#d8a23a'; x.fillRect(4,2,32,6);            // sign band
-    return c; })(),
   // exit portal — glowing arch
   exit:(()=>{ const c=newTex(48,80),x=c.getContext('2d');
     const g=x.createRadialGradient(24,40,4,24,40,38);
@@ -3493,8 +4046,19 @@ const TEX = {
 const HEIGHT = { hungry:0.86, family:1.0, elder:0.84, volunteer:0.92,
                  hall_volunteer:0.92, hall_elder:0.84, hall_pantry:0.88, hall_street:0.90,
                  hall_quiet:0.82, hall_kitchen:0.88, hall_servant:0.94,
-                 can:0.42, crate:0.5, cart:0.62, grass:0.22, pole:1.1, sign:0.62, busstop:1.0, exit:1.25 };
-function propTex(kind){ return TEX[kind] || TEX.grass; }
+                 can:0.42, crate:0.5, exit:1.25,
+                 mailbox:0.55, old_sedan:0.72, old_van:0.74, dumpster:0.68, shopping_cart:0.58,
+                 utility_pole:1.05, poster_pole:1.0, flyer_wall:0.82, mural_patch:0.82,
+                 dry_bush:0.28, scrub_tree:0.92, crate_stack:0.52, donation_bin:0.72,
+                 folding_chair:0.48, cooler:0.42, bus_stop_sign:0.95 };
+function propTex(kind, prop){
+  if(DECOR_PROP_REQUIRED.indexOf(kind) >= 0){
+    const v = prop ? decorPropVariantFromProp(prop) : 0;
+    return bakeDecorPropTexture(kind, v);
+  }
+  return TEX[kind] || bakeDecorPropTexture('dry_bush', 0);
+}
+initDecorPropTextureCache();
 
 // --- SKY / MESA HORIZON (pre-rendered once; warm dusty Western Colorado) ---
 let skyCanvas=null, skyBuilt='none';
@@ -3623,7 +4187,7 @@ function drawScene(now){
     sprites.push({obj,tex,hp,depth,hscr});
   }
   // decor first (ground-level), then pickups, then npcs, then exit
-  for(const p of game.props)   pushSp(p, propTex(p.kind), HEIGHT[p.kind]||0.5);
+  for(const p of game.props)   pushSp(p, propTex(p.kind, p), HEIGHT[p.kind]||0.5);
   for(const c of game.pickups) if(!c.taken) pushSp(c, TEX.can, HEIGHT.can);
   for(const n of game.npcs)    if(!n.helped) pushSp(n, npcSpriteTex(n.kind), HEIGHT[n.kind]||HEIGHT.hungry);
   if(game.exit && game.exit.active) pushSp(game.exit, TEX.exit, HEIGHT.exit);
@@ -6514,8 +7078,8 @@ function runDeclarativeControlsSelfCheckBody(){
     checks.menuNotEditable = INPUT_CONFIG.controls.menu && INPUT_CONFIG.controls.menu.editable === false;
     if(!checks.menuNotEditable) errors.push('MENU must stay non-editable');
 
-    checks.buildIdOptionsClean1 = BUILD_ID === 'optionsclean1';
-    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be optionsclean1');
+    checks.buildIdProps1 = BUILD_ID === 'props1';
+        if(!checks.buildIdProps1) errors.push('BUILD_ID must be props1');
 
     checks.saveFormatUnchanged = !('controlsLayout' in (options.data || options));
     evidence.inputConfigKeys = Object.keys(INPUT_CONFIG.controls);
@@ -6543,6 +7107,91 @@ function runDeclarativeControlsSelfCheckBody(){
 function crOptionsMenuHtml(){
   const r = document.getElementById('rmenu');
   return (r && r.innerHTML) || '';
+}
+
+function crDecorPropsPlacementSignature(seed){
+  return crWithTemporaryState('decorSig', () => {
+    genCity(seed, 2, 'clear');
+    const kinds = game.props.map(p => p.kind).slice().sort();
+    return { count: game.props.length, kinds: kinds.join('|') };
+  });
+}
+
+function runDecorativePropsSelfCheck(){
+  if(_crHarnessDepth > 0) return runDecorativePropsSelfCheckBody();
+  return crWithTemporaryState('decorativeProps', () => runDecorativePropsSelfCheckBody());
+}
+
+function runDecorativePropsSelfCheckBody(){
+  const errors = [];
+  const warnings = [];
+  const checks = {};
+  const evidence = {};
+  const err0 = window.__crRuntimeErrors.length;
+  try {
+    checks.buildIdProps1 = BUILD_ID === 'props1';
+    if(!checks.buildIdProps1) errors.push('BUILD_ID must be props1');
+
+    checks.decorArrayExported = Array.isArray(DECOR_PROP_REQUIRED) && DECOR_PROP_REQUIRED.length === 16;
+    if(!checks.decorArrayExported) errors.push('DECOR_PROP_REQUIRED must list 16 kinds');
+
+    checks.allKindsDefined = true;
+    for(const k of DECOR_PROP_REQUIRED){
+      if(!HEIGHT[k]) { checks.allKindsDefined = false; errors.push('HEIGHT missing '+k); }
+      try {
+        const tex = bakeDecorPropTexture(k, 0);
+        if(!tex || !tex.width) { checks.allKindsDefined = false; errors.push('propTex bake failed '+k); }
+      } catch(e) {
+        checks.allKindsDefined = false;
+        errors.push('propTex throw '+k+': '+String(e && e.message ? e.message : e));
+      }
+    }
+
+    const sigA = crDecorPropsPlacementSignature(424242);
+    const sigB = crDecorPropsPlacementSignature(424242);
+    checks.deterministicPlacement = sigA.count === sigB.count && sigA.kinds === sigB.kinds;
+    if(!checks.deterministicPlacement) errors.push('prop placement not deterministic for fixed seed');
+    evidence.placementSig = sigA;
+
+    genCity(424242, 2, 'clear');
+    const standAtProps = game.props.map(p => ({ x: p.x, y: p.y, kind: p.kind, stand: canStand(p.x, p.y) }));
+    game.props = [];
+    checks.propsNonCollision = standAtProps.every(s => canStand(s.x, s.y) === s.stand);
+    if(!checks.propsNonCollision) errors.push('props mutated collision (canStand changed when props cleared)');
+    game.props = standAtProps.map(s => ({ x: s.x, y: s.y, kind: s.kind, wob: 0 }));
+    checks.propsOnReachableTiles = standAtProps.every(s => s.stand);
+    if(!checks.propsOnReachableTiles) errors.push('prop placed off reachable floor tile');
+
+    startCustomLevel('hall_of_servants');
+    checks.hallPropsKinds = game.props.length >= 6 && game.props.every(p => DECOR_PROP_REQUIRED.indexOf(p.kind) >= 0);
+    if(!checks.hallPropsKinds) errors.push('hall props missing new decor kinds');
+
+    for(const p of game.props){
+      propTex(p.kind, p);
+    }
+    checks.propRenderNoThrow = true;
+
+    const oc = _crHarnessDepth > 0 ? runOptionsCleanupSelfCheckBody() : runOptionsCleanupSelfCheck();
+    checks.optionsUnchanged = !!oc.pass;
+    if(!oc.pass) errors.push('options cleanup regressed: '+(oc.errors||[]).join('; '));
+
+    if(!crHarnessWriteSaveToStorage()) errors.push('decor props save write failed');
+    const loaded = SAVE.load();
+    checks.saveLoadOk = !!loaded;
+    if(!checks.saveLoadOk) errors.push('save/load failed after decor check');
+
+    checks.noExternalAssetTags = document.querySelectorAll('img[src], audio[src], video[src]').length === 0;
+    if(!checks.noExternalAssetTags) errors.push('external asset tags present');
+
+    checks.runtimeClean = window.__crRuntimeErrors.length === err0;
+    if(!checks.runtimeClean) errors.push('runtime errors during decorative props check');
+
+    const pass = errors.length === 0;
+    return { pass, build: BUILD_ID, errors, warnings, checks, evidence, requiredKinds: DECOR_PROP_REQUIRED.slice() };
+  } catch(e){
+    errors.push(String(e && e.message ? e.message : e));
+    return { pass: false, build: BUILD_ID, errors, warnings, checks, evidence: {} };
+  }
 }
 
 function runOptionsCleanupSelfCheck(){
@@ -6573,8 +7222,8 @@ function runOptionsCleanupSelfCheckBody(){
   _controlEditActive = false;
   crShowControlEditChrome(false);
   try {
-    checks.buildIdOptionsClean1 = BUILD_ID === 'optionsclean1';
-    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be optionsclean1');
+    checks.buildIdProps1 = BUILD_ID === 'props1';
+        if(!checks.buildIdProps1) errors.push('BUILD_ID must be props1');
 
     state = STATE.TITLE;
     paused = false;
@@ -6712,6 +7361,7 @@ function runFullSelfCheckInner(){
   const viewportSafeArea = runViewportSafeAreaSelfCheck();
   const portraitUsability = runPortraitUsabilitySelfCheck();
   const settingsSafety = runSettingsSafetySelfCheck();
+  const decorativeProps = runDecorativePropsSelfCheck();
   const optionsCleanup = runOptionsCleanupSelfCheck();
   const mobileControlReliability = runMobileControlReliabilitySelfCheck();
   const movementCollision = runMovementCollisionSelfCheck();
@@ -6727,7 +7377,7 @@ function runFullSelfCheckInner(){
   const levels = runLevelSelfCheck();
   const renderFailure = runRenderFailureSelfCheck();
   const runtimeClean = window.__crRuntimeErrors.length === err0;
-  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && optionsCleanup.pass && mobileControlReliability.pass && movementCollision.pass && reachability.pass && proceduralLevelValidation.pass && fullRunProgression.pass && onboarding.pass && soundFeedback.pass && declarativeControls.pass && visualReadability.pass && visualRectangleRegression.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
+  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && decorativeProps.pass && optionsCleanup.pass && mobileControlReliability.pass && movementCollision.pass && reachability.pass && proceduralLevelValidation.pass && fullRunProgression.pass && onboarding.pass && soundFeedback.pass && declarativeControls.pass && visualReadability.pass && visualRectangleRegression.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
   return {
     pass,
     build: BUILD_ID,
@@ -6735,6 +7385,7 @@ function runFullSelfCheckInner(){
     viewportSafeArea,
     portraitUsability,
     settingsSafety,
+    decorativeProps,
     optionsCleanup,
     mobileControlReliability,
     movementCollision,
@@ -6886,13 +7537,13 @@ function runSoundFeedbackSelfCheckBody(){
   try {
     checks.functionExists = typeof runSoundFeedbackSelfCheck === 'function';
     checks.contract = !!(CR_SOUND_FEEDBACK && CR_SOUND_FEEDBACK.style === 'sound1' && CR_SOUND_FEEDBACK.webAudio === true);
-    checks.buildIdOptionsClean1 = BUILD_ID === 'optionsclean1';
+    checks.buildIdOptionsClean1 = BUILD_ID === 'props1';
     checks.crTriggerExists = typeof crTriggerSoundCue === 'function';
     checks.crSoundEnabledFn = typeof crSoundEnabled === 'function';
     checks.noExternalAudioTags = document.querySelectorAll('audio,source[src]').length === 0;
     checks.harnessMuted = _crHarnessDepth > 0 && crSoundEnabled() === false;
     if(!checks.contract) errors.push('CR_SOUND_FEEDBACK contract missing');
-    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be optionsclean1');
+    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be props1');
     if(!checks.crTriggerExists) errors.push('crTriggerSoundCue missing');
     if(!checks.harnessMuted) errors.push('harness must mute gameplay sound');
     if(!checks.noExternalAudioTags) errors.push('external audio tags present');
@@ -6955,13 +7606,13 @@ function runVisualReadabilitySelfCheckBody(){
   mobileOverride = true;
   try {
     checks.functionExists = typeof runVisualReadabilitySelfCheck === 'function';
-    checks.buildIdOptionsClean1 = BUILD_ID === 'optionsclean1';
+    checks.buildIdOptionsClean1 = BUILD_ID === 'props1';
     checks.visualContract = !!(CR_VISUAL_READABILITY && CR_VISUAL_READABILITY.style === 'visualfix1');
     checks.noScreenPathStripe = CR_VISUAL_READABILITY.floorPathStripe === false;
     checks.pickupTex = !!TEX.can;
     checks.npcTex = !!TEX.hungry;
     checks.exitTex = !!TEX.exit;
-    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be optionsclean1');
+    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be props1');
     if(!checks.visualContract) errors.push('CR_VISUAL_READABILITY contract missing');
     if(!checks.noScreenPathStripe) errors.push('screen-space floor path stripe must stay disabled');
     if(!checks.pickupTex || !checks.npcTex || !checks.exitTex) errors.push('sprite textures missing');
@@ -7088,9 +7739,9 @@ function runVisualRectangleRegressionSelfCheckBody(){
   mobileOverride = true;
   try {
     checks.functionExists = typeof runVisualRectangleRegressionSelfCheck === 'function';
-    checks.buildIdOptionsClean1 = BUILD_ID === 'optionsclean1';
+    checks.buildIdOptionsClean1 = BUILD_ID === 'props1';
     checks.noScreenPathStripe = !!(CR_VISUAL_READABILITY && CR_VISUAL_READABILITY.floorPathStripe === false);
-    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be optionsclean1');
+    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be props1');
     if(!checks.noScreenPathStripe) errors.push('screen-space path stripe flag must be false');
 
     startRun(42);
@@ -9178,8 +9829,8 @@ globalThis.CR = window.CR = {
   set paused(v){ paused=!!v; },
   get mobileMode(){ return mobileMode; },
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
-  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runOptionsCleanupSelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
-  CR_VISUAL_READABILITY,CR_SOUND_FEEDBACK,INPUT_CONFIG,CR_CONTROLS_LS_KEY,crTriggerSoundCue,crSoundEnabled,crSoundFeedbackCueIds,crLoadControlOverrides,crPersistControlOverrides,crResetControlLayoutOverrides,crClearControlOverrides,crEnterControlEditMode,crFinishControlEditMode,crControlHitTest,crSnapshotLayoutNorms,crPrepareSelfCheckPortrait,crStepEditControlSize,crSelectEditControl,
+  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runDecorativePropsSelfCheck,runOptionsCleanupSelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
+  CR_VISUAL_READABILITY,CR_SOUND_FEEDBACK,DECOR_PROP_REQUIRED,INPUT_CONFIG,CR_CONTROLS_LS_KEY,crTriggerSoundCue,crSoundEnabled,crSoundFeedbackCueIds,crLoadControlOverrides,crPersistControlOverrides,crResetControlLayoutOverrides,crClearControlOverrides,crEnterControlEditMode,crFinishControlEditMode,crControlHitTest,crSnapshotLayoutNorms,crPrepareSelfCheckPortrait,crStepEditControlSize,crSelectEditControl,
   getCrVisualHarnessSnapshot(){ return _crVisualHarnessSnapshot; },
   showOnboardingHelp,dismissOnboardingHelp,crOpenFirstRunHelpIfNeeded,
   get onboardingOpen(){ return onboardingOpen; },

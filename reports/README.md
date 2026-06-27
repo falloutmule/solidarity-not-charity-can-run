@@ -1,7 +1,7 @@
 # Reports — SNC Can Run
 
 Main hub for guard cards, reference studies, history, proofs, and backups.  
-**Gameplay baseline:** `optionsclean1` — see **`../PROJECT_STATUS.md`**.
+**Gameplay baseline:** `props1` — see **`../PROJECT_STATUS.md`**.
 
 Reports were moved out of the repo root so GitHub shows only the game + core docs.
 
@@ -32,6 +32,7 @@ Reports were moved out of the repo root so GitHub shows only the game + core doc
 | 19 | EDIT CONTROLS visibility | [guards/EDIT_CONTROLS_VISIBILITY_REPORT.md](guards/EDIT_CONTROLS_VISIBILITY_REPORT.md) | `controledit1` | OPTIONS→edit harness checks + `optionsEditPath` proof | Yes (edit overlay only) |
 | 20 | EDIT CONTROLS resize | [guards/EDIT_CONTROLS_RESIZE_FIX_REPORT.md](guards/EDIT_CONTROLS_RESIZE_FIX_REPORT.md) | `controlsresize1` | SIZE −/+ + `proof-edit-controls-resize.json` | Yes (controls UI) |
 | 21 | OPTIONS cleanup | [guards/OPTIONS_CLEANUP_PASS_REPORT.md](guards/OPTIONS_CLEANUP_PASS_REPORT.md) | `optionsclean1` / `8ef75ad` | `CR.runOptionsCleanupSelfCheck` + `proof-options-cleanup.json` | Yes (menu only) |
+| 22 | Community street punk decor props | [guards/COMMUNITY_STREET_PUNK_PROP_PASS_REPORT.md](guards/COMMUNITY_STREET_PUNK_PROP_PASS_REPORT.md) | `props1` | `CR.runDecorativePropsSelfCheck` + `proof-decorative-props.json` | Yes (decor only) |
 
 ---
 

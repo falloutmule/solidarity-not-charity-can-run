@@ -1,16 +1,16 @@
 # Project status — Solidarity Not Charity Can Run
 
-Last updated: OPTIONS cleanup (`optionsclean1`).
+Last updated: Community street punk decor props (`props1`).
 
-**CI:** `.github/workflows/selfcheck.yml` runs `npm run test:selfcheck` on push/PR to `main`. Latest push: **8ef75ad** — run https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28287680708 (**success**).
+**CI:** `.github/workflows/selfcheck.yml` runs `npm run test:selfcheck` on push/PR to `main`.
 
 ## Gameplay baseline
 
 | | |
 |--|--|
-| **BUILD_ID** (root `index.html`) | `optionsclean1` |
-| **Gameplay commit** | `8ef75ad` |
-| **Prior BUILD_ID** | `controlsresize1` / `14b31e8` |
+| **BUILD_ID** (root `index.html`) | `props1` |
+| **Gameplay commit** | *(pending push)* |
+| **Prior BUILD_ID** | `optionsclean1` / `8ef75ad` |
 | **Prior** | `controledit1` / `controls1` |
 | **Sound baseline** | `sound1` / `d06b2ee` |
 
@@ -39,7 +39,8 @@ Last updated: OPTIONS cleanup (`optionsclean1`).
 14. **Declarative custom mobile controls** — `controls1` / `4e311e7`, `CR.runDeclarativeControlsSelfCheck` — **closed**  
 15. **EDIT CONTROLS visibility** — `controledit1` — **closed**  
 16. **EDIT CONTROLS resize** — `controlsresize1` — **closed**  
-17. **OPTIONS cleanup** — `optionsclean1`, `CR.runOptionsCleanupSelfCheck` — **closed**
+17. **OPTIONS cleanup** — `optionsclean1`, `CR.runOptionsCleanupSelfCheck` — **closed**  
+18. **Community street punk decor props** — `props1`, `CR.runDecorativePropsSelfCheck` — **closed**
 
 ## Next likely work
 
