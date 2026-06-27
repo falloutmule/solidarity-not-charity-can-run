@@ -1060,6 +1060,42 @@ async function fullRunProgressionSection(page) {
   return { pass: proof.pass, proof, fullRunProgression: fr };
 }
 
+async function optionsCleanupSection(page) {
+  const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await waitGameReady(page);
+  await page.evaluate(() => {
+    CR.setMobileMode(true);
+    CR.state = CR.STATE.TITLE;
+    CR.drawMobileMenu();
+    CR.rmenuAction('title-options');
+    CR.drawMobileMenu();
+  });
+  await page.waitForTimeout(200);
+  await page.screenshot({ path: path.join(ROOT, 'proof-options-cleanup-menu.png') });
+  const oc = await page.evaluate(() => CR.runOptionsCleanupSelfCheck());
+  await page.evaluate(() => {
+    CR.state = CR.STATE.TITLE;
+    CR.drawMobileMenu();
+    CR.rmenuAction('title-options');
+    CR.drawMobileMenu();
+    CR.rmenuAction('option-edit-controls');
+    CR.drawMobileMenu();
+  });
+  await page.waitForTimeout(200);
+  await page.screenshot({ path: path.join(ROOT, 'proof-options-cleanup-edit-controls.png') });
+  const proof = {
+    pass: oc.pass === true,
+    build: oc.build,
+    optionsCleanup: oc,
+    screenshots: ['proof-options-cleanup-menu.png', 'proof-options-cleanup-edit-controls.png'],
+    timestamp: new Date().toISOString(),
+  };
+  writeProof('proof-options-cleanup.json', proof);
+  return { pass: proof.pass, proof, optionsCleanup: oc };
+}
+
 async function portraitUsabilitySection(page) {
   const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
   const presetList = [
@@ -1355,6 +1391,7 @@ async function main() {
   const audio = await audioUnlock(page);
   const viewportSafeArea = await viewportSafeAreaSection(page);
   const portraitUsability = await portraitUsabilitySection(page);
+  const optionsCleanup = await optionsCleanupSection(page);
   const settingsSafetyPass = portraitUsability.settingsSafety?.pass === true;
 
   const mobileControlReliability = await mobileControlReliabilitySection(page);
@@ -1400,6 +1437,7 @@ async function main() {
     audio.pass &&
     viewportSafeArea.pass &&
     portraitUsability.pass &&
+    optionsCleanup.pass &&
     settingsSafetyPass &&
     mobileControlReliability.pass &&
     declarativeControls.pass &&
@@ -1444,6 +1482,7 @@ async function main() {
     audio,
     viewportSafeArea,
     portraitUsability,
+    optionsCleanup,
     settingsSafety: portraitUsability.settingsSafety || { pass: settingsSafetyPass },
     mobileControlReliability,
     movementCollision,

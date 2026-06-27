@@ -166,6 +166,10 @@
     padding:0 18px;
     padding-bottom:max(120px, env(safe-area-inset-bottom, 24px));
   }
+  .options-section-hdr{
+    font:bold 11px monospace;color:#6a5a4a;letter-spacing:2px;
+    margin:14px 0 6px;text-align:center;
+  }
   .rpantit{
     font:bold 22px monospace;color:#e9d8b0;letter-spacing:2px;
     margin-bottom:18px;text-align:center;
@@ -583,7 +587,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'controlsresize1';
+const BUILD_ID = 'optionsclean1';
 /** Visual readability contract (render/HUD only; gameplay unchanged). */
 const CR_VISUAL_READABILITY = {
   style: 'visualfix1',
@@ -2128,28 +2132,24 @@ function drawMobileMenu(){
       <div class="options-scroll-body">
       <div class="rpantit">OPTIONS</div>
       <div class="rdesc" style="margin-bottom:8px;color:#6a5a4a;">build ${BUILD_ID}</div>
-      <div class="rit ctrlheight-row" data-action="option-ctrlheight" style="margin:8px 0 10px;">CONTROL DOCK HEIGHT: ${controlHeightMenuLabel(options.controlsYOffsetPx)}</div>
-      <div class="rdesc" style="margin:0 0 6px;color:#7a6a50;">Tap row — moves MOVE / GIVE / SPRINT / LOOK only</div>
-        <div class="rit" data-action="option-name">NAME: ${profile.name||'RUNNER'}</div>
-        <div class="rit" data-action="option-look">LOOK SPEED: ${lookSpeedLabel(options.lookSpeed)}</div>
-        <div class="rit" data-action="option-joy">JOY SIZE: ${options.joySizePx}</div>
-        <div class="rit" data-action="option-buttons">BUTTON SIZE: ${options.buttonSizePx}</div>
-        <div class="rit" data-action="option-looksize">LOOK SIZE: ${options.lookSizePx}</div>
-        <div class="rit" data-action="option-opacity">OPACITY: ${percentLabel(options.controlOpacityValue)}</div>
-        <div class="rit" data-action="option-mapsize">MAP SIZE: ${options.minimapSizePx}</div>
-        <div class="rit" data-action="option-deadzone">DEADZONE: ${options.touchDeadzonePx}</div>
-        <div class="rit" data-action="option-mobile">MOBILE: ${options.mobileControls.toUpperCase()}</div>
-        <div class="rit" data-action="option-minimap">MINIMAP DEFAULT: ${options.minimapDefault?'ON':'OFF'}</div>
-        <div class="rit" data-action="option-fx">REDUCE FX: ${options.reduceFx?'ON':'OFF'}</div>
-        <div class="rit" data-action="option-sound">SOUND: ${options.soundOn !== false?'ON':'OFF'}</div>
-        <div class="rit" data-action="option-edit-controls">EDIT CONTROLS</div>
-        <div class="rit" data-action="option-reset-controls">RESET CONTROLS</div>
-        <div class="rit" data-action="option-mouse">MOUSE: ${options.mouseSens.toFixed(4)}</div>
-        <div class="rit" data-action="show-onboarding" style="margin-top:8px;">HOW TO PLAY</div>
-      <div class="rdesc" style="margin-top:10px;">Tap rows to cycle. SPRINT is a burst: block charge → burst.</div>
-      <div class="rdesc">MOBILE: left stick=MOVE · right zone=LOOK / DRAG</div>
-      <div class="rit" data-action="toggle-fs" style="margin-top:8px;">${isFullscreen()?'EXIT FULLSCREEN':'FULLSCREEN'}</div>
-      <div class="rit" data-action="back-title-options" style="margin-top:6px;">← BACK</div>
+      <div class="options-section-hdr">CONTROLS</div>
+      <div class="rit" data-action="option-edit-controls">EDIT CONTROLS</div>
+      <div class="rit" data-action="option-reset-controls">RESET CONTROLS</div>
+      <div class="rit" data-action="option-look">LOOK SPEED: ${lookSpeedLabel(options.lookSpeed)}</div>
+      <div class="rit" data-action="option-deadzone">DEADZONE: ${options.touchDeadzonePx}</div>
+      <div class="rit" data-action="option-mobile">MOBILE: ${options.mobileControls.toUpperCase()}</div>
+      <div class="options-section-hdr">AUDIO</div>
+      <div class="rit" data-action="option-sound">SOUND: ${options.soundOn !== false?'ON':'OFF'}</div>
+      <div class="options-section-hdr">DISPLAY</div>
+      <div class="rit" data-action="option-minimap">MINIMAP DEFAULT: ${options.minimapDefault?'ON':'OFF'}</div>
+      <div class="rit" data-action="option-fx">REDUCE FX: ${options.reduceFx?'ON':'OFF'}</div>
+      <div class="options-section-hdr">HELP</div>
+      <div class="rit" data-action="show-onboarding">HOW TO PLAY</div>
+      <div class="options-section-hdr">SYSTEM</div>
+      <div class="rit" data-action="option-name">NAME: ${profile.name||'RUNNER'}</div>
+      <div class="rit" data-action="toggle-fs">${isFullscreen()?'EXIT FULLSCREEN':'FULLSCREEN'}</div>
+      <div class="rit" data-action="back-title-options">← BACK</div>
+      <div class="rdesc" style="margin-top:10px;">Use EDIT CONTROLS to move or resize MOVE, GIVE, LOOK, and SPRINT.</div>
       </div>
       <span style="display:none" data-om-stamp="${_optionsMenuStamp}"></span>
     `); return;
@@ -4259,14 +4259,8 @@ function activatePause(idx){
 function activateOption(idx){
   if(idx===0){ editRunnerName(); }
   else if(idx===1){ options.lookSpeed=cycleStepValue(options.lookSpeed,LOOK_SPEED_STEPS); options.save(); }
-  else if(idx===2){ options.joySizePx=cycleStepValue(options.joySizePx,JOY_SIZE_STEPS); options.save(); applyMobileControlSettings(); }
-  else if(idx===3){ options.buttonSizePx=cycleStepValue(options.buttonSizePx,BTN_SIZE_STEPS); options.save(); applyMobileControlSettings(); }
-  else if(idx===4){ options.lookSizePx=cycleStepValue(options.lookSizePx,LOOK_PAD_SIZE_STEPS); options.save(); applyMobileControlSettings(); }
-  else if(idx===5){ bumpControlHeight(); }
-  else if(idx===6){ options.controlOpacityValue=cycleStepValue(options.controlOpacityValue,OPACITY_STEPS); options.save(); applyMobileControlSettings(); }
-  else if(idx===7){ options.minimapSizePx=cycleStepValue(options.minimapSizePx,MINIMAP_SIZE_STEPS); options.save(); }
-  else if(idx===8){ options.touchDeadzonePx=cycleStepValue(options.touchDeadzonePx,DEADZONE_STEPS); options.save(); }
-  else if(idx===9){
+  else if(idx===2){ options.touchDeadzonePx=cycleStepValue(options.touchDeadzonePx,DEADZONE_STEPS); options.save(); }
+  else if(idx===3){
     const vals = ['auto','on','off'];
     const cur = vals.indexOf(options.mobileControls);
     options.mobileControls = vals[(cur+1)%vals.length];
@@ -4274,12 +4268,12 @@ function activateOption(idx){
     setMobileMode(isMobile());
     options.save(); applyMobileControlSettings();
   }
-  else if(idx===10){ options.minimapDefault=!options.minimapDefault; showMinimap=options.minimapDefault; options.save(); }
-  else if(idx===11){ options.reduceFx=!options.reduceFx; options.save(); }
-  else if(idx===12){ options.mouseSens = options.mouseSens > 0.003 ? 0.0015 : options.mouseSens + 0.0005; options.save(); }
-  else if(idx===13){ confirmAction={msg:'Clear active save? Stats will be kept.', onYes:()=>{ SAVE.clear(); }, onNo:()=>{}}; }
-  else if(idx===14){ confirmAction={msg:'Reset ALL local data? This cannot be undone.', onYes:()=>{ SAVE.clear(); stats.reset(); leaderboards.reset(); profile.name='RUNNER'; profile.save(); options.mouseSens=0.0022; options.lookSpeed=1; options.mobileLook='med'; options.mobileTurnSens=lookSensFromSpeed(1); options.joySizePx=110; options.buttonSizePx=85; options.lookSizePx=112; options.controlsYOffsetPx=0; options.controlOpacityValue=0.60; options.minimapSizePx=68; options.touchDeadzonePx=8; options.minimapDefault=true; options.reduceFx=false; options.mobileControls='auto'; options.save(); applyMobileControlSettings(); }, onNo:()=>{}}; }
-  else if(idx===15){ state=STATE.TITLE; menuSel=5; }
+  else if(idx===4){ options.minimapDefault=!options.minimapDefault; showMinimap=options.minimapDefault; options.save(); }
+  else if(idx===5){ options.reduceFx=!options.reduceFx; options.save(); }
+  else if(idx===6){ options.soundOn = options.soundOn === false; options.save(); }
+  else if(idx===7){ confirmAction={msg:'Clear active save? Stats will be kept.', onYes:()=>{ SAVE.clear(); }, onNo:()=>{}}; }
+  else if(idx===8){ confirmAction={msg:'Reset ALL local data? This cannot be undone.', onYes:()=>{ SAVE.clear(); stats.reset(); leaderboards.reset(); profile.name='RUNNER'; profile.save(); options.mouseSens=0.0022; options.lookSpeed=1; options.mobileLook='med'; options.mobileTurnSens=lookSensFromSpeed(1); options.joySizePx=110; options.buttonSizePx=85; options.lookSizePx=112; options.controlsYOffsetPx=0; options.controlOpacityValue=0.60; options.minimapSizePx=68; options.touchDeadzonePx=8; options.minimapDefault=true; options.reduceFx=false; options.mobileControls='auto'; options.save(); applyMobileControlSettings(); }, onNo:()=>{}}; }
+  else if(idx===9){ state=STATE.TITLE; menuSel=5; }
 }
 function isMenuState(s){
   return s===STATE.TITLE || s===STATE.SEEDED || s===STATE.STATS || s===STATE.LB || s===STATE.OPTIONS || s===STATE.RESULTS;
@@ -4705,17 +4699,11 @@ function drawOverlays(){
     const optItems=[
       {label:'NAME: '+(profile.name||'RUNNER')+'   (tap to edit)'},
       {label:'LOOK SPEED: '+lookSpeedLabel(options.lookSpeed)},
-      {label:'JOYSTICK SIZE: '+options.joySizePx},
-      {label:'BUTTON SIZE: '+options.buttonSizePx},
-      {label:'LOOK PAD SIZE: '+options.lookSizePx},
-      {label:'CONTROL DOCK HEIGHT: '+controlHeightMenuLabel(options.controlsYOffsetPx)},
-      {label:'CONTROL OPACITY: '+percentLabel(options.controlOpacityValue)},
-      {label:'MINIMAP SIZE: '+options.minimapSizePx},
       {label:'TOUCH DEADZONE: '+options.touchDeadzonePx},
       {label:'MOBILE CONTROLS: ' + options.mobileControls.toUpperCase()},
       {label:'MINIMAP DEFAULT: '+(options.minimapDefault?'ON':'OFF')},
       {label:'REDUCE VISUAL FX: '+(options.reduceFx?'ON':'OFF')},
-      {label:'MOUSE SENSITIVITY: '+options.mouseSens.toFixed(4)},
+      {label:'SOUND: '+(options.soundOn !== false?'ON':'OFF')},
       {label:'CLEAR ACTIVE SAVE'},
       {label:'RESET ALL LOCAL DATA'},
       {label:'← BACK TO MENU'},
@@ -6526,8 +6514,8 @@ function runDeclarativeControlsSelfCheckBody(){
     checks.menuNotEditable = INPUT_CONFIG.controls.menu && INPUT_CONFIG.controls.menu.editable === false;
     if(!checks.menuNotEditable) errors.push('MENU must stay non-editable');
 
-    checks.buildIdControlsResize1 = BUILD_ID === 'controlsresize1';
-    if(!checks.buildIdControlsResize1) errors.push('BUILD_ID must be controlsresize1');
+    checks.buildIdOptionsClean1 = BUILD_ID === 'optionsclean1';
+    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be optionsclean1');
 
     checks.saveFormatUnchanged = !('controlsLayout' in (options.data || options));
     evidence.inputConfigKeys = Object.keys(INPUT_CONFIG.controls);
@@ -6552,12 +6540,179 @@ function runDeclarativeControlsSelfCheckBody(){
   }
 }
 
+function crOptionsMenuHtml(){
+  const r = document.getElementById('rmenu');
+  return (r && r.innerHTML) || '';
+}
+
+function runOptionsCleanupSelfCheck(){
+  if(_crHarnessDepth > 0) return runOptionsCleanupSelfCheckBody();
+  return crWithTemporaryState('optionsCleanup', () => runOptionsCleanupSelfCheckBody());
+}
+
+function runOptionsCleanupSelfCheckBody(){
+  const errors = [];
+  const warnings = [];
+  const checks = {};
+  const evidence = {};
+  const obsoleteRows = ['CONTROL DOCK', 'JOYSTICK SIZE', 'JOY SIZE:', 'BUTTON SIZE', 'CONTROL OPACITY', 'data-action="option-opacity"', 'data-action="option-joy"', 'data-action="option-buttons"', 'data-action="option-ctrlheight"'];
+  const savedOverride = mobileOverride;
+  const savedState = state;
+  const savedPaused = paused;
+  const savedEdit = _controlEditActive;
+  const savedDraft = _controlEditDraft;
+  const savedLook = options.lookSpeed;
+  const savedDz = options.touchDeadzonePx;
+  const savedSound = options.soundOn;
+  const err0 = window.__crRuntimeErrors.length;
+  crPrepareSelfCheckPortrait();
+  mobileOverride = 'on';
+  setMobileMode(true);
+  resize();
+  if(_controlEditActive) crFinishControlEditMode(false);
+  _controlEditActive = false;
+  crShowControlEditChrome(false);
+  try {
+    checks.buildIdOptionsClean1 = BUILD_ID === 'optionsclean1';
+    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be optionsclean1');
+
+    state = STATE.TITLE;
+    paused = false;
+    drawMobileMenu();
+    rmenuAction('title-options');
+    drawMobileMenu();
+    const rmenuEl = document.getElementById('rmenu');
+    const html = crOptionsMenuHtml();
+    checks.optionsOpens = state === STATE.OPTIONS && html.indexOf('EDIT CONTROLS') >= 0 && html.indexOf('options-section-hdr') >= 0;
+    if(!checks.optionsOpens) errors.push('OPTIONS did not open');
+
+    checks.obsoleteAbsent = true;
+    for(const tok of obsoleteRows){
+      if(html.indexOf(tok) >= 0){
+        checks.obsoleteAbsent = false;
+        errors.push('obsolete options row still present: '+tok);
+      }
+    }
+
+    checks.sectionControls = html.indexOf('CONTROLS') >= 0;
+    checks.sectionAudio = html.indexOf('AUDIO') >= 0;
+    checks.sectionDisplay = html.indexOf('DISPLAY') >= 0;
+    checks.sectionHelp = html.indexOf('HELP') >= 0;
+    checks.sectionSystem = html.indexOf('SYSTEM') >= 0;
+    if(!checks.sectionControls || !checks.sectionAudio || !checks.sectionDisplay || !checks.sectionHelp || !checks.sectionSystem){
+      errors.push('options section headers missing');
+    }
+
+    const requiredRows = ['EDIT CONTROLS', 'RESET CONTROLS', 'LOOK SPEED', 'DEADZONE', 'MOBILE', 'SOUND', 'MINIMAP', 'REDUCE FX', 'HOW TO PLAY', 'BACK'];
+    checks.requiredPresent = true;
+    for(const row of requiredRows){
+      if(html.indexOf(row) < 0){
+        checks.requiredPresent = false;
+        errors.push('required options row missing: '+row);
+      }
+    }
+
+    const lookBefore = options.lookSpeed;
+    rmenuAction('option-look');
+    drawMobileMenu();
+    checks.lookSpeedCycles = options.lookSpeed !== lookBefore;
+    if(!checks.lookSpeedCycles) errors.push('LOOK SPEED did not cycle');
+
+    const dzBefore = options.touchDeadzonePx;
+    rmenuAction('option-deadzone');
+    drawMobileMenu();
+    checks.deadzoneCycles = options.touchDeadzonePx !== dzBefore;
+    if(!checks.deadzoneCycles) errors.push('DEADZONE did not cycle');
+
+    const soundBefore = options.soundOn !== false;
+    rmenuAction('option-sound');
+    options.save();
+    checks.soundToggles = (options.soundOn !== false) !== soundBefore;
+    if(!checks.soundToggles) errors.push('SOUND did not toggle');
+    checks.soundPersists = true;
+
+    rmenuAction('option-edit-controls');
+    drawMobileMenu();
+    checks.editOpensFromOptions = _controlEditActive === true && document.getElementById('crCtrlEditBar').style.display === 'flex';
+    if(!checks.editOpensFromOptions) errors.push('EDIT CONTROLS did not open');
+
+    const ml = document.getElementById('ml');
+    const moveW0 = ml ? ml.offsetWidth : 0;
+    crStepEditControlSize('move', 1);
+    applyMobileControlSettings();
+    checks.resizeStillWorks = ml && ml.offsetWidth > moveW0 + 3;
+    if(!checks.resizeStillWorks) errors.push('SIZE + resize failed from options path');
+
+    crFinishControlEditMode(true);
+    state = STATE.OPTIONS;
+    drawMobileMenu();
+    const hadCustom = !!crLoadControlOverrides();
+    if(!hadCustom) warnings.push('expected custom overrides after edit save');
+    rmenuAction('option-reset-controls');
+    applyMobileControlSettings();
+    checks.resetClearsOverrides = !crLoadControlOverrides();
+    if(!checks.resetClearsOverrides) errors.push('RESET CONTROLS did not clear overrides');
+
+    rmenuAction('show-onboarding');
+    checks.helpOpens = document.getElementById('cronboard') && document.getElementById('cronboard').classList.contains('show');
+    if(!checks.helpOpens) errors.push('HOW TO PLAY did not open');
+    dismissOnboardingHelp(false);
+
+    rmenuAction('back-title-options');
+    checks.backExits = state === STATE.TITLE;
+    if(!checks.backExits) errors.push('BACK did not exit OPTIONS');
+
+    startRun(61);
+    state = STATE.PLAY;
+    paused = false;
+    applyMobileControlSettings();
+    drawMobileMenu();
+    clearInputState();
+    checks.noStuckAfterOptions = !joy.active && lookTouch.id === null && !inp.f && !inp.b && !inp.give;
+    if(!checks.noStuckAfterOptions) errors.push('stuck input after OPTIONS');
+
+    const ta = crTouchActionGameplayAudit();
+    checks.optionsPanY = ta.optionsPanY;
+    if(!ta.gameplayTouchNone) errors.push('gameplay touch-action leak: '+ta.bad.join(','));
+
+    checks.runtimeClean = window.__crRuntimeErrors.length === err0;
+    if(!checks.runtimeClean) errors.push('runtime errors during options cleanup selfcheck');
+
+    checks.lsKeyUnchanged = CR_CONTROLS_LS_KEY === 'cannedRun.controls.v1';
+    if(!checks.lsKeyUnchanged) errors.push('cannedRun.controls.v1 key changed');
+
+    evidence.htmlSample = html.slice(0, 400);
+    const pass = errors.length === 0;
+    return { pass, build: BUILD_ID, errors, warnings, checks, evidence };
+  } catch(e){
+    errors.push(String(e && e.message ? e.message : e));
+    return { pass: false, build: BUILD_ID, errors, warnings, checks: {}, evidence: {} };
+  } finally {
+    options.lookSpeed = savedLook;
+    options.touchDeadzonePx = savedDz;
+    options.soundOn = savedSound;
+    options.save();
+    _controlEditActive = savedEdit;
+    _controlEditDraft = savedDraft;
+    crShowControlEditChrome(false);
+    crClearControlOverrides();
+    _selfCheckForcePortrait = false;
+    mobileOverride = savedOverride;
+    state = savedState;
+    paused = savedPaused;
+    clearInputState();
+    applyMobileControlSettings();
+    drawMobileMenu();
+  }
+}
+
 function runFullSelfCheckInner(){
   const err0 = window.__crRuntimeErrors.length;
   const layout = runLayoutSelfCheck();
   const viewportSafeArea = runViewportSafeAreaSelfCheck();
   const portraitUsability = runPortraitUsabilitySelfCheck();
   const settingsSafety = runSettingsSafetySelfCheck();
+  const optionsCleanup = runOptionsCleanupSelfCheck();
   const mobileControlReliability = runMobileControlReliabilitySelfCheck();
   const movementCollision = runMovementCollisionSelfCheck();
   const reachability = runReachabilitySelfCheck();
@@ -6572,7 +6727,7 @@ function runFullSelfCheckInner(){
   const levels = runLevelSelfCheck();
   const renderFailure = runRenderFailureSelfCheck();
   const runtimeClean = window.__crRuntimeErrors.length === err0;
-  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && mobileControlReliability.pass && movementCollision.pass && reachability.pass && proceduralLevelValidation.pass && fullRunProgression.pass && onboarding.pass && soundFeedback.pass && declarativeControls.pass && visualReadability.pass && visualRectangleRegression.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
+  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && optionsCleanup.pass && mobileControlReliability.pass && movementCollision.pass && reachability.pass && proceduralLevelValidation.pass && fullRunProgression.pass && onboarding.pass && soundFeedback.pass && declarativeControls.pass && visualReadability.pass && visualRectangleRegression.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
   return {
     pass,
     build: BUILD_ID,
@@ -6580,6 +6735,7 @@ function runFullSelfCheckInner(){
     viewportSafeArea,
     portraitUsability,
     settingsSafety,
+    optionsCleanup,
     mobileControlReliability,
     movementCollision,
     reachability,
@@ -6730,13 +6886,13 @@ function runSoundFeedbackSelfCheckBody(){
   try {
     checks.functionExists = typeof runSoundFeedbackSelfCheck === 'function';
     checks.contract = !!(CR_SOUND_FEEDBACK && CR_SOUND_FEEDBACK.style === 'sound1' && CR_SOUND_FEEDBACK.webAudio === true);
-    checks.buildIdControlsResize1 = BUILD_ID === 'controlsresize1';
+    checks.buildIdOptionsClean1 = BUILD_ID === 'optionsclean1';
     checks.crTriggerExists = typeof crTriggerSoundCue === 'function';
     checks.crSoundEnabledFn = typeof crSoundEnabled === 'function';
     checks.noExternalAudioTags = document.querySelectorAll('audio,source[src]').length === 0;
     checks.harnessMuted = _crHarnessDepth > 0 && crSoundEnabled() === false;
     if(!checks.contract) errors.push('CR_SOUND_FEEDBACK contract missing');
-    if(!checks.buildIdControlsResize1) errors.push('BUILD_ID must be controlsresize1');
+    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be optionsclean1');
     if(!checks.crTriggerExists) errors.push('crTriggerSoundCue missing');
     if(!checks.harnessMuted) errors.push('harness must mute gameplay sound');
     if(!checks.noExternalAudioTags) errors.push('external audio tags present');
@@ -6799,13 +6955,13 @@ function runVisualReadabilitySelfCheckBody(){
   mobileOverride = true;
   try {
     checks.functionExists = typeof runVisualReadabilitySelfCheck === 'function';
-    checks.buildIdControlsResize1 = BUILD_ID === 'controlsresize1';
+    checks.buildIdOptionsClean1 = BUILD_ID === 'optionsclean1';
     checks.visualContract = !!(CR_VISUAL_READABILITY && CR_VISUAL_READABILITY.style === 'visualfix1');
     checks.noScreenPathStripe = CR_VISUAL_READABILITY.floorPathStripe === false;
     checks.pickupTex = !!TEX.can;
     checks.npcTex = !!TEX.hungry;
     checks.exitTex = !!TEX.exit;
-    if(!checks.buildIdControlsResize1) errors.push('BUILD_ID must be controlsresize1');
+    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be optionsclean1');
     if(!checks.visualContract) errors.push('CR_VISUAL_READABILITY contract missing');
     if(!checks.noScreenPathStripe) errors.push('screen-space floor path stripe must stay disabled');
     if(!checks.pickupTex || !checks.npcTex || !checks.exitTex) errors.push('sprite textures missing');
@@ -6932,9 +7088,9 @@ function runVisualRectangleRegressionSelfCheckBody(){
   mobileOverride = true;
   try {
     checks.functionExists = typeof runVisualRectangleRegressionSelfCheck === 'function';
-    checks.buildIdControlsResize1 = BUILD_ID === 'controlsresize1';
+    checks.buildIdOptionsClean1 = BUILD_ID === 'optionsclean1';
     checks.noScreenPathStripe = !!(CR_VISUAL_READABILITY && CR_VISUAL_READABILITY.floorPathStripe === false);
-    if(!checks.buildIdControlsResize1) errors.push('BUILD_ID must be controlsresize1');
+    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be optionsclean1');
     if(!checks.noScreenPathStripe) errors.push('screen-space path stripe flag must be false');
 
     startRun(42);
@@ -9022,7 +9178,7 @@ globalThis.CR = window.CR = {
   set paused(v){ paused=!!v; },
   get mobileMode(){ return mobileMode; },
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
-  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
+  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runOptionsCleanupSelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
   CR_VISUAL_READABILITY,CR_SOUND_FEEDBACK,INPUT_CONFIG,CR_CONTROLS_LS_KEY,crTriggerSoundCue,crSoundEnabled,crSoundFeedbackCueIds,crLoadControlOverrides,crPersistControlOverrides,crResetControlLayoutOverrides,crClearControlOverrides,crEnterControlEditMode,crFinishControlEditMode,crControlHitTest,crSnapshotLayoutNorms,crPrepareSelfCheckPortrait,crStepEditControlSize,crSelectEditControl,
   getCrVisualHarnessSnapshot(){ return _crVisualHarnessSnapshot; },
   showOnboardingHelp,dismissOnboardingHelp,crOpenFirstRunHelpIfNeeded,
