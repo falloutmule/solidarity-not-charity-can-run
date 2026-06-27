@@ -1,6 +1,6 @@
 # Project status — Solidarity Not Charity Can Run
 
-Last updated: Street-block level grammar (`street1`).
+Last updated: D1 park landmark pass (`park1`).
 
 **CI:** `.github/workflows/selfcheck.yml` runs `npm run test:selfcheck` on push/PR to `main`.
 
@@ -8,19 +8,19 @@ Last updated: Street-block level grammar (`street1`).
 
 | | |
 |--|--|
-| **BUILD_ID** (root `index.html`) | `street1` |
-| **Gameplay commit** | `3cb957a` |
-| **Prior BUILD_ID** | `propsread1` / `e6f6af6` |
-| **Prior** | `props1` / `6adc981` |
+| **BUILD_ID** (root `index.html`) | `park1` |
+| **Gameplay commit** | `e801077` |
+| **Prior BUILD_ID** | `street1` / `3cb957a` |
+| **Prior** | `propsread1` / `e6f6af6` |
 
-**CI (street1):** [SNC Can Run Selfcheck run 28295099113](https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28295099113) — `success` on `3cb957a`, artifact `snc-can-run-proof-artifacts`.
+**CI (park1):** [SNC Can Run Selfcheck run 28295826828](https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28295826828) — `success` on `e801077`, artifact `snc-can-run-proof-artifacts`.
 
 ## URLs
 
-- **Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=3cb957a&mobile=on&portraitlayout=1  
-- **Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=3cb957a&mobile=on&portraitlayout=1  
+- **Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=e801077&mobile=on&portraitlayout=1  
+- **Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=e801077&mobile=on&portraitlayout=1  
 
-*(Cache-bust with `3cb957a` — see `reports/guards/STREET_BLOCK_LEVEL_GRAMMAR_REPORT.md`.)*
+*(Cache-bust with `e801077` — see `reports/guards/D1_PARK_LANDMARK_PASS_REPORT.md`.)*
 
 ## Completed cards (order)
 
@@ -43,7 +43,8 @@ Last updated: Street-block level grammar (`street1`).
 17. **OPTIONS cleanup** — `optionsclean1`, `CR.runOptionsCleanupSelfCheck` — **closed**  
 18. **Community street punk decor props** — `props1`, `CR.runDecorativePropsSelfCheck` — **closed**  
 19. **Prop readability polish** — `propsread1`, `CR.runDecorativePropsSelfCheck` — **closed**  
-20. **Street-block level grammar** — `street1`, `CR.runStreetBlockLevelSelfCheck` — **closed**
+20. **Street-block level grammar** — `street1`, `CR.runStreetBlockLevelSelfCheck` — **closed**  
+21. **D1 park landmark / plaza** — `park1`, `CR.runD1ParkLandmarkSelfCheck` — **closed**
 
 ## Next likely work
 
@@ -52,4 +53,4 @@ Last updated: Street-block level grammar (`street1`).
 
 ## Blockers
 
-- None known after local + CI `npm run test:selfcheck` PASS on `street1`.
+- None known after local + CI `npm run test:selfcheck` PASS on `park1`.

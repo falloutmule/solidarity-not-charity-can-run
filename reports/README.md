@@ -1,7 +1,7 @@
 # Reports — SNC Can Run
 
 Main hub for guard cards, reference studies, history, proofs, and backups.  
-**Gameplay baseline:** `street1` — see **`../PROJECT_STATUS.md`**.
+**Gameplay baseline:** `park1` — see **`../PROJECT_STATUS.md`**.
 
 Reports were moved out of the repo root so GitHub shows only the game + core docs.
 
@@ -35,6 +35,7 @@ Reports were moved out of the repo root so GitHub shows only the game + core doc
 | 22 | Community street punk decor props | [guards/COMMUNITY_STREET_PUNK_PROP_PASS_REPORT.md](guards/COMMUNITY_STREET_PUNK_PROP_PASS_REPORT.md) | `props1` / `6adc981` | `CR.runDecorativePropsSelfCheck` + `proof-decorative-props.json` | Yes (decor only) |
 | 23 | Prop readability polish | [guards/PROP_READABILITY_POLISH_REPORT.md](guards/PROP_READABILITY_POLISH_REPORT.md) | `propsread1` | `CR.runDecorativePropsSelfCheck` + proof PNGs | Yes (decor art only) |
 | 24 | Street-block level grammar | [guards/STREET_BLOCK_LEVEL_GRAMMAR_REPORT.md](guards/STREET_BLOCK_LEVEL_GRAMMAR_REPORT.md) | `street1` / `3cb957a` | `CR.runStreetBlockLevelSelfCheck` + street proof PNGs | Yes (procedural layout) |
+| 25 | D1 park landmark / plaza | [guards/D1_PARK_LANDMARK_PASS_REPORT.md](guards/D1_PARK_LANDMARK_PASS_REPORT.md) | `park1` / `e801077` | `CR.runD1ParkLandmarkSelfCheck` + D1 park proof PNGs | Yes (D1 layout + decor) |
 
 ---
 
