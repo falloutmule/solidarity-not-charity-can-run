@@ -1,0 +1,149 @@
+{
+  "pass": true,
+  "build": "districts1",
+  "errors": [],
+  "warnings": [],
+  "checks": {
+    "buildIdDistricts1": true,
+    "footprintUnchanged": true,
+    "saveVersionUnchanged": true,
+    "controlsSchemaUnchanged": true,
+    "noMovingBlockers": true,
+    "d1LandmarkAndOpen": true,
+    "d2StorefrontStreet": true,
+    "d3AlleyIntroduction": true,
+    "d4MorePockets": true,
+    "mainRoadSpineReadable": true,
+    "d2NpcMostlyVisible": true,
+    "d3SomeTucked": true,
+    "d4MoreTucked": true,
+    "d2CansRoadHeavy": true,
+    "d4CansSpread": true,
+    "reachabilityD1D4": true,
+    "decorRoster12": true,
+    "noRuntimeErrors": true
+  },
+  "evidence": {
+    "districts": [
+      {
+        "seed": 880101,
+        "district": 1,
+        "modifier": "",
+        "MAP_W": 40,
+        "MAP_H": 20,
+        "metrics": {
+          "mainRoad": 418,
+          "buildings": 14,
+          "alleys": 76,
+          "pockets": 176,
+          "GW": 40,
+          "GH": 20
+        },
+        "npcZones": {
+          "MAIN_ROAD": 8,
+          "POCKET": 0,
+          "ALLEY": 0
+        },
+        "canZones": {
+          "MAIN_ROAD": 16,
+          "POCKET": 0,
+          "ALLEY": 0
+        },
+        "landmark": {
+          "identity": "restroom_pavilion",
+          "x0": 16,
+          "y0": 2,
+          "x1": 20,
+          "y1": 4,
+          "cells": 13,
+          "northSide": true,
+          "doorY": 4,
+          "doorX0": 18,
+          "doorX1": 19
+        },
+        "propCount": 12
+      },
+      {
+        "seed": 880102,
+        "district": 2,
+        "modifier": "",
+        "MAP_W": 40,
+        "MAP_H": 20,
+        "metrics": {
+          "mainRoad": 342,
+          "buildings": 78,
+          "alleys": 76,
+          "pockets": 188,
+          "GW": 40,
+          "GH": 20
+        },
+        "npcZones": {
+          "MAIN_ROAD": 8,
+          "POCKET": 1,
+          "ALLEY": 0
+        },
+        "canZones": {
+          "MAIN_ROAD": 18,
+          "POCKET": 0,
+          "ALLEY": 0
+        },
+        "landmark": null,
+        "propCount": 11
+      },
+      {
+        "seed": 880103,
+        "district": 3,
+        "modifier": "",
+        "MAP_W": 40,
+        "MAP_H": 20,
+        "metrics": {
+          "mainRoad": 266,
+          "buildings": 68,
+          "alleys": 76,
+          "pockets": 274,
+          "GW": 40,
+          "GH": 20
+        },
+        "npcZones": {
+          "MAIN_ROAD": 0,
+          "POCKET": 10,
+          "ALLEY": 0
+        },
+        "canZones": {
+          "MAIN_ROAD": 20,
+          "POCKET": 0,
+          "ALLEY": 0
+        },
+        "landmark": null,
+        "propCount": 14
+      },
+      {
+        "seed": 880104,
+        "district": 4,
+        "modifier": "",
+        "MAP_W": 40,
+        "MAP_H": 20,
+        "metrics": {
+          "mainRoad": 266,
+          "buildings": 53,
+          "alleys": 76,
+          "pockets": 289,
+          "GW": 40,
+          "GH": 20
+        },
+        "npcZones": {
+          "MAIN_ROAD": 0,
+          "POCKET": 11,
+          "ALLEY": 0
+        },
+        "canZones": {
+          "MAIN_ROAD": 0,
+          "POCKET": 22,
+          "ALLEY": 0
+        },
+        "landmark": null,
+        "propCount": 14
+      }
+    ]
+  }
+}
