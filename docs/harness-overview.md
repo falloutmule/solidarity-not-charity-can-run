@@ -37,6 +37,8 @@ SNC Can Run uses **in-browser self-checks** (`window.CR`) plus a **Playwright** 
 | `proof-no-external-requests.json` | No external fetches |
 | `proof-declarative-controls.json` | Declarative custom controls + edit path |
 | `proof-edit-controls-resize.json` | EDIT CONTROLS SIZE −/+ |
+| `proof-options-cleanup.json` | OPTIONS menu cleanup (sections, obsolete rows) |
+| `proof-options-cleanup-menu.png` / `proof-options-cleanup-edit-controls.png` | OPTIONS cleanup proof shots |
 | `proof-control-resize-move-before.png` … `proof-control-resize-button-after.png` | Resize proof shots |
 | `proof-control-edit-reset.png` | RESET CONTROLS |
 

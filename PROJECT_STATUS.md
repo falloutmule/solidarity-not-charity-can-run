@@ -1,25 +1,25 @@
 # Project status — Solidarity Not Charity Can Run
 
-Last updated: EDIT CONTROLS resize (`controlsresize1`).
+Last updated: OPTIONS cleanup (`optionsclean1`).
 
-**CI:** `.github/workflows/selfcheck.yml` runs `npm run test:selfcheck` on push/PR to `main`. Re-run after push for latest **headSha**.
+**CI:** `.github/workflows/selfcheck.yml` runs `npm run test:selfcheck` on push/PR to `main`. Latest push: **8ef75ad** — run https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28287680708 (**success**).
 
 ## Gameplay baseline
 
 | | |
 |--|--|
-| **BUILD_ID** (root `index.html`) | `controlsresize1` |
-| **Prior BUILD_ID** | `controledit1` / `f543956` |
-| **Prior gameplay baseline** | `controls1` / `4e311e7` |
+| **BUILD_ID** (root `index.html`) | `optionsclean1` |
+| **Gameplay commit** | `8ef75ad` |
+| **Prior BUILD_ID** | `controlsresize1` / `14b31e8` |
+| **Prior** | `controledit1` / `controls1` |
 | **Sound baseline** | `sound1` / `d06b2ee` |
-| **Handoff reference baseline** | `onboard1` / `aaaf901` |
 
 ## URLs
 
-- **Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=14b31e8&mobile=on&portraitlayout=1  
-- **Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=14b31e8&mobile=on&portraitlayout=1  
+- **Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=8ef75ad&mobile=on&portraitlayout=1  
+- **Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=8ef75ad&mobile=on&portraitlayout=1  
 
-*(Cache-bust with `14b31e8` — see `reports/guards/EDIT_CONTROLS_RESIZE_FIX_REPORT.md`.)*
+*(Cache-bust with `8ef75ad` — see `reports/guards/OPTIONS_CLEANUP_PASS_REPORT.md`.)*
 
 ## Completed cards (order)
 
@@ -36,9 +36,10 @@ Last updated: EDIT CONTROLS resize (`controlsresize1`).
 11. **Visual readability polish** — `visual1`, `CR.runVisualReadabilitySelfCheck`  
 12. **Visual rectangle regression fix** — `visualfix1`, `CR.runVisualRectangleRegressionSelfCheck`  
 13. **Sound / feedback pass** — `sound1` / `d06b2ee`, `CR.runSoundFeedbackSelfCheck`  
-14. **Declarative custom mobile controls** — `controls1` / `4e311e7`, `CR.runDeclarativeControlsSelfCheck` — **closed**
-15. **EDIT CONTROLS visibility** — `controledit1`, OPTIONS path + `CR.runDeclarativeControlsSelfCheck` — **closed**
-16. **EDIT CONTROLS resize** — `controlsresize1`, SIZE −/+ + `CR.runDeclarativeControlsSelfCheck` — **closed**
+14. **Declarative custom mobile controls** — `controls1` / `4e311e7`, `CR.runDeclarativeControlsSelfCheck` — **closed**  
+15. **EDIT CONTROLS visibility** — `controledit1` — **closed**  
+16. **EDIT CONTROLS resize** — `controlsresize1` — **closed**  
+17. **OPTIONS cleanup** — `optionsclean1`, `CR.runOptionsCleanupSelfCheck` — **closed**
 
 ## Next likely work
 
@@ -47,4 +48,4 @@ Last updated: EDIT CONTROLS resize (`controlsresize1`).
 
 ## Blockers
 
-- None known after local harness + GitHub Actions CI pass on `4e311e7`.
+- None known after local harness + GitHub Actions CI pass on `8ef75ad`.
