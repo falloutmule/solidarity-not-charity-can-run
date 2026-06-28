@@ -2,8 +2,8 @@
 
 **Previous baseline:** `spriteground1` / split infrastructure `35c74cc`  
 **New BUILD_ID:** `groundplane1`  
-**Gameplay commit:** pending until push  
-**CI URL:** pending until push
+**Gameplay commit:** `3f489ed` (`3f489edd206556de7c40b387143f1366ef6f6f6b`)  
+**CI URL:** https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28337881113
 
 ## Cause found
 
@@ -103,5 +103,5 @@ Local results:
 
 ## URLs
 
-- Play: pending until commit hash exists
-- Self-check: pending until commit hash exists
+- Play: https://falloutmule.github.io/solidarity-not-charity-can-run/?v=3f489ed&mobile=on&portraitlayout=1
+- Self-check: https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=3f489ed&mobile=on&portraitlayout=1

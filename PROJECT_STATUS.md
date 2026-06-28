@@ -5,7 +5,7 @@
 | **Gameplay baseline** | `BUILD_ID` **`groundplane1`** |
 | **Previous gameplay baseline** | `spriteground1` / `820b67c`; split infra `35c74cc` |
 | **Infrastructure** | Split-source build pipeline (`src/` → `index.html`) |
-| **Gameplay commit** | Pending push for FPV ground-plane alignment |
+| **Gameplay commit** | `3f489ed` — FPV ground-plane alignment |
 
 ## Play / self-check
 
