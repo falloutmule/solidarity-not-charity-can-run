@@ -7,13 +7,13 @@
 | Field | Value |
 |-------|-------|
 | **BUILD_ID** | `facadecompose1` |
-| **Gameplay commit** | *(after push)* |
+| **Gameplay commit** | `58ca4c3` |
 | **Prior** | `facadev2safe1` / `4c0c4c0` |
 
 ## Play / self-check
 
-- Play: `https://falloutmule.github.io/solidarity-not-charity-can-run/?v=<commit>&mobile=on&portraitlayout=1`
-- Self-check: `https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=<commit>&mobile=on&portraitlayout=1`
+- Play: `https://falloutmule.github.io/solidarity-not-charity-can-run/?v=58ca4c3&mobile=on&portraitlayout=1`
+- Self-check: `https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=58ca4c3&mobile=on&portraitlayout=1`
 
 ## Recent passes
 

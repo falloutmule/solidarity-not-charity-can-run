@@ -1,8 +1,7 @@
 # Facade composition / module readability report
 
 **BUILD_ID:** `facadecompose1`  
-**Previous baseline:** `facadev2safe1` / `4c0c4c0`  
-**Backup:** `index.before-facade-composition-readability.html`
+**Gameplay commit:** `58ca4c3`
 
 ## What caused the conflicted look
 
@@ -34,7 +33,10 @@
 
 ## CI / play URLs
 
-*(Filled after push.)*
+- CI: https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28330244678 — **success**
+- Artifact: `snc-can-run-proof-artifacts`
+- Play: https://falloutmule.github.io/solidarity-not-charity-can-run/?v=58ca4c3&mobile=on&portraitlayout=1
+- Self-check: https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=58ca4c3&mobile=on&portraitlayout=1
 
 ## Proof artifacts
 
