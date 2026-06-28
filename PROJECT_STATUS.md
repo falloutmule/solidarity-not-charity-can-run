@@ -20,7 +20,7 @@
 
 ## Facade pack
 
-Copy-paste block in `index.html`: `/* BEGIN SNC FACADE PACK v1 */` … `/* END SNC FACADE PACK v1 */` — `CR_FACADE_PACK` (modules, roles, slots, materials). Snapshot: `proof-facade-pack-v1.txt`.
+Copy-paste block in `index.html`: `/* BEGIN SNC FACADE PACK v1 */` … `/* END SNC FACADE PACK v1 */` — `CR_FACADE_PACK` (modules, roles, slots, materials). Snapshot: `proof-facade-pack-v1.txt`. **Lab:** open `snc-building-module-lab-v2.html` locally → **COPY PACK** → paste into game block (lab-only v2 modules not shipped until copied).
 
 ## Harness
 

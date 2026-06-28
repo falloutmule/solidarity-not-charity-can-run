@@ -4,7 +4,16 @@
 **Gameplay commit:** `0a8d34f`  
 **Prior baseline:** `modules1` / `0905d1d`  
 **Backup:** `index.before-facade-pack-bridge.html`  
-**Reference (not imported):** `snc-building-module-lab.html` (concept only; pack lives in game)
+**Reference (not imported):**
+- `snc-building-module-lab.html` (v1 concept)
+- `snc-building-module-lab-v2.html` — **facadepack1 / 0a8d34f** base pack preview + **COPY PACK** export; lab-only modules (`garage_service_4x2`, `two_story_storefront_4x2_visual`, `walkin_storefront_4x3`, etc.) stay in lab until copied into `CR_FACADE_PACK` in `index.html`
+
+## Lab sync workflow
+
+1. Open **`snc-building-module-lab-v2.html`** locally (standalone; not loaded by the game).
+2. **Base modules** in lab `BASE_FACADE_PACK` match shipped **`proof-facade-pack-v1.txt`** / `CR_FACADE_PACK` in `index.html`.
+3. Edit modules/roles/slots in lab → **COPY PACK** → replace the marked block in `index.html` between `BEGIN` / `END` markers.
+4. Bump `CR_FACADE_PACK.version` + `BUILD_ID` only when you ship a gameplay change; re-run `npm run test:selfcheck`.
 
 ## Problem
 
