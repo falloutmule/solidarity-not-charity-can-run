@@ -10,7 +10,7 @@
 | Backup | `index.before-fpv-street-shimmer-fix.html` |
 | Previous | `streetread1` / `3cd3b7f` |
 | New BUILD_ID | `shimmerfix1` |
-| Gameplay commit | *(after push)* |
+| Gameplay commit | `7f3ad89` |
 
 ## Root cause
 
@@ -27,7 +27,7 @@ Contributing factors:
 2. **Floor:** Darker, lower-contrast matte asphalt gradient; **removed** center flecks.
 3. **Facades:** Procedural cues on **every other column** (`col & 1`); softened GLASS awning strip (lower alpha, slightly thicker).
 
-| Gameplay commit | `7f3ad89` |
+**Unchanged:** `CR_BUILDING_FPV_MASS` **1.5**, minimap `crMinimapNavCellColor` navigation palette, level selector, map 40×20, save/controls/Hall.
 
 ## Harness
 

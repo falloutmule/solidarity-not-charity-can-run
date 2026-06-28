@@ -1,28 +1,33 @@
-# Project status — Solidarity Not Charity Can Run
+# SNC Can Run — project status
 
-Last updated: building module / facade role pass (`modules1`).
-
-**CI:** `.github/workflows/selfcheck.yml` runs `npm run test:selfcheck` on push/PR to `main`.
+**Last updated:** Facade pack bridge / lab sync pass (`facadepack1`)
 
 ## Gameplay baseline
 
 | Field | Value |
 |-------|-------|
-| BUILD_ID | `modules1` |
-| Gameplay commit | `0905d1d` |
-| Map | Procedural **40×20** |
+| **BUILD_ID** | `facadepack1` |
+| **Prior baseline** | `modules1` / `0905d1d` |
+| **Backup** | `index.before-facade-pack-bridge.html` |
 
-**Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=0905d1d&mobile=on&portraitlayout=1
+## Play (cache-bust after push)
 
-**Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=0905d1d&mobile=on&portraitlayout=1
+`https://falloutmule.github.io/solidarity-not-charity-can-run/?v=<commit>&mobile=on&portraitlayout=1`
 
-## Recent shipped cards
+## Self-check
 
-- **modules1** — semantic building modules + facade roles; report `reports/guards/BUILDING_MODULE_FACADE_ROLE_REPORT.md`
-- **facadefix1** — FPV broad facade panels; `2c80f71`
-- **wallfix1** — FPV wall line artifact reduction
-- **shimmerfix1** — matte FPV road
+`https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=<commit>&mobile=on&portraitlayout=1`
+
+## Facade pack
+
+Copy-paste block in `index.html`: `/* BEGIN SNC FACADE PACK v1 */` … `/* END SNC FACADE PACK v1 */` — `CR_FACADE_PACK` (modules, roles, slots, materials). Snapshot: `proof-facade-pack-v1.txt`.
 
 ## Harness
 
-Local: `npm run test:selfcheck` (Playwright + in-page `CR.runFullSelfCheck()`).
+```bash
+npm run test:selfcheck
+```
+
+## Guard report
+
+`reports/guards/FACADE_PACK_BRIDGE_REPORT.md`

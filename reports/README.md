@@ -1,7 +1,7 @@
 # Reports — SNC Can Run
 
 Main hub for guard cards, reference studies, history, proofs, and backups.  
-**Gameplay baseline:** `modules1` — see **`../PROJECT_STATUS.md`**.
+**Gameplay baseline:** `facadepack1` — see **`../PROJECT_STATUS.md`**.
 
 Reports were moved out of the repo root so GitHub shows only the game + core docs.
 
@@ -42,7 +42,8 @@ Reports were moved out of the repo root so GitHub shows only the game + core doc
 | 29 | Street readability / minimap | [guards/STREET_READABILITY_MINIMAP_REPORT.md](guards/STREET_READABILITY_MINIMAP_REPORT.md) | `streetread1` / `3cd3b7f` | `CR.runStreetReadabilityMinimapSelfCheck` + readability PNGs | Yes (minimap nav palette) |
 | 30 | FPV street shimmer fix | [guards/FPV_STREET_SHIMMER_FIX_REPORT.md](guards/FPV_STREET_SHIMMER_FIX_REPORT.md) | `shimmerfix1` / `7f3ad89` | `CR.runFpvStreetShimmerFixSelfCheck` + FPV matte road PNGs | Yes (D2/D3 storefront FPV) |
 | 32 | FPV facade target polish | [guards/FPV_FACADE_TARGET_POLISH_REPORT.md](guards/FPV_FACADE_TARGET_POLISH_REPORT.md) | `facadefix1` / `2c80f71` | `CR.runFpvFacadeTargetPolishSelfCheck` + D1–D3 facade PNGs | Yes (broad panels vs comb lines) |
-| 33 | Building module / facade roles | [guards/BUILDING_MODULE_FACADE_ROLE_REPORT.md](guards/BUILDING_MODULE_FACADE_ROLE_REPORT.md) | `modules1` / `0905d1d` | `CR.runBuildingModuleFacadeSelfCheck` + module PNGs | Yes (semantic storefront/side/back) |
+| 33 | Building module / facade roles | [guards/BUILDING_MODULE_FACADE_ROLE_REPORT.md](guards/BUILDING_MODULE_FACADE_ROLE_REPORT.md) | `modules1` / `0905d1d` | `CR.runBuildingModuleFacadeSelfCheck` + D2/D3 module proofs |
+| 34 | Facade pack bridge / lab sync | [guards/FACADE_PACK_BRIDGE_REPORT.md](guards/FACADE_PACK_BRIDGE_REPORT.md) | `facadepack1` | `CR_FACADE_PACK` block + `CR.runFacadePackBridgeSelfCheck` + `proof-facade-pack-v1.txt` |
 | 31 | FPV wall line artifact fix | [guards/FPV_WALL_LINE_ARTIFACT_FIX_REPORT.md](guards/FPV_WALL_LINE_ARTIFACT_FIX_REPORT.md) | `wallfix1` / `d419ca9` | `CR.runFpvWallLineArtifactFixSelfCheck` + D1–D3 FPV wall PNGs | Yes (storefront/alley walls) |
 
 ---

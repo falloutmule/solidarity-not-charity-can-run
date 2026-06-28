@@ -1344,6 +1344,79 @@ async function buildingModuleFacadeSection(page) {
   return { pass: bm.pass === true, buildingModuleFacade: bm };
 }
 
+async function facadePackBridgeSection(page) {
+  const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await waitGameReady(page);
+
+  const fp = await page.evaluate(() => CR.runFacadePackBridgeSelfCheck());
+  writeProof('proof-facade-pack-bridge.json', fp);
+
+  const roleDebug = await page.evaluate(() => {
+    CR.crSetSelectedStartDistrict(2);
+    CR.startRun(902002);
+    CR.state = CR.STATE.PLAY;
+    let hit = null;
+    for (let y = 1; y < CR.game.MAP_H - 1 && !hit; y++) {
+      for (let x = 1; x < CR.game.MAP_W - 1 && !hit; x++) {
+        if (!CR.game.buildingGrid[y][x]) continue;
+        for (const face of ['north', 'south', 'east', 'west']) {
+          const d = CR.crDebugDescribeFacadeHit(x, y, face);
+          if (d.role && d.role.indexOf('storefront') === 0) {
+            hit = d;
+            break;
+          }
+        }
+      }
+    }
+    CR.crSetSelectedStartDistrict(3);
+    CR.startRun(902003);
+    let hit3 = null;
+    for (let y = 1; y < CR.game.MAP_H - 1 && !hit3; y++) {
+      for (let x = 1; x < CR.game.MAP_W - 1 && !hit3; x++) {
+        if (!CR.game.buildingGrid[y][x]) continue;
+        for (const face of ['north', 'east', 'west']) {
+          const d = CR.crDebugDescribeFacadeHit(x, y, face);
+          if (d.role && (d.role === 'blank_brick' || d.role === 'service_wall' || d.role === 'side_door')) {
+            hit3 = d;
+            break;
+          }
+        }
+      }
+    }
+    return { d2: hit, d3: hit3, packVersion: (typeof CR_FACADE_PACK !== 'undefined' && CR_FACADE_PACK.version) || null };
+  });
+  roleDebug.packVersion = roleDebug.packVersion || (await page.evaluate(() => CR_FACADE_PACK && CR_FACADE_PACK.version));
+  writeProof('proof-facadepack-role-debug.json', roleDebug);
+
+  const shots = [
+    { d: 2, seed: 902102, file: 'proof-facadepack-d2-storefront-front.png', angle: Math.PI / 2 },
+    { d: 3, seed: 902103, file: 'proof-facadepack-d3-side-back-alley.png', angle: Math.PI * 0.82 },
+  ];
+  for (const s of shots) {
+    await page.evaluate(({ d, seed, angle }) => {
+      CR.crSetSelectedStartDistrict(d);
+      CR.startRun(seed);
+      CR.state = CR.STATE.PLAY;
+      CR.paused = false;
+      if (typeof CR.player !== 'undefined') CR.player.angle = angle;
+    }, s);
+    await page.waitForTimeout(220);
+    await page.screenshot({ path: path.join(ROOT, s.file) });
+  }
+  await page.evaluate(() => {
+    CR.crSetSelectedStartDistrict(2);
+    CR.startRun(902102);
+    CR.state = CR.STATE.PLAY;
+    CR.paused = false;
+  });
+  await page.waitForTimeout(80);
+  await page.screenshot({ path: path.join(ROOT, 'proof-facadepack-minimap-preserved.png') });
+
+  return { pass: fp.pass === true, facadePackBridge: fp };
+}
+
 async function fpvWallLineArtifactFixSection(page) {
   const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
   await page.setViewportSize({ width: 412, height: 915 });
@@ -1848,6 +1921,7 @@ async function main() {
   const streetBlockLevel = await streetBlockLevelSection(page);
   const d1ParkLandmark = await d1ParkLandmarkSection(page);
   const buildingModuleFacade = await buildingModuleFacadeSection(page);
+  const facadePackBridge = await facadePackBridgeSection(page);
   const fpvFacadeTargetPolish = await fpvFacadeTargetPolishSection(page);
   const fpvWallLineArtifactFix = await fpvWallLineArtifactFixSection(page);
   const fpvStreetShimmerFix = await fpvStreetShimmerFixSection(page);
@@ -1905,6 +1979,7 @@ async function main() {
     streetBlockLevel.pass &&
     d1ParkLandmark.pass &&
     buildingModuleFacade.pass &&
+    facadePackBridge.pass &&
     fpvFacadeTargetPolish.pass &&
     fpvWallLineArtifactFix.pass &&
     fpvStreetShimmerFix.pass &&
@@ -1961,6 +2036,7 @@ async function main() {
     streetBlockLevel,
     d1ParkLandmark,
     buildingModuleFacade,
+    facadePackBridge,
     fpvFacadeTargetPolish,
     fpvWallLineArtifactFix,
     fpvStreetShimmerFix,
