@@ -39,7 +39,7 @@
 - Local: `npm run test:selfcheck` — **PASS**
 
 ## CI
-- Workflow: SNC Can Run Selfcheck (post-push)
+- **GitHub Actions:** https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28325373507 — **success**
 - Artifact: `snc-can-run-proof-artifacts`
 
 ## Proof paths
