@@ -1417,6 +1417,88 @@ async function facadePackBridgeSection(page) {
   return { pass: fp.pass === true, facadePackBridge: fp };
 }
 
+async function facadePackV2SafeSection(page) {
+  const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await waitGameReady(page);
+
+  const v2 = await page.evaluate(() => CR.runFacadePackV2SafeModuleSelfCheck());
+  writeProof('proof-facadev2safe-modules.json', v2);
+
+  const roleDebug = await page.evaluate(() => {
+    CR.crSetSelectedStartDistrict(2);
+    CR.startRun(902201);
+    CR.state = CR.STATE.PLAY;
+    let boarded = null;
+    for (let y = 1; y < CR.game.MAP_H - 1 && !boarded; y++) {
+      for (let x = 1; x < CR.game.MAP_W - 1 && !boarded; x++) {
+        if (!CR.game.buildingGrid[y][x] || CR.game.buildingGrid[y][x].mid !== 'boarded_shop_3x2') continue;
+        for (const face of ['south', 'north']) {
+          const d = CR.crDebugDescribeFacadeHit(x, y, face);
+          if (d.role && (d.role.indexOf('boarded') >= 0 || d.role === 'storefront_door')) {
+            boarded = d;
+            break;
+          }
+        }
+      }
+    }
+    CR.crSetSelectedStartDistrict(3);
+    CR.startRun(902203);
+    CR.state = CR.STATE.PLAY;
+    let garage = null;
+    for (let y = 1; y < CR.game.MAP_H - 1 && !garage; y++) {
+      for (let x = 1; x < CR.game.MAP_W - 1 && !garage; x++) {
+        if (!CR.game.buildingGrid[y][x] || CR.game.buildingGrid[y][x].mid !== 'garage_service_4x2') continue;
+        for (const face of ['south', 'north', 'east']) {
+          const d = CR.crDebugDescribeFacadeHit(x, y, face);
+          if (d.role && (d.role.indexOf('garage') >= 0 || d.role === 'service_door' || d.role === 'blank_concrete')) {
+            garage = d;
+            break;
+          }
+        }
+      }
+    }
+    const mods = (typeof CR_FACADE_PACK !== 'undefined' && CR_FACADE_PACK.modules) ? Object.keys(CR_FACADE_PACK.modules) : [];
+    const labOnly = ['two_story_storefront_4x2_visual', 'walkin_storefront_4x3', 'corner_shop_L'];
+    const labOnlyInGameplay = labOnly.filter((id) => mods.indexOf(id) >= 0);
+    return {
+      boarded,
+      garage,
+      packVersion: CR_FACADE_PACK && CR_FACADE_PACK.version,
+      moduleList: mods,
+      labOnlyNotImported: labOnlyInGameplay.length === 0,
+    };
+  });
+  writeProof('proof-facadev2safe-role-debug.json', roleDebug);
+
+  const shots = [
+    { d: 2, seed: 902201, file: 'proof-facadev2safe-d2-boarded-shop.png', angle: Math.PI / 2 },
+    { d: 3, seed: 902203, file: 'proof-facadev2safe-d3-garage-service.png', angle: Math.PI * 0.82 },
+  ];
+  for (const s of shots) {
+    await page.evaluate(({ d, seed, angle }) => {
+      CR.crSetSelectedStartDistrict(d);
+      CR.startRun(seed);
+      CR.state = CR.STATE.PLAY;
+      CR.paused = false;
+      if (typeof CR.player !== 'undefined') CR.player.angle = angle;
+    }, s);
+    await page.waitForTimeout(220);
+    await page.screenshot({ path: path.join(ROOT, s.file) });
+  }
+  await page.evaluate(() => {
+    CR.crSetSelectedStartDistrict(2);
+    CR.startRun(902201);
+    CR.state = CR.STATE.PLAY;
+    CR.paused = false;
+  });
+  await page.waitForTimeout(80);
+  await page.screenshot({ path: path.join(ROOT, 'proof-facadev2safe-minimap-preserved.png') });
+
+  return { pass: v2.pass === true, facadePackV2Safe: v2 };
+}
+
 async function fpvWallLineArtifactFixSection(page) {
   const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
   await page.setViewportSize({ width: 412, height: 915 });
@@ -1922,6 +2004,7 @@ async function main() {
   const d1ParkLandmark = await d1ParkLandmarkSection(page);
   const buildingModuleFacade = await buildingModuleFacadeSection(page);
   const facadePackBridge = await facadePackBridgeSection(page);
+  const facadePackV2Safe = await facadePackV2SafeSection(page);
   const fpvFacadeTargetPolish = await fpvFacadeTargetPolishSection(page);
   const fpvWallLineArtifactFix = await fpvWallLineArtifactFixSection(page);
   const fpvStreetShimmerFix = await fpvStreetShimmerFixSection(page);
@@ -1980,6 +2063,7 @@ async function main() {
     d1ParkLandmark.pass &&
     buildingModuleFacade.pass &&
     facadePackBridge.pass &&
+    facadePackV2Safe.pass &&
     fpvFacadeTargetPolish.pass &&
     fpvWallLineArtifactFix.pass &&
     fpvStreetShimmerFix.pass &&
@@ -2037,6 +2121,7 @@ async function main() {
     d1ParkLandmark,
     buildingModuleFacade,
     facadePackBridge,
+    facadePackV2Safe,
     fpvFacadeTargetPolish,
     fpvWallLineArtifactFix,
     fpvStreetShimmerFix,

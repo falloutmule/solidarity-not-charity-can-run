@@ -1,7 +1,7 @@
 # Reports — SNC Can Run
 
 Main hub for guard cards, reference studies, history, proofs, and backups.  
-**Gameplay baseline:** `facadepack1` — see **`../PROJECT_STATUS.md`**.
+**Gameplay baseline:** `facadev2safe1` — see **`../PROJECT_STATUS.md`**.
 
 Reports were moved out of the repo root so GitHub shows only the game + core docs.
 
@@ -44,6 +44,7 @@ Reports were moved out of the repo root so GitHub shows only the game + core doc
 | 32 | FPV facade target polish | [guards/FPV_FACADE_TARGET_POLISH_REPORT.md](guards/FPV_FACADE_TARGET_POLISH_REPORT.md) | `facadefix1` / `2c80f71` | `CR.runFpvFacadeTargetPolishSelfCheck` + D1–D3 facade PNGs | Yes (broad panels vs comb lines) |
 | 33 | Building module / facade roles | [guards/BUILDING_MODULE_FACADE_ROLE_REPORT.md](guards/BUILDING_MODULE_FACADE_ROLE_REPORT.md) | `modules1` / `0905d1d` | `CR.runBuildingModuleFacadeSelfCheck` + D2/D3 module proofs |
 | 34 | Facade pack bridge / lab sync | [guards/FACADE_PACK_BRIDGE_REPORT.md](guards/FACADE_PACK_BRIDGE_REPORT.md) | `facadepack1` | `CR_FACADE_PACK` block + `CR.runFacadePackBridgeSelfCheck` + `proof-facade-pack-v1.txt` |
+| 35 | Facade pack v2 safe modules | [guards/FACADE_PACK_V2_SAFE_MODULE_IMPORT_REPORT.md](guards/FACADE_PACK_V2_SAFE_MODULE_IMPORT_REPORT.md) | `facadev2safe1` | `garage_service_4x2` + `boarded_shop_3x2` + `CR.runFacadePackV2SafeModuleSelfCheck` |
 | 31 | FPV wall line artifact fix | [guards/FPV_WALL_LINE_ARTIFACT_FIX_REPORT.md](guards/FPV_WALL_LINE_ARTIFACT_FIX_REPORT.md) | `wallfix1` / `d419ca9` | `CR.runFpvWallLineArtifactFixSelfCheck` + D1–D3 FPV wall PNGs | Yes (storefront/alley walls) |
 
 ---

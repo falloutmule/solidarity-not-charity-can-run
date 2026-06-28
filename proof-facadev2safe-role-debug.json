@@ -1,0 +1,39 @@
+{
+  "boarded": {
+    "buildingId": 3,
+    "moduleId": "boarded_shop_3x2",
+    "localX": 0,
+    "localY": 0,
+    "faceDirection": "south",
+    "role": "boarded_window",
+    "material": "brick",
+    "slots": [
+      "sign_band",
+      "boarded_window",
+      "dark_base"
+    ]
+  },
+  "garage": {
+    "buildingId": 5,
+    "moduleId": "garage_service_4x2",
+    "localX": 0,
+    "localY": 0,
+    "faceDirection": "south",
+    "role": "garage_bay",
+    "material": "concrete",
+    "slots": [
+      "garage_door",
+      "dark_base"
+    ]
+  },
+  "packVersion": "facadev2safe1",
+  "moduleList": [
+    "storefront_4x2",
+    "storefront_3x2",
+    "restroom_pavilion",
+    "blank_service_block",
+    "garage_service_4x2",
+    "boarded_shop_3x2"
+  ],
+  "labOnlyNotImported": true
+}

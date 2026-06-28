@@ -1,0 +1,104 @@
+const CR_FACADE_PACK = {
+  version: 'facadev2safe1',
+  modules: {
+    storefront_4x2: {
+      cells: ['####', '####'],
+      front: 'south',
+      faces: {
+        south: ['storefront_window', 'storefront_door', 'storefront_window', 'storefront_sign'],
+        north: ['service_wall', 'mural_wall', 'blank_brick', 'utility_wall'],
+        east: ['side_door', 'blank_brick'],
+        west: ['blank_brick', 'blank_brick']
+      }
+    },
+    storefront_3x2: {
+      cells: ['###', '###'],
+      front: 'south',
+      faces: {
+        south: ['storefront_window', 'storefront_door', 'storefront_sign'],
+        north: ['service_wall', 'blank_brick', 'utility_wall'],
+        east: ['blank_brick', 'side_door'],
+        west: ['blank_brick', 'blank_brick']
+      }
+    },
+    restroom_pavilion: {
+      cells: ['#######', '#######', '#######', '#######'],
+      front: 'south',
+      faces: {
+        south: ['storefront_window', 'storefront_door', 'storefront_door', 'storefront_window', 'blank_brick', 'mural_wall', 'utility_wall'],
+        north: ['blank_brick', 'blank_brick', 'blank_brick', 'blank_brick', 'service_wall', 'service_wall', 'mural_wall'],
+        east: ['blank_brick', 'side_door', 'blank_brick', 'utility_wall'],
+        west: ['blank_brick', 'blank_brick', 'side_door', 'blank_brick']
+      }
+    },
+    blank_service_block: {
+      cells: ['###', '###'],
+      front: 'south',
+      faces: {
+        south: ['blank_brick', 'service_wall', 'utility_wall'],
+        north: ['utility_wall', 'service_wall', 'blank_brick'],
+        east: ['blank_brick', 'side_door'],
+        west: ['blank_brick', 'blank_brick']
+      }
+    },
+    garage_service_4x2: {
+      cells: ['####', '####'],
+      front: 'south',
+      faces: {
+        south: ['garage_bay', 'garage_bay', 'service_door', 'utility_wall'],
+        north: ['blank_concrete', 'service_wall', 'utility_wall', 'blank_concrete'],
+        east: ['blank_concrete', 'side_door'],
+        west: ['blank_concrete', 'blank_concrete']
+      }
+    },
+    boarded_shop_3x2: {
+      cells: ['###', '###'],
+      front: 'south',
+      faces: {
+        south: ['boarded_window', 'storefront_door', 'boarded_window'],
+        north: ['blank_brick', 'mural_wall', 'service_wall'],
+        east: ['blank_brick', 'side_door'],
+        west: ['blank_brick', 'blank_brick']
+      }
+    }
+  },
+  roles: {
+    storefront_window: { material: 'brick', slots: ['sign_band', 'glass_window', 'dark_base'] },
+    storefront_door: { material: 'brick', slots: ['sign_band', 'glass_door', 'dark_base'] },
+    storefront_sign: { material: 'brick', slots: ['large_sign', 'poster_window', 'dark_base'] },
+    blank_brick: { material: 'brick', slots: ['soft_brick_bands'] },
+    side_door: { material: 'brick', slots: ['soft_brick_bands', 'side_door', 'small_light'] },
+    service_wall: { material: 'stucco', slots: ['service_panel', 'vent', 'dark_base'] },
+    mural_wall: { material: 'stucco', slots: ['mural_patch', 'dark_base'] },
+    utility_wall: { material: 'concrete', slots: ['utility_box', 'small_vent', 'dark_base'] },
+    blank_concrete: { material: 'concrete', slots: ['soft_panel_bands'] },
+    garage_bay: { material: 'concrete', slots: ['garage_door', 'dark_base'] },
+    service_door: { material: 'stucco', slots: ['service_door', 'small_light', 'dark_base'] },
+    boarded_window: { material: 'brick', slots: ['sign_band', 'boarded_window', 'dark_base'] }
+  },
+  slots: {
+    sign_band: { kind: 'rect', zone: 'upper', style: 'muted_sign' },
+    large_sign: { kind: 'rect', zone: 'upper', style: 'large_sign' },
+    glass_window: { kind: 'rect', zone: 'middle', style: 'glass' },
+    poster_window: { kind: 'rect', zone: 'middle', style: 'poster' },
+    glass_door: { kind: 'door', zone: 'middle', style: 'glass_door' },
+    dark_base: { kind: 'rect', zone: 'base', style: 'dark_base' },
+    soft_brick_bands: { kind: 'rect', zone: 'full', style: 'soft_brick' },
+    side_door: { kind: 'door', zone: 'middle', style: 'side_door' },
+    small_light: { kind: 'rect', zone: 'upper', style: 'small_light' },
+    service_panel: { kind: 'rect', zone: 'middle', style: 'service_panel' },
+    vent: { kind: 'rect', zone: 'upper', style: 'vent' },
+    mural_patch: { kind: 'rect', zone: 'middle', style: 'mural' },
+    utility_box: { kind: 'rect', zone: 'middle', style: 'utility_box' },
+    small_vent: { kind: 'rect', zone: 'upper', style: 'small_vent' },
+    soft_panel_bands: { kind: 'rect', zone: 'full', style: 'soft_panel' },
+    garage_door: { kind: 'rect', zone: 'middle', style: 'garage_door' },
+    service_door: { kind: 'door', zone: 'middle', style: 'service_door' },
+    boarded_window: { kind: 'rect', zone: 'middle', style: 'boards' }
+  },
+  materials: {
+    brick: { base: 'brick', texture: 'soft_block' },
+    stucco: { base: 'stucco', texture: 'soft_block' },
+    concrete: { base: 'concrete', texture: 'soft_block' }
+  }
+}

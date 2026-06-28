@@ -1,14 +1,15 @@
 # SNC Can Run — project status
 
-**Last updated:** Facade pack bridge / lab sync pass (`facadepack1`)
+**Last updated:** Facade pack v2 safe module import (`facadev2safe1`)
 
 ## Gameplay baseline
 
 | Field | Value |
 |-------|-------|
-| **BUILD_ID** | `facadepack1` |
-| **Prior baseline** | `modules1` / `0905d1d` |
-| **Backup** | `index.before-facade-pack-bridge.html` |
+| **BUILD_ID** | `facadev2safe1` |
+| **Prior baseline** | `facadepack1` / `0a8d34f` |
+| **Lab reference** | `snc-building-module-lab-v2.html` @ `af37c54` |
+| **Backup** | `index.before-facade-pack-v2-safe-modules.html` |
 
 ## Play (cache-bust after push)
 
@@ -20,7 +21,7 @@
 
 ## Facade pack
 
-Copy-paste block in `index.html`: `/* BEGIN SNC FACADE PACK v1 */` … `/* END SNC FACADE PACK v1 */` — `CR_FACADE_PACK` (modules, roles, slots, materials). Snapshot: `proof-facade-pack-v1.txt`. **Lab:** open `snc-building-module-lab-v2.html` locally → **COPY PACK** → paste into game block (lab-only v2 modules not shipped until copied).
+`CR_FACADE_PACK` in `index.html` (markers `BEGIN`/`END SNC FACADE PACK v1`). Shipped modules include **`garage_service_4x2`** and **`boarded_shop_3x2`**. Snapshot: `proof-facade-pack-v2-safe.txt`. Lab v2 remains standalone — two-story / walk-in / corner modules not in gameplay.
 
 ## Harness
 
@@ -30,4 +31,4 @@ npm run test:selfcheck
 
 ## Guard report
 
-`reports/guards/FACADE_PACK_BRIDGE_REPORT.md`
+`reports/guards/FACADE_PACK_V2_SAFE_MODULE_IMPORT_REPORT.md`

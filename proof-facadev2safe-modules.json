@@ -1,0 +1,104 @@
+{
+  "pass": true,
+  "checks": {
+    "buildId": true,
+    "v2SafeFlag": true,
+    "packExists": true,
+    "packMarkers": true,
+    "baseStorefront": true,
+    "garageModule": true,
+    "boardedModule": true,
+    "garageRoles": true,
+    "boardedRoles": true,
+    "garageSlots": true,
+    "boardedSlots": true,
+    "labOnlyNotInGameplay": true,
+    "noFloorZonesGameplay": true,
+    "packRenderer": true,
+    "matteRoad": true,
+    "minimapNav": true,
+    "fpvMass": true,
+    "d2BoardedPlaced": true,
+    "d3GaragePlaced": true,
+    "boardedFacadeHit": true,
+    "garageFacadeHit": true,
+    "reachD2": true,
+    "reachD3": true
+  },
+  "evidence": {
+    "packVersion": "facadev2safe1",
+    "moduleList": [
+      "storefront_4x2",
+      "storefront_3x2",
+      "restroom_pavilion",
+      "blank_service_block",
+      "garage_service_4x2",
+      "boarded_shop_3x2"
+    ],
+    "roleList": [
+      "storefront_window",
+      "storefront_door",
+      "storefront_sign",
+      "blank_brick",
+      "side_door",
+      "service_wall",
+      "mural_wall",
+      "utility_wall",
+      "blank_concrete",
+      "garage_bay",
+      "service_door",
+      "boarded_window"
+    ],
+    "slotList": [
+      "sign_band",
+      "large_sign",
+      "glass_window",
+      "poster_window",
+      "glass_door",
+      "dark_base",
+      "soft_brick_bands",
+      "side_door",
+      "small_light",
+      "service_panel",
+      "vent",
+      "mural_patch",
+      "utility_box",
+      "small_vent",
+      "soft_panel_bands",
+      "garage_door",
+      "service_door",
+      "boarded_window"
+    ],
+    "boardedHit": {
+      "buildingId": 6,
+      "moduleId": "boarded_shop_3x2",
+      "localX": 0,
+      "localY": 0,
+      "faceDirection": "south",
+      "role": "boarded_window",
+      "material": "brick",
+      "slots": [
+        "sign_band",
+        "boarded_window",
+        "dark_base"
+      ]
+    },
+    "garageHit": {
+      "buildingId": 5,
+      "moduleId": "garage_service_4x2",
+      "localX": 0,
+      "localY": 0,
+      "faceDirection": "south",
+      "role": "garage_bay",
+      "material": "concrete",
+      "slots": [
+        "garage_door",
+        "dark_base"
+      ]
+    },
+    "labOnlyNotImported": []
+  },
+  "errors": [],
+  "warnings": [],
+  "build": "facadev2safe1"
+}
