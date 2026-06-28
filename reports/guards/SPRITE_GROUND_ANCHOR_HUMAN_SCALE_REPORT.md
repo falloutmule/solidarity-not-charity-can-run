@@ -29,9 +29,14 @@ Billboards used `bottom = RH/2 + lineH/2` with **texture-bottom** as the foot po
 
 - Local: `npm run test:selfcheck` — **pass**
 
+**Gameplay commit:** `820b67c`
+
 ## CI / play URLs
 
-*(Filled after push.)*
+- CI: https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28332919108 — **success**
+- Artifact: `snc-can-run-proof-artifacts`
+- Play: https://falloutmule.github.io/solidarity-not-charity-can-run/?v=820b67c&mobile=on&portraitlayout=1
+- Self-check: https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=820b67c&mobile=on&portraitlayout=1
 
 ## Proof artifacts
 

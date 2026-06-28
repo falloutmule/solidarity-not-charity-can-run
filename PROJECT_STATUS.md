@@ -4,13 +4,13 @@
 |-------|-------|
 | **Gameplay baseline** | `BUILD_ID` **`spriteground1`** |
 | **Previous baseline** | `facadeart1` / `56f4acb` |
-| **Gameplay commit** | *(after push)* |
+| **Gameplay commit** | `820b67c` |
 | **Backup** | `index.before-sprite-ground-anchor.html` |
 
 ## Play / self-check
 
-- Play: `https://falloutmule.github.io/solidarity-not-charity-can-run/?v=<commit>&mobile=on&portraitlayout=1`
-- Self-check: `https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=<commit>&mobile=on&portraitlayout=1`
+- Play: `https://falloutmule.github.io/solidarity-not-charity-can-run/?v=820b67c&mobile=on&portraitlayout=1`
+- Self-check: `https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=820b67c&mobile=on&portraitlayout=1`
 
 ## Latest guard
 
