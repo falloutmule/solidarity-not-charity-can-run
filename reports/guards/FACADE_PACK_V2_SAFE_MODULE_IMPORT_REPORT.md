@@ -5,8 +5,8 @@
 **Previous baseline:** `facadepack1` / `0a8d34f`  
 **Lab reference commit:** `af37c54` (`snc-building-module-lab-v2.html`)  
 **BUILD_ID:** `facadev2safe1`  
-**Gameplay commit:** *(filled after push)*
-
+**Gameplay commit:** `4c0c4c0`  
+**Previous baseline:** `facadepack1` / `0a8d34f`
 ## Modules imported
 
 - `garage_service_4x2`
@@ -67,9 +67,13 @@ npm run test:selfcheck → pass:true
 
 ## CI
 
-*(Run URL after push.)*
-
+- https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28329532063 — **success**
 - Artifact: `snc-can-run-proof-artifacts`
+
+## Play URLs
+
+- Play: https://falloutmule.github.io/solidarity-not-charity-can-run/?v=4c0c4c0&mobile=on&portraitlayout=1
+- Self-check: https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=4c0c4c0&mobile=on&portraitlayout=1
 
 ## Proof paths
 
@@ -83,5 +87,5 @@ npm run test:selfcheck → pass:true
 
 ## Play URLs
 
-- Play: `https://falloutmule.github.io/solidarity-not-charity-can-run/?v=<commit>&mobile=on&portraitlayout=1`
-- Self-check: `https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=<commit>&mobile=on&portraitlayout=1`
+- Play: `https://falloutmule.github.io/solidarity-not-charity-can-run/?v=4c0c4c0&mobile=on&portraitlayout=1`
+- Self-check: `https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=4c0c4c0&mobile=on&portraitlayout=1`
