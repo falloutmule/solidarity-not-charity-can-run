@@ -1,0 +1,95 @@
+{
+  "pass": true,
+  "checks": {
+    "buildId": true,
+    "packExists": true,
+    "packVersion": true,
+    "packMarkers": true,
+    "importedModules": true,
+    "labOnlyNotInGameplay": true,
+    "composedRenderer": true,
+    "composeFlag": true,
+    "moduleFacesSkipWallTex": true,
+    "noLeadingEdgeStripes": true,
+    "debugHelper": true,
+    "d1ParkIdentity": true,
+    "d2StorefrontProof": true,
+    "d2BoardedProof": true,
+    "d3GarageProof": true,
+    "storefrontHit": true,
+    "boardedHit": true,
+    "garageHit": true,
+    "sideHit": true,
+    "reachD1": true,
+    "reachD2": true
+  },
+  "evidence": {
+    "storefrontHit": {
+      "buildingId": 4,
+      "moduleId": "storefront_4x2",
+      "localX": 0,
+      "localY": 0,
+      "faceDirection": "south",
+      "role": "storefront_window",
+      "material": "brick",
+      "slots": [
+        "sign_band",
+        "glass_window",
+        "dark_base"
+      ]
+    },
+    "boardedHit": {
+      "buildingId": 6,
+      "moduleId": "boarded_shop_3x2",
+      "localX": 2,
+      "localY": 1,
+      "faceDirection": "south",
+      "role": "boarded_window",
+      "material": "brick",
+      "slots": [
+        "sign_band",
+        "boarded_window",
+        "dark_base"
+      ]
+    },
+    "garageHit": {
+      "buildingId": 5,
+      "moduleId": "garage_service_4x2",
+      "localX": 0,
+      "localY": 0,
+      "faceDirection": "south",
+      "role": "garage_bay",
+      "material": "concrete",
+      "slots": [
+        "garage_door",
+        "dark_base"
+      ]
+    },
+    "sideHit": {
+      "buildingId": 7,
+      "moduleId": "blank_service_block",
+      "localX": 1,
+      "localY": 0,
+      "faceDirection": "east",
+      "role": "blank_brick",
+      "material": "brick",
+      "slots": [
+        "soft_brick_bands"
+      ]
+    },
+    "d1Modules": [
+      "restroom_pavilion"
+    ],
+    "moduleNames": [
+      "storefront_4x2",
+      "storefront_3x2",
+      "restroom_pavilion",
+      "blank_service_block",
+      "garage_service_4x2",
+      "boarded_shop_3x2"
+    ]
+  },
+  "errors": [],
+  "warnings": [],
+  "build": "facadecompose1"
+}

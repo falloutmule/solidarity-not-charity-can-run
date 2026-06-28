@@ -1,27 +1,24 @@
 # SNC Can Run — project status
 
-**Last updated:** Facade pack v2 safe module import (`facadev2safe1`)
+**Last updated:** Facade composition / module readability (`facadecompose1`)
 
 ## Gameplay baseline
 
 | Field | Value |
 |-------|-------|
-| **BUILD_ID** | `facadev2safe1` |
-| **Prior baseline** | `facadepack1` / `0a8d34f` |
-| **Lab reference** | `snc-building-module-lab-v2.html` @ `af37c54` |
-| **Backup** | `index.before-facade-pack-v2-safe-modules.html` |
+| **BUILD_ID** | `facadecompose1` |
+| **Gameplay commit** | *(after push)* |
+| **Prior** | `facadev2safe1` / `4c0c4c0` |
 
-## Play (cache-bust after push)
+## Play / self-check
 
-`https://falloutmule.github.io/solidarity-not-charity-can-run/?v=<commit>&mobile=on&portraitlayout=1`
+- Play: `https://falloutmule.github.io/solidarity-not-charity-can-run/?v=<commit>&mobile=on&portraitlayout=1`
+- Self-check: `https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=<commit>&mobile=on&portraitlayout=1`
 
-## Self-check
+## Recent passes
 
-`https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=<commit>&mobile=on&portraitlayout=1`
-
-## Facade pack
-
-`CR_FACADE_PACK` in `index.html` (markers `BEGIN`/`END SNC FACADE PACK v1`). Shipped modules include **`garage_service_4x2`** and **`boarded_shop_3x2`**. Snapshot: `proof-facade-pack-v2-safe.txt`. Lab v2 remains standalone — two-story / walk-in / corner modules not in gameplay.
+- **facadecompose1** — composed FPV facades (`crDrawComposedFacadeFaceColumn`), D1 identity preserved
+- **facadev2safe1** — `garage_service_4x2`, `boarded_shop_3x2` safe import
 
 ## Harness
 
@@ -29,6 +26,9 @@
 npm run test:selfcheck
 ```
 
-## Guard report
+Includes `CR.runFacadeCompositionReadabilitySelfCheck()` in `CR.runFullSelfCheck()`.
 
-`reports/guards/FACADE_PACK_V2_SAFE_MODULE_IMPORT_REPORT.md`
+## Reports
+
+- [FACADE_COMPOSITION_READABILITY_REPORT.md](reports/guards/FACADE_COMPOSITION_READABILITY_REPORT.md)
+- [FACADE_PACK_V2_SAFE_MODULE_IMPORT_REPORT.md](reports/guards/FACADE_PACK_V2_SAFE_MODULE_IMPORT_REPORT.md)
