@@ -4,13 +4,13 @@
 |-------|-------|
 | **Gameplay baseline** | `BUILD_ID` **`facadeart1`** |
 | **Previous baseline** | `facadecompose1` / `58ca4c3` |
-| **Gameplay commit** | *(after push)* |
+| **Gameplay commit** | `56f4acb` |
 | **Backup** | `index.before-facade-art-vocabulary.html` |
 
 ## Play / self-check
 
-- Play: `https://falloutmule.github.io/solidarity-not-charity-can-run/?v=<commit>&mobile=on&portraitlayout=1`
-- Self-check: `https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=<commit>&mobile=on&portraitlayout=1`
+- Play: `https://falloutmule.github.io/solidarity-not-charity-can-run/?v=56f4acb&mobile=on&portraitlayout=1`
+- Self-check: `https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=56f4acb&mobile=on&portraitlayout=1`
 
 ## Latest guard
 

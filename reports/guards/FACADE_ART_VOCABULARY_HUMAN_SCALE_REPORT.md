@@ -2,7 +2,8 @@
 
 **BUILD_ID:** `facadeart1`  
 **Previous gameplay baseline:** `facadecompose1` / `58ca4c3`  
-**Backup:** `index.before-facade-art-vocabulary.html`
+**Backup:** `index.before-facade-art-vocabulary.html` (local; may be gitignored)  
+**Gameplay commit:** `56f4acb`
 
 ## What caused the flat / wallpaper look
 
@@ -40,7 +41,10 @@
 
 ## CI / play URLs
 
-*(Filled after push.)*
+- CI: https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28331089765 — **success**
+- Artifact: `snc-can-run-proof-artifacts`
+- Play: https://falloutmule.github.io/solidarity-not-charity-can-run/?v=56f4acb&mobile=on&portraitlayout=1
+- Self-check: https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=56f4acb&mobile=on&portraitlayout=1
 
 ## Proof artifacts
 
