@@ -1307,6 +1307,43 @@ async function fpvFacadeTargetPolishSection(page) {
   return { pass: ff.pass === true, fpvFacadeTargetPolish: ff };
 }
 
+async function buildingModuleFacadeSection(page) {
+  const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await waitGameReady(page);
+
+  const bm = await page.evaluate(() => CR.runBuildingModuleFacadeSelfCheck());
+  writeProof('proof-building-module-facade.json', bm);
+
+  const shots = [
+    { d: 2, seed: 890602, file: 'proof-modules-d2-storefront-front.png', angle: Math.PI / 2 },
+    { d: 3, seed: 890603, file: 'proof-modules-d3-side-back-alley.png', angle: Math.PI * 0.78 },
+    { d: 1, seed: 890601, file: 'proof-modules-d1-pavilion.png', angle: 0 },
+  ];
+  for (const s of shots) {
+    await page.evaluate(({ d, seed, angle }) => {
+      CR.crSetSelectedStartDistrict(d);
+      CR.startRun(seed);
+      CR.state = CR.STATE.PLAY;
+      CR.paused = false;
+      if (typeof CR.player !== 'undefined') CR.player.angle = angle;
+    }, s);
+    await page.waitForTimeout(200);
+    await page.screenshot({ path: path.join(ROOT, s.file) });
+  }
+  await page.evaluate(() => {
+    CR.crSetSelectedStartDistrict(2);
+    CR.startRun(890602);
+    CR.state = CR.STATE.PLAY;
+    CR.paused = false;
+  });
+  await page.waitForTimeout(80);
+  await page.screenshot({ path: path.join(ROOT, 'proof-modules-minimap-preserved.png') });
+
+  return { pass: bm.pass === true, buildingModuleFacade: bm };
+}
+
 async function fpvWallLineArtifactFixSection(page) {
   const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
   await page.setViewportSize({ width: 412, height: 915 });
@@ -1810,6 +1847,7 @@ async function main() {
   const decorativeProps = await decorativePropsSection(page);
   const streetBlockLevel = await streetBlockLevelSection(page);
   const d1ParkLandmark = await d1ParkLandmarkSection(page);
+  const buildingModuleFacade = await buildingModuleFacadeSection(page);
   const fpvFacadeTargetPolish = await fpvFacadeTargetPolishSection(page);
   const fpvWallLineArtifactFix = await fpvWallLineArtifactFixSection(page);
   const fpvStreetShimmerFix = await fpvStreetShimmerFixSection(page);
@@ -1866,6 +1904,7 @@ async function main() {
     decorativeProps.pass &&
     streetBlockLevel.pass &&
     d1ParkLandmark.pass &&
+    buildingModuleFacade.pass &&
     fpvFacadeTargetPolish.pass &&
     fpvWallLineArtifactFix.pass &&
     fpvStreetShimmerFix.pass &&
@@ -1921,6 +1960,7 @@ async function main() {
     decorativeProps,
     streetBlockLevel,
     d1ParkLandmark,
+    buildingModuleFacade,
     fpvFacadeTargetPolish,
     fpvWallLineArtifactFix,
     fpvStreetShimmerFix,

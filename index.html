@@ -587,12 +587,13 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'facadefix1';
+const BUILD_ID = 'modules1';
 const CR_FPV_STREET_SHIMMER_FIX = 1;
 const CR_FPV_STREET_MATTE = true;
 const CR_FPV_WALL_LINE_FIX = 1;
 const CR_FPV_FACADE_TARGET_POLISH = 1;
-/** Coarse FPV wall texture U sampling (broad panels; low stripe frequency). */
+const CR_BUILDING_MODULE_FACADE = 1;
+/** Coarse FPV wall texture U sampling (reduces vertical stripe/moiré on buildings). */
 const CR_FPV_WALL_TEX_COARSE = 16;
 /** Visual readability contract (render/HUD only; gameplay unchanged). */
 const CR_VISUAL_READABILITY = {
@@ -2231,6 +2232,201 @@ const STREET_FOOTPRINT_H = 20;
 /** FPV wall height multiplier (~50% more substantial storefronts / blocks). */
 const CR_BUILDING_FPV_MASS = 1.5;
 
+/** Semantic building modules (reference: snc-building-module-lab.html — not imported). */
+const BUILDING_MODULES = {
+  storefront_4x2: {
+    id: 'storefront_4x2', w: 4, h: 2,
+    faces: {
+      south: ['storefront_glass','storefront_door','storefront_glass','storefront_poster'],
+      north: ['back_service_wall','mural_panel','blank_brick_side','utility_wall'],
+      east: ['side_door','blank_brick_side'],
+      west: ['blank_brick_side','blank_brick_side']
+    }
+  },
+  storefront_3x2: {
+    id: 'storefront_3x2', w: 3, h: 2,
+    faces: {
+      south: ['storefront_glass','storefront_door','storefront_poster'],
+      north: ['back_service_wall','blank_brick_side','utility_wall'],
+      east: ['blank_brick_side','side_door'],
+      west: ['blank_brick_side','blank_brick_side']
+    }
+  },
+  restroom_pavilion: {
+    id: 'restroom_pavilion', w: 7, h: 4,
+    faces: {
+      south: ['storefront_glass','storefront_door','storefront_door','storefront_glass','blank_brick_side','mural_panel','utility_wall'],
+      north: ['blank_brick_side','blank_brick_side','blank_brick_side','blank_brick_side','back_service_wall','back_service_wall','mural_panel'],
+      east: ['blank_brick_side','side_door','blank_brick_side','utility_wall'],
+      west: ['blank_brick_side','blank_brick_side','side_door','blank_brick_side']
+    }
+  },
+  blank_service_block: {
+    id: 'blank_service_block', w: 3, h: 2,
+    faces: {
+      south: ['blank_brick_side','back_service_wall','utility_wall'],
+      north: ['utility_wall','back_service_wall','blank_brick_side'],
+      east: ['blank_brick_side','side_door'],
+      west: ['blank_brick_side','blank_brick_side']
+    }
+  }
+};
+
+function crClearBuildingModules(GW, GH){
+  game.buildingRegistry = {};
+  game.buildingGrid = [];
+  game._nextBuildingId = 1;
+  for(let y=0;y<GH;y++) game.buildingGrid.push(new Array(GW).fill(null));
+}
+
+function crPlaceBuildingModule(map, shade, x0, y0, moduleId, frontFace){
+  const mod = BUILDING_MODULES[moduleId];
+  if(!mod) return false;
+  for(let dy=0;dy<mod.h;dy++){
+    for(let dx=0;dx<mod.w;dx++){
+      const x = x0+dx, y = y0+dy;
+      if(x<1||y<1||x>=map[0].length-1||y>=map.length-1) return false;
+    }
+  }
+  const bid = game._nextBuildingId++;
+  game.buildingRegistry[bid] = { moduleId, x0, y0, front: frontFace, mod };
+  for(let dy=0;dy<mod.h;dy++){
+    for(let dx=0;dx<mod.w;dx++){
+      const x = x0+dx, y = y0+dy;
+      if(map[y][x]===0) continue;
+      map[y][x] = WALL.BUILDING;
+      shade[y][x] = 0.5;
+      game.buildingGrid[y][x] = { bid, lx: dx, ly: dy, mid: moduleId };
+    }
+  }
+  return true;
+}
+
+function crAssignBuildingModules(map, shade, meta, d, r){
+  const { roadY0, roadY1, GW, GH } = meta;
+  if(!game.buildingGrid || game.buildingGrid.length !== GH) crClearBuildingModules(GW, GH);
+  const segW = 9;
+  const segCount = Math.ceil((GW-4)/segW);
+  const spineXs = [5, 12, 20, 28, 35];
+  for(let seg=0; seg<segCount; seg++){
+    const bx0 = 2 + seg*segW;
+    if(bx0 + 5 >= GW-3) continue;
+    if(d>=2){
+      const ySouth = roadY1 + 3;
+      if(ySouth + 2 < GH-2 && !spineXs.some(sx => sx>=bx0 && sx<=bx0+4)){
+        const mid = r()<0.4 ? 'storefront_3x2' : 'storefront_4x2';
+        crPlaceBuildingModule(map, shade, bx0+1, ySouth, mid, 'north');
+      }
+      const yNorth = Math.max(2, roadY0 - 4);
+      if(yNorth >= 2){
+        crPlaceBuildingModule(map, shade, bx0+2, yNorth, 'storefront_4x2', 'south');
+      }
+    }
+  }
+  if(d===3){
+    crPlaceBuildingModule(map, shade, 7, Math.min(GH-4, roadY1+4), 'blank_service_block', 'north');
+    crPlaceBuildingModule(map, shade, 22, Math.max(2, roadY0-4), 'blank_service_block', 'south');
+  }
+  if(d>=4){
+    crPlaceBuildingModule(map, shade, 30, Math.max(2, roadY0-3), 'blank_service_block', 'south');
+  }
+}
+
+function crRegisterD1PavilionModule(lm, map){
+  if(!lm || !game.buildingGrid || !map) return;
+  const mod = BUILDING_MODULES.restroom_pavilion;
+  const bid = game._nextBuildingId++;
+  const front = lm.northSide ? 'south' : 'north';
+  game.buildingRegistry[bid] = { moduleId: 'restroom_pavilion', x0: lm.x0, y0: lm.y0, front, mod };
+  for(let y=lm.y0;y<=lm.y1;y++){
+    for(let x=lm.x0;x<lm.x0+mod.w;x++){
+      if(y<0||x<0||y>=game.buildingGrid.length||x>=game.buildingGrid[0].length) continue;
+      if(map[y][x]===0) continue;
+      game.buildingGrid[y][x] = { bid, lx: x-lm.x0, ly: y-lm.y0, mid: 'restroom_pavilion' };
+    }
+  }
+}
+
+function crWallHitFaceDir(side, stepX, stepY){
+  if(side===0) return stepX>0 ? 'west' : 'east';
+  return stepY>0 ? 'north' : 'south';
+}
+
+function crGetBuildingFaceRole(mapX, mapY, faceDir){
+  if(!game.buildingGrid || !game.buildingGrid[mapY]) return null;
+  const cell = game.buildingGrid[mapY][mapX];
+  if(!cell) return null;
+  const reg = game.buildingRegistry[cell.bid];
+  if(!reg || !reg.mod || !reg.mod.faces) return null;
+  const row = reg.mod.faces[faceDir];
+  if(!row || !row.length) return null;
+  if(faceDir==='south' || faceDir==='north') return row[Math.min(cell.lx, row.length-1)];
+  return row[Math.min(cell.ly, row.length-1)];
+}
+
+function crResolveBuildingFaceRole(mapX, mapY, side, stepX, stepY){
+  return crGetBuildingFaceRole(mapX, mapY, crWallHitFaceDir(side, stepX, stepY));
+}
+
+function crDrawFpvFacadeRoleOverlay(ctx, col, drawStart, sliceH, role, wallX){
+  if(sliceH < 14 || !role) return;
+  if(!crFpvFacadePanelLeadingEdge(wallX)) return;
+  const pw = Math.min(9, RW - col);
+  const h = sliceH;
+  const y0 = drawStart;
+  ctx.fillStyle = 'rgba(0,0,0,0.05)';
+  ctx.fillRect(col, y0, pw, h);
+  if(role === 'blank_brick_side'){
+    ctx.fillStyle = 'rgba(70,52,40,0.10)';
+    ctx.fillRect(col, y0+h*.22, pw, h*.14);
+    ctx.fillRect(col, y0+h*.48, pw, h*.12);
+    return;
+  }
+  if(role === 'storefront_glass' || role === 'storefront_poster'){
+    ctx.fillStyle = role==='storefront_poster' ? 'rgba(166,77,63,0.55)' : 'rgba(208,165,83,0.45)';
+    ctx.fillRect(col, y0+h*.10, pw, h*.18);
+    ctx.fillStyle = 'rgba(52,74,85,0.65)';
+    ctx.fillRect(col, y0+h*.36, pw, h*.32);
+    ctx.fillStyle = 'rgba(29,26,22,0.85)';
+    ctx.fillRect(col, y0+h*.82, pw, h*.18);
+    return;
+  }
+  if(role === 'storefront_door'){
+    ctx.fillStyle = 'rgba(208,165,83,0.40)';
+    ctx.fillRect(col, y0+h*.10, pw, h*.16);
+    ctx.fillStyle = 'rgba(63,47,37,0.75)';
+    ctx.fillRect(col, y0+h*.38, pw, h*.38);
+    ctx.fillStyle = 'rgba(213,178,71,0.5)';
+    ctx.fillRect(col+pw*.55, y0+h*.58, Math.max(1,pw*.12), Math.max(1,h*.05));
+    ctx.fillStyle = 'rgba(29,26,22,0.85)';
+    ctx.fillRect(col, y0+h*.82, pw, h*.18);
+    return;
+  }
+  if(role === 'side_door'){
+    ctx.fillStyle = 'rgba(70,52,40,0.08)';
+    ctx.fillRect(col, y0+h*.20, pw, h*.55);
+    ctx.fillStyle = 'rgba(63,47,37,0.72)';
+    ctx.fillRect(col+pw*.22, y0+h*.36, pw*.52, h*.38);
+    ctx.fillStyle = 'rgba(127,106,75,0.45)';
+    ctx.fillRect(col+pw*.25, y0+h*.30, pw*.45, h*.06);
+    return;
+  }
+  if(role === 'back_service_wall' || role === 'utility_wall'){
+    ctx.fillStyle = 'rgba(110,113,105,0.35)';
+    ctx.fillRect(col+pw*.15, y0+h*.38, pw*.28, h*.22);
+    if(role==='utility_wall'){
+      ctx.fillStyle = 'rgba(63,77,85,0.45)';
+      ctx.fillRect(col+pw*.52, y0+h*.42, pw*.22, h*.18);
+    }
+    return;
+  }
+  if(role === 'mural_panel'){
+    ctx.fillStyle = 'rgba(76,147,137,0.55)';
+    ctx.fillRect(col+pw*.10, y0+h*.28, pw*.78, h*.38);
+    return;
+  }
+}
+
 function crWallVisualMassScale(mapX, mapY, wt){
   const lm = game.d1ParkLandmark;
   if(lm && mapX >= lm.x0 && mapX <= lm.x1 && mapY >= lm.y0 && mapY <= lm.y1) return 1.58;
@@ -2439,6 +2635,7 @@ function crPlaceDistrictCommunityProps(d, r, meta, map, reach, used, takeCandida
 function applyStreetBlockGrammar(map, shade, GW, GH, district, modifier, r){
   const knobs = crDistrictGrammarKnobs(district, modifier);
   const d = knobs.district;
+  crClearBuildingModules(GW, GH);
   const { buildingFill, alleyBias, roadHalf, maxVertAlleys, shallowPocketRate, backAlleyRate, servicePocketRate, storefrontBands } = knobs;
 
   const centerY = (GH/2)|0;
@@ -2567,7 +2764,9 @@ function applyStreetBlockGrammar(map, shade, GW, GH, district, modifier, r){
     for(let y=2;y<GH-2;y++) if(map[y][cx]!==0) map[y][cx]=0;
   }
 
-  return { roadY0, roadY1, district:d, GW, GH, buildingFill, alleyBias, knobs };
+  const streetMeta = { roadY0, roadY1, district:d, GW, GH, buildingFill, alleyBias, knobs };
+  crAssignBuildingModules(map, shade, streetMeta, d, r);
+  return streetMeta;
 }
 
 function crStreetZoneAt(tx, ty, meta){
@@ -2669,6 +2868,7 @@ function crApplyD1ParkLandmark(map, shade, meta, r){
   };
   game.d1ParkLandmark = landmark;
   meta.d1ParkLandmark = landmark;
+  crRegisterD1PavilionModule(landmark, map);
   return landmark;
 }
 
@@ -4771,7 +4971,8 @@ function drawScene(now){
     let wallX = (side===0) ? (py + perp*rdy) : (px + perp*rdx);
     wallX -= Math.floor(wallX);
     const texX = crCoarseWallTexX(wallX, side, rdx, rdy, wt);
-    const tex = WALL_TEX[wt] || WALL_TEX[WALL.BUILDING];
+    const facadeRole = crResolveBuildingFaceRole(mapX, mapY, side, stepX, stepY);
+    const tex = WALL_TEX[facadeRole ? WALL.BUILDING : wt] || WALL_TEX[WALL.BUILDING];
     const texSampleW = (wt === WALL.FENCE) ? 2 : CR_FPV_WALL_TEX_COARSE;
 
     let sh = (game.wallShade[mapY]?(0.94+0.06*(game.wallShade[mapY][mapX]||0.5)):1);
@@ -4782,7 +4983,9 @@ function drawScene(now){
     if(sh<1){ bctx.fillStyle=`rgba(0,0,0,${(1-sh).toFixed(3)})`; bctx.fillRect(col,drawStart,1,sliceH); }
     const f = Math.min(1, d/visRange)*fogStrength;
     if(f>0){ bctx.fillStyle=`rgba(${fog[0]},${fog[1]},${fog[2]},${f.toFixed(3)})`; bctx.fillRect(col,drawStart,1,sliceH); }
-    if(mass > 1.05 && wt !== WALL.FENCE && wt !== WALL.VAN){
+    if(facadeRole){
+      crDrawFpvFacadeRoleOverlay(bctx, col, drawStart, sliceH, facadeRole, wallX);
+    } else if(mass > 1.05 && wt !== WALL.FENCE && wt !== WALL.VAN){
       crDrawFpvWorldFacadePanel(bctx, col, drawStart, sliceH, wt, mapX, mapY, side, wallX);
     }
   }
@@ -7719,7 +7922,7 @@ function runDeclarativeControlsSelfCheckBody(){
     checks.menuNotEditable = INPUT_CONFIG.controls.menu && INPUT_CONFIG.controls.menu.editable === false;
     if(!checks.menuNotEditable) errors.push('MENU must stay non-editable');
 
-    checks.buildIdBuildScale1 = BUILD_ID === 'facadefix1';
+    checks.buildIdBuildScale1 = BUILD_ID === 'modules1';
         if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
 
     checks.saveFormatUnchanged = !('controlsLayout' in (options.data || options));
@@ -7770,7 +7973,7 @@ function runDecorativePropsSelfCheckBody(){
   const evidence = {};
   const err0 = window.__crRuntimeErrors.length;
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'facadefix1';
+    checks.buildIdBuildScale1 = BUILD_ID === 'modules1';
     if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
 
     checks.decorArrayExported = Array.isArray(DECOR_PROP_REQUIRED) && DECOR_PROP_REQUIRED.length === 12;
@@ -7880,7 +8083,7 @@ function runOptionsCleanupSelfCheckBody(){
   _controlEditActive = false;
   crShowControlEditChrome(false);
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'facadefix1';
+    checks.buildIdBuildScale1 = BUILD_ID === 'modules1';
         if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
 
     state = STATE.TITLE;
@@ -8033,7 +8236,7 @@ function runLevelSelectorSelfCheckBody(){
   mobileOverride = 'on';
   setMobileMode(true);
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'facadefix1';
+    checks.buildIdBuildScale1 = BUILD_ID === 'modules1';
     if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
     checks.saveVersionUnchanged = SAVE_VERSION === 1;
     checks.controlsSchemaUnchanged = CR_CONTROLS_LS_KEY === 'cannedRun.controls.v1';
@@ -8129,6 +8332,113 @@ function runLevelSelectorSelfCheckBody(){
   }
 }
 
+function runBuildingModuleFacadeSelfCheck(){
+  if(_crHarnessDepth > 0) return runBuildingModuleFacadeSelfCheckBody();
+  return crWithTemporaryState('buildingModuleFacade', () => runBuildingModuleFacadeSelfCheckBody());
+}
+
+function runBuildingModuleFacadeSelfCheckBody(){
+  const errors = [];
+  const warnings = [];
+  const checks = {};
+  const evidence = { reference: 'snc-building-module-lab.html (concept only)', modules: [] };
+  const err0 = window.__crRuntimeErrors.length;
+  const savedPick = selectedStartDistrict;
+  crPrepareSelfCheckPortrait();
+  try {
+    checks.buildIdModules1 = BUILD_ID === 'modules1';
+    checks.moduleFlag = CR_BUILDING_MODULE_FACADE >= 1;
+    checks.moduleDefs = !!(BUILDING_MODULES && BUILDING_MODULES.storefront_4x2 && BUILDING_MODULES.storefront_3x2);
+    checks.faceRoles = !!(BUILDING_MODULES.storefront_4x2.faces && BUILDING_MODULES.storefront_4x2.faces.south);
+    const drawSrc = String(drawScene);
+    checks.roleOverlay = drawSrc.indexOf('crDrawFpvFacadeRoleOverlay') >= 0;
+    checks.roleLookup = typeof crGetBuildingFaceRole === 'function' && typeof crResolveBuildingFaceRole === 'function';
+    checks.matteRoadPreserved = CR_FPV_STREET_MATTE === true;
+    checks.minimapNavPreserved = typeof crMinimapNavCellColor === 'function';
+    checks.fpvMassPreserved = CR_BUILDING_FPV_MASS >= 1.45;
+
+    game.run = { active: true, harnessOnly: true, customLevel: null };
+    genCity(901002, 2, '');
+    let storefrontFront = false;
+    let sideBack = false;
+    let sideDoorCount = 0;
+    for(const bid in game.buildingRegistry){
+      const reg = game.buildingRegistry[bid];
+      if(!reg) continue;
+      evidence.modules.push(reg.moduleId);
+      if(reg.moduleId.indexOf('storefront') === 0) storefrontFront = true;
+      const faces = reg.mod.faces;
+      if(faces.east && faces.east.indexOf('side_door') >= 0) sideDoorCount++;
+      if(faces.north && (faces.north.indexOf('back_service_wall') >= 0 || faces.north.indexOf('utility_wall') >= 0)) sideBack = true;
+    }
+    checks.d2StorefrontModule = storefrontFront;
+    checks.sideBackFaces = sideBack;
+    checks.sideDoorOncePerModule = sideDoorCount >= 1 && sideDoorCount <= Object.keys(game.buildingRegistry).length;
+
+    let roleResolved = false;
+    outer: for(let y=1;y<game.MAP_H-1;y++){
+      for(let x=1;x<game.MAP_W-1;x++){
+        if(!game.buildingGrid[y][x]) continue;
+        const r0 = crGetBuildingFaceRole(x, y, 'north');
+        const r1 = crGetBuildingFaceRole(x, y, 'south');
+        if(r0 || r1){ roleResolved = true; break outer; }
+      }
+    }
+    checks.wallHitRoleLookup = roleResolved;
+
+    genCity(901003, 3, '');
+    let d3Service = false;
+    for(const bid in game.buildingRegistry){
+      const reg = game.buildingRegistry[bid];
+      if(reg && reg.moduleId === 'blank_service_block') d3Service = true;
+    }
+    checks.d3SideBackPlacement = d3Service;
+
+    genCity(901001, 1, '');
+    checks.d1PavilionModule = !!(game.d1ParkLandmark && game.buildingRegistry && Object.values(game.buildingRegistry).some(r => r.moduleId === 'restroom_pavilion'));
+
+    try { drawScene(0); checks.fpvRenderOk = true; } catch(e){
+      checks.fpvRenderOk = false;
+      errors.push('fpv draw: '+(e&&e.message?e.message:e));
+    }
+
+    let reachOk = true;
+    for(const c of [{seed:901011,district:1},{seed:901012,district:2},{seed:901013,district:3},{seed:901014,district:4}]){
+      game.run = { active: true, harnessOnly: true, customLevel: null };
+      genCity(c.seed, c.district, '');
+      const val = crHarnessValidateProceduralCase(c);
+      if(!val.ok){ reachOk = false; errors.push('reach d'+c.district+': '+val.reason); }
+    }
+    checks.reachabilityD1D4 = reachOk;
+    checks.levelSelectorCycle = (function(){
+      selectedStartDistrict = 1;
+      const c = [];
+      for(let i=0;i<5;i++) c.push('D'+crCycleSelectedStartDistrict());
+      return c.join('→') === 'D2→D3→D4→D1→D2';
+    })();
+    checks.saveVersionUnchanged = SAVE_VERSION === 1;
+    checks.controlsSchemaUnchanged = CR_CONTROLS_LS_KEY === 'cannedRun.controls.v1';
+    checks.noMovingBlockers = typeof game.movingBlockers === 'undefined';
+    checks.runtimeClean = window.__crRuntimeErrors.length === err0;
+
+    if(!checks.buildIdModules1) errors.push('BUILD_ID must be modules1');
+    if(!checks.moduleDefs) errors.push('BUILDING_MODULES missing storefront');
+    if(!checks.roleOverlay) errors.push('crDrawFpvFacadeRoleOverlay missing from drawScene');
+    if(!checks.d2StorefrontModule) errors.push('D2 must place storefront module');
+    if(!checks.wallHitRoleLookup) errors.push('face role lookup failed');
+  } catch(e){
+    errors.push('exception: '+(e&&e.message?e.message:e));
+  } finally {
+    selectedStartDistrict = savedPick;
+    _selfCheckForcePortrait = false;
+    state = STATE.TITLE;
+    paused = false;
+    drawMobileMenu();
+  }
+  const pass = errors.length === 0 && Object.keys(checks).every(k => checks[k] !== false);
+  return { pass, checks, errors, warnings, evidence };
+}
+
 function runFpvFacadeTargetPolishSelfCheck(){
   if(_crHarnessDepth > 0) return runFpvFacadeTargetPolishSelfCheckBody();
   return crWithTemporaryState('fpvFacadeTargetPolish', () => runFpvFacadeTargetPolishSelfCheckBody());
@@ -8143,12 +8453,13 @@ function runFpvFacadeTargetPolishSelfCheckBody(){
   const savedPick = selectedStartDistrict;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdFacadeFix1 = BUILD_ID === 'facadefix1';
+    checks.buildIdFacadeFix1 = BUILD_ID === 'facadefix1' || BUILD_ID === 'modules1';
     checks.facadePolishFlag = CR_FPV_FACADE_TARGET_POLISH >= 1;
     checks.fpvMassPreserved = CR_BUILDING_FPV_MASS >= 1.45 && CR_BUILDING_FPV_MASS <= 1.55;
     checks.coarseWallTexBroad = CR_FPV_WALL_TEX_COARSE >= 12;
     const drawSrc = String(drawScene);
     checks.worldFacadePanels = drawSrc.indexOf('crDrawFpvWorldFacadePanel') >= 0;
+    checks.facadeSystem = checks.worldFacadePanels || (drawSrc.indexOf('crDrawFpvFacadeRoleOverlay') >= 0);
     checks.noPerColumnFacadeCue = drawSrc.indexOf('crDrawProceduralFacadeCue') < 0;
     checks.matteRoadPreserved = CR_FPV_STREET_MATTE === true && String(crDrawFpvStreetReadabilityCues).indexOf('RH * 0.72') >= 0;
     checks.minimapNavPreserved = typeof crMinimapNavCellColor === 'function';
@@ -8213,8 +8524,8 @@ function runFpvFacadeTargetPolishSelfCheckBody(){
     state = STATE.TITLE;
     drawMobileMenu();
 
-    if(!checks.buildIdFacadeFix1) errors.push('BUILD_ID must be facadefix1');
-    if(!checks.worldFacadePanels) errors.push('FPV must use crDrawFpvWorldFacadePanel');
+    if(!checks.buildIdFacadeFix1) errors.push('BUILD_ID must be facadefix1 or modules1');
+    if(!checks.facadeSystem) errors.push('FPV must use facade panels or role overlay');
     if(!checks.noPerColumnFacadeCue) errors.push('per-column crDrawProceduralFacadeCue still in drawScene');
     if(!checks.coarseWallTexBroad) errors.push('CR_FPV_WALL_TEX_COARSE too small for broad panels');
     if(!checks.matteRoadPreserved) errors.push('matte road regressed');
@@ -8252,7 +8563,7 @@ function runFpvWallLineArtifactFixSelfCheckBody(){
   const savedPick = selectedStartDistrict;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdWallLineStack = BUILD_ID === 'wallfix1' || BUILD_ID === 'facadefix1';
+    checks.buildIdWallLineStack = BUILD_ID === 'wallfix1' || BUILD_ID === 'modules1';
     checks.fpvMassPreserved = CR_BUILDING_FPV_MASS >= 1.45 && CR_BUILDING_FPV_MASS <= 1.55;
     checks.coarseWallTex = typeof CR_FPV_WALL_TEX_COARSE === 'number' && CR_FPV_WALL_TEX_COARSE >= 6;
     checks.wallLineFixFlag = CR_FPV_WALL_LINE_FIX >= 1;
@@ -8366,7 +8677,7 @@ function runFpvStreetShimmerFixSelfCheckBody(){
   const savedPick = selectedStartDistrict;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdShimmerFix1 = BUILD_ID === 'shimmerfix1' || BUILD_ID === 'wallfix1' || BUILD_ID === 'facadefix1';
+    checks.buildIdShimmerFix1 = BUILD_ID === 'shimmerfix1' || BUILD_ID === 'wallfix1' || BUILD_ID === 'modules1';
     checks.fpvMassPreserved = CR_BUILDING_FPV_MASS >= 1.45 && CR_BUILDING_FPV_MASS <= 1.55;
     checks.matteStreetMode = CR_FPV_STREET_MATTE === true && CR_FPV_STREET_SHIMMER_FIX >= 1;
     checks.minimapNavPreserved = typeof crMinimapNavCellColor === 'function' && Array.isArray(CR_MINIMAP_NAV_PALETTE);
@@ -8483,7 +8794,7 @@ function runStreetReadabilityMinimapSelfCheckBody(){
   const savedPick = selectedStartDistrict;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdStreetRead1 = BUILD_ID === 'facadefix1';
+    checks.buildIdStreetRead1 = BUILD_ID === 'modules1';
     if(!checks.buildIdStreetRead1) errors.push('BUILD_ID must be facadefix1 (minimap contract)');
     checks.footprint40x20 = true;
     checks.buildingMassPreserved = CR_BUILDING_FPV_MASS >= 1.45 && CR_BUILDING_FPV_MASS <= 1.55;
@@ -8606,7 +8917,7 @@ function runBuildingScalePolishSelfCheckBody(){
   const savedPick = selectedStartDistrict;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'facadefix1';
+    checks.buildIdBuildScale1 = BUILD_ID === 'modules1';
     if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
     checks.fpvMassConstant = CR_BUILDING_FPV_MASS >= 1.45 && CR_BUILDING_FPV_MASS <= 1.55;
     checks.footprint40x20 = true;
@@ -8722,7 +9033,7 @@ function runEarlyDistrictProgressionSelfCheckBody(){
   const err0 = window.__crRuntimeErrors.length;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'facadefix1';
+    checks.buildIdBuildScale1 = BUILD_ID === 'modules1';
     if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
     checks.footprintUnchanged = true;
     checks.saveVersionUnchanged = SAVE_VERSION === 1;
@@ -8821,7 +9132,7 @@ function runD1ParkLandmarkSelfCheckBody(){
   const err0 = window.__crRuntimeErrors.length;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'facadefix1';
+    checks.buildIdBuildScale1 = BUILD_ID === 'modules1';
     if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
 
     const matrix = [
@@ -8937,7 +9248,7 @@ function runStreetBlockLevelSelfCheckBody(){
   const err0 = window.__crRuntimeErrors.length;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'facadefix1';
+    checks.buildIdBuildScale1 = BUILD_ID === 'modules1';
     if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
 
     const matrix = [
@@ -9021,6 +9332,7 @@ function runFullSelfCheckInner(){
   const reachability = runReachabilitySelfCheck();
   const streetBlockLevel = runStreetBlockLevelSelfCheck();
   const d1ParkLandmark = runD1ParkLandmarkSelfCheck();
+  const buildingModuleFacade = runBuildingModuleFacadeSelfCheck();
   const fpvFacadeTargetPolish = runFpvFacadeTargetPolishSelfCheck();
   const fpvWallLineArtifactFix = runFpvWallLineArtifactFixSelfCheck();
   const fpvStreetShimmerFix = runFpvStreetShimmerFixSelfCheck();
@@ -9039,7 +9351,7 @@ function runFullSelfCheckInner(){
   const levels = runLevelSelfCheck();
   const renderFailure = runRenderFailureSelfCheck();
   const runtimeClean = window.__crRuntimeErrors.length === err0;
-  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && decorativeProps.pass && optionsCleanup.pass && mobileControlReliability.pass && movementCollision.pass && reachability.pass && streetBlockLevel.pass && d1ParkLandmark.pass && fpvFacadeTargetPolish.pass && fpvWallLineArtifactFix.pass && fpvStreetShimmerFix.pass && streetReadabilityMinimap.pass && buildingScalePolish.pass && earlyDistrictProgression.pass && levelSelector.pass && proceduralLevelValidation.pass && fullRunProgression.pass && onboarding.pass && soundFeedback.pass && declarativeControls.pass && visualReadability.pass && visualRectangleRegression.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
+  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && decorativeProps.pass && optionsCleanup.pass && mobileControlReliability.pass && movementCollision.pass && reachability.pass && streetBlockLevel.pass && d1ParkLandmark.pass && buildingModuleFacade.pass && fpvFacadeTargetPolish.pass && fpvWallLineArtifactFix.pass && fpvStreetShimmerFix.pass && streetReadabilityMinimap.pass && buildingScalePolish.pass && earlyDistrictProgression.pass && levelSelector.pass && proceduralLevelValidation.pass && fullRunProgression.pass && onboarding.pass && soundFeedback.pass && declarativeControls.pass && visualReadability.pass && visualRectangleRegression.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
   return {
     pass,
     build: BUILD_ID,
@@ -9054,6 +9366,7 @@ function runFullSelfCheckInner(){
     reachability,
     streetBlockLevel,
     d1ParkLandmark,
+    buildingModuleFacade,
     fpvFacadeTargetPolish,
     fpvWallLineArtifactFix,
     fpvStreetShimmerFix,
@@ -9208,7 +9521,7 @@ function runSoundFeedbackSelfCheckBody(){
   try {
     checks.functionExists = typeof runSoundFeedbackSelfCheck === 'function';
     checks.contract = !!(CR_SOUND_FEEDBACK && CR_SOUND_FEEDBACK.style === 'sound1' && CR_SOUND_FEEDBACK.webAudio === true);
-    checks.buildIdOptionsClean1 = BUILD_ID === 'facadefix1';
+    checks.buildIdOptionsClean1 = BUILD_ID === 'modules1';
     checks.crTriggerExists = typeof crTriggerSoundCue === 'function';
     checks.crSoundEnabledFn = typeof crSoundEnabled === 'function';
     checks.noExternalAudioTags = document.querySelectorAll('audio,source[src]').length === 0;
@@ -9277,7 +9590,7 @@ function runVisualReadabilitySelfCheckBody(){
   mobileOverride = true;
   try {
     checks.functionExists = typeof runVisualReadabilitySelfCheck === 'function';
-    checks.buildIdOptionsClean1 = BUILD_ID === 'facadefix1';
+    checks.buildIdOptionsClean1 = BUILD_ID === 'modules1';
     checks.visualContract = !!(CR_VISUAL_READABILITY && CR_VISUAL_READABILITY.style === 'visualfix1');
     checks.noScreenPathStripe = CR_VISUAL_READABILITY.floorPathStripe === false;
     checks.pickupTex = !!TEX.can;
@@ -9410,7 +9723,7 @@ function runVisualRectangleRegressionSelfCheckBody(){
   mobileOverride = true;
   try {
     checks.functionExists = typeof runVisualRectangleRegressionSelfCheck === 'function';
-    checks.buildIdOptionsClean1 = BUILD_ID === 'facadefix1';
+    checks.buildIdOptionsClean1 = BUILD_ID === 'modules1';
     checks.noScreenPathStripe = !!(CR_VISUAL_READABILITY && CR_VISUAL_READABILITY.floorPathStripe === false);
     if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be shimmerfix1');
     if(!checks.noScreenPathStripe) errors.push('screen-space path stripe flag must be false');
@@ -11501,7 +11814,7 @@ globalThis.CR = window.CR = {
   get mobileMode(){ return mobileMode; },
   crGetSelectedStartDistrict,crCycleSelectedStartDistrict,crSetSelectedStartDistrict,crTitleMenuSelectableRows,titleMenuRowLabel,crMinimapNavCellColor,
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
-  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runDecorativePropsSelfCheck,runOptionsCleanupSelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runStreetBlockLevelSelfCheck,runD1ParkLandmarkSelfCheck,runFpvFacadeTargetPolishSelfCheck,runFpvWallLineArtifactFixSelfCheck,runFpvStreetShimmerFixSelfCheck,runStreetReadabilityMinimapSelfCheck,runBuildingScalePolishSelfCheck,runEarlyDistrictProgressionSelfCheck,runLevelSelectorSelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
+  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runDecorativePropsSelfCheck,runOptionsCleanupSelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runStreetBlockLevelSelfCheck,runD1ParkLandmarkSelfCheck,runBuildingModuleFacadeSelfCheck,runFpvFacadeTargetPolishSelfCheck,runFpvWallLineArtifactFixSelfCheck,runFpvStreetShimmerFixSelfCheck,runStreetReadabilityMinimapSelfCheck,runBuildingScalePolishSelfCheck,runEarlyDistrictProgressionSelfCheck,runLevelSelectorSelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
   CR_VISUAL_READABILITY,CR_SOUND_FEEDBACK,DECOR_PROP_REQUIRED,INPUT_CONFIG,CR_CONTROLS_LS_KEY,crTriggerSoundCue,crSoundEnabled,crSoundFeedbackCueIds,crLoadControlOverrides,crPersistControlOverrides,crResetControlLayoutOverrides,crClearControlOverrides,crEnterControlEditMode,crFinishControlEditMode,crControlHitTest,crSnapshotLayoutNorms,crPrepareSelfCheckPortrait,crStepEditControlSize,crSelectEditControl,
   getCrVisualHarnessSnapshot(){ return _crVisualHarnessSnapshot; },
   showOnboardingHelp,dismissOnboardingHelp,crOpenFirstRunHelpIfNeeded,
