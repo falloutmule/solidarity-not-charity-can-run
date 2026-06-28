@@ -5,8 +5,8 @@
 **Previous baseline:** `facadepack1` / `0a8d34f`  
 **Lab reference commit:** `af37c54` (`snc-building-module-lab-v2.html`)  
 **BUILD_ID:** `facadev2safe1`  
-**Gameplay commit:** `4c0c4c0`  
-**Previous baseline:** `facadepack1` / `0a8d34f`
+**Gameplay commit:** `4c0c4c0`
+
 ## Modules imported
 
 - `garage_service_4x2`

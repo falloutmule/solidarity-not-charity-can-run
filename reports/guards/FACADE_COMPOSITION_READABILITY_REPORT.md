@@ -1,7 +1,9 @@
 # Facade composition / module readability report
 
 **BUILD_ID:** `facadecompose1`  
-**Gameplay commit:** `58ca4c3`
+**Previous gameplay baseline:** `facadev2safe1` / `4c0c4c0`  
+**Gameplay commit:** `58ca4c3`  
+**Backup:** `index.before-facade-composition-readability.html`
 
 ## What caused the conflicted look
 

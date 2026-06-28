@@ -1499,6 +1499,96 @@ async function facadePackV2SafeSection(page) {
   return { pass: v2.pass === true, facadePackV2Safe: v2 };
 }
 
+async function facadeArtVocabularySection(page) {
+  const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await waitGameReady(page);
+
+  const av = await page.evaluate(() => CR.runFacadeArtVocabularySelfCheck());
+  writeProof('proof-facade-art-vocabulary.json', av);
+
+  const roleDebug = await page.evaluate(() => {
+    CR.crSetSelectedStartDistrict(2);
+    CR.startRun(904201);
+    CR.state = CR.STATE.PLAY;
+    let storefront = null;
+    for (let y = 1; y < CR.game.MAP_H - 1 && !storefront; y++) {
+      for (let x = 1; x < CR.game.MAP_W - 1 && !storefront; x++) {
+        if (!CR.game.buildingGrid[y][x]) continue;
+        const mid = CR.game.buildingGrid[y][x].mid;
+        if (mid !== 'storefront_4x2' && mid !== 'storefront_3x2') continue;
+        storefront = CR.crDebugDescribeFacadeHit(x, y, 'south');
+      }
+    }
+    let boarded = null;
+    for (let y = 1; y < CR.game.MAP_H - 1 && !boarded; y++) {
+      for (let x = 1; x < CR.game.MAP_W - 1 && !boarded; x++) {
+        if (!CR.game.buildingGrid[y][x] || CR.game.buildingGrid[y][x].mid !== 'boarded_shop_3x2') continue;
+        boarded = CR.crDebugDescribeFacadeHit(x, y, 'south');
+      }
+    }
+    CR.crSetSelectedStartDistrict(3);
+    CR.startRun(904203);
+    CR.state = CR.STATE.PLAY;
+    let garage = null;
+    for (let y = 1; y < CR.game.MAP_H - 1 && !garage; y++) {
+      for (let x = 1; x < CR.game.MAP_W - 1 && !garage; x++) {
+        if (!CR.game.buildingGrid[y][x] || CR.game.buildingGrid[y][x].mid !== 'garage_service_4x2') continue;
+        garage = CR.crDebugDescribeFacadeHit(x, y, 'south');
+      }
+    }
+    let side = null;
+    for (let y = 1; y < CR.game.MAP_H - 1 && !side; y++) {
+      for (let x = 1; x < CR.game.MAP_W - 1 && !side; x++) {
+        if (!CR.game.buildingGrid[y][x]) continue;
+        side = CR.crDebugDescribeFacadeHit(x, y, 'east');
+        if (side.role) break;
+      }
+    }
+    return {
+      BUILD_ID: CR.BUILD_ID,
+      packVersion: CR_FACADE_PACK && CR_FACADE_PACK.version,
+      moduleList: Object.keys(CR_FACADE_PACK.modules || {}),
+      roleList: Object.keys(CR_FACADE_PACK.roles || {}),
+      storefront,
+      boarded,
+      garage,
+      side,
+    };
+  });
+  writeProof('proof-facadeart-role-debug.json', roleDebug);
+
+  const shots = [
+    { d: 1, seed: 904101, file: 'proof-facadeart-d1-identity.png', angle: 0 },
+    { d: 2, seed: 904201, file: 'proof-facadeart-d2-storefront-human-scale.png', angle: Math.PI / 2 },
+    { d: 2, seed: 904202, file: 'proof-facadeart-d2-boarded-shop-human-scale.png', angle: Math.PI * 0.45 },
+    { d: 3, seed: 904203, file: 'proof-facadeart-d3-garage-service-human-scale.png', angle: Math.PI / 2 },
+    { d: 3, seed: 904204, file: 'proof-facadeart-d3-side-back-quiet.png', angle: Math.PI * 0.82 },
+  ];
+  for (const s of shots) {
+    await page.evaluate(({ d, seed, angle }) => {
+      CR.crSetSelectedStartDistrict(d);
+      CR.startRun(seed);
+      CR.state = CR.STATE.PLAY;
+      CR.paused = false;
+      if (typeof CR.player !== 'undefined') CR.player.angle = angle;
+    }, s);
+    await page.waitForTimeout(220);
+    await page.screenshot({ path: path.join(ROOT, s.file) });
+  }
+  await page.evaluate(() => {
+    CR.crSetSelectedStartDistrict(2);
+    CR.startRun(904201);
+    CR.state = CR.STATE.PLAY;
+    CR.paused = false;
+  });
+  await page.waitForTimeout(80);
+  await page.screenshot({ path: path.join(ROOT, 'proof-facadeart-minimap-preserved.png') });
+
+  return { pass: av.pass === true, facadeArtVocabulary: av };
+}
+
 async function facadeCompositionReadabilitySection(page) {
   const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
   await page.setViewportSize({ width: 412, height: 915 });
@@ -2094,6 +2184,7 @@ async function main() {
   const buildingModuleFacade = await buildingModuleFacadeSection(page);
   const facadePackBridge = await facadePackBridgeSection(page);
   const facadePackV2Safe = await facadePackV2SafeSection(page);
+  const facadeArtVocabulary = await facadeArtVocabularySection(page);
   const facadeCompositionReadability = await facadeCompositionReadabilitySection(page);
   const fpvFacadeTargetPolish = await fpvFacadeTargetPolishSection(page);
   const fpvWallLineArtifactFix = await fpvWallLineArtifactFixSection(page);
@@ -2154,6 +2245,7 @@ async function main() {
     buildingModuleFacade.pass &&
     facadePackBridge.pass &&
     facadePackV2Safe.pass &&
+    facadeArtVocabulary.pass &&
     facadeCompositionReadability.pass &&
     fpvFacadeTargetPolish.pass &&
     fpvWallLineArtifactFix.pass &&
@@ -2213,6 +2305,7 @@ async function main() {
     buildingModuleFacade,
     facadePackBridge,
     facadePackV2Safe,
+    facadeArtVocabulary,
     facadeCompositionReadability,
     fpvFacadeTargetPolish,
     fpvWallLineArtifactFix,

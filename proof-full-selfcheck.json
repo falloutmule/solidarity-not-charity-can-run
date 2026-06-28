@@ -1,9 +1,9 @@
 {
   "pass": true,
-  "build": "facadecompose1",
+  "build": "facadeart1",
   "layout": {
     "pass": true,
-    "build": "facadecompose1",
+    "build": "facadeart1",
     "errors": [],
     "warnings": [
       "intentional SPRINT/LOOK overlap"
@@ -125,7 +125,7 @@
   },
   "viewportSafeArea": {
     "pass": true,
-    "build": "facadecompose1",
+    "build": "facadeart1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -199,7 +199,7 @@
       "left": 0
     },
     "viewport": {
-      "BUILD_ID": "facadecompose1",
+      "BUILD_ID": "facadeart1",
       "inner": {
         "w": 390,
         "h": 844
@@ -243,11 +243,11 @@
       "cw": 390,
       "ch": 844
     },
-    "timestamp": "2026-06-28T17:25:50.893Z"
+    "timestamp": "2026-06-28T17:57:29.745Z"
   },
   "portraitUsability": {
     "pass": true,
-    "build": "facadecompose1",
+    "build": "facadeart1",
     "errors": [],
     "warnings": [],
     "thresholds": {
@@ -371,7 +371,7 @@
   },
   "settingsSafety": {
     "pass": true,
-    "build": "facadecompose1",
+    "build": "facadeart1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -392,7 +392,7 @@
   },
   "decorativeProps": {
     "pass": true,
-    "build": "facadecompose1",
+    "build": "facadeart1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -433,7 +433,7 @@
   },
   "optionsCleanup": {
     "pass": true,
-    "build": "facadecompose1",
+    "build": "facadeart1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -461,12 +461,12 @@
       "lsKeyUnchanged": true
     },
     "evidence": {
-      "htmlSample": "\n      <div class=\"options-scroll-body\">\n      <div class=\"rpantit\">OPTIONS</div>\n      <div class=\"rdesc\" style=\"margin-bottom:8px;color:#6a5a4a;\">build facadecompose1</div>\n      <div class=\"options-section-hdr\">CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-edit-controls\">EDIT CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-reset-controls\">RESET CONTROLS</div>\n      <div cl"
+      "htmlSample": "\n      <div class=\"options-scroll-body\">\n      <div class=\"rpantit\">OPTIONS</div>\n      <div class=\"rdesc\" style=\"margin-bottom:8px;color:#6a5a4a;\">build facadeart1</div>\n      <div class=\"options-section-hdr\">CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-edit-controls\">EDIT CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-reset-controls\">RESET CONTROLS</div>\n      <div class="
     }
   },
   "mobileControlReliability": {
     "pass": true,
-    "build": "facadecompose1",
+    "build": "facadeart1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -488,7 +488,7 @@
         "joyActive": false
       },
       "sprint": {
-        "burstUntil": 1.5598000000715255,
+        "burstUntil": 1.5620999999046326,
         "stamBefore": 60,
         "stamAfter": 40
       },
@@ -501,7 +501,7 @@
   },
   "movementCollision": {
     "pass": true,
-    "build": "facadecompose1",
+    "build": "facadeart1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -562,7 +562,7 @@
   },
   "reachability": {
     "pass": true,
-    "build": "facadecompose1",
+    "build": "facadeart1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -590,7 +590,7 @@
   },
   "streetBlockLevel": {
     "pass": true,
-    "build": "facadecompose1",
+    "build": "facadeart1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -717,7 +717,7 @@
   },
   "d1ParkLandmark": {
     "pass": true,
-    "build": "facadecompose1",
+    "build": "facadeart1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -998,7 +998,7 @@
       "levelSelector": true
     },
     "evidence": {
-      "packVersion": "facadecompose1",
+      "packVersion": "facadeart1",
       "moduleNames": [
         "storefront_4x2",
         "storefront_3x2",
@@ -1081,7 +1081,7 @@
       "reachD3": true
     },
     "evidence": {
-      "packVersion": "facadecompose1",
+      "packVersion": "facadeart1",
       "moduleList": [
         "storefront_4x2",
         "storefront_3x2",
@@ -1155,7 +1155,125 @@
     },
     "errors": [],
     "warnings": [],
-    "build": "facadecompose1"
+    "build": "facadeart1"
+  },
+  "facadeArtVocabulary": {
+    "pass": true,
+    "checks": {
+      "buildId": true,
+      "packExists": true,
+      "packVersion": true,
+      "packMarkers": true,
+      "sixModules": true,
+      "labOnlyNotImported": true,
+      "composedRenderer": true,
+      "artVocabularyFlag": true,
+      "artInsetHelpers": true,
+      "insetWindowsNotSlabs": true,
+      "doorShapedObjects": true,
+      "boardsInsideWindowBox": true,
+      "framedGarageBay": true,
+      "quietSideWalls": true,
+      "noCombLeadingEdge": true,
+      "debugHelper": true,
+      "matteRoad": true,
+      "minimapNav": true,
+      "fpvMass": true,
+      "saveVersion": true,
+      "d1Identity": true,
+      "d2HasStorefront": true,
+      "d2HasBoarded": true,
+      "d3HasGarage": true,
+      "storefrontHit": true,
+      "boardedHit": true,
+      "garageHit": true,
+      "sideHit": true,
+      "fpvRenderOk": true,
+      "reachD1D4": true,
+      "levelSelector": true
+    },
+    "evidence": {
+      "storefrontHit": {
+        "buildingId": 1,
+        "moduleId": "storefront_4x2",
+        "localX": 0,
+        "localY": 0,
+        "faceDirection": "south",
+        "role": "storefront_window",
+        "material": "brick",
+        "slots": [
+          "sign_band",
+          "glass_window",
+          "dark_base"
+        ]
+      },
+      "boardedHit": {
+        "buildingId": 6,
+        "moduleId": "boarded_shop_3x2",
+        "localX": 0,
+        "localY": 0,
+        "faceDirection": "south",
+        "role": "boarded_window",
+        "material": "brick",
+        "slots": [
+          "sign_band",
+          "boarded_window",
+          "dark_base"
+        ]
+      },
+      "garageHit": {
+        "buildingId": 5,
+        "moduleId": "garage_service_4x2",
+        "localX": 0,
+        "localY": 0,
+        "faceDirection": "south",
+        "role": "garage_bay",
+        "material": "concrete",
+        "slots": [
+          "garage_door",
+          "dark_base"
+        ]
+      },
+      "sideHit": {
+        "buildingId": 7,
+        "moduleId": "blank_service_block",
+        "localX": 1,
+        "localY": 0,
+        "faceDirection": "east",
+        "role": "blank_brick",
+        "material": "brick",
+        "slots": [
+          "soft_brick_bands"
+        ]
+      },
+      "d1Modules": [
+        "restroom_pavilion"
+      ],
+      "moduleNames": [
+        "storefront_4x2",
+        "storefront_3x2",
+        "restroom_pavilion",
+        "blank_service_block",
+        "garage_service_4x2",
+        "boarded_shop_3x2"
+      ],
+      "roleNames": [
+        "storefront_window",
+        "storefront_door",
+        "storefront_sign",
+        "blank_brick",
+        "side_door",
+        "service_wall",
+        "mural_wall",
+        "utility_wall",
+        "blank_concrete",
+        "garage_bay",
+        "service_door",
+        "boarded_window"
+      ]
+    },
+    "errors": [],
+    "warnings": []
   },
   "facadeCompositionReadability": {
     "pass": true,
@@ -1250,11 +1368,11 @@
     },
     "errors": [],
     "warnings": [],
-    "build": "facadecompose1"
+    "build": "facadeart1"
   },
   "fpvFacadeTargetPolish": {
     "pass": true,
-    "build": "facadecompose1",
+    "build": "facadeart1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -1302,7 +1420,7 @@
   },
   "fpvWallLineArtifactFix": {
     "pass": true,
-    "build": "facadecompose1",
+    "build": "facadeart1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -1359,7 +1477,7 @@
   },
   "fpvStreetShimmerFix": {
     "pass": true,
-    "build": "facadecompose1",
+    "build": "facadeart1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -1421,7 +1539,7 @@
   },
   "streetReadabilityMinimap": {
     "pass": true,
-    "build": "facadecompose1",
+    "build": "facadeart1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -1557,7 +1675,7 @@
   },
   "buildingScalePolish": {
     "pass": true,
-    "build": "facadecompose1",
+    "build": "facadeart1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -1679,7 +1797,7 @@
   },
   "earlyDistrictProgression": {
     "pass": true,
-    "build": "facadecompose1",
+    "build": "facadeart1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -1828,7 +1946,7 @@
   },
   "levelSelector": {
     "pass": true,
-    "build": "facadecompose1",
+    "build": "facadeart1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -1959,7 +2077,7 @@
   },
   "proceduralLevelValidation": {
     "pass": true,
-    "build": "facadecompose1",
+    "build": "facadeart1",
     "seedCount": 52,
     "districtCount": 3,
     "errors": [],
@@ -1985,11 +2103,11 @@
       "harnessStateRestored": true
     },
     "cases": 52,
-    "timestamp": "2026-06-28T17:26:04.955Z"
+    "timestamp": "2026-06-28T17:57:44.394Z"
   },
   "fullRunProgression": {
     "pass": true,
-    "build": "facadecompose1",
+    "build": "facadeart1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -2041,11 +2159,11 @@
     },
     "hallPass": true,
     "mobilePass": true,
-    "timestamp": "2026-06-28T17:26:05.165Z"
+    "timestamp": "2026-06-28T17:57:44.602Z"
   },
   "onboarding": {
     "pass": true,
-    "build": "facadecompose1",
+    "build": "facadeart1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -2075,7 +2193,7 @@
   },
   "soundFeedback": {
     "pass": true,
-    "build": "facadecompose1",
+    "build": "facadeart1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -2152,7 +2270,7 @@
         }
       },
       "audioProof": {
-        "BUILD_ID": "facadecompose1",
+        "BUILD_ID": "facadeart1",
         "gateBound": true,
         "unlockAttempted": false,
         "hasContext": true,
@@ -2170,7 +2288,7 @@
   },
   "declarativeControls": {
     "pass": true,
-    "build": "facadecompose1",
+    "build": "facadeart1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -2252,7 +2370,7 @@
   },
   "visualReadability": {
     "pass": true,
-    "build": "facadecompose1",
+    "build": "facadeart1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -2285,9 +2403,9 @@
         "giveReady": false
       },
       "hallStats": {
-        "mean": 113.65176334388713,
-        "brightRatio": 0.16025,
-        "variance": 4325.8863260843555,
+        "mean": 113.21378687513658,
+        "brightRatio": 0.16046875,
+        "variance": 4305.833636526861,
         "count": 64000
       },
       "exitReadySnapshot": {
@@ -2323,7 +2441,7 @@
   },
   "visualRectangleRegression": {
     "pass": true,
-    "build": "facadecompose1",
+    "build": "facadeart1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -2356,9 +2474,9 @@
             "count": 2960
           },
           "sideR": {
-            "mean": 50.128999999998975,
+            "mean": 50.12693817567465,
             "brightRatio": 0,
-            "variance": 246.84036763648524,
+            "variance": 246.4627541904381,
             "count": 2960
           },
           "roi": {
@@ -2371,21 +2489,21 @@
         },
         "probe1": {
           "center": {
-            "mean": 117.35270766468953,
+            "mean": 118.38106302786781,
             "brightRatio": 0,
-            "variance": 1432.2286757153067,
+            "variance": 1467.4921337590636,
             "count": 9472
           },
           "sideL": {
-            "mean": 90.7048381756787,
+            "mean": 90.90822229730038,
             "brightRatio": 0,
-            "variance": 2304.6665596660687,
+            "variance": 2324.278295088357,
             "count": 2960
           },
           "sideR": {
-            "mean": 133.3421547297212,
+            "mean": 133.55818547296425,
             "brightRatio": 0,
-            "variance": 31.11738576254459,
+            "variance": 18.882150398370193,
             "count": 2960
           },
           "roi": {
@@ -2398,21 +2516,21 @@
         },
         "probe2": {
           "center": {
-            "mean": 117.82220682009331,
+            "mean": 118.56895396959142,
             "brightRatio": 0,
-            "variance": 1408.812030313525,
+            "variance": 1432.5845136667888,
             "count": 9472
           },
           "sideL": {
-            "mean": 135.58907499999077,
+            "mean": 138.76806891890874,
             "brightRatio": 0,
-            "variance": 11.944012065996894,
+            "variance": 2.4712619857906617,
             "count": 2960
           },
           "sideR": {
-            "mean": 91.13426587838131,
+            "mean": 91.56088750000298,
             "brightRatio": 0,
-            "variance": 2324.5393781972016,
+            "variance": 2363.7562747802394,
             "count": 2960
           },
           "roi": {
@@ -2423,8 +2541,8 @@
           },
           "angle": 3.9269908169872414
         },
-        "meanSpread": 69.43328188343224,
-        "pairDiff01": 68.96378272802846,
+        "meanSpread": 70.18002903293035,
+        "pairDiff01": 69.99213809120675,
         "stuckBrightBlock": false
       }
     }
@@ -2481,7 +2599,7 @@
   },
   "renderFailure": {
     "pass": true,
-    "build": "facadecompose1",
+    "build": "facadeart1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -2500,7 +2618,7 @@
     },
     "evidence": {
       "haloSource": {
-        "BUILD_ID": "facadecompose1",
+        "BUILD_ID": "facadeart1",
         "policy": "walls own distance fog; billboards drawImage only — no post-loop sprite fog fillRect",
         "forbiddenPatternsAbsent": true,
         "forbiddenHits": [],
@@ -2510,7 +2628,7 @@
         "regressionCommentMarker": "SPRITE HALO REGRESSION GUARD"
       },
       "occlusionSource": {
-        "BUILD_ID": "facadecompose1",
+        "BUILD_ID": "facadeart1",
         "renderWidth": 320,
         "zbufferLength": 320,
         "zbufferMatchesRenderWidth": true,
@@ -2587,9 +2705,9 @@
         "pass": true,
         "haloPass": true,
         "borderStats": {
-          "mean": 162.54321343873423,
+          "mean": 163.32487549407003,
           "brightRatio": 0.2134387351778656,
-          "variance": 2659.150800231122,
+          "variance": 2677.1438949588073,
           "count": 506
         },
         "proj": {
@@ -2601,7 +2719,7 @@
           "screenW": 15.272727272727273,
           "screenH": 16.8
         },
-        "canvasVariance": 4724.247334256136
+        "canvasVariance": 4749.360151875729
       },
       "occludedSprite": {
         "pass": true,
@@ -2669,9 +2787,9 @@
       "hallStart": {
         "pass": true,
         "stats": {
-          "mean": 76.66037467344557,
-          "brightRatio": 0.034328358208955224,
-          "variance": 2119.340710239006,
+          "mean": 75.84964186094508,
+          "brightRatio": 0.02786847014925373,
+          "variance": 1974.5175588091895,
           "count": 42880
         },
         "customLevel": "hall_of_servants"
@@ -2683,19 +2801,19 @@
           "h": 844
         },
         "stats": {
-          "mean": 113.77884631261837,
-          "brightRatio": 0.163953125,
-          "variance": 4359.922084336377,
+          "mean": 113.23565532824387,
+          "brightRatio": 0.159625,
+          "variance": 4303.360737481812,
           "count": 64000
         }
       }
     },
     "runtimeErrors": [],
-    "timestamp": "2026-06-28T17:26:05.447Z"
+    "timestamp": "2026-06-28T17:57:44.881Z"
   },
   "render": {
     "pass": true,
-    "build": "facadecompose1",
+    "build": "facadeart1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -2714,7 +2832,7 @@
     },
     "evidence": {
       "haloSource": {
-        "BUILD_ID": "facadecompose1",
+        "BUILD_ID": "facadeart1",
         "policy": "walls own distance fog; billboards drawImage only — no post-loop sprite fog fillRect",
         "forbiddenPatternsAbsent": true,
         "forbiddenHits": [],
@@ -2724,7 +2842,7 @@
         "regressionCommentMarker": "SPRITE HALO REGRESSION GUARD"
       },
       "occlusionSource": {
-        "BUILD_ID": "facadecompose1",
+        "BUILD_ID": "facadeart1",
         "renderWidth": 320,
         "zbufferLength": 320,
         "zbufferMatchesRenderWidth": true,
@@ -2801,9 +2919,9 @@
         "pass": true,
         "haloPass": true,
         "borderStats": {
-          "mean": 162.54321343873423,
+          "mean": 163.32487549407003,
           "brightRatio": 0.2134387351778656,
-          "variance": 2659.150800231122,
+          "variance": 2677.1438949588073,
           "count": 506
         },
         "proj": {
@@ -2815,7 +2933,7 @@
           "screenW": 15.272727272727273,
           "screenH": 16.8
         },
-        "canvasVariance": 4724.247334256136
+        "canvasVariance": 4749.360151875729
       },
       "occludedSprite": {
         "pass": true,
@@ -2883,9 +3001,9 @@
       "hallStart": {
         "pass": true,
         "stats": {
-          "mean": 76.66037467344557,
-          "brightRatio": 0.034328358208955224,
-          "variance": 2119.340710239006,
+          "mean": 75.84964186094508,
+          "brightRatio": 0.02786847014925373,
+          "variance": 1974.5175588091895,
           "count": 42880
         },
         "customLevel": "hall_of_servants"
@@ -2897,17 +3015,17 @@
           "h": 844
         },
         "stats": {
-          "mean": 113.77884631261837,
-          "brightRatio": 0.163953125,
-          "variance": 4359.922084336377,
+          "mean": 113.23565532824387,
+          "brightRatio": 0.159625,
+          "variance": 4303.360737481812,
           "count": 64000
         }
       }
     },
     "runtimeErrors": [],
-    "timestamp": "2026-06-28T17:26:05.447Z"
+    "timestamp": "2026-06-28T17:57:44.881Z"
   },
   "runtimeErrors": [],
   "runtimeClean": true,
-  "timestamp": "2026-06-28T17:26:05.447Z"
+  "timestamp": "2026-06-28T17:57:44.881Z"
 }

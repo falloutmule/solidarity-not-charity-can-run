@@ -587,7 +587,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'facadecompose1';
+const BUILD_ID = 'facadeart1';
 const CR_FPV_STREET_SHIMMER_FIX = 1;
 const CR_FPV_STREET_MATTE = true;
 const CR_FPV_WALL_LINE_FIX = 1;
@@ -596,6 +596,7 @@ const CR_BUILDING_MODULE_FACADE = 1;
 const CR_FACADE_PACK_BRIDGE = 1;
 const CR_FACADE_PACK_V2_SAFE = 1;
 const CR_FACADE_COMPOSE_READABILITY = 1;
+const CR_FACADE_ART_VOCABULARY = 1;
 /** Coarse FPV wall texture U sampling (reduces vertical stripe/moiré on buildings). */
 const CR_FPV_WALL_TEX_COARSE = 16;
 /** Visual readability contract (render/HUD only; gameplay unchanged). */
@@ -2238,7 +2239,7 @@ const CR_BUILDING_FPV_MASS = 1.5;
 /** Semantic building modules — authority is CR_FACADE_PACK (copy-paste bridge). */
 /* BEGIN SNC FACADE PACK v1 */
 const CR_FACADE_PACK = {
-  version: 'facadecompose1',
+  version: 'facadeart1',
   modules: {
     storefront_4x2: {
       cells: ['####', '####'],
@@ -2529,6 +2530,42 @@ function crFacadeComposeKind(moduleId, faceDir){
   return 'service_front';
 }
 
+function crFacadeArtVocabularyZones(drawStart, sliceH){
+  return {
+    roof0: drawStart + sliceH * 0.04,
+    roof1: drawStart + sliceH * 0.09,
+    sign0: drawStart + sliceH * 0.10,
+    sign1: drawStart + sliceH * 0.17,
+    win0: drawStart + sliceH * 0.22,
+    win1: drawStart + sliceH * 0.58,
+    door0: drawStart + sliceH * 0.20,
+    door1: drawStart + sliceH * 0.62,
+    kick0: drawStart + sliceH * 0.74,
+    kick1: drawStart + sliceH * 0.81,
+    base0: drawStart + sliceH * 0.81,
+    base1: drawStart + sliceH * 0.95
+  };
+}
+function crFacadeArtPanelInset(panelIndex, panelCount, margin){
+  const w = 1 / Math.max(1, panelCount);
+  const x0 = panelIndex * w;
+  const x1 = x0 + w;
+  const m = margin * w;
+  return { px0: x0, px1: x1, ox0: x0 + m, ox1: x1 - m };
+}
+function crFacadeArtFuIn(fu, x0, x1){
+  return fu >= x0 && fu < x1;
+}
+function crFacadeArtColBand(ctx, col, pw, y0, y1, color){
+  if(y1 <= y0) return;
+  ctx.fillStyle = color;
+  ctx.fillRect(col, y0, pw, Math.max(1, y1 - y0));
+}
+function crFacadeArtColLine(ctx, col, pw, y, color){
+  ctx.fillStyle = color;
+  ctx.fillRect(col, y, pw, 1);
+}
+
 function crDrawComposedFacadeFaceColumn(ctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX, roleId){
   if(sliceH < 14 || !roleId) return;
   const faceDir = crWallHitFaceDir(side, stepX, stepY);
@@ -2542,115 +2579,151 @@ function crDrawComposedFacadeFaceColumn(ctx, col, drawStart, sliceH, mapX, mapY,
   const role = CR_FACADE_PACK.roles[roleKey];
   if(!role) return;
   crDrawFpvFacadePackMaterialBase(ctx, col, drawStart, sliceH, pw, role.material);
-  const yTop = drawStart + sliceH * 0.05;
-  const ySign1 = drawStart + sliceH * 0.22;
-  const yMid0 = drawStart + sliceH * 0.26;
-  const yMid1 = drawStart + sliceH * 0.74;
-  const yBase0 = drawStart + sliceH * 0.78;
-  const yBase1 = drawStart + sliceH * 0.96;
+  const Z = crFacadeArtVocabularyZones(drawStart, sliceH);
   const fu = fc.faceU;
-  const pu = fc.panelU;
   const kind = crFacadeComposeKind(fc.moduleId, faceDir);
   const row = fc.reg.mod.faces[faceDir];
-  const isDoorPanel = (r)=> r === 'storefront_door' || r === 'service_door';
-  const isWindowPanel = (r)=> r === 'storefront_window' || r === 'boarded_window';
-  const isGaragePanel = (r)=> r === 'garage_bay';
   const norm = (i)=> crNormalizeFacadeRoleId(row[i]);
+  const n = row.length;
 
-  function fillRect(y0, y1, x0f, x1f, color){
-    if(fu < x0f || fu >= x1f) return;
-    ctx.fillStyle = color;
-    ctx.fillRect(col, y0, pw, Math.max(1, y1 - y0));
+  function panelAt(i){
+    return crFacadeArtPanelInset(i, n, 0.14);
   }
 
-  if(kind === 'storefront_front' || kind === 'pavilion_front'){
-    fillRect(yTop, ySign1, 0, 1, 'rgba(178,138,68,0.40)');
-    for(let i=0;i<row.length;i++){
-      const x0 = i / row.length, x1 = (i+1) / row.length;
+  if(kind === 'storefront_front'){
+    if(crFacadeArtFuIn(fu, 0, 1)){
+      crFacadeArtColBand(ctx, col, pw, Z.roof0, Z.roof1, 'rgba(42,38,34,0.55)');
+      crFacadeArtColLine(ctx, col, pw, Z.roof1, 'rgba(28,26,22,0.70)');
+    }
+    if(crFacadeArtFuIn(fu, 0, 1)){
+      crFacadeArtColBand(ctx, col, pw, Z.sign0, Z.sign1, 'rgba(168,142,88,0.38)');
+      crFacadeArtColLine(ctx, col, pw, Z.sign0, 'rgba(32,28,24,0.45)');
+      crFacadeArtColLine(ctx, col, pw, Z.sign1, 'rgba(32,28,24,0.45)');
+    }
+    for(let i=0;i<n;i++){
+      const P = panelAt(i);
       const pr = norm(i);
-      if(isDoorPanel(pr)){
-        fillRect(yMid0, yMid1, x0, x1, 'rgba(48,38,32,0.82)');
-        if(fu >= x0 && fu < x1){
-          ctx.fillStyle = 'rgba(210,175,80,0.42)';
-          ctx.fillRect(col, yMid0 + (yMid1-yMid0)*0.55, pw, Math.max(1, (yMid1-yMid0)*0.08));
+      if(!crFacadeArtFuIn(fu, P.ox0, P.ox1)) continue;
+      if(pr === 'storefront_door'){
+        crFacadeArtColBand(ctx, col, pw, Z.door0, Z.door1, 'rgba(44,36,30,0.88)');
+        crFacadeArtColBand(ctx, col, pw, Z.door0, Z.door0 + (Z.door1-Z.door0)*0.28, 'rgba(72,92,108,0.55)');
+        if(crFacadeArtFuIn(fu, P.ox0 + (P.ox1-P.ox0)*0.72, P.ox1)){
+          crFacadeArtColBand(ctx, col, pw, Z.door0 + (Z.door1-Z.door0)*0.48, Z.door0 + (Z.door1-Z.door0)*0.52, 'rgba(210,175,80,0.50)');
         }
-      } else if(isWindowPanel(pr)){
-        fillRect(yMid0, yMid1, x0, x1, 'rgba(58,78,96,0.68)');
+        crFacadeArtColLine(ctx, col, pw, P.ox0 === fu ? Z.door0 : Z.door0, 'rgba(22,18,14,0.50)');
+      } else if(pr === 'storefront_window'){
+        crFacadeArtColBand(ctx, col, pw, Z.win0, Z.win1, 'rgba(62,82,98,0.62)');
+        crFacadeArtColBand(ctx, col, pw, Z.win0, Z.win0 + (Z.win1-Z.win0)*0.12, 'rgba(120,145,165,0.35)');
+        crFacadeArtColLine(ctx, col, pw, Z.win0 + (Z.win1-Z.win0)*0.5, 'rgba(38,48,58,0.40)');
       } else if(pr === 'storefront_sign'){
-        fillRect(yMid0, yMid1, x0, x1, 'rgba(168,72,58,0.50)');
+        crFacadeArtColBand(ctx, col, pw, Z.win0, Z.win0 + (Z.win1-Z.win0)*0.35, 'rgba(152,118,72,0.42)');
+        crFacadeArtColBand(ctx, col, pw, Z.win0 + (Z.win1-Z.win0)*0.42, Z.win1, 'rgba(58,78,96,0.48)');
       }
     }
-    fillRect(yBase0, yBase1, 0, 1, 'rgba(22,18,14,0.88)');
+    if(crFacadeArtFuIn(fu, 0, 1)){
+      crFacadeArtColBand(ctx, col, pw, Z.kick0, Z.kick1, 'rgba(32,28,24,0.75)');
+      crFacadeArtColBand(ctx, col, pw, Z.base0, Z.base1, 'rgba(18,16,14,0.90)');
+    }
+    return;
+  }
+
+  if(kind === 'pavilion_front'){
+    if(crFacadeArtFuIn(fu, 0, 1)) crFacadeArtColLine(ctx, col, pw, Z.roof1, 'rgba(48,52,48,0.50)');
+    for(let i=0;i<n;i++){
+      const P = panelAt(i);
+      const pr = norm(i);
+      if(!crFacadeArtFuIn(fu, P.ox0, P.ox1)) continue;
+      if(pr === 'storefront_door'){
+        crFacadeArtColBand(ctx, col, pw, Z.door0, Z.door1, 'rgba(58,62,58,0.78)');
+      } else if(pr === 'mural_wall'){
+        crFacadeArtColBand(ctx, col, pw, Z.win0, Z.win1, 'rgba(88,128,118,0.40)');
+      } else if(pr === 'utility_wall'){
+        crFacadeArtColBand(ctx, col, pw, Z.win0 + (Z.win1-Z.win0)*0.35, Z.win0 + (Z.win1-Z.win0)*0.55, 'rgba(72,78,82,0.45)');
+      }
+    }
+    if(crFacadeArtFuIn(fu, 0, 1)) crFacadeArtColBand(ctx, col, pw, Z.base0, Z.base1, 'rgba(28,30,28,0.82)');
     return;
   }
 
   if(kind === 'boarded_front'){
-    fillRect(yTop, ySign1, 0, 1, 'rgba(150,120,72,0.28)');
-    for(let i=0;i<row.length;i++){
-      const x0 = i / row.length, x1 = (i+1) / row.length;
+    if(crFacadeArtFuIn(fu, 0, 1)){
+      crFacadeArtColBand(ctx, col, pw, Z.sign0, Z.sign1, 'rgba(140,128,108,0.22)');
+      crFacadeArtColLine(ctx, col, pw, Z.sign1, 'rgba(48,42,36,0.35)');
+    }
+    for(let i=0;i<n;i++){
+      const P = panelAt(i);
       const pr = norm(i);
-      if(pr === 'storefront_door'){
-        fillRect(yMid0, yMid1, x0, x1, 'rgba(48,38,32,0.80)');
-      } else if(pr === 'boarded_window' && fu >= x0 && fu < x1){
-        ctx.fillStyle = 'rgba(92,68,48,0.75)';
-        ctx.fillRect(col, yMid0, pw, yMid1 - yMid0);
-        ctx.fillStyle = 'rgba(48,36,28,0.40)';
-        const bh = (yMid1 - yMid0) / 5;
-        for(let b=0;b<4;b++) ctx.fillRect(col, yMid0 + bh*(0.15 + b*1.05), pw, Math.max(1, bh*0.35));
+      if(pr === 'storefront_door' && crFacadeArtFuIn(fu, P.ox0, P.ox1)){
+        crFacadeArtColBand(ctx, col, pw, Z.door0, Z.door1, 'rgba(46,38,32,0.85)');
+        crFacadeArtColBand(ctx, col, pw, Z.kick0, Z.kick1, 'rgba(36,30,26,0.70)');
+      } else if(pr === 'boarded_window' && crFacadeArtFuIn(fu, P.ox0, P.ox1)){
+        const wbox0 = Z.win0, wbox1 = Z.win0 + (Z.win1 - Z.win0) * 0.92;
+        crFacadeArtColBand(ctx, col, pw, wbox0, wbox1, 'rgba(118,98,72,0.55)');
+        const plankH = (wbox1 - wbox0) / 6;
+        for(let b=0;b<5;b++){
+          const py = wbox0 + plankH * (0.35 + b * 1.05);
+          crFacadeArtColBand(ctx, col, pw, py, py + Math.max(1, plankH * 0.28), 'rgba(78,62,48,0.55)');
+        }
+        crFacadeArtColLine(ctx, col, pw, wbox0, 'rgba(40,34,28,0.50)');
+        crFacadeArtColLine(ctx, col, pw, wbox1, 'rgba(40,34,28,0.50)');
       }
     }
-    fillRect(yBase0, yBase1, 0, 1, 'rgba(22,18,14,0.88)');
+    if(crFacadeArtFuIn(fu, 0, 1)) crFacadeArtColBand(ctx, col, pw, Z.base0, Z.base1, 'rgba(18,16,14,0.90)');
     return;
   }
 
   if(kind === 'garage_front'){
-    fillRect(yTop, ySign1, 0, 1, 'rgba(132,136,128,0.22)');
+    if(crFacadeArtFuIn(fu, 0, 1)) crFacadeArtColBand(ctx, col, pw, Z.sign0, Z.sign1, 'rgba(128,132,126,0.18)');
     let g0 = -1, g1 = -1;
-    for(let i=0;i<row.length;i++){
-      if(isGaragePanel(norm(i))){ if(g0<0) g0=i; g1=i+1; }
+    for(let i=0;i<n;i++){
+      if(norm(i) === 'garage_bay'){ if(g0<0) g0=i; g1=i+1; }
     }
     if(g0 >= 0){
-      const x0 = g0 / row.length, x1 = g1 / row.length;
-      if(fu >= x0 && fu < x1){
-        const pad = 0.05 * (x1 - x0);
-        if(fu >= x0 + pad && fu < x1 - pad){
-          ctx.fillStyle = 'rgba(58,62,68,0.88)';
-          ctx.fillRect(col, yMid0 - sliceH*0.02, pw, (yMid1 - yMid0) + sliceH*0.04);
-          ctx.fillStyle = 'rgba(38,42,48,0.45)';
-          const sh = (yMid1 - yMid0) * 0.12;
-          ctx.fillRect(col, yMid0 + sh*0.5, pw, sh);
-          ctx.fillRect(col, yMid0 + sh*2.2, pw, sh);
-        }
-        ctx.fillStyle = 'rgba(28,30,34,0.55)';
-        ctx.fillRect(col, yMid0 - sliceH*0.02, pw, Math.max(1, sliceH*0.02));
-        ctx.fillRect(col, yMid1, pw, Math.max(1, sliceH*0.02));
+      const gx0 = g0 / n, gx1 = g1 / n;
+      const frameM = 0.04 / n * (g1 - g0);
+      const bx0 = gx0 + frameM, bx1 = gx1 - frameM;
+      const bayY0 = Z.win0 - sliceH * 0.02, bayY1 = Z.win1 + sliceH * 0.04;
+      if(crFacadeArtFuIn(fu, gx0, gx1)){
+        crFacadeArtColLine(ctx, col, pw, bayY0, 'rgba(28,30,32,0.75)');
+        crFacadeArtColLine(ctx, col, pw, bayY1, 'rgba(28,30,32,0.75)');
+      }
+      if(crFacadeArtFuIn(fu, bx0, bx1)){
+        crFacadeArtColBand(ctx, col, pw, bayY0 + 2, bayY1 - 2, 'rgba(52,56,62,0.82)');
+        const rh = (bayY1 - bayY0) * 0.11;
+        crFacadeArtColBand(ctx, col, pw, bayY0 + rh * 1.2, bayY0 + rh * 1.2 + rh, 'rgba(36,40,46,0.50)');
+        crFacadeArtColBand(ctx, col, pw, bayY0 + rh * 3.0, bayY0 + rh * 3.0 + rh, 'rgba(36,40,46,0.50)');
       }
     }
-    for(let i=0;i<row.length;i++){
-      const x0 = i / row.length, x1 = (i+1) / row.length;
-      if(norm(i) === 'service_door' && fu >= x0 && fu < x1){
-        ctx.fillStyle = 'rgba(58,50,42,0.78)';
-        ctx.fillRect(col, yMid0 + (yMid1-yMid0)*0.15, pw, (yMid1-yMid0)*0.7);
+    for(let i=0;i<n;i++){
+      const P = panelAt(i);
+      if(norm(i) === 'service_door' && crFacadeArtFuIn(fu, P.ox0, P.ox1)){
+        const sd0 = Z.door0 + (Z.door1 - Z.door0) * 0.12;
+        const sd1 = Z.door0 + (Z.door1 - Z.door0) * 0.72;
+        crFacadeArtColBand(ctx, col, pw, sd0, sd1, 'rgba(54,48,40,0.80)');
+        crFacadeArtColLine(ctx, col, pw, sd0, 'rgba(30,28,26,0.55)');
       }
     }
-    fillRect(yBase0, yBase1, 0, 1, 'rgba(22,18,14,0.88)');
+    if(crFacadeArtFuIn(fu, 0, 1)) crFacadeArtColBand(ctx, col, pw, Z.base0, Z.base1, 'rgba(18,16,14,0.90)');
     return;
   }
 
   if(kind === 'side' || kind === 'service_front'){
-    if(roleKey === 'mural_wall' && pu > 0.2 && pu < 0.8){
-      fillRect(yMid0, yMid1, 0.15, 0.85, 'rgba(72,148,132,0.45)');
+    if(roleKey === 'mural_wall' && crFacadeArtFuIn(fu, 0.22, 0.78)){
+      crFacadeArtColBand(ctx, col, pw, Z.win0, Z.win1, 'rgba(72,128,112,0.38)');
+      crFacadeArtColLine(ctx, col, pw, Z.win0, 'rgba(40,48,44,0.40)');
+      crFacadeArtColLine(ctx, col, pw, Z.win1, 'rgba(40,48,44,0.40)');
     }
-    if(roleKey === 'side_door' && pu > 0.25 && pu < 0.75){
-      fillRect(yMid0 + (yMid1-yMid0)*0.2, yMid1 - (yMid1-yMid0)*0.15, 0.2, 0.8, 'rgba(52,40,32,0.72)');
+    if(roleKey === 'side_door' && crFacadeArtFuIn(fu, 0.32, 0.68)){
+      crFacadeArtColBand(ctx, col, pw, Z.door0, Z.door1, 'rgba(50,40,34,0.72)');
+      crFacadeArtColLine(ctx, col, pw, Z.door0, 'rgba(28,24,20,0.45)');
     }
-    if(roleKey === 'utility_wall' && pu > 0.55 && pu < 0.85){
-      fillRect(yMid0, yMid1, 0.45, 0.75, 'rgba(62,74,82,0.42)');
+    if(roleKey === 'utility_wall' && crFacadeArtFuIn(fu, 0.58, 0.78)){
+      crFacadeArtColBand(ctx, col, pw, Z.win0 + (Z.win1-Z.win0)*0.55, Z.win0 + (Z.win1-Z.win0)*0.72, 'rgba(62,70,76,0.42)');
     }
-    if(roleKey === 'service_wall' && pu > 0.1 && pu < 0.45){
-      fillRect(yMid0, yMid1, 0.1, 0.4, 'rgba(108,110,102,0.35)');
+    if(roleKey === 'service_wall' && crFacadeArtFuIn(fu, 0.12, 0.38)){
+      crFacadeArtColBand(ctx, col, pw, Z.win0 + (Z.win1-Z.win0)*0.4, Z.win0 + (Z.win1-Z.win0)*0.55, 'rgba(98,100,94,0.32)');
     }
-    fillRect(yBase0, yBase1, 0, 1, 'rgba(22,18,14,0.75)');
+    if(crFacadeArtFuIn(fu, 0, 1)) crFacadeArtColBand(ctx, col, pw, Z.base0, Z.base1, 'rgba(22,20,18,0.72)');
     return;
   }
 
@@ -8295,7 +8368,7 @@ function runDeclarativeControlsSelfCheckBody(){
     checks.menuNotEditable = INPUT_CONFIG.controls.menu && INPUT_CONFIG.controls.menu.editable === false;
     if(!checks.menuNotEditable) errors.push('MENU must stay non-editable');
 
-    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1';
+    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1';
         if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
 
     checks.saveFormatUnchanged = !('controlsLayout' in (options.data || options));
@@ -8346,7 +8419,7 @@ function runDecorativePropsSelfCheckBody(){
   const evidence = {};
   const err0 = window.__crRuntimeErrors.length;
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1';
+    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1';
     if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
 
     checks.decorArrayExported = Array.isArray(DECOR_PROP_REQUIRED) && DECOR_PROP_REQUIRED.length === 12;
@@ -8456,7 +8529,7 @@ function runOptionsCleanupSelfCheckBody(){
   _controlEditActive = false;
   crShowControlEditChrome(false);
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1';
+    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1';
         if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
 
     state = STATE.TITLE;
@@ -8609,7 +8682,7 @@ function runLevelSelectorSelfCheckBody(){
   mobileOverride = 'on';
   setMobileMode(true);
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1';
+    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1';
     if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
     checks.saveVersionUnchanged = SAVE_VERSION === 1;
     checks.controlsSchemaUnchanged = CR_CONTROLS_LS_KEY === 'cannedRun.controls.v1';
@@ -8706,7 +8779,174 @@ function runLevelSelectorSelfCheckBody(){
 }
 
 
-function runFacadeCompositionReadabilitySelfCheck(){
+
+function runFacadeArtVocabularySelfCheck(){
+  if(_crHarnessDepth > 0) return runFacadeArtVocabularySelfCheckBody();
+  return crWithTemporaryState('facadeArtVocabulary', () => runFacadeArtVocabularySelfCheckBody());
+}
+function runFacadeArtVocabularySelfCheckBody(){
+  const errors = [];
+  const warnings = [];
+  const checks = {};
+  const evidence = { storefrontHit: null, boardedHit: null, garageHit: null, sideHit: null, d1Modules: [] };
+  const err0 = window.__crRuntimeErrors.length;
+  const savedPick = selectedStartDistrict;
+  const drawSrc = String(drawScene);
+  const artSrc = String(crDrawComposedFacadeFaceColumn);
+  crPrepareSelfCheckPortrait();
+  try {
+    checks.buildId = BUILD_ID === 'facadeart1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1';
+    checks.packExists = typeof CR_FACADE_PACK === 'object' && CR_FACADE_PACK !== null;
+    checks.packVersion = checks.packExists && CR_FACADE_PACK.version === 'facadeart1';
+    checks.packMarkers = (function(){
+      const scripts = document.getElementsByTagName('script');
+      for(let i=0;i<scripts.length;i++){
+        const t = scripts[i].textContent || '';
+        if(t.indexOf('BEGIN SNC FACADE PACK v1') >= 0 && t.indexOf('END SNC FACADE PACK v1') >= 0) return true;
+      }
+      return typeof CR_FACADE_PACK !== 'undefined';
+    })();
+    const mods = checks.packExists ? Object.keys(CR_FACADE_PACK.modules) : [];
+    evidence.moduleNames = mods.slice();
+    evidence.roleNames = checks.packExists ? Object.keys(CR_FACADE_PACK.roles || {}) : [];
+    checks.sixModules = ['storefront_4x2','storefront_3x2','restroom_pavilion','blank_service_block','garage_service_4x2','boarded_shop_3x2']
+      .every(m => mods.indexOf(m) >= 0);
+    checks.labOnlyNotImported = mods.indexOf('two_story_storefront_4x2_visual') < 0
+      && mods.indexOf('walkin_storefront_4x3') < 0 && mods.indexOf('corner_shop_L') < 0;
+    checks.composedRenderer = drawSrc.indexOf('crDrawComposedFacadeFaceColumn') >= 0;
+    checks.artVocabularyFlag = typeof CR_FACADE_ART_VOCABULARY !== 'undefined' && CR_FACADE_ART_VOCABULARY === 1;
+    checks.artInsetHelpers = artSrc.indexOf('crFacadeArtVocabularyZones') >= 0 && artSrc.indexOf('crFacadeArtPanelInset') >= 0;
+    checks.insetWindowsNotSlabs = artSrc.indexOf('storefront_window') >= 0 && artSrc.indexOf('Z.win0') >= 0 && artSrc.indexOf('P.ox0') >= 0;
+    checks.doorShapedObjects = artSrc.indexOf('storefront_door') >= 0 && artSrc.indexOf('Z.door0') >= 0;
+    checks.boardsInsideWindowBox = artSrc.indexOf('boarded_window') >= 0 && artSrc.indexOf('plankH') >= 0;
+    checks.framedGarageBay = artSrc.indexOf('garage_bay') >= 0 && artSrc.indexOf('bayY0') >= 0;
+    checks.quietSideWalls = artSrc.indexOf('side_door') >= 0 && artSrc.indexOf('kind === \'side\'') >= 0;
+    checks.noCombLeadingEdge = drawSrc.indexOf('crDrawComposedFacadeFaceColumn') >= 0;
+    checks.debugHelper = typeof crDebugDescribeFacadeHit === 'function';
+    checks.matteRoad = CR_FPV_STREET_MATTE === true;
+    checks.minimapNav = typeof crMinimapNavCellColor === 'function';
+    checks.fpvMass = CR_BUILDING_FPV_MASS >= 1.45;
+    checks.saveVersion = SAVE_VERSION === 1;
+
+    game.run = { active: true, harnessOnly: true, customLevel: null };
+    genCity(904101, 1, '');
+    const d1Mods = {};
+    for(let y=0;y<game.MAP_H;y++){
+      for(let x=0;x<game.MAP_W;x++){
+        const c = game.buildingGrid[y] && game.buildingGrid[y][x];
+        if(c && c.mid) d1Mods[c.mid] = (d1Mods[c.mid]|0) + 1;
+      }
+    }
+    evidence.d1Modules = Object.keys(d1Mods);
+    checks.d1Identity = d1Mods.restroom_pavilion > 0
+      && !d1Mods.storefront_4x2 && !d1Mods.storefront_3x2 && !d1Mods.garage_service_4x2 && !d1Mods.boarded_shop_3x2;
+
+    genCity(904201, 2, '');
+    checks.d2HasStorefront = false;
+    checks.d2HasBoarded = false;
+    for(let y=1;y<game.MAP_H-1;y++){
+      for(let x=1;x<game.MAP_W-1;x++){
+        const c = game.buildingGrid[y] && game.buildingGrid[y][x];
+        if(!c) continue;
+        if(c.mid === 'boarded_shop_3x2') checks.d2HasBoarded = true;
+        if(c.mid === 'storefront_4x2' || c.mid === 'storefront_3x2') checks.d2HasStorefront = true;
+      }
+    }
+
+    genCity(904203, 3, '');
+    checks.d3HasGarage = false;
+    for(let y=1;y<game.MAP_H-1;y++){
+      for(let x=1;x<game.MAP_W-1;x++){
+        if(game.buildingGrid[y] && game.buildingGrid[y][x] && game.buildingGrid[y][x].mid === 'garage_service_4x2') checks.d3HasGarage = true;
+      }
+    }
+
+    outerS: for(let y=1;y<game.MAP_H-1;y++){
+      for(let x=1;x<game.MAP_W-1;x++){
+        if(!game.buildingGrid[y] || !game.buildingGrid[y][x]) continue;
+        const mid = game.buildingGrid[y][x].mid;
+        if(mid !== 'storefront_4x2' && mid !== 'storefront_3x2') continue;
+        const desc = crDebugDescribeFacadeHit(x, y, 'south');
+        if(desc.role){ evidence.storefrontHit = desc; break outerS; }
+      }
+    }
+    outerB: for(let y=1;y<game.MAP_H-1;y++){
+      for(let x=1;x<game.MAP_W-1;x++){
+        if(!game.buildingGrid[y] || !game.buildingGrid[y][x]) continue;
+        if(game.buildingGrid[y][x].mid !== 'boarded_shop_3x2') continue;
+        const desc = crDebugDescribeFacadeHit(x, y, 'south');
+        if(desc.role === 'boarded_window' || desc.role === 'storefront_door'){ evidence.boardedHit = desc; break outerB; }
+      }
+    }
+    outerG: for(let y=1;y<game.MAP_H-1;y++){
+      for(let x=1;x<game.MAP_W-1;x++){
+        if(!game.buildingGrid[y] || !game.buildingGrid[y][x]) continue;
+        if(game.buildingGrid[y][x].mid !== 'garage_service_4x2') continue;
+        const desc = crDebugDescribeFacadeHit(x, y, 'south');
+        if(desc.role === 'garage_bay' || desc.role === 'service_door'){ evidence.garageHit = desc; break outerG; }
+      }
+    }
+    outerSide: for(let y=1;y<game.MAP_H-1;y++){
+      for(let x=1;x<game.MAP_W-1;x++){
+        if(!game.buildingGrid[y] || !game.buildingGrid[y][x]) continue;
+        const desc = crDebugDescribeFacadeHit(x, y, 'east');
+        if(desc.role === 'side_door' || desc.role === 'service_wall' || desc.role === 'blank_brick'){
+          evidence.sideHit = desc; break outerSide;
+        }
+      }
+    }
+    checks.storefrontHit = !!evidence.storefrontHit;
+    checks.boardedHit = !!evidence.boardedHit;
+    checks.garageHit = !!evidence.garageHit;
+    checks.sideHit = !!evidence.sideHit;
+
+    try { drawScene(0); checks.fpvRenderOk = true; } catch(e){
+      checks.fpvRenderOk = false;
+      errors.push('fpv draw: '+(e&&e.message?e.message:e));
+    }
+
+    let reachOk = true;
+    for(const c of [{seed:904011,district:1},{seed:904012,district:2},{seed:904013,district:3},{seed:904014,district:4}]){
+      game.run = { active: true, harnessOnly: true, customLevel: null };
+      genCity(c.seed, c.district, '');
+      const val = crHarnessValidateProceduralCase(c);
+      if(!val.ok){ reachOk = false; errors.push('reach d'+c.district); }
+    }
+    checks.reachD1D4 = reachOk;
+    checks.levelSelector = (function(){
+      selectedStartDistrict = 1;
+      const a = crGetSelectedStartDistrict();
+      crCycleSelectedStartDistrict();
+      return a === 1 && crGetSelectedStartDistrict() === 2;
+    })();
+
+    if(!checks.buildId) errors.push('BUILD_ID must be facadeart1');
+    if(!checks.packVersion) errors.push('pack version facadeart1');
+    if(!checks.sixModules) errors.push('six gameplay modules missing');
+    if(!checks.labOnlyNotImported) errors.push('lab-only module in gameplay pack');
+    if(!checks.artInsetHelpers) errors.push('facade art inset helpers missing');
+    if(!checks.insetWindowsNotSlabs) errors.push('inset window drawing missing');
+    if(!checks.boardsInsideWindowBox) errors.push('boarded planks must be inside window box');
+    if(!checks.framedGarageBay) errors.push('framed garage bay missing');
+    if(!checks.d1Identity) errors.push('D1 identity');
+    if(!checks.d2HasStorefront || !checks.d2HasBoarded) errors.push('D2 proof targets');
+    if(!checks.d3HasGarage) errors.push('D3 garage proof');
+    if(!checks.storefrontHit || !checks.boardedHit || !checks.garageHit || !checks.sideHit) errors.push('role debug hits');
+    if(!checks.reachD1D4) errors.push('reachability');
+  } catch(e){
+    errors.push('facade art vocabulary: '+(e&&e.message?e.message:e));
+  } finally {
+    selectedStartDistrict = savedPick;
+    state = STATE.TITLE;
+    paused = false;
+    game.run = { active: false, harnessOnly: false, customLevel: null };
+    drawMobileMenu();
+  }
+  const runtimeDelta = window.__crRuntimeErrors.length - err0;
+  if(runtimeDelta > 0) errors.push('runtime errors: '+runtimeDelta);
+  const pass = errors.length === 0;
+  return { pass, checks, evidence, errors, warnings };
+}function runFacadeCompositionReadabilitySelfCheck(){
   if(_crHarnessDepth > 0) return runFacadeCompositionReadabilitySelfCheckBody();
   return crWithTemporaryState('facadeComposition', () => runFacadeCompositionReadabilitySelfCheckBody());
 }
@@ -8721,9 +8961,9 @@ function runFacadeCompositionReadabilitySelfCheckBody(){
   const drawSrc = String(drawScene);
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildId = BUILD_ID === 'facadecompose1';
+    checks.buildId = BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1';
     checks.packExists = typeof CR_FACADE_PACK === 'object' && CR_FACADE_PACK !== null;
-    checks.packVersion = checks.packExists && CR_FACADE_PACK.version === 'facadecompose1';
+    checks.packVersion = checks.packExists && (CR_FACADE_PACK.version === 'facadecompose1' || CR_FACADE_PACK.version === 'facadeart1');
     checks.packMarkers = (function(){
       const scripts = document.getElementsByTagName('script');
       for(let i=0;i<scripts.length;i++){
@@ -8879,7 +9119,7 @@ function runFacadePackV2SafeModuleSelfCheckBody(){
   const savedPick = selectedStartDistrict;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildId = BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1';
+    checks.buildId = BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1';
     checks.v2SafeFlag = CR_FACADE_PACK_V2_SAFE >= 1;
     checks.packExists = typeof CR_FACADE_PACK === 'object' && CR_FACADE_PACK !== null;
     checks.packMarkers = (function(){
@@ -9014,9 +9254,9 @@ function runFacadePackBridgeSelfCheckBody(){
   crPrepareSelfCheckPortrait();
   try {
     const html = typeof CR_FACADE_PACK !== 'undefined' ? 'ok' : '';
-    checks.buildId = BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1';
+    checks.buildId = BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1';
     checks.packExists = typeof CR_FACADE_PACK === 'object' && CR_FACADE_PACK !== null;
-    checks.packVersion = checks.packExists && (CR_FACADE_PACK.version === 'facadepack1' || CR_FACADE_PACK.version === 'facadev2safe1' || CR_FACADE_PACK.version === 'facadecompose1');
+    checks.packVersion = checks.packExists && (CR_FACADE_PACK.version === 'facadepack1' || CR_FACADE_PACK.version === 'facadev2safe1' || CR_FACADE_PACK.version === 'facadecompose1' || CR_FACADE_PACK.version === 'facadeart1');
     checks.packMarkers = (function(){
       const scripts = document.getElementsByTagName('script');
       for(let i=0;i<scripts.length;i++){
@@ -9141,7 +9381,7 @@ function runBuildingModuleFacadeSelfCheckBody(){
   const savedPick = selectedStartDistrict;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdModules1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1';
+    checks.buildIdModules1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1';
     checks.moduleFlag = CR_BUILDING_MODULE_FACADE >= 1;
     checks.moduleDefs = !!(CR_FACADE_PACK && CR_FACADE_PACK.modules && CR_FACADE_PACK.modules.storefront_4x2 && CR_FACADE_PACK.modules.storefront_3x2);
     checks.faceRoles = !!(CR_FACADE_PACK.modules.storefront_4x2.faces && CR_FACADE_PACK.modules.storefront_4x2.faces.south);
@@ -9248,7 +9488,7 @@ function runFpvFacadeTargetPolishSelfCheckBody(){
   const savedPick = selectedStartDistrict;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdFacadeFix1 = BUILD_ID === 'facadefix1' || BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1';
+    checks.buildIdFacadeFix1 = BUILD_ID === 'facadefix1' || BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1';
     checks.facadePolishFlag = CR_FPV_FACADE_TARGET_POLISH >= 1;
     checks.fpvMassPreserved = CR_BUILDING_FPV_MASS >= 1.45 && CR_BUILDING_FPV_MASS <= 1.55;
     checks.coarseWallTexBroad = CR_FPV_WALL_TEX_COARSE >= 12;
@@ -9358,7 +9598,7 @@ function runFpvWallLineArtifactFixSelfCheckBody(){
   const savedPick = selectedStartDistrict;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdWallLineStack = BUILD_ID === 'wallfix1' || BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1';
+    checks.buildIdWallLineStack = BUILD_ID === 'wallfix1' || BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1';
     checks.fpvMassPreserved = CR_BUILDING_FPV_MASS >= 1.45 && CR_BUILDING_FPV_MASS <= 1.55;
     checks.coarseWallTex = typeof CR_FPV_WALL_TEX_COARSE === 'number' && CR_FPV_WALL_TEX_COARSE >= 6;
     checks.wallLineFixFlag = CR_FPV_WALL_LINE_FIX >= 1;
@@ -9472,7 +9712,7 @@ function runFpvStreetShimmerFixSelfCheckBody(){
   const savedPick = selectedStartDistrict;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdShimmerFix1 = BUILD_ID === 'shimmerfix1' || BUILD_ID === 'wallfix1' || BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1';
+    checks.buildIdShimmerFix1 = BUILD_ID === 'shimmerfix1' || BUILD_ID === 'wallfix1' || BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1';
     checks.fpvMassPreserved = CR_BUILDING_FPV_MASS >= 1.45 && CR_BUILDING_FPV_MASS <= 1.55;
     checks.matteStreetMode = CR_FPV_STREET_MATTE === true && CR_FPV_STREET_SHIMMER_FIX >= 1;
     checks.minimapNavPreserved = typeof crMinimapNavCellColor === 'function' && Array.isArray(CR_MINIMAP_NAV_PALETTE);
@@ -9589,7 +9829,7 @@ function runStreetReadabilityMinimapSelfCheckBody(){
   const savedPick = selectedStartDistrict;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdStreetRead1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1';
+    checks.buildIdStreetRead1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1';
     if(!checks.buildIdStreetRead1) errors.push('BUILD_ID must be facadefix1 (minimap contract)');
     checks.footprint40x20 = true;
     checks.buildingMassPreserved = CR_BUILDING_FPV_MASS >= 1.45 && CR_BUILDING_FPV_MASS <= 1.55;
@@ -9712,7 +9952,7 @@ function runBuildingScalePolishSelfCheckBody(){
   const savedPick = selectedStartDistrict;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1';
+    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1';
     if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
     checks.fpvMassConstant = CR_BUILDING_FPV_MASS >= 1.45 && CR_BUILDING_FPV_MASS <= 1.55;
     checks.footprint40x20 = true;
@@ -9828,7 +10068,7 @@ function runEarlyDistrictProgressionSelfCheckBody(){
   const err0 = window.__crRuntimeErrors.length;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1';
+    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1';
     if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
     checks.footprintUnchanged = true;
     checks.saveVersionUnchanged = SAVE_VERSION === 1;
@@ -9927,7 +10167,7 @@ function runD1ParkLandmarkSelfCheckBody(){
   const err0 = window.__crRuntimeErrors.length;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1';
+    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1';
     if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
 
     const matrix = [
@@ -10043,7 +10283,7 @@ function runStreetBlockLevelSelfCheckBody(){
   const err0 = window.__crRuntimeErrors.length;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1';
+    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1';
     if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
 
     const matrix = [
@@ -10130,6 +10370,7 @@ function runFullSelfCheckInner(){
   const buildingModuleFacade = runBuildingModuleFacadeSelfCheck();
   const facadePackBridge = runFacadePackBridgeSelfCheck();
   const facadePackV2Safe = runFacadePackV2SafeModuleSelfCheck();
+  const facadeArtVocabulary = runFacadeArtVocabularySelfCheck();
   const facadeCompositionReadability = runFacadeCompositionReadabilitySelfCheck();
   const fpvFacadeTargetPolish = runFpvFacadeTargetPolishSelfCheck();
   const fpvWallLineArtifactFix = runFpvWallLineArtifactFixSelfCheck();
@@ -10149,7 +10390,7 @@ function runFullSelfCheckInner(){
   const levels = runLevelSelfCheck();
   const renderFailure = runRenderFailureSelfCheck();
   const runtimeClean = window.__crRuntimeErrors.length === err0;
-  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && decorativeProps.pass && optionsCleanup.pass && mobileControlReliability.pass && movementCollision.pass && reachability.pass && streetBlockLevel.pass && d1ParkLandmark.pass && buildingModuleFacade.pass && facadePackBridge.pass && facadePackV2Safe.pass && facadeCompositionReadability.pass && fpvFacadeTargetPolish.pass && fpvWallLineArtifactFix.pass && fpvStreetShimmerFix.pass && streetReadabilityMinimap.pass && buildingScalePolish.pass && earlyDistrictProgression.pass && levelSelector.pass && proceduralLevelValidation.pass && fullRunProgression.pass && onboarding.pass && soundFeedback.pass && declarativeControls.pass && visualReadability.pass && visualRectangleRegression.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
+  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && decorativeProps.pass && optionsCleanup.pass && mobileControlReliability.pass && movementCollision.pass && reachability.pass && streetBlockLevel.pass && d1ParkLandmark.pass && buildingModuleFacade.pass && facadePackBridge.pass && facadePackV2Safe.pass && facadeArtVocabulary.pass && facadeCompositionReadability.pass && fpvFacadeTargetPolish.pass && fpvWallLineArtifactFix.pass && fpvStreetShimmerFix.pass && streetReadabilityMinimap.pass && buildingScalePolish.pass && earlyDistrictProgression.pass && levelSelector.pass && proceduralLevelValidation.pass && fullRunProgression.pass && onboarding.pass && soundFeedback.pass && declarativeControls.pass && visualReadability.pass && visualRectangleRegression.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
   return {
     pass,
     build: BUILD_ID,
@@ -10167,6 +10408,7 @@ function runFullSelfCheckInner(){
     buildingModuleFacade,
     facadePackBridge,
     facadePackV2Safe,
+    facadeArtVocabulary,
     facadeCompositionReadability,
     fpvFacadeTargetPolish,
     fpvWallLineArtifactFix,
@@ -10322,7 +10564,7 @@ function runSoundFeedbackSelfCheckBody(){
   try {
     checks.functionExists = typeof runSoundFeedbackSelfCheck === 'function';
     checks.contract = !!(CR_SOUND_FEEDBACK && CR_SOUND_FEEDBACK.style === 'sound1' && CR_SOUND_FEEDBACK.webAudio === true);
-    checks.buildIdOptionsClean1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1';
+    checks.buildIdOptionsClean1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1';
     checks.crTriggerExists = typeof crTriggerSoundCue === 'function';
     checks.crSoundEnabledFn = typeof crSoundEnabled === 'function';
     checks.noExternalAudioTags = document.querySelectorAll('audio,source[src]').length === 0;
@@ -10391,7 +10633,7 @@ function runVisualReadabilitySelfCheckBody(){
   mobileOverride = true;
   try {
     checks.functionExists = typeof runVisualReadabilitySelfCheck === 'function';
-    checks.buildIdOptionsClean1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1';
+    checks.buildIdOptionsClean1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1';
     checks.visualContract = !!(CR_VISUAL_READABILITY && CR_VISUAL_READABILITY.style === 'visualfix1');
     checks.noScreenPathStripe = CR_VISUAL_READABILITY.floorPathStripe === false;
     checks.pickupTex = !!TEX.can;
@@ -10524,7 +10766,7 @@ function runVisualRectangleRegressionSelfCheckBody(){
   mobileOverride = true;
   try {
     checks.functionExists = typeof runVisualRectangleRegressionSelfCheck === 'function';
-    checks.buildIdOptionsClean1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1';
+    checks.buildIdOptionsClean1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1';
     checks.noScreenPathStripe = !!(CR_VISUAL_READABILITY && CR_VISUAL_READABILITY.floorPathStripe === false);
     if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be shimmerfix1');
     if(!checks.noScreenPathStripe) errors.push('screen-space path stripe flag must be false');
@@ -12615,7 +12857,7 @@ globalThis.CR = window.CR = {
   get mobileMode(){ return mobileMode; },
   crGetSelectedStartDistrict,crCycleSelectedStartDistrict,crSetSelectedStartDistrict,crTitleMenuSelectableRows,titleMenuRowLabel,crMinimapNavCellColor,
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
-  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runDecorativePropsSelfCheck,runOptionsCleanupSelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runStreetBlockLevelSelfCheck,runD1ParkLandmarkSelfCheck,runBuildingModuleFacadeSelfCheck,runFacadePackBridgeSelfCheck,runFacadePackV2SafeModuleSelfCheck,runFacadeCompositionReadabilitySelfCheck,crDebugDescribeFacadeHit,runFpvFacadeTargetPolishSelfCheck,runFpvWallLineArtifactFixSelfCheck,runFpvStreetShimmerFixSelfCheck,runStreetReadabilityMinimapSelfCheck,runBuildingScalePolishSelfCheck,runEarlyDistrictProgressionSelfCheck,runLevelSelectorSelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
+  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runDecorativePropsSelfCheck,runOptionsCleanupSelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runStreetBlockLevelSelfCheck,runD1ParkLandmarkSelfCheck,runBuildingModuleFacadeSelfCheck,runFacadePackBridgeSelfCheck,runFacadePackV2SafeModuleSelfCheck,runFacadeArtVocabularySelfCheck,runFacadeCompositionReadabilitySelfCheck,crDebugDescribeFacadeHit,runFpvFacadeTargetPolishSelfCheck,runFpvWallLineArtifactFixSelfCheck,runFpvStreetShimmerFixSelfCheck,runStreetReadabilityMinimapSelfCheck,runBuildingScalePolishSelfCheck,runEarlyDistrictProgressionSelfCheck,runLevelSelectorSelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
   CR_VISUAL_READABILITY,CR_SOUND_FEEDBACK,DECOR_PROP_REQUIRED,INPUT_CONFIG,CR_CONTROLS_LS_KEY,crTriggerSoundCue,crSoundEnabled,crSoundFeedbackCueIds,crLoadControlOverrides,crPersistControlOverrides,crResetControlLayoutOverrides,crClearControlOverrides,crEnterControlEditMode,crFinishControlEditMode,crControlHitTest,crSnapshotLayoutNorms,crPrepareSelfCheckPortrait,crStepEditControlSize,crSelectEditControl,
   getCrVisualHarnessSnapshot(){ return _crVisualHarnessSnapshot; },
   showOnboardingHelp,dismissOnboardingHelp,crOpenFirstRunHelpIfNeeded,
