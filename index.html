@@ -587,7 +587,9 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'streetread1';
+const BUILD_ID = 'shimmerfix1';
+const CR_FPV_STREET_SHIMMER_FIX = 1;
+const CR_FPV_STREET_MATTE = true;
 /** Visual readability contract (render/HUD only; gameplay unchanged). */
 const CR_VISUAL_READABILITY = {
   style: 'visualfix1',
@@ -2245,9 +2247,9 @@ function crDrawProceduralFacadeCue(ctx, col, drawStart, sliceH, wt){
     ctx.fillStyle = wt === WALL.GLASS ? 'rgba(100,125,150,0.42)' : 'rgba(55,70,88,0.45)';
     ctx.fillRect(col, winY, doorW, winH);
     if(sliceH > 22){ winY += winH + 3; ctx.fillRect(col, winY, doorW, winH); }
-    if(wt === WALL.GLASS && sliceH > 18){
-      ctx.fillStyle = 'rgba(200,175,120,0.35)';
-      ctx.fillRect(col, drawStart + 2, doorW + 1, Math.max(2, (sliceH * 0.08)|0));
+    if(wt === WALL.GLASS && sliceH > 22){
+      ctx.fillStyle = 'rgba(175,155,105,0.22)';
+      ctx.fillRect(col, drawStart + 3, doorW + 1, Math.max(3, (sliceH * 0.07)|0));
     }
   }
   if(wt === WALL.GARAGE){
@@ -3882,23 +3884,15 @@ function crPlayerNearBuildingEdge(){
 }
 
 function crDrawFpvStreetReadabilityCues(){
-  if(!game.streetLayoutMeta) return;
+  // Matte zone tint in lower FPV only — no screen-fixed horizon bands (those read wet/reflective vs scrolling walls).
+  if(!game.streetLayoutMeta || !CR_FPV_STREET_MATTE) return;
   const zm = crStreetZoneAt(player.x|0, player.y|0, game.streetLayoutMeta);
-  if(zm === 'MAIN_ROAD'){
-    bctx.fillStyle='rgba(72,76,86,0.28)';
-    bctx.fillRect(0, RH/2+3, RW, 4);
-    bctx.fillStyle='rgba(48,50,58,0.32)';
-    bctx.fillRect(0, RH-10, RW, 5);
-  } else if(zm === 'BACK_ALLEY'){
-    bctx.fillStyle='rgba(55,58,66,0.22)';
-    bctx.fillRect(0, RH/2+5, RW, 3);
-  }
-  if(crPlayerNearBuildingEdge()){
-    bctx.fillStyle='rgba(110,105,98,0.16)';
-    bctx.fillRect(0, RH/2, RW, 6);
-    bctx.fillStyle='rgba(140,132,118,0.12)';
-    bctx.fillRect(0, RH/2+6, RW, 2);
-  }
+  let tint = 'rgba(34,36,40,0.07)';
+  if(zm === 'MAIN_ROAD') tint = 'rgba(38,40,46,0.06)';
+  else if(zm === 'BACK_ALLEY') tint = 'rgba(32,34,38,0.08)';
+  else if(crPlayerNearBuildingEdge()) tint = 'rgba(44,42,40,0.05)';
+  bctx.fillStyle = tint;
+  bctx.fillRect(0, RH * 0.72, RW, RH * 0.28);
 }
 
 // --- COMMUNITY STREET PUNK SOUTHWEST DECOR PROPS ---
@@ -4679,14 +4673,11 @@ function drawScene(now){
   if(skyBuilt!==game.modifier) buildSky(game.modifier);
   bctx.drawImage(skyCanvas,0,0);
 
-  // --- FLOOR (asphalt gradient; higher contrast vs walls) ---
+  // --- FLOOR (matte asphalt — low contrast at horizon to avoid wet/reflective read) ---
   const gfloor=bctx.createLinearGradient(0,RH/2,0,RH);
-  if(game.modifier==='rainy'){ gfloor.addColorStop(0,'#32363e'); gfloor.addColorStop(1,'#14161c'); }
-  else { gfloor.addColorStop(0,'#4a4a52'); gfloor.addColorStop(0.45,'#36363c'); gfloor.addColorStop(1,'#1a1a1e'); }
+  if(game.modifier==='rainy'){ gfloor.addColorStop(0,'#2e3238'); gfloor.addColorStop(1,'#14161c'); }
+  else { gfloor.addColorStop(0,'#3a3a40'); gfloor.addColorStop(0.5,'#323238'); gfloor.addColorStop(1,'#1a1a1e'); }
   bctx.fillStyle=gfloor; bctx.fillRect(0,RH/2,RW,RH/2);
-  // faint road center-line flecks near horizon for asphalt feel
-  bctx.fillStyle='rgba(200,190,120,0.10)';
-  for(let i=0;i<10;i++){ bctx.fillRect((RW/2)-1+(i-5)*4, RH/2+2+i*2, 2, 1); }
   crDrawFpvStreetReadabilityCues();
 
   const px=player.x, py=player.y, a=player.angle;
@@ -4740,7 +4731,7 @@ function drawScene(now){
     if(sh<1){ bctx.fillStyle=`rgba(0,0,0,${(1-sh).toFixed(3)})`; bctx.fillRect(col,drawStart,1,sliceH); }
     const f = Math.min(1, d/visRange)*fogStrength;
     if(f>0){ bctx.fillStyle=`rgba(${fog[0]},${fog[1]},${fog[2]},${f.toFixed(3)})`; bctx.fillRect(col,drawStart,1,sliceH); }
-    if(mass > 1.05 && wt !== WALL.FENCE && wt !== WALL.VAN) crDrawProceduralFacadeCue(bctx, col, drawStart, sliceH, wt);
+    if(mass > 1.05 && wt !== WALL.FENCE && wt !== WALL.VAN && (col & 1) === 0) crDrawProceduralFacadeCue(bctx, col, drawStart, sliceH, wt);
   }
 
   // ---- SPRITES (billboards), projected from WORLD coords (UNCHANGED math) ----
@@ -7675,8 +7666,8 @@ function runDeclarativeControlsSelfCheckBody(){
     checks.menuNotEditable = INPUT_CONFIG.controls.menu && INPUT_CONFIG.controls.menu.editable === false;
     if(!checks.menuNotEditable) errors.push('MENU must stay non-editable');
 
-    checks.buildIdBuildScale1 = BUILD_ID === 'streetread1';
-        if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be streetread1');
+    checks.buildIdBuildScale1 = BUILD_ID === 'shimmerfix1';
+        if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
 
     checks.saveFormatUnchanged = !('controlsLayout' in (options.data || options));
     evidence.inputConfigKeys = Object.keys(INPUT_CONFIG.controls);
@@ -7726,8 +7717,8 @@ function runDecorativePropsSelfCheckBody(){
   const evidence = {};
   const err0 = window.__crRuntimeErrors.length;
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'streetread1';
-    if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be streetread1');
+    checks.buildIdBuildScale1 = BUILD_ID === 'shimmerfix1';
+    if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
 
     checks.decorArrayExported = Array.isArray(DECOR_PROP_REQUIRED) && DECOR_PROP_REQUIRED.length === 12;
     if(!checks.decorArrayExported) errors.push('DECOR_PROP_REQUIRED must list 12 kinds');
@@ -7836,8 +7827,8 @@ function runOptionsCleanupSelfCheckBody(){
   _controlEditActive = false;
   crShowControlEditChrome(false);
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'streetread1';
-        if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be streetread1');
+    checks.buildIdBuildScale1 = BUILD_ID === 'shimmerfix1';
+        if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
 
     state = STATE.TITLE;
     paused = false;
@@ -7989,8 +7980,8 @@ function runLevelSelectorSelfCheckBody(){
   mobileOverride = 'on';
   setMobileMode(true);
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'streetread1';
-    if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be streetread1');
+    checks.buildIdBuildScale1 = BUILD_ID === 'shimmerfix1';
+    if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
     checks.saveVersionUnchanged = SAVE_VERSION === 1;
     checks.controlsSchemaUnchanged = CR_CONTROLS_LS_KEY === 'cannedRun.controls.v1';
 
@@ -8085,6 +8076,123 @@ function runLevelSelectorSelfCheckBody(){
   }
 }
 
+function runFpvStreetShimmerFixSelfCheck(){
+  if(_crHarnessDepth > 0) return runFpvStreetShimmerFixSelfCheckBody();
+  return crWithTemporaryState('fpvStreetShimmerFix', () => runFpvStreetShimmerFixSelfCheckBody());
+}
+
+function runFpvStreetShimmerFixSelfCheckBody(){
+  const errors = [];
+  const warnings = [];
+  const checks = {};
+  const evidence = { districts: [], minimapColors: [], cueContract: null };
+  const err0 = window.__crRuntimeErrors.length;
+  const savedPick = selectedStartDistrict;
+  crPrepareSelfCheckPortrait();
+  try {
+    checks.buildIdShimmerFix1 = BUILD_ID === 'shimmerfix1';
+    checks.fpvMassPreserved = CR_BUILDING_FPV_MASS >= 1.45 && CR_BUILDING_FPV_MASS <= 1.55;
+    checks.matteStreetMode = CR_FPV_STREET_MATTE === true && CR_FPV_STREET_SHIMMER_FIX >= 1;
+    checks.minimapNavPreserved = typeof crMinimapNavCellColor === 'function' && Array.isArray(CR_MINIMAP_NAV_PALETTE);
+    const cueSrc = String(crDrawFpvStreetReadabilityCues);
+    checks.noReflectiveHorizonBands = cueSrc.indexOf('RH/2+3') < 0 && cueSrc.indexOf('RH/2+6') < 0 && cueSrc.indexOf('fillRect(0, RH/2, RW') < 0;
+    checks.bottomMatteTintOnly = cueSrc.indexOf('RH * 0.72') >= 0;
+    evidence.cueContract = { noReflectiveHorizonBands: checks.noReflectiveHorizonBands, bottomMatteTintOnly: checks.bottomMatteTintOnly };
+    checks.saveVersionUnchanged = SAVE_VERSION === 1;
+    checks.controlsSchemaUnchanged = CR_CONTROLS_LS_KEY === 'cannedRun.controls.v1';
+    checks.noMovingBlockers = typeof game.movingBlockers === 'undefined';
+
+    selectedStartDistrict = 1;
+    state = STATE.TITLE;
+    drawMobileMenu();
+    const labels = crTitleMenuSelectableRows().map(it => titleMenuRowLabel(it));
+    checks.levelSelectorBelowNewRun = labels[0] === 'NEW RUN' && (labels[1] || '').indexOf('START DISTRICT: D') === 0;
+    checks.levelSelectorCycle = (function(){
+      selectedStartDistrict = 1;
+      const c = [];
+      for(let i=0;i<5;i++) c.push('D'+crCycleSelectedStartDistrict());
+      return c.join('→') === 'D2→D3→D4→D1→D2';
+    })();
+    evidence.selector = { labels };
+
+    let fpvOk = true;
+    for(const c of [{ seed: 890301, district: 2 }, { seed: 890302, district: 3 }]){
+      game.run = { active: true, harnessOnly: true, customLevel: null };
+      game.seed = c.seed;
+      game.district = c.district;
+      genCity(c.seed, c.district, '');
+      try {
+        drawScene(0);
+      } catch(e){
+        fpvOk = false;
+        errors.push('fpv render d'+c.district+': '+(e && e.message ? e.message : e));
+      }
+      evidence.districts.push({ district: c.district, MAP_W: game.MAP_W, MAP_H: game.MAP_H });
+    }
+    checks.fpvRenderStorefrontDistricts = fpvOk;
+
+    genCity(890301, 2, '');
+    const sampleColors = new Set();
+    for(let sy=1;sy<game.MAP_H-1;sy+=4) for(let sx=1;sx<game.MAP_W-1;sx+=4){
+      sampleColors.add(crMinimapNavCellColor(sx, sy, game.map[sy][sx]));
+    }
+    checks.minimapPaletteLimited = sampleColors.size <= 9;
+    evidence.minimapColors = [...sampleColors].slice(0, 12);
+    checks.footprint40x20 = game.MAP_W === 40 && game.MAP_H === 20;
+
+    let reachOk = true;
+    let propsOk = true;
+    for(const c of [{ seed:890311,district:1},{seed:890312,district:2},{seed:890313,district:3},{seed:890314,district:4}]){
+      game.run = { active: true, harnessOnly: true, customLevel: null };
+      genCity(c.seed, c.district, '');
+      const val = crHarnessValidateProceduralCase(c);
+      if(!val.ok){ reachOk = false; errors.push('reach d'+c.district+': '+val.reason); }
+      for(const p of game.props || []){ if(!canStand(p.x, p.y)) propsOk = false; }
+    }
+    checks.reachabilityD1D4 = reachOk;
+    checks.propsNonCollision = propsOk;
+    checks.runtimeClean = window.__crRuntimeErrors.length === err0;
+
+    state = STATE.TITLE;
+    paused = false;
+    game.run = game.run || {};
+    game.run.active = false;
+    game.run.harnessOnly = false;
+    drawMobileMenu();
+    rmenuAction('title-options');
+    drawMobileMenu();
+    checks.optionsOpens = state === STATE.OPTIONS && crOptionsMenuHtml().indexOf('EDIT CONTROLS') >= 0;
+    state = STATE.TITLE;
+    drawMobileMenu();
+
+    if(!checks.buildIdShimmerFix1) errors.push('BUILD_ID must be shimmerfix1');
+    if(!checks.fpvMassPreserved) errors.push('CR_BUILDING_FPV_MASS must remain ~1.5');
+    if(!checks.matteStreetMode) errors.push('matte street mode flags missing');
+    if(!checks.noReflectiveHorizonBands) errors.push('FPV still uses horizon band overlays');
+    if(!checks.bottomMatteTintOnly) errors.push('FPV street cues must use bottom matte tint only');
+    if(!checks.minimapNavPreserved) errors.push('minimap navigation helper missing');
+    if(!checks.minimapPaletteLimited) errors.push('minimap palette too noisy');
+    if(!checks.fpvRenderStorefrontDistricts) errors.push('D2/D3 FPV render failed');
+    if(!checks.levelSelectorBelowNewRun) errors.push('START DISTRICT row broken');
+    if(!checks.levelSelectorCycle) errors.push('level selector cycle broken');
+    if(!checks.reachabilityD1D4) errors.push('reachability failed');
+    if(!checks.propsNonCollision) errors.push('props collision');
+    if(!checks.optionsOpens) errors.push('OPTIONS broken');
+    if(!checks.runtimeClean) errors.push('runtime errors');
+
+    const pass = errors.length === 0;
+    return { pass, build: BUILD_ID, errors, warnings, checks, evidence };
+  } catch(e){
+    errors.push(String(e && e.message ? e.message : e));
+    return { pass: false, build: BUILD_ID, errors, warnings, checks, evidence };
+  } finally {
+    selectedStartDistrict = savedPick;
+    _selfCheckForcePortrait = false;
+    crForceSafeTitleAfterHarness();
+    drawMobileMenu();
+  }
+}
+
 function runStreetReadabilityMinimapSelfCheck(){
   if(_crHarnessDepth > 0) return runStreetReadabilityMinimapSelfCheckBody();
   return crWithTemporaryState('streetReadabilityMinimap', () => runStreetReadabilityMinimapSelfCheckBody());
@@ -8099,8 +8207,8 @@ function runStreetReadabilityMinimapSelfCheckBody(){
   const savedPick = selectedStartDistrict;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdStreetRead1 = BUILD_ID === 'streetread1';
-    if(!checks.buildIdStreetRead1) errors.push('BUILD_ID must be streetread1');
+    checks.buildIdStreetRead1 = BUILD_ID === 'shimmerfix1';
+    if(!checks.buildIdStreetRead1) errors.push('BUILD_ID must be shimmerfix1 (minimap contract)');
     checks.footprint40x20 = true;
     checks.buildingMassPreserved = CR_BUILDING_FPV_MASS >= 1.45 && CR_BUILDING_FPV_MASS <= 1.55;
     checks.saveVersionUnchanged = SAVE_VERSION === 1;
@@ -8222,8 +8330,8 @@ function runBuildingScalePolishSelfCheckBody(){
   const savedPick = selectedStartDistrict;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'streetread1';
-    if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be streetread1');
+    checks.buildIdBuildScale1 = BUILD_ID === 'shimmerfix1';
+    if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
     checks.fpvMassConstant = CR_BUILDING_FPV_MASS >= 1.45 && CR_BUILDING_FPV_MASS <= 1.55;
     checks.footprint40x20 = true;
     checks.saveVersionUnchanged = SAVE_VERSION === 1;
@@ -8338,8 +8446,8 @@ function runEarlyDistrictProgressionSelfCheckBody(){
   const err0 = window.__crRuntimeErrors.length;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'streetread1';
-    if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be streetread1');
+    checks.buildIdBuildScale1 = BUILD_ID === 'shimmerfix1';
+    if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
     checks.footprintUnchanged = true;
     checks.saveVersionUnchanged = SAVE_VERSION === 1;
     checks.controlsSchemaUnchanged = CR_CONTROLS_LS_KEY === 'cannedRun.controls.v1';
@@ -8437,8 +8545,8 @@ function runD1ParkLandmarkSelfCheckBody(){
   const err0 = window.__crRuntimeErrors.length;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'streetread1';
-    if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be streetread1');
+    checks.buildIdBuildScale1 = BUILD_ID === 'shimmerfix1';
+    if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
 
     const matrix = [
       { seed: 880101, district: 1, modifier: '' },
@@ -8553,8 +8661,8 @@ function runStreetBlockLevelSelfCheckBody(){
   const err0 = window.__crRuntimeErrors.length;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'streetread1';
-    if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be streetread1');
+    checks.buildIdBuildScale1 = BUILD_ID === 'shimmerfix1';
+    if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
 
     const matrix = [
       { seed: 880101, district: 1, modifier: '' },
@@ -8637,6 +8745,7 @@ function runFullSelfCheckInner(){
   const reachability = runReachabilitySelfCheck();
   const streetBlockLevel = runStreetBlockLevelSelfCheck();
   const d1ParkLandmark = runD1ParkLandmarkSelfCheck();
+  const fpvStreetShimmerFix = runFpvStreetShimmerFixSelfCheck();
   const streetReadabilityMinimap = runStreetReadabilityMinimapSelfCheck();
   const buildingScalePolish = runBuildingScalePolishSelfCheck();
   const earlyDistrictProgression = runEarlyDistrictProgressionSelfCheck();
@@ -8652,7 +8761,7 @@ function runFullSelfCheckInner(){
   const levels = runLevelSelfCheck();
   const renderFailure = runRenderFailureSelfCheck();
   const runtimeClean = window.__crRuntimeErrors.length === err0;
-  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && decorativeProps.pass && optionsCleanup.pass && mobileControlReliability.pass && movementCollision.pass && reachability.pass && streetBlockLevel.pass && d1ParkLandmark.pass && streetReadabilityMinimap.pass && buildingScalePolish.pass && earlyDistrictProgression.pass && levelSelector.pass && proceduralLevelValidation.pass && fullRunProgression.pass && onboarding.pass && soundFeedback.pass && declarativeControls.pass && visualReadability.pass && visualRectangleRegression.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
+  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && decorativeProps.pass && optionsCleanup.pass && mobileControlReliability.pass && movementCollision.pass && reachability.pass && streetBlockLevel.pass && d1ParkLandmark.pass && fpvStreetShimmerFix.pass && streetReadabilityMinimap.pass && buildingScalePolish.pass && earlyDistrictProgression.pass && levelSelector.pass && proceduralLevelValidation.pass && fullRunProgression.pass && onboarding.pass && soundFeedback.pass && declarativeControls.pass && visualReadability.pass && visualRectangleRegression.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
   return {
     pass,
     build: BUILD_ID,
@@ -8667,6 +8776,7 @@ function runFullSelfCheckInner(){
     reachability,
     streetBlockLevel,
     d1ParkLandmark,
+    fpvStreetShimmerFix,
     streetReadabilityMinimap,
     buildingScalePolish,
     earlyDistrictProgression,
@@ -8818,13 +8928,13 @@ function runSoundFeedbackSelfCheckBody(){
   try {
     checks.functionExists = typeof runSoundFeedbackSelfCheck === 'function';
     checks.contract = !!(CR_SOUND_FEEDBACK && CR_SOUND_FEEDBACK.style === 'sound1' && CR_SOUND_FEEDBACK.webAudio === true);
-    checks.buildIdOptionsClean1 = BUILD_ID === 'streetread1';
+    checks.buildIdOptionsClean1 = BUILD_ID === 'shimmerfix1';
     checks.crTriggerExists = typeof crTriggerSoundCue === 'function';
     checks.crSoundEnabledFn = typeof crSoundEnabled === 'function';
     checks.noExternalAudioTags = document.querySelectorAll('audio,source[src]').length === 0;
     checks.harnessMuted = _crHarnessDepth > 0 && crSoundEnabled() === false;
     if(!checks.contract) errors.push('CR_SOUND_FEEDBACK contract missing');
-    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be streetread1');
+    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be shimmerfix1');
     if(!checks.crTriggerExists) errors.push('crTriggerSoundCue missing');
     if(!checks.harnessMuted) errors.push('harness must mute gameplay sound');
     if(!checks.noExternalAudioTags) errors.push('external audio tags present');
@@ -8887,13 +8997,13 @@ function runVisualReadabilitySelfCheckBody(){
   mobileOverride = true;
   try {
     checks.functionExists = typeof runVisualReadabilitySelfCheck === 'function';
-    checks.buildIdOptionsClean1 = BUILD_ID === 'streetread1';
+    checks.buildIdOptionsClean1 = BUILD_ID === 'shimmerfix1';
     checks.visualContract = !!(CR_VISUAL_READABILITY && CR_VISUAL_READABILITY.style === 'visualfix1');
     checks.noScreenPathStripe = CR_VISUAL_READABILITY.floorPathStripe === false;
     checks.pickupTex = !!TEX.can;
     checks.npcTex = !!TEX.hungry;
     checks.exitTex = !!TEX.exit;
-    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be streetread1');
+    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be shimmerfix1');
     if(!checks.visualContract) errors.push('CR_VISUAL_READABILITY contract missing');
     if(!checks.noScreenPathStripe) errors.push('screen-space floor path stripe must stay disabled');
     if(!checks.pickupTex || !checks.npcTex || !checks.exitTex) errors.push('sprite textures missing');
@@ -9020,9 +9130,9 @@ function runVisualRectangleRegressionSelfCheckBody(){
   mobileOverride = true;
   try {
     checks.functionExists = typeof runVisualRectangleRegressionSelfCheck === 'function';
-    checks.buildIdOptionsClean1 = BUILD_ID === 'streetread1';
+    checks.buildIdOptionsClean1 = BUILD_ID === 'shimmerfix1';
     checks.noScreenPathStripe = !!(CR_VISUAL_READABILITY && CR_VISUAL_READABILITY.floorPathStripe === false);
-    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be streetread1');
+    if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be shimmerfix1');
     if(!checks.noScreenPathStripe) errors.push('screen-space path stripe flag must be false');
 
     startRun(42);
@@ -11111,7 +11221,7 @@ globalThis.CR = window.CR = {
   get mobileMode(){ return mobileMode; },
   crGetSelectedStartDistrict,crCycleSelectedStartDistrict,crSetSelectedStartDistrict,crTitleMenuSelectableRows,titleMenuRowLabel,crMinimapNavCellColor,
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
-  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runDecorativePropsSelfCheck,runOptionsCleanupSelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runStreetBlockLevelSelfCheck,runD1ParkLandmarkSelfCheck,runStreetReadabilityMinimapSelfCheck,runBuildingScalePolishSelfCheck,runEarlyDistrictProgressionSelfCheck,runLevelSelectorSelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
+  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runDecorativePropsSelfCheck,runOptionsCleanupSelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runStreetBlockLevelSelfCheck,runD1ParkLandmarkSelfCheck,runFpvStreetShimmerFixSelfCheck,runStreetReadabilityMinimapSelfCheck,runBuildingScalePolishSelfCheck,runEarlyDistrictProgressionSelfCheck,runLevelSelectorSelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
   CR_VISUAL_READABILITY,CR_SOUND_FEEDBACK,DECOR_PROP_REQUIRED,INPUT_CONFIG,CR_CONTROLS_LS_KEY,crTriggerSoundCue,crSoundEnabled,crSoundFeedbackCueIds,crLoadControlOverrides,crPersistControlOverrides,crResetControlLayoutOverrides,crClearControlOverrides,crEnterControlEditMode,crFinishControlEditMode,crControlHitTest,crSnapshotLayoutNorms,crPrepareSelfCheckPortrait,crStepEditControlSize,crSelectEditControl,
   getCrVisualHarnessSnapshot(){ return _crVisualHarnessSnapshot; },
   showOnboardingHelp,dismissOnboardingHelp,crOpenFirstRunHelpIfNeeded,
