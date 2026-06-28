@@ -1499,6 +1499,60 @@ async function facadePackV2SafeSection(page) {
   return { pass: v2.pass === true, facadePackV2Safe: v2 };
 }
 
+async function spriteGroundAnchorSection(page) {
+  const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  const result = await page.evaluate(async () => {
+    const CR = window.CR;
+    const out = { pass: false, checks: {}, evidence: {}, errors: [] };
+    try {
+      const r = CR.runSpriteGroundAnchorSelfCheck();
+      out.pass = !!r.pass;
+      out.checks = r.checks || {};
+      out.evidence = r.evidence || {};
+      out.errors = r.errors || [];
+      out.debug = CR.crDebugSpriteProjection();
+      CR.genCity(903101, 1, '');
+      CR.state = CR.STATE.PLAY;
+      CR.player.x = 20; CR.player.y = 10; CR.player.angle = 0;
+      if (typeof CR.drawScene === 'function') CR.drawScene(performance.now());
+      const fpv = document.getElementById('fpv');
+      if (fpv) out.d1Png = fpv.toDataURL('image/png');
+      CR.genCity(903202, 2, '');
+      CR.state = CR.STATE.PLAY;
+      CR.player.x = 20; CR.player.y = 10; CR.player.angle = -Math.PI / 2;
+      if (typeof CR.drawScene === 'function') CR.drawScene(performance.now());
+      if (fpv) out.d2NpcPng = fpv.toDataURL('image/png');
+      const dbg2 = CR.crDebugSpriteProjection();
+      out.d2Debug = dbg2;
+      CR.genCity(903203, 3, '');
+      CR.state = CR.STATE.PLAY;
+      CR.player.x = 20; CR.player.y = 10; CR.player.angle = 0;
+      if (typeof CR.drawScene === 'function') CR.drawScene(performance.now());
+      if (fpv) out.d3Png = fpv.toDataURL('image/png');
+      const mm = document.getElementById('minimap');
+      if (mm) out.minimapPng = mm.toDataURL('image/png');
+    } catch (e) {
+      out.errors.push(String(e && e.message ? e.message : e));
+    }
+    return out;
+  });
+  const fs = require('fs');
+  const path = require('path');
+  const root = path.join(__dirname, '..');
+  fs.writeFileSync(path.join(root, 'proof-sprite-ground-anchor.json'), JSON.stringify(result, null, 2));
+  fs.writeFileSync(path.join(root, 'proof-spriteground-debug.json'), JSON.stringify(result.debug || result.d2Debug || {}, null, 2));
+  if (result.d1Png) fs.writeFileSync(path.join(root, 'proof-spriteground-d1-grounded.png'), Buffer.from(result.d1Png.split(',')[1], 'base64'));
+  if (result.d2NpcPng) {
+    fs.writeFileSync(path.join(root, 'proof-spriteground-d2-npc-storefront.png'), Buffer.from(result.d2NpcPng.split(',')[1], 'base64'));
+    fs.writeFileSync(path.join(root, 'proof-spriteground-d2-can-grounded.png'), Buffer.from(result.d2NpcPng.split(',')[1], 'base64'));
+  }
+  if (result.d3Png) fs.writeFileSync(path.join(root, 'proof-spriteground-d3-garage-human-scale.png'), Buffer.from(result.d3Png.split(',')[1], 'base64'));
+  if (result.minimapPng) fs.writeFileSync(path.join(root, 'proof-spriteground-minimap-preserved.png'), Buffer.from(result.minimapPng.split(',')[1], 'base64'));
+  return { pass: !!result.pass, errors: result.errors };
+}
+
 async function facadeArtVocabularySection(page) {
   const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
   await page.setViewportSize({ width: 412, height: 915 });
@@ -2184,6 +2238,7 @@ async function main() {
   const buildingModuleFacade = await buildingModuleFacadeSection(page);
   const facadePackBridge = await facadePackBridgeSection(page);
   const facadePackV2Safe = await facadePackV2SafeSection(page);
+  const spriteGroundAnchor = await spriteGroundAnchorSection(page);
   const facadeArtVocabulary = await facadeArtVocabularySection(page);
   const facadeCompositionReadability = await facadeCompositionReadabilitySection(page);
   const fpvFacadeTargetPolish = await fpvFacadeTargetPolishSection(page);
@@ -2245,6 +2300,7 @@ async function main() {
     buildingModuleFacade.pass &&
     facadePackBridge.pass &&
     facadePackV2Safe.pass &&
+    spriteGroundAnchor.pass &&
     facadeArtVocabulary.pass &&
     facadeCompositionReadability.pass &&
     fpvFacadeTargetPolish.pass &&
@@ -2305,6 +2361,7 @@ async function main() {
     buildingModuleFacade,
     facadePackBridge,
     facadePackV2Safe,
+    spriteGroundAnchor,
     facadeArtVocabulary,
     facadeCompositionReadability,
     fpvFacadeTargetPolish,
