@@ -1270,6 +1270,43 @@ async function fpvStreetShimmerFixSection(page) {
   return { pass: sf.pass === true, fpvStreetShimmerFix: sf };
 }
 
+async function fpvWallLineArtifactFixSection(page) {
+  const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await waitGameReady(page);
+
+  const wf = await page.evaluate(() => CR.runFpvWallLineArtifactFixSelfCheck());
+  writeProof('proof-fpv-wall-line-artifact-fix.json', wf);
+
+  const shots = [
+    { d: 1, seed: 890401, file: 'proof-fpv-wallfix-d1.png', angle: 0 },
+    { d: 2, seed: 890402, file: 'proof-fpv-wallfix-d2-storefront.png', angle: Math.PI / 2 },
+    { d: 3, seed: 890403, file: 'proof-fpv-wallfix-d3-alley.png', angle: Math.PI * 0.75 },
+  ];
+  for (const s of shots) {
+    await page.evaluate(({ d, seed, angle }) => {
+      CR.crSetSelectedStartDistrict(d);
+      CR.startRun(seed);
+      CR.state = CR.STATE.PLAY;
+      CR.paused = false;
+      if (typeof CR.player !== 'undefined') CR.player.angle = angle;
+    }, s);
+    await page.waitForTimeout(180);
+    await page.screenshot({ path: path.join(ROOT, s.file) });
+  }
+  await page.evaluate(() => {
+    CR.crSetSelectedStartDistrict(2);
+    CR.startRun(890402);
+    CR.state = CR.STATE.PLAY;
+    CR.paused = false;
+  });
+  await page.waitForTimeout(80);
+  await page.screenshot({ path: path.join(ROOT, 'proof-wallfix-minimap-preserved.png') });
+
+  return { pass: wf.pass === true, fpvWallLineArtifactFix: wf };
+}
+
 async function streetReadabilityMinimapSection(page) {
   const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
   await page.setViewportSize({ width: 412, height: 915 });
@@ -1736,6 +1773,7 @@ async function main() {
   const decorativeProps = await decorativePropsSection(page);
   const streetBlockLevel = await streetBlockLevelSection(page);
   const d1ParkLandmark = await d1ParkLandmarkSection(page);
+  const fpvWallLineArtifactFix = await fpvWallLineArtifactFixSection(page);
   const fpvStreetShimmerFix = await fpvStreetShimmerFixSection(page);
   const streetReadabilityMinimap = await streetReadabilityMinimapSection(page);
   const earlyDistrictProgression = await earlyDistrictProgressionSection(page);
@@ -1790,6 +1828,7 @@ async function main() {
     decorativeProps.pass &&
     streetBlockLevel.pass &&
     d1ParkLandmark.pass &&
+    fpvWallLineArtifactFix.pass &&
     fpvStreetShimmerFix.pass &&
     streetReadabilityMinimap.pass &&
     earlyDistrictProgression.pass &&
@@ -1843,6 +1882,7 @@ async function main() {
     decorativeProps,
     streetBlockLevel,
     d1ParkLandmark,
+    fpvWallLineArtifactFix,
     fpvStreetShimmerFix,
     streetReadabilityMinimap,
     earlyDistrictProgression,
