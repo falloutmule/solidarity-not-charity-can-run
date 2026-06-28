@@ -2,7 +2,7 @@
 
 SNC Can Run uses **in-browser self-checks** (`window.CR`) plus a **Playwright** driver that loads root **`index.html`** and collects proofs.
 
-**Gameplay baseline:** `BUILD_ID` `streetread1` — see `PROJECT_STATUS.md` for cache-busted Play / self-check URLs.
+**Gameplay baseline:** `BUILD_ID` `shimmerfix1` — see `PROJECT_STATUS.md` for cache-busted Play / self-check URLs.
 
 ## In-browser (`window.CR`)
 
@@ -53,6 +53,8 @@ SNC Can Run uses **in-browser self-checks** (`window.CR`) plus a **Playwright** 
 | `proof-building-scale-d1.png` … `proof-building-scale-d4.png` / `proof-building-scale-minimap.png` | Building scale proof shots |
 | `proof-street-readability-minimap.json` | Street readability / minimap self-check |
 | `proof-street-readability-d1.png` … `proof-street-readability-d4.png` / `proof-street-readability-minimap.png` | Minimap nav + FPV readability shots |
+| `proof-fpv-street-shimmer-fix.json` | FPV street shimmer fix self-check |
+| `proof-fpv-street-shimmer-d2.png` / `proof-fpv-street-shimmer-d3.png` / `proof-streetread-minimap-preserved.png` | Matte FPV road + minimap preserved |
 | `proof-options-cleanup-menu.png` / `proof-options-cleanup-edit-controls.png` | OPTIONS cleanup proof shots |
 | `proof-control-resize-move-before.png` … `proof-control-resize-button-after.png` | Resize proof shots |
 | `proof-control-edit-reset.png` | RESET CONTROLS |

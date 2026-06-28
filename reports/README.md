@@ -1,7 +1,7 @@
 # Reports — SNC Can Run
 
 Main hub for guard cards, reference studies, history, proofs, and backups.  
-**Gameplay baseline:** `streetread1` — see **`../PROJECT_STATUS.md`**.
+**Gameplay baseline:** `shimmerfix1` — see **`../PROJECT_STATUS.md`**.
 
 Reports were moved out of the repo root so GitHub shows only the game + core docs.
 
@@ -40,6 +40,7 @@ Reports were moved out of the repo root so GitHub shows only the game + core doc
 | 27 | Level selector (START DISTRICT) | [guards/LEVEL_SELECTOR_PASS_REPORT.md](guards/LEVEL_SELECTOR_PASS_REPORT.md) | `levelselect1` / `9136c01` | `CR.runLevelSelectorSelfCheck` + selector proof PNGs | Yes (title menu testing) |
 | 28 | Building scale / street mass | [guards/BUILDING_SCALE_POLISH_REPORT.md](guards/BUILDING_SCALE_POLISH_REPORT.md) | `buildscale1` / `0092fab` | `CR.runBuildingScalePolishSelfCheck` + building-scale PNGs | Yes (FPV + band mass) |
 | 29 | Street readability / minimap | [guards/STREET_READABILITY_MINIMAP_REPORT.md](guards/STREET_READABILITY_MINIMAP_REPORT.md) | `streetread1` / `3cd3b7f` | `CR.runStreetReadabilityMinimapSelfCheck` + readability PNGs | Yes (minimap nav palette) |
+| 30 | FPV street shimmer fix | [guards/FPV_STREET_SHIMMER_FIX_REPORT.md](guards/FPV_STREET_SHIMMER_FIX_REPORT.md) | `shimmerfix1` / `7f3ad89` | `CR.runFpvStreetShimmerFixSelfCheck` + FPV matte road PNGs | Yes (D2/D3 storefront FPV) |
 
 ---
 
