@@ -1,6 +1,7 @@
 # Facade pack bridge / lab sync pass
 
 **BUILD_ID:** `facadepack1`  
+**Gameplay commit:** `0a8d34f`  
 **Prior baseline:** `modules1` / `0905d1d`  
 **Backup:** `index.before-facade-pack-bridge.html`  
 **Reference (not imported):** `snc-building-module-lab.html` (concept only; pack lives in game)
@@ -65,9 +66,13 @@ npm run test:selfcheck
 
 ## CI
 
-*(Fill run URL after push.)*
-
+- **GitHub Actions:** https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28326390332 — **success**
 - Artifact: `snc-can-run-proof-artifacts`
+
+## Play URLs
+
+- Play: https://falloutmule.github.io/solidarity-not-charity-can-run/?v=0a8d34f&mobile=on&portraitlayout=1
+- Self-check: https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=0a8d34f&mobile=on&portraitlayout=1
 
 ## Proof paths
 
@@ -81,4 +86,4 @@ npm run test:selfcheck
 
 ## Play URLs
 
-*(Update `v=` with gameplay commit hash after push.)*
+*(See CI section above.)*
