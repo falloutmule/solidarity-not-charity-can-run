@@ -2,6 +2,10 @@
   "name": "solidarity-not-charity-can-run",
   "private": true,
   "scripts": {
+    "build": "node tools/build-single-file.js",
+    "build:check": "node tools/build-single-file.js --check",
+    "build:min": "node tools/build-single-file.js --min",
+    "pretest:selfcheck": "npm run build:check",
     "test:selfcheck": "node tests/run_selfcheck_playwright.js"
   },
   "devDependencies": {

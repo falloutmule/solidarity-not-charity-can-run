@@ -1,0 +1,60 @@
+<canvas id="view"></canvas>
+<!-- mobile control overlay -->
+<div id="mob">
+  <div id="ml" class="mbtn"><div class="mjl" id="mjdot"></div><span class="mcap">MOVE</span></div>
+    <div id="mlookpad" class="mbtn" aria-hidden="true">
+      <span>LOOK</span><span style="font-size:8px;opacity:0.7">DRAG</span>
+    </div>
+    <div id="mr" class="mbtn">
+      <div id="mlookhint">LOOK<br>DRAG TO TURN</div>
+      <span class="mlook-arrows" aria-hidden="true">&#8592; &#8594;</span>
+    </div>
+  <div id="mg" class="mbtn">GIVE</div>
+  <div id="ms" class="mbtn">SPRINT</div>
+  <div id="mportmenu" class="mbtn" type="button">MENU</div>
+  <div id="mm" class="mbtn">MAP</div>
+  <div id="mp" class="mbtn">PAUSE</div>
+</div>
+<!-- portrait orientation hint -->
+<div id="porthint" aria-hidden="true">
+  <div>Solidarity Not Charity Can Run</div>
+  <div style="color:#6a5a3a;font-size:12px;">Fullscreen is optional.</div>
+  <div style="color:#4a3a2a;font-size:11px;">Use the FULLSCREEN button any time.</div>
+  <button id="portplay" type="button">OK</button>
+</div>
+<div id="cronboard" aria-hidden="true">
+  <div class="cronboard-panel">
+    <div class="cronboard-tit">How to Play</div>
+    <ul class="cronboard-ul">
+      <li>Collect cans.</li>
+      <li>Help people with GIVE when close enough.</li>
+      <li>Reach the quota.</li>
+      <li>Find the exit to finish the district.</li>
+      <li>Choose an upgrade and keep going.</li>
+    </ul>
+    <div class="cronboard-ctrl">MOVE: walk · LOOK: turn · SPRINT: move faster · GIVE: help / give cans · MENU: pause, options, restart</div>
+    <div class="cronboard-note">If mobile controls get misplaced, open with resetcontrols=1.</div>
+    <button id="cronboardok" type="button">GOT IT</button>
+  </div>
+</div>
+<!-- responsive mobile menu panels (injected by JS, shown via class toggle) -->
+<div id="rmenu" class="rpan in"></div>
+<!-- small fullscreen toggle for mobile in-game -->
+<div id="fsbtn">FULLSCREEN</div>
+<!-- fullscreen unavailable toast -->
+<div id="fstoast"></div>
+<!-- touch debug overlay (gated by ?touchdebug=1) -->
+<div id="touchdebug" aria-hidden="true"></div>
+<div id="crselfcheck" aria-hidden="true"></div>
+<div id="crCtrlEditBar" aria-hidden="true">
+  <div class="cr-edit-bar-row">
+    <span id="crCtrlEditSelected">SELECTED: MOVE</span>
+  </div>
+  <div class="cr-edit-bar-row">
+    <button id="crCtrlEditSizeDown" type="button">SIZE −</button>
+    <button id="crCtrlEditSizeUp" type="button">SIZE +</button>
+    <button id="crCtrlEditDone" type="button">DONE</button>
+    <button id="crCtrlEditCancel" type="button">CANCEL</button>
+    <button id="crCtrlEditReset" type="button">RESET</button>
+  </div>
+</div>

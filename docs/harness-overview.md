@@ -2,7 +2,7 @@
 
 SNC Can Run uses **in-browser self-checks** (`window.CR`) plus a **Playwright** driver that loads root **`index.html`** and collects proofs.
 
-**Gameplay baseline:** `BUILD_ID` `spriteground1` — see `PROJECT_STATUS.md` for cache-busted Play / self-check URLs.
+**Gameplay baseline:** `BUILD_ID` `spriteground1` — see `PROJECT_STATUS.md`. **Build:** `npm run build` / `build:check` (see `src/README.md`).
 
 ## In-browser (`window.CR`)
 
@@ -60,6 +60,8 @@ SNC Can Run uses **in-browser self-checks** (`window.CR`) plus a **Playwright** 
 | `proof-fpv-facade-target-polish.json` | FPV facade target polish self-check |
 | `proof-building-module-facade.json` | Building module / facade role self-check |
 | `proof-facade-pack-v2-safe.txt` | `CR_FACADE_PACK` snapshot (v2 safe modules) |
+| `proof-source-build-pipeline.json` | Playwright gate: `build:check` + manifest proof |
+| `proof-source-build-manifest.json` | Input/output SHA-256 from `tools/build-single-file.js` |
 | `proof-sprite-ground-anchor.json` | Sprite ground anchor self-check |
 | `proof-facade-art-vocabulary.json` | Facade art vocabulary self-check |
 | `proof-facade-composition-readability.json` | Facade composition self-check |

@@ -1,0 +1,140 @@
+{
+  "generatedAt": "2026-06-28T20:52:04.683Z",
+  "output": "index.html",
+  "outputSha256": "0565e70870bcde188e6e43a36b5ae413aeceed2313660577cdacd02d6316d984",
+  "outputBytes": 562769,
+  "inputs": [
+    {
+      "path": "src/template.html",
+      "sha256": "8514eab1da1e6cdfc2ba50b2c88c347cf66bf76a4e2856211604744874bd1ebb",
+      "bytes": 683
+    },
+    {
+      "path": "src/styles/game.css",
+      "sha256": "ff99829ab35df66ee993ddd7fb24363f4b039ae1098373e10a31bc697587f635",
+      "bytes": 12912
+    },
+    {
+      "path": "src/html/body.html",
+      "sha256": "308ad2c6f0761586a5a38698de4f824f566946976e9addcbbd1888b4a46f08a4",
+      "bytes": 2670
+    },
+    {
+      "path": "src/js/game-00-preamble.js",
+      "sha256": "c32dbc071e7e497bac7eb81ca48eec05ab4cd2d145bd30dc4824fff8a5aa2a11",
+      "bytes": 2745
+    },
+    {
+      "path": "src/js/game-01-section-0-canvas-resolution.js",
+      "sha256": "7561b9db38ba1da3ecf6735f33259dde24f6b0983776e7b03cf6ab4ee93c9324",
+      "bytes": 563
+    },
+    {
+      "path": "src/js/game-02-section-0b-fullscreen-api-helpers.js",
+      "sha256": "91a91fc26f7ce830d4ebd99d22ff423a8c1265a75f357e1d07d99d9356b5497d",
+      "bytes": 5069
+    },
+    {
+      "path": "src/js/game-03-section-0c-debug-flag.js",
+      "sha256": "a4d858a4cf9681533600cc6bc592a2b78acfdcaae0024ffaa952d71aae9f37c9",
+      "bytes": 805
+    },
+    {
+      "path": "src/js/game-04-section-1-seeded-rng-mulberry32.js",
+      "sha256": "00d104060e8b470bd4c3b9316efc5d8cb171b73c4964555dad5a3760dbc2fdaf",
+      "bytes": 451
+    },
+    {
+      "path": "src/js/game-05-section-2-game-state.js",
+      "sha256": "c58f66a71e67d5f57f2911df3d70a686def0d351495a0016cab3ab2bb0c00259",
+      "bytes": 1504
+    },
+    {
+      "path": "src/js/game-06-section-2b-mobile-touch-input.js",
+      "sha256": "940363f7d638272ea0a5af55a0feff04f82cb7da2b105d176cea27621323c1fb",
+      "bytes": 53538
+    },
+    {
+      "path": "src/js/game-07-section-2c-responsive-mobile-menu-html-overlay.js",
+      "sha256": "42705f0fdc480c4a069b363bfeb06a4f389f9aeab471c5fcd1bacbb632d756aa",
+      "bytes": 17861
+    },
+    {
+      "path": "src/js/game-08-section-2d-mobile-init.js",
+      "sha256": "5c44f01ca25f133a261822e7453c3409b4164e0c729a1f49e76a7b7cefe39624",
+      "bytes": 225
+    },
+    {
+      "path": "src/js/game-09-section-3-city-generation.js",
+      "sha256": "9ceb008d21f7ee695666cba5a687a6ce5b4ce40037410c7b0e6f84459c5ffd10",
+      "bytes": 51984
+    },
+    {
+      "path": "src/js/game-10-section-3b.js",
+      "sha256": "66ba2b5996732e71390d3e0cc5b9bfdfe58ae3d6d383ceaa3274b3759655debe",
+      "bytes": 79
+    },
+    {
+      "path": "src/js/game-11-section-3b.js",
+      "sha256": "ad41a49ec8f881bd6d0a318a6b6d1e6fd49cd23f4c3901328d7108fd14dcf5e2",
+      "bytes": 8458
+    },
+    {
+      "path": "src/js/game-12-section-4-collision-walk-helpers.js",
+      "sha256": "3979ba89200d75f0124d2d567c1635ee3325c1d885b4ee8ca49162514b84372a",
+      "bytes": 5032
+    },
+    {
+      "path": "src/js/game-13-section-5-audio-centralized-audiocontext-unlock-.js",
+      "sha256": "1844e3327cae6fb738199d9fe10d94e3f096440e23ae600c71a2c8e1d2623d1d",
+      "bytes": 4889
+    },
+    {
+      "path": "src/js/game-14-section-5b-local-persistence.js",
+      "sha256": "47a7c1cb97e952569d8b26f6ececdff54a8a4bfa4e8b29af95d5c88cdb7bdc28",
+      "bytes": 16471
+    },
+    {
+      "path": "src/js/game-15-section-6-procedural-assets.js",
+      "sha256": "8e1b8a529c0208d3cb18e23e7adf7247f842cf9813838a597f2c4c54147118ef",
+      "bytes": 41648
+    },
+    {
+      "path": "src/js/game-16-section-7-render.js",
+      "sha256": "f9d69b3f325d41ff6748cd4bd39db64a14fb49acd32575d9a38655c963a7d920",
+      "bytes": 8665
+    },
+    {
+      "path": "src/js/game-17-section-8-minimap.js",
+      "sha256": "31a4bfee249a88b22339510a9d8ef0f544460ab829726406fa1a2a11c868d02c",
+      "bytes": 5299
+    },
+    {
+      "path": "src/js/game-18-section-9-hud-reticle-popups.js",
+      "sha256": "3e91ccce6649a19b1596fd7bdb6a4350817a3fce28971eafab2be2e7cf63aa74",
+      "bytes": 5951
+    },
+    {
+      "path": "src/js/game-19-section-10-gameplay-actions.js",
+      "sha256": "8c38a207642c7d49f5184da96d7a708ad5814fbf08fbf1a7924b409632e76445",
+      "bytes": 4880
+    },
+    {
+      "path": "src/js/game-20-section-11-update-input.js",
+      "sha256": "bd8b6de7dfbbf96ba9857bb6900f829a533170c23a07db7447cf31e4f4e80066",
+      "bytes": 21566
+    },
+    {
+      "path": "src/js/game-21-section-12-overlays.js",
+      "sha256": "44bf373ae77ed80d90837b9e39a925f404d0f3c55910720027abec691a6af007",
+      "bytes": 15385
+    },
+    {
+      "path": "src/js/game-22-section-13-main-loop.js",
+      "sha256": "1e62ca61fecca22dc5a0feab478f10c01bba5ffba530d455ae2d8dce4a913ed0",
+      "bytes": 273465
+    }
+  ],
+  "nodeVersion": "v24.14.0",
+  "check": "pass"
+}

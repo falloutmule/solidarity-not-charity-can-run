@@ -39,5 +39,6 @@ jobs:
           path: |
             proof-*.json
             proof-*.png
+            proof-source-build-manifest.json
             reports/proofs/current/**
           if-no-files-found: warn

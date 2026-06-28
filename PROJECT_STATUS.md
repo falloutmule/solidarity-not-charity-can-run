@@ -2,24 +2,22 @@
 
 | Field | Value |
 |-------|-------|
-| **Gameplay baseline** | `BUILD_ID` **`spriteground1`** |
-| **Previous baseline** | `facadeart1` / `56f4acb` |
-| **Gameplay commit** | `820b67c` |
-| **Backup** | `index.before-sprite-ground-anchor.html` |
+| **Gameplay baseline** | `BUILD_ID` **`spriteground1`** (unchanged) |
+| **Infrastructure** | Split-source build pipeline (`src/` → `index.html`) |
+| **Previous gameplay commit** | `820b67c` |
+| **Gameplay commit** | *(after push)* |
 
 ## Play / self-check
 
-- Play: `https://falloutmule.github.io/solidarity-not-charity-can-run/?v=820b67c&mobile=on&portraitlayout=1`
-- Self-check: `https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=820b67c&mobile=on&portraitlayout=1`
+- Play: `https://falloutmule.github.io/solidarity-not-charity-can-run/?v=<commit>&mobile=on&portraitlayout=1`
+- Self-check: `https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=<commit>&mobile=on&portraitlayout=1`
 
-## Latest guard
-
-- [SPRITE_GROUND_ANCHOR_HUMAN_SCALE_REPORT.md](reports/guards/SPRITE_GROUND_ANCHOR_HUMAN_SCALE_REPORT.md)
-
-## Harness
+## Build workflow
 
 ```bash
+npm run build        # combine src/ → index.html
+npm run build:check  # verify index.html matches src/
 npm run test:selfcheck
 ```
 
-Must pass full aggregate including `spriteGroundAnchor`.
+See **`src/README.md`** and **`reports/guards/SOURCE_SPLIT_BUILD_PIPELINE_REPORT.md`**.

@@ -2192,9 +2192,41 @@ async function renderFailureSection(page) {
   return proof;
 }
 
+function sourceBuildPipelineSection() {
+  const errors = [];
+  const manifestPath = path.join(ROOT, 'src', 'build-manifest.json');
+  const buildTool = path.join(ROOT, 'tools', 'build-single-file.js');
+  if (!fs.existsSync(manifestPath)) errors.push('missing src/build-manifest.json');
+  if (!fs.existsSync(buildTool)) errors.push('missing tools/build-single-file.js');
+  try {
+    execSync('node tools/build-single-file.js --check', { cwd: ROOT, encoding: 'utf8', stdio: 'pipe' });
+  } catch (e) {
+    errors.push('build:check failed: ' + String(e.stderr || e.stdout || e.message).trim());
+  }
+  let proof = null;
+  const proofPath = path.join(ROOT, 'proof-source-build-manifest.json');
+  if (fs.existsSync(proofPath)) {
+    try {
+      proof = JSON.parse(fs.readFileSync(proofPath, 'utf8'));
+    } catch (err) {
+      errors.push('invalid proof-source-build-manifest.json');
+    }
+  } else {
+    errors.push('missing proof-source-build-manifest.json');
+  }
+  const indexText = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+  const buildIdOk = indexText.includes("const BUILD_ID = 'spriteground1'");
+  if (!buildIdOk) errors.push('BUILD_ID must remain spriteground1 for this pass');
+  const pass = errors.length === 0 && proof && proof.check === 'pass';
+  const result = { pass, errors, buildId: 'spriteground1', proofSummary: proof ? { outputSha256: proof.outputSha256, outputBytes: proof.outputBytes, check: proof.check } : null };
+  writeProof('proof-source-build-pipeline.json', result);
+  return result;
+}
+
 async function main() {
   const releaseArtifactPath = resolveReleaseArtifactPath();
   const constitution = runAiSafeConstitutionCheck(releaseArtifactPath);
+  const sourceBuildPipeline = sourceBuildPipelineSection();
   const srv = await startStaticServer(releaseArtifactPath);
   const browser = await chromium.launch();
   const context = await browser.newContext();
@@ -2285,6 +2317,7 @@ async function main() {
 
   const corePass =
     constitution.pass &&
+    sourceBuildPipeline.pass &&
     full.pass &&
     dock.pass &&
     pointer.pass &&
@@ -2345,6 +2378,7 @@ async function main() {
     githubPagesArtifact: 'index.html (repo root)',
     constitution,
     aiSafeConstitution: { pass: constitution.pass, proof: 'proof-ai-safe-constitution.json' },
+    sourceBuildPipeline,
     releaseArtifact,
     fullSelfCheck: { pass: full.pass, build: full.build },
     dock,

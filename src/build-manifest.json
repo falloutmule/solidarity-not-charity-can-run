@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "buildIdPolicy": "preserve unless rebuild changes output",
+  "template": "src/template.html",
+  "styles": [
+    "src/styles/game.css"
+  ],
+  "body": "src/html/body.html",
+  "scripts": [
+    "src/js/game-00-preamble.js",
+    "src/js/game-01-section-0-canvas-resolution.js",
+    "src/js/game-02-section-0b-fullscreen-api-helpers.js",
+    "src/js/game-03-section-0c-debug-flag.js",
+    "src/js/game-04-section-1-seeded-rng-mulberry32.js",
+    "src/js/game-05-section-2-game-state.js",
+    "src/js/game-06-section-2b-mobile-touch-input.js",
+    "src/js/game-07-section-2c-responsive-mobile-menu-html-overlay.js",
+    "src/js/game-08-section-2d-mobile-init.js",
+    "src/js/game-09-section-3-city-generation.js",
+    "src/js/game-10-section-3b.js",
+    "src/js/game-11-section-3b.js",
+    "src/js/game-12-section-4-collision-walk-helpers.js",
+    "src/js/game-13-section-5-audio-centralized-audiocontext-unlock-.js",
+    "src/js/game-14-section-5b-local-persistence.js",
+    "src/js/game-15-section-6-procedural-assets.js",
+    "src/js/game-16-section-7-render.js",
+    "src/js/game-17-section-8-minimap.js",
+    "src/js/game-18-section-9-hud-reticle-popups.js",
+    "src/js/game-19-section-10-gameplay-actions.js",
+    "src/js/game-20-section-11-update-input.js",
+    "src/js/game-21-section-12-overlays.js",
+    "src/js/game-22-section-13-main-loop.js"
+  ],
+  "output": "index.html",
+  "distMin": "dist/index.min.html"
+}
