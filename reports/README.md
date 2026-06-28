@@ -1,7 +1,7 @@
 # Reports — SNC Can Run
 
 Main hub for guard cards, reference studies, history, proofs, and backups.  
-**Gameplay baseline:** `shimmerfix1` — see **`../PROJECT_STATUS.md`**.
+**Gameplay baseline:** `wallfix1` — see **`../PROJECT_STATUS.md`**.
 
 Reports were moved out of the repo root so GitHub shows only the game + core docs.
 
@@ -41,6 +41,7 @@ Reports were moved out of the repo root so GitHub shows only the game + core doc
 | 28 | Building scale / street mass | [guards/BUILDING_SCALE_POLISH_REPORT.md](guards/BUILDING_SCALE_POLISH_REPORT.md) | `buildscale1` / `0092fab` | `CR.runBuildingScalePolishSelfCheck` + building-scale PNGs | Yes (FPV + band mass) |
 | 29 | Street readability / minimap | [guards/STREET_READABILITY_MINIMAP_REPORT.md](guards/STREET_READABILITY_MINIMAP_REPORT.md) | `streetread1` / `3cd3b7f` | `CR.runStreetReadabilityMinimapSelfCheck` + readability PNGs | Yes (minimap nav palette) |
 | 30 | FPV street shimmer fix | [guards/FPV_STREET_SHIMMER_FIX_REPORT.md](guards/FPV_STREET_SHIMMER_FIX_REPORT.md) | `shimmerfix1` / `7f3ad89` | `CR.runFpvStreetShimmerFixSelfCheck` + FPV matte road PNGs | Yes (D2/D3 storefront FPV) |
+| 31 | FPV wall line artifact fix | [guards/FPV_WALL_LINE_ARTIFACT_FIX_REPORT.md](guards/FPV_WALL_LINE_ARTIFACT_FIX_REPORT.md) | `wallfix1` / `d419ca9` | `CR.runFpvWallLineArtifactFixSelfCheck` + D1–D3 FPV wall PNGs | Yes (storefront/alley walls) |
 
 ---
 

@@ -1,6 +1,6 @@
 # Project status — Solidarity Not Charity Can Run
 
-Last updated: FPV street shimmer fix (`shimmerfix1`).
+Last updated: FPV wall line artifact fix (`wallfix1`).
 
 **CI:** `.github/workflows/selfcheck.yml` runs `npm run test:selfcheck` on push/PR to `main`.
 
@@ -8,20 +8,21 @@ Last updated: FPV street shimmer fix (`shimmerfix1`).
 
 | Field | Value |
 |-------|-------|
-| BUILD_ID | `shimmerfix1` |
-| Commit | `7f3ad89` |
-| Prior | `streetread1` / `3cd3b7f` |
+| **BUILD_ID** | `wallfix1` |
+| **Commit** | `d419ca9` |
+| **Backup** | `index.before-fpv-wall-line-artifact-fix.html` |
+| **Prior** | `shimmerfix1` / `7f3ad89` |
 
-**Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=7f3ad89&mobile=on&portraitlayout=1
+**Play:** https://falloutmule.github.io/solidarity-not-charity-can-run/?v=d419ca9&mobile=on&portraitlayout=1  
 
-**Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=7f3ad89&mobile=on&portraitlayout=1
+**Self-check:** https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=d419ca9&mobile=on&portraitlayout=1  
 
-## Recent closure
+## Recent cards
 
-- **shimmerfix1** — matte FPV road; removed horizon band overlays from `crDrawFpvStreetReadabilityCues`; report `reports/guards/FPV_STREET_SHIMMER_FIX_REPORT.md`
-- **streetread1** — nav-first minimap (`3cd3b7f`)
-- **buildscale1** — building FPV mass ×1.5 (`0092fab`)
+- **wallfix1** — coarse FPV wall texture U + world-band facades; matte road + nav minimap + building mass preserved (`reports/guards/FPV_WALL_LINE_ARTIFACT_FIX_REPORT.md`)
+- **shimmerfix1** — matte FPV street (`reports/guards/FPV_STREET_SHIMMER_FIX_REPORT.md`)
+- **streetread1** — minimap navigation (`reports/guards/STREET_READABILITY_MINIMAP_REPORT.md`)
 
-## Harness
+## Map
 
-`npm run test:selfcheck` — full Playwright + in-page gates including `CR.runFpvStreetShimmerFixSelfCheck()`.
+Procedural **40×20**; level selector D1–D4; Hall / save / controls unchanged.
