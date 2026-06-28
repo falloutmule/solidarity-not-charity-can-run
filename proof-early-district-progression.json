@@ -1,10 +1,10 @@
 {
   "pass": true,
-  "build": "districts1",
+  "build": "groundplane1",
   "errors": [],
   "warnings": [],
   "checks": {
-    "buildIdDistricts1": true,
+    "buildIdBuildScale1": true,
     "footprintUnchanged": true,
     "saveVersionUnchanged": true,
     "controlsSchemaUnchanged": true,
@@ -32,10 +32,10 @@
         "MAP_W": 40,
         "MAP_H": 20,
         "metrics": {
-          "mainRoad": 418,
-          "buildings": 14,
+          "mainRoad": 413,
+          "buildings": 26,
           "alleys": 76,
-          "pockets": 176,
+          "pockets": 169,
           "GW": 40,
           "GH": 20
         },
@@ -53,11 +53,11 @@
           "identity": "restroom_pavilion",
           "x0": 16,
           "y0": 2,
-          "x1": 20,
-          "y1": 4,
-          "cells": 13,
+          "x1": 22,
+          "y1": 5,
+          "cells": 26,
           "northSide": true,
-          "doorY": 4,
+          "doorY": 5,
           "doorX0": 18,
           "doorX1": 19
         },
@@ -71,9 +71,9 @@
         "MAP_H": 20,
         "metrics": {
           "mainRoad": 342,
-          "buildings": 78,
+          "buildings": 134,
           "alleys": 76,
-          "pockets": 188,
+          "pockets": 132,
           "GW": 40,
           "GH": 20
         },
@@ -88,7 +88,7 @@
           "ALLEY": 0
         },
         "landmark": null,
-        "propCount": 11
+        "propCount": 8
       },
       {
         "seed": 880103,
@@ -98,9 +98,9 @@
         "MAP_H": 20,
         "metrics": {
           "mainRoad": 266,
-          "buildings": 68,
+          "buildings": 150,
           "alleys": 76,
-          "pockets": 274,
+          "pockets": 192,
           "GW": 40,
           "GH": 20
         },
@@ -115,7 +115,7 @@
           "ALLEY": 0
         },
         "landmark": null,
-        "propCount": 14
+        "propCount": 12
       },
       {
         "seed": 880104,
@@ -125,9 +125,9 @@
         "MAP_H": 20,
         "metrics": {
           "mainRoad": 266,
-          "buildings": 53,
+          "buildings": 115,
           "alleys": 76,
-          "pockets": 289,
+          "pockets": 227,
           "GW": 40,
           "GH": 20
         },
@@ -142,7 +142,7 @@
           "ALLEY": 0
         },
         "landmark": null,
-        "propCount": 14
+        "propCount": 13
       }
     ]
   }

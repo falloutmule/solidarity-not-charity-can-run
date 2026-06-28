@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-28T20:52:04.683Z",
+  "generatedAt": "2026-06-28T22:14:58.139Z",
   "output": "index.html",
-  "outputSha256": "0565e70870bcde188e6e43a36b5ae413aeceed2313660577cdacd02d6316d984",
-  "outputBytes": 562769,
+  "outputSha256": "0f9fd1eb3698bfde602902b53c8d9ec17e3f375f42f8dc3aabf75205f04e2b32",
+  "outputBytes": 574882,
   "inputs": [
     {
       "path": "src/template.html",
@@ -51,8 +51,8 @@
     },
     {
       "path": "src/js/game-06-section-2b-mobile-touch-input.js",
-      "sha256": "940363f7d638272ea0a5af55a0feff04f82cb7da2b105d176cea27621323c1fb",
-      "bytes": 53538
+      "sha256": "1af99a5948216c31bdc93f2ddabf3c73e0b7633f0a407f9ba5643e4d8a759326",
+      "bytes": 53789
     },
     {
       "path": "src/js/game-07-section-2c-responsive-mobile-menu-html-overlay.js",
@@ -96,13 +96,13 @@
     },
     {
       "path": "src/js/game-15-section-6-procedural-assets.js",
-      "sha256": "8e1b8a529c0208d3cb18e23e7adf7247f842cf9813838a597f2c4c54147118ef",
-      "bytes": 41648
+      "sha256": "5938129d9aadde00df98e60011a8e1c5bd384006794b2c04cd602dbf8f6521d8",
+      "bytes": 45597
     },
     {
       "path": "src/js/game-16-section-7-render.js",
-      "sha256": "f9d69b3f325d41ff6748cd4bd39db64a14fb49acd32575d9a38655c963a7d920",
-      "bytes": 8665
+      "sha256": "986337a5c6ddc677275e4e4375ade7b2e96c62db9792d30e014506eb263c2dad",
+      "bytes": 8721
     },
     {
       "path": "src/js/game-17-section-8-minimap.js",
@@ -131,8 +131,8 @@
     },
     {
       "path": "src/js/game-22-section-13-main-loop.js",
-      "sha256": "1e62ca61fecca22dc5a0feab478f10c01bba5ffba530d455ae2d8dce4a913ed0",
-      "bytes": 273465
+      "sha256": "90605a04cdee24b0e9b171a1366e012ca42614759ba7d36dd94d13b7000e527b",
+      "bytes": 281322
     }
   ],
   "nodeVersion": "v24.14.0",

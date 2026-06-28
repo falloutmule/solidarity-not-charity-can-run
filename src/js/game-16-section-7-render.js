@@ -44,9 +44,10 @@ function drawScene(now){
     const d = Math.max(0.05, perp);
     zbuffer[col]=d;
     const mass = crWallVisualMassScale(mapX, mapY, wt);
-    const lineH = (RH/d) * mass;
-    const drawStart=Math.floor(RH/2 - lineH/2);
-    const drawEnd=Math.ceil(RH/2 + lineH/2);
+    const wallProj = crWallProjectionMetrics(d, mass);
+    const lineH = wallProj.massLineH;
+    const drawStart = wallProj.wallDrawStart;
+    const drawEnd = wallProj.wallDrawEnd;
     const sliceH = drawEnd-drawStart;
 
     // texture column selection (standard raycaster texturing)
@@ -109,9 +110,9 @@ function drawScene(now){
     const spriteFront = midCol >= 0 && midCol < RW && depth < zbuffer[midCol];
     if(spriteFront && !proj.floating && CR_SPRITE_GROUND_ANCHOR){
       const sw = Math.max(2, screenW * 0.32);
-      bctx.fillStyle = 'rgba(0,0,0,0.2)';
+      bctx.fillStyle = 'rgba(0,0,0,0.14)';
       bctx.beginPath();
-      bctx.ellipse(screenX, groundBottomY, sw / 2, Math.max(1, screenH * 0.035), 0, 0, Math.PI * 2);
+      bctx.ellipse(screenX, groundBottomY, sw / 2, Math.max(1, screenH * 0.026), 0, 0, Math.PI * 2);
       bctx.fill();
     }
     // SPRITE HALO REGRESSION GUARD — no full-rect sprite fog overlay.

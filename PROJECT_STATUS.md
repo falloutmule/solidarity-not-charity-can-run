@@ -2,10 +2,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Gameplay baseline** | `BUILD_ID` **`spriteground1`** (unchanged) |
+| **Gameplay baseline** | `BUILD_ID` **`groundplane1`** |
+| **Previous gameplay baseline** | `spriteground1` / `820b67c`; split infra `35c74cc` |
 | **Infrastructure** | Split-source build pipeline (`src/` → `index.html`) |
-| **Previous gameplay commit** | `820b67c` |
-| **Gameplay commit** | `35c74cc` (infrastructure only) |
+| **Gameplay commit** | Pending push for FPV ground-plane alignment |
 
 ## Play / self-check
 
@@ -20,4 +20,4 @@ npm run build:check  # verify index.html matches src/
 npm run test:selfcheck
 ```
 
-See **`src/README.md`** and **`reports/guards/SOURCE_SPLIT_BUILD_PIPELINE_REPORT.md`**.
+See **`src/README.md`**, **`reports/guards/SOURCE_SPLIT_BUILD_PIPELINE_REPORT.md`**, and **`reports/guards/FPV_GROUND_PLANE_ALIGNMENT_REPORT.md`**.

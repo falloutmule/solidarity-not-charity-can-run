@@ -1,13 +1,13 @@
 {
   "pass": true,
-  "build": "park1",
+  "build": "groundplane1",
   "decorativeProps": {
     "pass": true,
-    "build": "park1",
+    "build": "groundplane1",
     "errors": [],
     "warnings": [],
     "checks": {
-      "buildIdPark1": true,
+      "buildIdBuildScale1": true,
       "decorArrayExported": true,
       "allKindsDefined": true,
       "propDimsReasonable": true,
@@ -23,8 +23,8 @@
     },
     "evidence": {
       "placementSig": {
-        "count": 13,
-        "kinds": "bench|bench|bench|bench|bench|bench|mailbox|mailbox|mailbox|mailbox|mailbox|signboard|signboard"
+        "count": 11,
+        "kinds": "bench|bench|bench|bench|mailbox|mailbox|mailbox|mailbox|signboard|signboard|utility_box"
       }
     },
     "requiredKinds": [
@@ -47,5 +47,5 @@
     "proof-decorative-props-world.png",
     "proof-decorative-props-closeup.png"
   ],
-  "timestamp": "2026-06-27T16:59:02.152Z"
+  "timestamp": "2026-06-28T22:15:48.672Z"
 }

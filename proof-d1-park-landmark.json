@@ -1,10 +1,10 @@
 {
   "pass": true,
-  "build": "park1",
+  "build": "groundplane1",
   "errors": [],
   "warnings": [],
   "checks": {
-    "buildIdPark1": true,
+    "buildIdBuildScale1": true,
     "footprintUnchanged": true,
     "d1LandmarkPresent": true,
     "d1ParkCommunityProps": true,
@@ -25,31 +25,30 @@
         "MAP_W": 40,
         "MAP_H": 20,
         "metrics": {
-          "mainRoad": 418,
-          "buildings": 19,
+          "mainRoad": 413,
+          "buildings": 26,
           "alleys": 76,
-          "pockets": 171,
+          "pockets": 169,
           "GW": 40,
           "GH": 20
         },
         "landmark": {
           "identity": "restroom_pavilion",
-          "x0": 15,
+          "x0": 16,
           "y0": 2,
-          "x1": 19,
-          "y1": 4,
-          "cells": 13,
+          "x1": 22,
+          "y1": 5,
+          "cells": 26,
           "northSide": true,
-          "doorY": 4,
-          "doorX0": 17,
-          "doorX1": 18
+          "doorY": 5,
+          "doorX0": 18,
+          "doorX1": 19
         },
         "propSummary": {
           "kinds": {
-            "bench": 2,
-            "signboard": 2,
             "scrub_bush": 2,
-            "mailbox": 1,
+            "bench": 3,
+            "mailbox": 2,
             "cooler": 1,
             "crate_stack": 1,
             "shopping_cart": 1,
@@ -67,36 +66,36 @@
         "MAP_W": 40,
         "MAP_H": 20,
         "metrics": {
-          "mainRoad": 342,
-          "buildings": 18,
+          "mainRoad": 337,
+          "buildings": 30,
           "alleys": 76,
-          "pockets": 248,
+          "pockets": 241,
           "GW": 40,
           "GH": 20
         },
         "landmark": {
           "identity": "restroom_pavilion",
           "x0": 18,
-          "y0": 2,
-          "x1": 22,
-          "y1": 4,
-          "cells": 13,
-          "northSide": true,
-          "doorY": 4,
+          "y0": 14,
+          "x1": 24,
+          "y1": 17,
+          "cells": 26,
+          "northSide": false,
+          "doorY": 14,
           "doorX0": 20,
           "doorX1": 21
         },
         "propSummary": {
           "kinds": {
-            "bench": 2,
-            "signboard": 2,
             "scrub_bush": 2,
-            "mailbox": 1,
+            "bench": 1,
+            "mailbox": 2,
             "cooler": 1,
             "crate_stack": 1,
             "shopping_cart": 1,
             "agave": 1,
-            "tarp_bundle": 1
+            "tarp_bundle": 1,
+            "signboard": 2
           },
           "parkish": 11,
           "total": 12
@@ -109,38 +108,37 @@
         "MAP_W": 40,
         "MAP_H": 20,
         "metrics": {
-          "mainRoad": 415,
-          "buildings": 20,
+          "mainRoad": 406,
+          "buildings": 27,
           "alleys": 76,
-          "pockets": 173,
+          "pockets": 175,
           "GW": 40,
           "GH": 20
         },
         "landmark": {
           "identity": "restroom_pavilion",
           "x0": 17,
-          "y0": 15,
-          "x1": 21,
+          "y0": 14,
+          "x1": 23,
           "y1": 17,
-          "cells": 13,
+          "cells": 26,
           "northSide": false,
-          "doorY": 15,
+          "doorY": 14,
           "doorX0": 19,
           "doorX1": 20
         },
         "propSummary": {
           "kinds": {
-            "signboard": 3,
+            "bench": 4,
+            "mural_panel": 1,
             "scrub_bush": 2,
-            "bench": 1,
-            "mailbox": 1,
             "cooler": 1,
-            "crate_stack": 1,
             "shopping_cart": 1,
             "agave": 1,
-            "tarp_bundle": 1
+            "tarp_bundle": 1,
+            "mailbox": 1
           },
-          "parkish": 11,
+          "parkish": 10,
           "total": 12
         }
       },
@@ -151,23 +149,24 @@
         "MAP_W": 40,
         "MAP_H": 20,
         "metrics": {
-          "mainRoad": 418,
-          "buildings": 33,
+          "mainRoad": 342,
+          "buildings": 126,
           "alleys": 76,
-          "pockets": 157,
+          "pockets": 140,
           "GW": 40,
           "GH": 20
         },
         "landmark": null,
         "propSummary": {
           "kinds": {
-            "signboard": 1,
-            "bench": 6,
-            "mailbox": 5,
-            "utility_box": 2
+            "utility_box": 2,
+            "signboard": 2,
+            "bench": 4,
+            "scrub_bush": 1,
+            "mailbox": 2
           },
-          "parkish": 14,
-          "total": 14
+          "parkish": 11,
+          "total": 11
         }
       }
     ]

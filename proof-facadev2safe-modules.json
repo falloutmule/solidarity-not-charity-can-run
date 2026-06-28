@@ -26,7 +26,7 @@
     "reachD3": true
   },
   "evidence": {
-    "packVersion": "facadev2safe1",
+    "packVersion": "facadeart1",
     "moduleList": [
       "storefront_4x2",
       "storefront_3x2",
@@ -100,5 +100,5 @@
   },
   "errors": [],
   "warnings": [],
-  "build": "facadev2safe1"
+  "build": "groundplane1"
 }

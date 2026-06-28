@@ -62,11 +62,21 @@
     "errors": [],
     "artifactPath": "C:\\Users\\fallo\\Documents\\HermesProjects\\canned-run\\index.html",
     "policyPath": "C:\\Users\\fallo\\Documents\\HermesProjects\\canned-run\\SOURCE_RELEASE_POLICY.md",
-    "timestamp": "2026-06-28T14:28:31.918Z"
+    "timestamp": "2026-06-28T22:14:58.090Z"
   },
   "aiSafeConstitution": {
     "pass": true,
     "proof": "proof-ai-safe-constitution.json"
+  },
+  "sourceBuildPipeline": {
+    "pass": true,
+    "errors": [],
+    "buildId": "groundplane1",
+    "proofSummary": {
+      "outputSha256": "0f9fd1eb3698bfde602902b53c8d9ec17e3f375f42f8dc3aabf75205f04e2b32",
+      "outputBytes": 574882,
+      "check": "pass"
+    }
   },
   "releaseArtifact": {
     "pass": true,
@@ -83,17 +93,17 @@
     "pageErrorCount": 0,
     "fullSelfCheck": {
       "pass": true,
-      "build": "modules1"
+      "build": "groundplane1"
     },
     "playwrightSummaryPass": true,
-    "buildId": "modules1",
-    "commitHash": "0905d1d",
+    "buildId": "groundplane1",
+    "commitHash": "e04e519",
     "errors": [],
-    "timestamp": "2026-06-28T14:30:52.447Z"
+    "timestamp": "2026-06-28T22:17:40.170Z"
   },
   "fullSelfCheck": {
     "pass": true,
-    "build": "modules1"
+    "build": "groundplane1"
   },
   "dock": {
     "pass": true,
@@ -106,27 +116,27 @@
       "ml": {
         "top": 557,
         "left": 10,
-        "menuText": "MENUmodules1"
+        "menuText": "MENUgroundplane1"
       },
       "mg": {
         "top": 484,
         "left": 35,
-        "menuText": "MENUmodules1"
+        "menuText": "MENUgroundplane1"
       },
       "ms": {
         "top": 533,
         "left": 313,
-        "menuText": "MENUmodules1"
+        "menuText": "MENUgroundplane1"
       },
       "mlookpad": {
         "top": 557,
         "left": 268,
-        "menuText": "MENUmodules1"
+        "menuText": "MENUgroundplane1"
       },
       "mportmenu": {
         "top": 463,
         "left": 115,
-        "menuText": "MENUmodules1"
+        "menuText": "MENUgroundplane1"
       },
       "canvas": {
         "top": 0,
@@ -213,27 +223,27 @@
       "ml": {
         "top": 437,
         "left": 10,
-        "menuText": "MENUmodules1"
+        "menuText": "MENUgroundplane1"
       },
       "mg": {
         "top": 364,
         "left": 35,
-        "menuText": "MENUmodules1"
+        "menuText": "MENUgroundplane1"
       },
       "ms": {
         "top": 413,
         "left": 313,
-        "menuText": "MENUmodules1"
+        "menuText": "MENUgroundplane1"
       },
       "mlookpad": {
         "top": 437,
         "left": 268,
-        "menuText": "MENUmodules1"
+        "menuText": "MENUgroundplane1"
       },
       "mportmenu": {
         "top": 463,
         "left": 115,
-        "menuText": "MENUmodules1"
+        "menuText": "MENUgroundplane1"
       },
       "canvas": {
         "top": 0,
@@ -320,27 +330,27 @@
       "ml": {
         "top": 534,
         "left": 10,
-        "menuText": "MENUmodules1"
+        "menuText": "MENUgroundplane1"
       },
       "mg": {
         "top": 461,
         "left": 35,
-        "menuText": "MENUmodules1"
+        "menuText": "MENUgroundplane1"
       },
       "ms": {
         "top": 510,
         "left": 313,
-        "menuText": "MENUmodules1"
+        "menuText": "MENUgroundplane1"
       },
       "mlookpad": {
         "top": 534,
         "left": 268,
-        "menuText": "MENUmodules1"
+        "menuText": "MENUgroundplane1"
       },
       "mportmenu": {
         "top": 463,
         "left": 115,
-        "menuText": "MENUmodules1"
+        "menuText": "MENUgroundplane1"
       },
       "canvas": {
         "top": 0,
@@ -469,7 +479,7 @@
   "audio": {
     "pass": true,
     "before": {
-      "BUILD_ID": "modules1",
+      "BUILD_ID": "groundplane1",
       "gateBound": true,
       "unlockAttempted": false,
       "hasContext": false,
@@ -484,7 +494,7 @@
       "harnessMuted": false
     },
     "after": {
-      "BUILD_ID": "modules1",
+      "BUILD_ID": "groundplane1",
       "gateBound": true,
       "unlockAttempted": false,
       "hasContext": true,
@@ -504,7 +514,7 @@
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "scenarios": [
         {
           "label": "pixel7-portrait",
@@ -515,7 +525,7 @@
           "pass": true,
           "checkInitial": {
             "pass": true,
-            "build": "modules1",
+            "build": "groundplane1",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -589,7 +599,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "modules1",
+              "BUILD_ID": "groundplane1",
               "inner": {
                 "w": 412,
                 "h": 915
@@ -633,11 +643,11 @@
               "cw": 412,
               "ch": 915
             },
-            "timestamp": "2026-06-28T14:28:52.891Z"
+            "timestamp": "2026-06-28T22:15:22.304Z"
           },
           "checkAfterResize": {
             "pass": true,
-            "build": "modules1",
+            "build": "groundplane1",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -711,7 +721,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "modules1",
+              "BUILD_ID": "groundplane1",
               "inner": {
                 "w": 412,
                 "h": 875
@@ -755,7 +765,7 @@
               "cw": 412,
               "ch": 875
             },
-            "timestamp": "2026-06-28T14:28:53.109Z"
+            "timestamp": "2026-06-28T22:15:22.520Z"
           },
           "fingerprint": {
             "state": "play",
@@ -763,7 +773,7 @@
             "benchmark": false,
             "mapW": 40,
             "mapH": 20,
-            "timeLeft": 94.43330000000003,
+            "timeLeft": 94.41670000000003,
             "seed": 77,
             "runActive": true,
             "harnessOnly": false,
@@ -782,7 +792,7 @@
           "pass": true,
           "checkInitial": {
             "pass": true,
-            "build": "modules1",
+            "build": "groundplane1",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -809,7 +819,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "modules1",
+              "BUILD_ID": "groundplane1",
               "inner": {
                 "w": 915,
                 "h": 412
@@ -853,11 +863,11 @@
               "cw": 915,
               "ch": 412
             },
-            "timestamp": "2026-06-28T14:28:53.951Z"
+            "timestamp": "2026-06-28T22:15:23.344Z"
           },
           "checkAfterResize": {
             "pass": true,
-            "build": "modules1",
+            "build": "groundplane1",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -884,7 +894,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "modules1",
+              "BUILD_ID": "groundplane1",
               "inner": {
                 "w": 915,
                 "h": 400
@@ -928,7 +938,7 @@
               "cw": 915,
               "ch": 400
             },
-            "timestamp": "2026-06-28T14:28:54.171Z"
+            "timestamp": "2026-06-28T22:15:23.560Z"
           },
           "fingerprint": {
             "state": "play",
@@ -936,7 +946,7 @@
             "benchmark": false,
             "mapW": 40,
             "mapH": 20,
-            "timeLeft": 94.41670000000003,
+            "timeLeft": 94.41660000000003,
             "seed": 77,
             "runActive": true,
             "harnessOnly": false,
@@ -955,7 +965,7 @@
           "pass": true,
           "checkInitial": {
             "pass": true,
-            "build": "modules1",
+            "build": "groundplane1",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -1029,7 +1039,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "modules1",
+              "BUILD_ID": "groundplane1",
               "inner": {
                 "w": 360,
                 "h": 800
@@ -1073,11 +1083,11 @@
               "cw": 360,
               "ch": 800
             },
-            "timestamp": "2026-06-28T14:28:54.994Z"
+            "timestamp": "2026-06-28T22:15:24.399Z"
           },
           "checkAfterResize": {
             "pass": true,
-            "build": "modules1",
+            "build": "groundplane1",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -1151,7 +1161,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "modules1",
+              "BUILD_ID": "groundplane1",
               "inner": {
                 "w": 360,
                 "h": 760
@@ -1195,7 +1205,7 @@
               "cw": 360,
               "ch": 760
             },
-            "timestamp": "2026-06-28T14:28:55.211Z"
+            "timestamp": "2026-06-28T22:15:24.615Z"
           },
           "fingerprint": {
             "state": "play",
@@ -1203,7 +1213,7 @@
             "benchmark": false,
             "mapW": 40,
             "mapH": 20,
-            "timeLeft": 94.41670000000003,
+            "timeLeft": 94.39990000000003,
             "seed": 77,
             "runActive": true,
             "harnessOnly": false,
@@ -1222,7 +1232,7 @@
           "pass": true,
           "checkInitial": {
             "pass": true,
-            "build": "modules1",
+            "build": "groundplane1",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -1296,7 +1306,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "modules1",
+              "BUILD_ID": "groundplane1",
               "inner": {
                 "w": 390,
                 "h": 720
@@ -1340,11 +1350,11 @@
               "cw": 390,
               "ch": 720
             },
-            "timestamp": "2026-06-28T14:28:56.330Z"
+            "timestamp": "2026-06-28T22:15:25.729Z"
           },
           "checkAfterResize": {
             "pass": true,
-            "build": "modules1",
+            "build": "groundplane1",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -1418,7 +1428,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "modules1",
+              "BUILD_ID": "groundplane1",
               "inner": {
                 "w": 390,
                 "h": 680
@@ -1462,7 +1472,7 @@
               "cw": 390,
               "ch": 680
             },
-            "timestamp": "2026-06-28T14:28:56.550Z"
+            "timestamp": "2026-06-28T22:15:25.949Z"
           },
           "fingerprint": {
             "state": "play",
@@ -1489,7 +1499,7 @@
           "pass": true,
           "checkInitial": {
             "pass": true,
-            "build": "modules1",
+            "build": "groundplane1",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -1563,7 +1573,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "modules1",
+              "BUILD_ID": "groundplane1",
               "inner": {
                 "w": 390,
                 "h": 900
@@ -1607,11 +1617,11 @@
               "cw": 390,
               "ch": 900
             },
-            "timestamp": "2026-06-28T14:28:57.375Z"
+            "timestamp": "2026-06-28T22:15:26.788Z"
           },
           "checkAfterResize": {
             "pass": true,
-            "build": "modules1",
+            "build": "groundplane1",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -1685,7 +1695,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "modules1",
+              "BUILD_ID": "groundplane1",
               "inner": {
                 "w": 390,
                 "h": 860
@@ -1729,7 +1739,7 @@
               "cw": 390,
               "ch": 860
             },
-            "timestamp": "2026-06-28T14:28:57.592Z"
+            "timestamp": "2026-06-28T22:15:27.005Z"
           },
           "fingerprint": {
             "state": "play",
@@ -1756,7 +1766,7 @@
           "pass": true,
           "checkInitial": {
             "pass": true,
-            "build": "modules1",
+            "build": "groundplane1",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -1830,7 +1840,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "modules1",
+              "BUILD_ID": "groundplane1",
               "inner": {
                 "w": 390,
                 "h": 844
@@ -1874,11 +1884,11 @@
               "cw": 390,
               "ch": 844
             },
-            "timestamp": "2026-06-28T14:28:58.417Z"
+            "timestamp": "2026-06-28T22:15:27.812Z"
           },
           "checkAfterResize": {
             "pass": true,
-            "build": "modules1",
+            "build": "groundplane1",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -1952,7 +1962,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "modules1",
+              "BUILD_ID": "groundplane1",
               "inner": {
                 "w": 390,
                 "h": 804
@@ -1996,7 +2006,7 @@
               "cw": 390,
               "ch": 804
             },
-            "timestamp": "2026-06-28T14:28:58.636Z"
+            "timestamp": "2026-06-28T22:15:28.031Z"
           },
           "fingerprint": {
             "state": "play",
@@ -2004,7 +2014,7 @@
             "benchmark": false,
             "mapW": 40,
             "mapH": 20,
-            "timeLeft": 94.41660000000003,
+            "timeLeft": 94.41670000000003,
             "seed": 77,
             "runActive": true,
             "harnessOnly": false,
@@ -2015,7 +2025,7 @@
           "shot": null
         }
       ],
-      "timestamp": "2026-06-28T14:28:58.637Z"
+      "timestamp": "2026-06-28T22:15:28.032Z"
     },
     "results": [
       {
@@ -2027,7 +2037,7 @@
         "pass": true,
         "checkInitial": {
           "pass": true,
-          "build": "modules1",
+          "build": "groundplane1",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -2101,7 +2111,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "modules1",
+            "BUILD_ID": "groundplane1",
             "inner": {
               "w": 412,
               "h": 915
@@ -2145,11 +2155,11 @@
             "cw": 412,
             "ch": 915
           },
-          "timestamp": "2026-06-28T14:28:52.891Z"
+          "timestamp": "2026-06-28T22:15:22.304Z"
         },
         "checkAfterResize": {
           "pass": true,
-          "build": "modules1",
+          "build": "groundplane1",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -2223,7 +2233,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "modules1",
+            "BUILD_ID": "groundplane1",
             "inner": {
               "w": 412,
               "h": 875
@@ -2267,7 +2277,7 @@
             "cw": 412,
             "ch": 875
           },
-          "timestamp": "2026-06-28T14:28:53.109Z"
+          "timestamp": "2026-06-28T22:15:22.520Z"
         },
         "fingerprint": {
           "state": "play",
@@ -2275,7 +2285,7 @@
           "benchmark": false,
           "mapW": 40,
           "mapH": 20,
-          "timeLeft": 94.43330000000003,
+          "timeLeft": 94.41670000000003,
           "seed": 77,
           "runActive": true,
           "harnessOnly": false,
@@ -2294,7 +2304,7 @@
         "pass": true,
         "checkInitial": {
           "pass": true,
-          "build": "modules1",
+          "build": "groundplane1",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -2321,7 +2331,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "modules1",
+            "BUILD_ID": "groundplane1",
             "inner": {
               "w": 915,
               "h": 412
@@ -2365,11 +2375,11 @@
             "cw": 915,
             "ch": 412
           },
-          "timestamp": "2026-06-28T14:28:53.951Z"
+          "timestamp": "2026-06-28T22:15:23.344Z"
         },
         "checkAfterResize": {
           "pass": true,
-          "build": "modules1",
+          "build": "groundplane1",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -2396,7 +2406,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "modules1",
+            "BUILD_ID": "groundplane1",
             "inner": {
               "w": 915,
               "h": 400
@@ -2440,7 +2450,7 @@
             "cw": 915,
             "ch": 400
           },
-          "timestamp": "2026-06-28T14:28:54.171Z"
+          "timestamp": "2026-06-28T22:15:23.560Z"
         },
         "fingerprint": {
           "state": "play",
@@ -2448,7 +2458,7 @@
           "benchmark": false,
           "mapW": 40,
           "mapH": 20,
-          "timeLeft": 94.41670000000003,
+          "timeLeft": 94.41660000000003,
           "seed": 77,
           "runActive": true,
           "harnessOnly": false,
@@ -2467,7 +2477,7 @@
         "pass": true,
         "checkInitial": {
           "pass": true,
-          "build": "modules1",
+          "build": "groundplane1",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -2541,7 +2551,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "modules1",
+            "BUILD_ID": "groundplane1",
             "inner": {
               "w": 360,
               "h": 800
@@ -2585,11 +2595,11 @@
             "cw": 360,
             "ch": 800
           },
-          "timestamp": "2026-06-28T14:28:54.994Z"
+          "timestamp": "2026-06-28T22:15:24.399Z"
         },
         "checkAfterResize": {
           "pass": true,
-          "build": "modules1",
+          "build": "groundplane1",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -2663,7 +2673,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "modules1",
+            "BUILD_ID": "groundplane1",
             "inner": {
               "w": 360,
               "h": 760
@@ -2707,7 +2717,7 @@
             "cw": 360,
             "ch": 760
           },
-          "timestamp": "2026-06-28T14:28:55.211Z"
+          "timestamp": "2026-06-28T22:15:24.615Z"
         },
         "fingerprint": {
           "state": "play",
@@ -2715,7 +2725,7 @@
           "benchmark": false,
           "mapW": 40,
           "mapH": 20,
-          "timeLeft": 94.41670000000003,
+          "timeLeft": 94.39990000000003,
           "seed": 77,
           "runActive": true,
           "harnessOnly": false,
@@ -2734,7 +2744,7 @@
         "pass": true,
         "checkInitial": {
           "pass": true,
-          "build": "modules1",
+          "build": "groundplane1",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -2808,7 +2818,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "modules1",
+            "BUILD_ID": "groundplane1",
             "inner": {
               "w": 390,
               "h": 720
@@ -2852,11 +2862,11 @@
             "cw": 390,
             "ch": 720
           },
-          "timestamp": "2026-06-28T14:28:56.330Z"
+          "timestamp": "2026-06-28T22:15:25.729Z"
         },
         "checkAfterResize": {
           "pass": true,
-          "build": "modules1",
+          "build": "groundplane1",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -2930,7 +2940,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "modules1",
+            "BUILD_ID": "groundplane1",
             "inner": {
               "w": 390,
               "h": 680
@@ -2974,7 +2984,7 @@
             "cw": 390,
             "ch": 680
           },
-          "timestamp": "2026-06-28T14:28:56.550Z"
+          "timestamp": "2026-06-28T22:15:25.949Z"
         },
         "fingerprint": {
           "state": "play",
@@ -3001,7 +3011,7 @@
         "pass": true,
         "checkInitial": {
           "pass": true,
-          "build": "modules1",
+          "build": "groundplane1",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -3075,7 +3085,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "modules1",
+            "BUILD_ID": "groundplane1",
             "inner": {
               "w": 390,
               "h": 900
@@ -3119,11 +3129,11 @@
             "cw": 390,
             "ch": 900
           },
-          "timestamp": "2026-06-28T14:28:57.375Z"
+          "timestamp": "2026-06-28T22:15:26.788Z"
         },
         "checkAfterResize": {
           "pass": true,
-          "build": "modules1",
+          "build": "groundplane1",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -3197,7 +3207,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "modules1",
+            "BUILD_ID": "groundplane1",
             "inner": {
               "w": 390,
               "h": 860
@@ -3241,7 +3251,7 @@
             "cw": 390,
             "ch": 860
           },
-          "timestamp": "2026-06-28T14:28:57.592Z"
+          "timestamp": "2026-06-28T22:15:27.005Z"
         },
         "fingerprint": {
           "state": "play",
@@ -3268,7 +3278,7 @@
         "pass": true,
         "checkInitial": {
           "pass": true,
-          "build": "modules1",
+          "build": "groundplane1",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -3342,7 +3352,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "modules1",
+            "BUILD_ID": "groundplane1",
             "inner": {
               "w": 390,
               "h": 844
@@ -3386,11 +3396,11 @@
             "cw": 390,
             "ch": 844
           },
-          "timestamp": "2026-06-28T14:28:58.417Z"
+          "timestamp": "2026-06-28T22:15:27.812Z"
         },
         "checkAfterResize": {
           "pass": true,
-          "build": "modules1",
+          "build": "groundplane1",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -3464,7 +3474,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "modules1",
+            "BUILD_ID": "groundplane1",
             "inner": {
               "w": 390,
               "h": 804
@@ -3508,7 +3518,7 @@
             "cw": 390,
             "ch": 804
           },
-          "timestamp": "2026-06-28T14:28:58.636Z"
+          "timestamp": "2026-06-28T22:15:28.031Z"
         },
         "fingerprint": {
           "state": "play",
@@ -3516,7 +3526,7 @@
           "benchmark": false,
           "mapW": 40,
           "mapH": 20,
-          "timeLeft": 94.41660000000003,
+          "timeLeft": 94.41670000000003,
           "seed": 77,
           "runActive": true,
           "harnessOnly": false,
@@ -3532,10 +3542,10 @@
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "usability": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "thresholds": {
@@ -3659,7 +3669,7 @@
       },
       "settingsSafety": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -3694,11 +3704,11 @@
         "proof-usability-very-high.png",
         "proof-resetcontrols-safe.png"
       ],
-      "timestamp": "2026-06-28T14:29:15.597Z"
+      "timestamp": "2026-06-28T22:15:47.061Z"
     },
     "usability": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "errors": [],
       "warnings": [],
       "thresholds": {
@@ -3834,10 +3844,10 @@
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "optionsCleanup": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -3865,18 +3875,18 @@
           "lsKeyUnchanged": true
         },
         "evidence": {
-          "htmlSample": "\n      <div class=\"options-scroll-body\">\n      <div class=\"rpantit\">OPTIONS</div>\n      <div class=\"rdesc\" style=\"margin-bottom:8px;color:#6a5a4a;\">build modules1</div>\n      <div class=\"options-section-hdr\">CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-edit-controls\">EDIT CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-reset-controls\">RESET CONTROLS</div>\n      <div class=\"r"
+          "htmlSample": "\n      <div class=\"options-scroll-body\">\n      <div class=\"rpantit\">OPTIONS</div>\n      <div class=\"rdesc\" style=\"margin-bottom:8px;color:#6a5a4a;\">build groundplane1</div>\n      <div class=\"options-section-hdr\">CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-edit-controls\">EDIT CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-reset-controls\">RESET CONTROLS</div>\n      <div clas"
         }
       },
       "screenshots": [
         "proof-options-cleanup-menu.png",
         "proof-options-cleanup-edit-controls.png"
       ],
-      "timestamp": "2026-06-28T14:29:16.500Z"
+      "timestamp": "2026-06-28T22:15:47.966Z"
     },
     "optionsCleanup": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -3904,7 +3914,7 @@
         "lsKeyUnchanged": true
       },
       "evidence": {
-        "htmlSample": "\n      <div class=\"options-scroll-body\">\n      <div class=\"rpantit\">OPTIONS</div>\n      <div class=\"rdesc\" style=\"margin-bottom:8px;color:#6a5a4a;\">build modules1</div>\n      <div class=\"options-section-hdr\">CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-edit-controls\">EDIT CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-reset-controls\">RESET CONTROLS</div>\n      <div class=\"r"
+        "htmlSample": "\n      <div class=\"options-scroll-body\">\n      <div class=\"rpantit\">OPTIONS</div>\n      <div class=\"rdesc\" style=\"margin-bottom:8px;color:#6a5a4a;\">build groundplane1</div>\n      <div class=\"options-section-hdr\">CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-edit-controls\">EDIT CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-reset-controls\">RESET CONTROLS</div>\n      <div clas"
       }
     }
   },
@@ -3912,10 +3922,10 @@
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "decorativeProps": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -3959,11 +3969,11 @@
         "proof-decorative-props-world.png",
         "proof-decorative-props-closeup.png"
       ],
-      "timestamp": "2026-06-28T14:29:17.205Z"
+      "timestamp": "2026-06-28T22:15:48.672Z"
     },
     "decorativeProps": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -4007,10 +4017,10 @@
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "streetBlockLevel": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -4142,11 +4152,11 @@
         "proof-street-block-d3.png",
         "proof-street-block-minimap.png"
       ],
-      "timestamp": "2026-06-28T14:29:19.168Z"
+      "timestamp": "2026-06-28T22:15:50.638Z"
     },
     "streetBlockLevel": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -4276,10 +4286,10 @@
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "d1ParkLandmark": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -4456,11 +4466,11 @@
         "proof-d1-park-landmark-fpv.png",
         "proof-d1-park-landmark-minimap.png"
       ],
-      "timestamp": "2026-06-28T14:29:20.302Z"
+      "timestamp": "2026-06-28T22:15:51.785Z"
     },
     "d1ParkLandmark": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -4664,21 +4674,493 @@
       "errors": [],
       "warnings": [],
       "evidence": {
-        "reference": "snc-building-module-lab.html (concept only)",
+        "reference": "snc-building-module-lab-v2.html (base pack sync; not imported)",
         "modules": [
           "storefront_4x2",
           "storefront_4x2",
-          "storefront_4x2",
+          "boarded_shop_3x2",
           "storefront_4x2"
         ]
       }
+    }
+  },
+  "facadePackBridge": {
+    "pass": true,
+    "facadePackBridge": {
+      "pass": true,
+      "checks": {
+        "buildId": true,
+        "packExists": true,
+        "packVersion": true,
+        "packMarkers": true,
+        "modules": {
+          "cells": [
+            "####",
+            "####"
+          ],
+          "front": "south",
+          "faces": {
+            "south": [
+              "storefront_window",
+              "storefront_door",
+              "storefront_window",
+              "storefront_sign"
+            ],
+            "north": [
+              "service_wall",
+              "mural_wall",
+              "blank_brick",
+              "utility_wall"
+            ],
+            "east": [
+              "side_door",
+              "blank_brick"
+            ],
+            "west": [
+              "blank_brick",
+              "blank_brick"
+            ]
+          }
+        },
+        "roles": {
+          "material": "brick",
+          "slots": [
+            "sign_band",
+            "glass_window",
+            "dark_base"
+          ]
+        },
+        "slots": {
+          "kind": "rect",
+          "zone": "middle",
+          "style": "glass"
+        },
+        "materials": {
+          "base": "brick",
+          "texture": "soft_block"
+        },
+        "storefrontFaces": true,
+        "storefrontFrontRoles": true,
+        "sideRole": true,
+        "backRoles": true,
+        "packRenderer": true,
+        "noAnonymousOverlay": true,
+        "noCombOnPackFaces": true,
+        "debugHit": true,
+        "matteRoad": true,
+        "minimapNav": true,
+        "fpvMass": true,
+        "bridgeFlag": true,
+        "d2StorefrontHit": true,
+        "d3SideBackHit": true,
+        "reachabilityD1D4": true,
+        "levelSelector": true
+      },
+      "evidence": {
+        "packVersion": "facadeart1",
+        "moduleNames": [
+          "storefront_4x2",
+          "storefront_3x2",
+          "restroom_pavilion",
+          "blank_service_block",
+          "garage_service_4x2",
+          "boarded_shop_3x2"
+        ],
+        "roleNames": [
+          "storefront_window",
+          "storefront_door",
+          "storefront_sign",
+          "blank_brick",
+          "side_door",
+          "service_wall",
+          "mural_wall",
+          "utility_wall",
+          "blank_concrete",
+          "garage_bay",
+          "service_door",
+          "boarded_window"
+        ],
+        "d2Hit": {
+          "buildingId": 1,
+          "moduleId": "storefront_4x2",
+          "localX": 0,
+          "localY": 0,
+          "faceDirection": "south",
+          "role": "storefront_window",
+          "material": "brick",
+          "slots": [
+            "sign_band",
+            "glass_window",
+            "dark_base"
+          ]
+        },
+        "d3Hit": {
+          "buildingId": 7,
+          "moduleId": "blank_service_block",
+          "localX": 1,
+          "localY": 0,
+          "faceDirection": "north",
+          "role": "service_wall",
+          "material": "stucco",
+          "slots": [
+            "service_panel",
+            "vent",
+            "dark_base"
+          ]
+        }
+      },
+      "errors": [],
+      "warnings": []
+    }
+  },
+  "facadePackV2Safe": {
+    "pass": true,
+    "facadePackV2Safe": {
+      "pass": true,
+      "checks": {
+        "buildId": true,
+        "v2SafeFlag": true,
+        "packExists": true,
+        "packMarkers": true,
+        "baseStorefront": true,
+        "garageModule": true,
+        "boardedModule": true,
+        "garageRoles": true,
+        "boardedRoles": true,
+        "garageSlots": true,
+        "boardedSlots": true,
+        "labOnlyNotInGameplay": true,
+        "noFloorZonesGameplay": true,
+        "packRenderer": true,
+        "matteRoad": true,
+        "minimapNav": true,
+        "fpvMass": true,
+        "d2BoardedPlaced": true,
+        "d3GaragePlaced": true,
+        "boardedFacadeHit": true,
+        "garageFacadeHit": true,
+        "reachD2": true,
+        "reachD3": true
+      },
+      "evidence": {
+        "packVersion": "facadeart1",
+        "moduleList": [
+          "storefront_4x2",
+          "storefront_3x2",
+          "restroom_pavilion",
+          "blank_service_block",
+          "garage_service_4x2",
+          "boarded_shop_3x2"
+        ],
+        "roleList": [
+          "storefront_window",
+          "storefront_door",
+          "storefront_sign",
+          "blank_brick",
+          "side_door",
+          "service_wall",
+          "mural_wall",
+          "utility_wall",
+          "blank_concrete",
+          "garage_bay",
+          "service_door",
+          "boarded_window"
+        ],
+        "slotList": [
+          "sign_band",
+          "large_sign",
+          "glass_window",
+          "poster_window",
+          "glass_door",
+          "dark_base",
+          "soft_brick_bands",
+          "side_door",
+          "small_light",
+          "service_panel",
+          "vent",
+          "mural_patch",
+          "utility_box",
+          "small_vent",
+          "soft_panel_bands",
+          "garage_door",
+          "service_door",
+          "boarded_window"
+        ],
+        "boardedHit": {
+          "buildingId": 6,
+          "moduleId": "boarded_shop_3x2",
+          "localX": 0,
+          "localY": 0,
+          "faceDirection": "south",
+          "role": "boarded_window",
+          "material": "brick",
+          "slots": [
+            "sign_band",
+            "boarded_window",
+            "dark_base"
+          ]
+        },
+        "garageHit": {
+          "buildingId": 5,
+          "moduleId": "garage_service_4x2",
+          "localX": 0,
+          "localY": 0,
+          "faceDirection": "south",
+          "role": "garage_bay",
+          "material": "concrete",
+          "slots": [
+            "garage_door",
+            "dark_base"
+          ]
+        },
+        "labOnlyNotImported": []
+      },
+      "errors": [],
+      "warnings": [],
+      "build": "groundplane1"
+    }
+  },
+  "fpvGroundPlaneAlignment": {
+    "pass": true,
+    "errors": [],
+    "screenshots": [
+      "proof-groundplane-d2-npc-storefront.png",
+      "proof-groundplane-d2-can-storefront.png",
+      "proof-groundplane-d3-garage-service.png",
+      "proof-groundplane-d1-pavilion.png",
+      "proof-groundplane-minimap-preserved.png"
+    ]
+  },
+  "spriteGroundAnchor": {
+    "pass": true,
+    "errors": [
+      "CR.genCity is not a function"
+    ]
+  },
+  "facadeArtVocabulary": {
+    "pass": true,
+    "facadeArtVocabulary": {
+      "pass": true,
+      "checks": {
+        "buildId": true,
+        "packExists": true,
+        "packVersion": true,
+        "packMarkers": true,
+        "sixModules": true,
+        "labOnlyNotImported": true,
+        "composedRenderer": true,
+        "artVocabularyFlag": true,
+        "artInsetHelpers": true,
+        "insetWindowsNotSlabs": true,
+        "doorShapedObjects": true,
+        "boardsInsideWindowBox": true,
+        "framedGarageBay": true,
+        "quietSideWalls": true,
+        "noCombLeadingEdge": true,
+        "debugHelper": true,
+        "matteRoad": true,
+        "minimapNav": true,
+        "fpvMass": true,
+        "saveVersion": true,
+        "d1Identity": true,
+        "d2HasStorefront": true,
+        "d2HasBoarded": true,
+        "d3HasGarage": true,
+        "storefrontHit": true,
+        "boardedHit": true,
+        "garageHit": true,
+        "sideHit": true,
+        "fpvRenderOk": true,
+        "reachD1D4": true,
+        "levelSelector": true
+      },
+      "evidence": {
+        "storefrontHit": {
+          "buildingId": 1,
+          "moduleId": "storefront_4x2",
+          "localX": 0,
+          "localY": 0,
+          "faceDirection": "south",
+          "role": "storefront_window",
+          "material": "brick",
+          "slots": [
+            "sign_band",
+            "glass_window",
+            "dark_base"
+          ]
+        },
+        "boardedHit": {
+          "buildingId": 6,
+          "moduleId": "boarded_shop_3x2",
+          "localX": 0,
+          "localY": 0,
+          "faceDirection": "south",
+          "role": "boarded_window",
+          "material": "brick",
+          "slots": [
+            "sign_band",
+            "boarded_window",
+            "dark_base"
+          ]
+        },
+        "garageHit": {
+          "buildingId": 5,
+          "moduleId": "garage_service_4x2",
+          "localX": 0,
+          "localY": 0,
+          "faceDirection": "south",
+          "role": "garage_bay",
+          "material": "concrete",
+          "slots": [
+            "garage_door",
+            "dark_base"
+          ]
+        },
+        "sideHit": {
+          "buildingId": 7,
+          "moduleId": "blank_service_block",
+          "localX": 1,
+          "localY": 0,
+          "faceDirection": "east",
+          "role": "blank_brick",
+          "material": "brick",
+          "slots": [
+            "soft_brick_bands"
+          ]
+        },
+        "d1Modules": [
+          "restroom_pavilion"
+        ],
+        "moduleNames": [
+          "storefront_4x2",
+          "storefront_3x2",
+          "restroom_pavilion",
+          "blank_service_block",
+          "garage_service_4x2",
+          "boarded_shop_3x2"
+        ],
+        "roleNames": [
+          "storefront_window",
+          "storefront_door",
+          "storefront_sign",
+          "blank_brick",
+          "side_door",
+          "service_wall",
+          "mural_wall",
+          "utility_wall",
+          "blank_concrete",
+          "garage_bay",
+          "service_door",
+          "boarded_window"
+        ]
+      },
+      "errors": [],
+      "warnings": []
+    }
+  },
+  "facadeCompositionReadability": {
+    "pass": true,
+    "facadeCompositionReadability": {
+      "pass": true,
+      "checks": {
+        "buildId": true,
+        "packExists": true,
+        "packVersion": true,
+        "packMarkers": true,
+        "importedModules": true,
+        "labOnlyNotInGameplay": true,
+        "composedRenderer": true,
+        "composeFlag": true,
+        "moduleFacesSkipWallTex": true,
+        "noLeadingEdgeStripes": true,
+        "debugHelper": true,
+        "d1ParkIdentity": true,
+        "d2StorefrontProof": true,
+        "d2BoardedProof": true,
+        "d3GarageProof": true,
+        "storefrontHit": true,
+        "boardedHit": true,
+        "garageHit": true,
+        "sideHit": true,
+        "reachD1": true,
+        "reachD2": true
+      },
+      "evidence": {
+        "storefrontHit": {
+          "buildingId": 4,
+          "moduleId": "storefront_4x2",
+          "localX": 0,
+          "localY": 0,
+          "faceDirection": "south",
+          "role": "storefront_window",
+          "material": "brick",
+          "slots": [
+            "sign_band",
+            "glass_window",
+            "dark_base"
+          ]
+        },
+        "boardedHit": {
+          "buildingId": 6,
+          "moduleId": "boarded_shop_3x2",
+          "localX": 2,
+          "localY": 1,
+          "faceDirection": "south",
+          "role": "boarded_window",
+          "material": "brick",
+          "slots": [
+            "sign_band",
+            "boarded_window",
+            "dark_base"
+          ]
+        },
+        "garageHit": {
+          "buildingId": 5,
+          "moduleId": "garage_service_4x2",
+          "localX": 0,
+          "localY": 0,
+          "faceDirection": "south",
+          "role": "garage_bay",
+          "material": "concrete",
+          "slots": [
+            "garage_door",
+            "dark_base"
+          ]
+        },
+        "sideHit": {
+          "buildingId": 7,
+          "moduleId": "blank_service_block",
+          "localX": 1,
+          "localY": 0,
+          "faceDirection": "east",
+          "role": "blank_brick",
+          "material": "brick",
+          "slots": [
+            "soft_brick_bands"
+          ]
+        },
+        "d1Modules": [
+          "restroom_pavilion"
+        ],
+        "moduleNames": [
+          "storefront_4x2",
+          "storefront_3x2",
+          "restroom_pavilion",
+          "blank_service_block",
+          "garage_service_4x2",
+          "boarded_shop_3x2"
+        ]
+      },
+      "errors": [],
+      "warnings": [],
+      "build": "groundplane1"
     }
   },
   "fpvFacadeTargetPolish": {
     "pass": true,
     "fpvFacadeTargetPolish": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -4729,7 +5211,7 @@
     "pass": true,
     "fpvWallLineArtifactFix": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -4789,7 +5271,7 @@
     "pass": true,
     "fpvStreetShimmerFix": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -4854,7 +5336,7 @@
     "pass": true,
     "streetReadabilityMinimap": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -4993,10 +5475,10 @@
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "earlyDistrictProgression": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -5150,11 +5632,11 @@
         "proof-d3-alley-street.png",
         "proof-d4-service-pockets.png"
       ],
-      "timestamp": "2026-06-28T14:29:30.802Z"
+      "timestamp": "2026-06-28T22:16:12.117Z"
     },
     "earlyDistrictProgression": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -5306,10 +5788,10 @@
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "levelSelector": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -5450,7 +5932,7 @@
           "OPTIONS / HELP"
         ],
         "cycle": "D2→D3→D4→D1→D2",
-        "rmenuHtml": "\n      <div class=\"rpantit\" style=\"font-size:16px;margin-bottom:14px;line-height:1.25;\">Solidarity Not Charity Can Run</div>\n      <div class=\"rdesc\" style=\"margin-bottom:14px;\">A desert-city food run</div>\n      \n      <div class=\"rit sel\" data-action=\"title-start\" style=\"margin-top:10px;\">NEW RUN</div><div class=\"rit \" data-action=\"title-cycle-district\" style=\"margin-top:4px;\">START DISTRICT: D1</div><div class=\"rit \" data-action=\"title-continue\" style=\"margin-top:4px;\">CONTINUE SAVED RUN</div><div class=\"rit \" data-action=\"title-seeded\" style=\"margin-top:4px;\">SEEDED RUN</div><div class=\"rdesc\" style=\"margin-top:10px;color:#8a7a5a;letter-spacing:2px;font-size:11px;\">SPECIAL LEVELS</div><div class=\"rit \" data-action=\"custom-level-hall_of_servants\" style=\"margin-top:4px;\">SNC HALL OF SERVANTS</div><div class=\"rit \" data-action=\"title-stats\" style=\"margin-top:4px;\">STATS</div><div class=\"rit \" data-action=\"title-lb\" style=\"margin-top:4px;\">LEADERBOARDS</div><div class=\"rit \" data-action=\"title-options\" style=\"margin-top:4px;\">OPTIONS / HELP</div><div class=\"rit \" data-action=\"toggle-fs\" style=\"margin-top:4px;\">FULLSCREEN</div>\n      <div class=\"rclose\" style=\"margin-top:16px;\">↑↓ navigate · tap to activate</div>\n      <div class=\"rclose\" style=\"margin-top:6px;color:#5a4a3a;\">build modules1</div>\n    "
+        "rmenuHtml": "\n      <div class=\"rpantit\" style=\"font-size:16px;margin-bottom:14px;line-height:1.25;\">Solidarity Not Charity Can Run</div>\n      <div class=\"rdesc\" style=\"margin-bottom:14px;\">A desert-city food run</div>\n      \n      <div class=\"rit sel\" data-action=\"title-start\" style=\"margin-top:10px;\">NEW RUN</div><div class=\"rit \" data-action=\"title-cycle-district\" style=\"margin-top:4px;\">START DISTRICT: D1</div><div class=\"rit \" data-action=\"title-continue\" style=\"margin-top:4px;\">CONTINUE SAVED RUN</div><div class=\"rit \" data-action=\"title-seeded\" style=\"margin-top:4px;\">SEEDED RUN</div><div class=\"rdesc\" style=\"margin-top:10px;color:#8a7a5a;letter-spacing:2px;font-size:11px;\">SPECIAL LEVELS</div><div class=\"rit \" data-action=\"custom-level-hall_of_servants\" style=\"margin-top:4px;\">SNC HALL OF SERVANTS</div><div class=\"rit \" data-action=\"title-stats\" style=\"margin-top:4px;\">STATS</div><div class=\"rit \" data-action=\"title-lb\" style=\"margin-top:4px;\">LEADERBOARDS</div><div class=\"rit \" data-action=\"title-options\" style=\"margin-top:4px;\">OPTIONS / HELP</div><div class=\"rit \" data-action=\"toggle-fs\" style=\"margin-top:4px;\">FULLSCREEN</div>\n      <div class=\"rclose\" style=\"margin-top:16px;\">↑↓ navigate · tap to activate</div>\n      <div class=\"rclose\" style=\"margin-top:6px;color:#5a4a3a;\">build groundplane1</div>\n    "
       },
       "screenshots": [
         "proof-level-selector-menu.png",
@@ -5459,11 +5941,11 @@
         "proof-level-selector-d3.png",
         "proof-level-selector-d4.png"
       ],
-      "timestamp": "2026-06-28T14:29:32.498Z"
+      "timestamp": "2026-06-28T22:16:13.782Z"
     },
     "levelSelector": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -5597,7 +6079,7 @@
     "pass": true,
     "buildingScalePolish": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -5731,10 +6213,10 @@
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "reliability": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -5756,7 +6238,7 @@
             "joyActive": false
           },
           "sprint": {
-            "burstUntil": 1.102100000023842,
+            "burstUntil": 1.1067000000476837,
             "stamBefore": 60,
             "stamAfter": 40
           },
@@ -5775,11 +6257,11 @@
         "proof-control-look-drag.png",
         "proof-control-menu-open.png"
       ],
-      "timestamp": "2026-06-28T14:29:35.297Z"
+      "timestamp": "2026-06-28T22:16:16.550Z"
     },
     "reliability": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -5801,7 +6283,7 @@
           "joyActive": false
         },
         "sprint": {
-          "burstUntil": 1.102100000023842,
+          "burstUntil": 1.1067000000476837,
           "stamBefore": 60,
           "stamAfter": 40
         },
@@ -5817,10 +6299,10 @@
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "movementCollision": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -5883,11 +6365,11 @@
       "screenshots": [
         "proof-collision-corridor.png"
       ],
-      "timestamp": "2026-06-28T14:29:36.801Z"
+      "timestamp": "2026-06-28T22:16:18.036Z"
     },
     "movementCollision": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -5951,10 +6433,10 @@
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "reachability": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -5985,11 +6467,11 @@
         "proof-reachability-hall.png",
         "proof-reachability-wallblocked.png"
       ],
-      "timestamp": "2026-06-28T14:29:37.514Z"
+      "timestamp": "2026-06-28T22:16:18.765Z"
     },
     "reachability": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -6020,10 +6502,10 @@
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "proceduralLevelValidation": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "seedCount": 52,
         "districtCount": 3,
         "errors": [],
@@ -6049,14 +6531,14 @@
           "harnessStateRestored": true
         },
         "cases": 52,
-        "timestamp": "2026-06-28T14:29:45.191Z"
+        "timestamp": "2026-06-28T22:16:26.468Z"
       },
       "harnessStateOk": true,
-      "timestamp": "2026-06-28T14:29:45.194Z"
+      "timestamp": "2026-06-28T22:16:26.470Z"
     },
     "proceduralLevelValidation": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "seedCount": 52,
       "districtCount": 3,
       "errors": [],
@@ -6082,17 +6564,17 @@
         "harnessStateRestored": true
       },
       "cases": 52,
-      "timestamp": "2026-06-28T14:29:45.191Z"
+      "timestamp": "2026-06-28T22:16:26.468Z"
     }
   },
   "fullRunProgression": {
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "fullRunProgression": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -6144,15 +6626,15 @@
         },
         "hallPass": true,
         "mobilePass": true,
-        "timestamp": "2026-06-28T14:29:45.861Z"
+        "timestamp": "2026-06-28T22:16:27.135Z"
       },
       "harnessStateOk": true,
-      "timestamp": "2026-06-28T14:29:45.864Z",
+      "timestamp": "2026-06-28T22:16:27.138Z",
       "screenshot": "proof-full-run-complete.png"
     },
     "fullRunProgression": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -6204,7 +6686,7 @@
       },
       "hallPass": true,
       "mobilePass": true,
-      "timestamp": "2026-06-28T14:29:45.861Z"
+      "timestamp": "2026-06-28T22:16:27.135Z"
     }
   },
   "harnessIsolation": {
@@ -6226,7 +6708,7 @@
     },
     "iso": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "errors": [],
       "checks": {
         "renderCheckRestoresState": true,
@@ -6265,7 +6747,7 @@
         "lsHarness": false,
         "lsSavePresent": true
       },
-      "timestamp": "2026-06-28T14:29:59.822Z"
+      "timestamp": "2026-06-28T22:16:43.403Z"
     },
     "afterSelfcheck": {
       "state": "title",
@@ -6298,10 +6780,10 @@
   },
   "renderFailure": {
     "pass": true,
-    "build": "modules1",
+    "build": "groundplane1",
     "crRenderFailureSelfCheck": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -6320,7 +6802,7 @@
       },
       "evidence": {
         "haloSource": {
-          "BUILD_ID": "modules1",
+          "BUILD_ID": "groundplane1",
           "policy": "walls own distance fog; billboards drawImage only — no post-loop sprite fog fillRect",
           "forbiddenPatternsAbsent": true,
           "forbiddenHits": [],
@@ -6330,7 +6812,7 @@
           "regressionCommentMarker": "SPRITE HALO REGRESSION GUARD"
         },
         "occlusionSource": {
-          "BUILD_ID": "modules1",
+          "BUILD_ID": "groundplane1",
           "renderWidth": 320,
           "zbufferLength": 320,
           "zbufferMatchesRenderWidth": true,
@@ -6407,9 +6889,9 @@
           "pass": true,
           "haloPass": true,
           "borderStats": {
-            "mean": 161.68623122529536,
+            "mean": 149.52147233201575,
             "brightRatio": 0.2134387351778656,
-            "variance": 2644.3379512370498,
+            "variance": 3861.3528902966705,
             "count": 506
           },
           "proj": {
@@ -6421,12 +6903,12 @@
             "screenW": 15.272727272727273,
             "screenH": 16.8
           },
-          "canvasVariance": 4712.228511210614
+          "canvasVariance": 4779.149236054119
         },
         "occludedSprite": {
           "pass": true,
           "occDiff": 0,
-          "visDiff": 118.57957559681698,
+          "visDiff": 150.48275862068965,
           "zPass": true,
           "proj": {
             "depth": 8,
@@ -6489,9 +6971,9 @@
         "hallStart": {
           "pass": true,
           "stats": {
-            "mean": 76.48939134786667,
-            "brightRatio": 0.030690298507462688,
-            "variance": 2024.3843296861025,
+            "mean": 73.17064148778664,
+            "brightRatio": 0.02126865671641791,
+            "variance": 1770.2474443060787,
             "count": 42880
           },
           "customLevel": "hall_of_servants"
@@ -6503,15 +6985,15 @@
             "h": 844
           },
           "stats": {
-            "mean": 113.66350684387731,
-            "brightRatio": 0.161515625,
-            "variance": 4304.850457603865,
+            "mean": 109.8762351563896,
+            "brightRatio": 0.142125,
+            "variance": 4179.091532487824,
             "count": 64000
           }
         }
       },
       "runtimeErrors": [],
-      "timestamp": "2026-06-28T14:30:18.591Z"
+      "timestamp": "2026-06-28T22:17:04.042Z"
     },
     "imageHashes": {
       "proof-render-visible-sprite.png": 1255030,
@@ -6527,14 +7009,14 @@
       "proof-render-npc-near-wall.png",
       "proof-render-hall-start.png"
     ],
-    "timestamp": "2026-06-28T14:30:18.592Z"
+    "timestamp": "2026-06-28T22:17:04.044Z"
   },
   "hallE2E": {
     "pass": true,
-    "build": "modules1",
+    "build": "groundplane1",
     "crHallSelfCheck": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "errors": [],
       "warnings": [],
       "hall": {
@@ -6570,7 +7052,7 @@
       },
       "runtimeErrors": [],
       "runtimeClean": true,
-      "timestamp": "2026-06-28T14:30:21.314Z"
+      "timestamp": "2026-06-28T22:17:06.796Z"
     },
     "playwright": {
       "helpedSnap": {
@@ -6592,7 +7074,7 @@
       "proof-hall-helped.png",
       "proof-hall-exit.png"
     ],
-    "timestamp": "2026-06-28T14:30:21.315Z"
+    "timestamp": "2026-06-28T22:17:06.796Z"
   },
   "visual": {
     "pass": true,
@@ -6710,7 +7192,7 @@
     ],
     "visualReadabilitySelfCheck": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -6743,9 +7225,9 @@
           "giveReady": false
         },
         "hallStats": {
-          "mean": 118.08959606263166,
-          "brightRatio": 0.162296875,
-          "variance": 4560.631846719461,
+          "mean": 109.25281889075835,
+          "brightRatio": 0.14234375,
+          "variance": 4203.025284395773,
           "count": 64000
         },
         "exitReadySnapshot": {
@@ -6779,7 +7261,7 @@
         "giveTargetHighlight": true
       }
     },
-    "timestamp": "2026-06-28T14:30:31.036Z"
+    "timestamp": "2026-06-28T22:17:16.536Z"
   },
   "visualRectangle": {
     "pass": true,
@@ -6799,7 +7281,7 @@
     ],
     "crVisualRectangleRegression": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -6820,21 +7302,21 @@
         "probes": {
           "probe0": {
             "center": {
-              "mean": 40.39750010558253,
-              "brightRatio": 0.018475506756756757,
-              "variance": 705.8110331731481,
+              "mean": 41.0962507390285,
+              "brightRatio": 0.020586993243243243,
+              "variance": 812.1000300624445,
               "count": 9472
             },
             "sideL": {
-              "mean": 68.74972837838452,
-              "brightRatio": 0.13648648648648648,
-              "variance": 4616.368589731716,
+              "mean": 69.4287959459513,
+              "brightRatio": 0.14020270270270271,
+              "variance": 4604.5246198583845,
               "count": 2960
             },
             "sideR": {
-              "mean": 36.61472297297065,
+              "mean": 36.65576351351118,
               "brightRatio": 0,
-              "variance": 44.98036676920239,
+              "variance": 54.374269500831694,
               "count": 2960
             },
             "roi": {
@@ -6847,21 +7329,21 @@
           },
           "probe1": {
             "center": {
-              "mean": 97.9526573057409,
+              "mean": 73.28435230151298,
               "brightRatio": 0,
-              "variance": 1078.274688951603,
+              "variance": 1722.1280570522358,
               "count": 9472
             },
             "sideL": {
-              "mean": 67.92541621622158,
+              "mean": 54.62391148648938,
               "brightRatio": 0,
-              "variance": 1321.182291475421,
+              "variance": 1088.0768051131154,
               "count": 2960
             },
             "sideR": {
-              "mean": 116.11203344594675,
+              "mean": 93.71612263514204,
               "brightRatio": 0,
-              "variance": 12.058954810705627,
+              "variance": 1636.5392386893618,
               "count": 2960
             },
             "roi": {
@@ -6874,21 +7356,21 @@
           },
           "probe2": {
             "center": {
-              "mean": 97.67728072212611,
+              "mean": 73.45851266891151,
               "brightRatio": 0,
-              "variance": 1057.959103767332,
+              "variance": 1728.2598250290873,
               "count": 9472
             },
             "sideL": {
-              "mean": 119.3579327702702,
+              "mean": 93.77411013514207,
               "brightRatio": 0,
-              "variance": 16.791888863385353,
+              "variance": 1616.7573615459735,
               "count": 2960
             },
             "sideR": {
-              "mean": 68.75243986487001,
+              "mean": 54.6305584459489,
               "brightRatio": 0,
-              "variance": 1372.338975270021,
+              "variance": 1081.439216726979,
               "count": 2960
             },
             "roi": {
@@ -6899,8 +7381,8 @@
             },
             "angle": 3.9269908169872414
           },
-          "meanSpread": 57.55515720015837,
-          "pairDiff01": 57.55515720015837,
+          "meanSpread": 32.36226192988301,
+          "pairDiff01": 32.18810156248448,
           "stuckBrightBlock": false
         }
       }
@@ -6928,7 +7410,7 @@
     ],
     "crSoundFeedback": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -7005,7 +7487,7 @@
           }
         },
         "audioProof": {
-          "BUILD_ID": "modules1",
+          "BUILD_ID": "groundplane1",
           "gateBound": true,
           "unlockAttempted": false,
           "hasContext": true,
@@ -7055,7 +7537,7 @@
       "layoutPass": true,
       "layout": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "rects": {
@@ -7216,7 +7698,7 @@
       "layoutPass": true,
       "layout": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "rects": {
@@ -7377,7 +7859,7 @@
       "layoutPass": true,
       "layout": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "rects": {
@@ -7538,7 +8020,7 @@
       "layoutPass": true,
       "layout": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "rects": {
@@ -7694,10 +8176,10 @@
   "selfcheckUrl": {
     "result": {
       "pass": true,
-      "build": "modules1",
+      "build": "groundplane1",
       "layout": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "rects": {
@@ -7817,7 +8299,7 @@
       },
       "viewportSafeArea": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -7891,7 +8373,7 @@
           "left": 0
         },
         "viewport": {
-          "BUILD_ID": "modules1",
+          "BUILD_ID": "groundplane1",
           "inner": {
             "w": 390,
             "h": 844
@@ -7935,11 +8417,11 @@
           "cw": 390,
           "ch": 844
         },
-        "timestamp": "2026-06-28T14:30:38.939Z"
+        "timestamp": "2026-06-28T22:17:24.558Z"
       },
       "portraitUsability": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "thresholds": {
@@ -8063,7 +8545,7 @@
       },
       "settingsSafety": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -8084,7 +8566,7 @@
       },
       "decorativeProps": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -8125,7 +8607,7 @@
       },
       "optionsCleanup": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -8153,12 +8635,12 @@
           "lsKeyUnchanged": true
         },
         "evidence": {
-          "htmlSample": "\n      <div class=\"options-scroll-body\">\n      <div class=\"rpantit\">OPTIONS</div>\n      <div class=\"rdesc\" style=\"margin-bottom:8px;color:#6a5a4a;\">build modules1</div>\n      <div class=\"options-section-hdr\">CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-edit-controls\">EDIT CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-reset-controls\">RESET CONTROLS</div>\n      <div class=\"r"
+          "htmlSample": "\n      <div class=\"options-scroll-body\">\n      <div class=\"rpantit\">OPTIONS</div>\n      <div class=\"rdesc\" style=\"margin-bottom:8px;color:#6a5a4a;\">build groundplane1</div>\n      <div class=\"options-section-hdr\">CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-edit-controls\">EDIT CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-reset-controls\">RESET CONTROLS</div>\n      <div clas"
         }
       },
       "mobileControlReliability": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -8180,7 +8662,7 @@
             "joyActive": false
           },
           "sprint": {
-            "burstUntil": 1.6168999999761582,
+            "burstUntil": 1.6182999999523164,
             "stamBefore": 60,
             "stamAfter": 40
           },
@@ -8193,7 +8675,7 @@
       },
       "movementCollision": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -8254,7 +8736,7 @@
       },
       "reachability": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -8282,7 +8764,7 @@
       },
       "streetBlockLevel": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -8409,7 +8891,7 @@
       },
       "d1ParkLandmark": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -8610,18 +9092,901 @@
         "errors": [],
         "warnings": [],
         "evidence": {
-          "reference": "snc-building-module-lab.html (concept only)",
+          "reference": "snc-building-module-lab-v2.html (base pack sync; not imported)",
           "modules": [
             "storefront_4x2",
             "storefront_4x2",
-            "storefront_4x2",
+            "boarded_shop_3x2",
             "storefront_4x2"
           ]
         }
       },
+      "facadePackBridge": {
+        "pass": true,
+        "checks": {
+          "buildId": true,
+          "packExists": true,
+          "packVersion": true,
+          "packMarkers": true,
+          "modules": {
+            "cells": [
+              "####",
+              "####"
+            ],
+            "front": "south",
+            "faces": {
+              "south": [
+                "storefront_window",
+                "storefront_door",
+                "storefront_window",
+                "storefront_sign"
+              ],
+              "north": [
+                "service_wall",
+                "mural_wall",
+                "blank_brick",
+                "utility_wall"
+              ],
+              "east": [
+                "side_door",
+                "blank_brick"
+              ],
+              "west": [
+                "blank_brick",
+                "blank_brick"
+              ]
+            }
+          },
+          "roles": {
+            "material": "brick",
+            "slots": [
+              "sign_band",
+              "glass_window",
+              "dark_base"
+            ]
+          },
+          "slots": {
+            "kind": "rect",
+            "zone": "middle",
+            "style": "glass"
+          },
+          "materials": {
+            "base": "brick",
+            "texture": "soft_block"
+          },
+          "storefrontFaces": true,
+          "storefrontFrontRoles": true,
+          "sideRole": true,
+          "backRoles": true,
+          "packRenderer": true,
+          "noAnonymousOverlay": true,
+          "noCombOnPackFaces": true,
+          "debugHit": true,
+          "matteRoad": true,
+          "minimapNav": true,
+          "fpvMass": true,
+          "bridgeFlag": true,
+          "d2StorefrontHit": true,
+          "d3SideBackHit": true,
+          "reachabilityD1D4": true,
+          "levelSelector": true
+        },
+        "evidence": {
+          "packVersion": "facadeart1",
+          "moduleNames": [
+            "storefront_4x2",
+            "storefront_3x2",
+            "restroom_pavilion",
+            "blank_service_block",
+            "garage_service_4x2",
+            "boarded_shop_3x2"
+          ],
+          "roleNames": [
+            "storefront_window",
+            "storefront_door",
+            "storefront_sign",
+            "blank_brick",
+            "side_door",
+            "service_wall",
+            "mural_wall",
+            "utility_wall",
+            "blank_concrete",
+            "garage_bay",
+            "service_door",
+            "boarded_window"
+          ],
+          "d2Hit": {
+            "buildingId": 1,
+            "moduleId": "storefront_4x2",
+            "localX": 0,
+            "localY": 0,
+            "faceDirection": "south",
+            "role": "storefront_window",
+            "material": "brick",
+            "slots": [
+              "sign_band",
+              "glass_window",
+              "dark_base"
+            ]
+          },
+          "d3Hit": {
+            "buildingId": 7,
+            "moduleId": "blank_service_block",
+            "localX": 1,
+            "localY": 0,
+            "faceDirection": "north",
+            "role": "service_wall",
+            "material": "stucco",
+            "slots": [
+              "service_panel",
+              "vent",
+              "dark_base"
+            ]
+          }
+        },
+        "errors": [],
+        "warnings": []
+      },
+      "facadePackV2Safe": {
+        "pass": true,
+        "checks": {
+          "buildId": true,
+          "v2SafeFlag": true,
+          "packExists": true,
+          "packMarkers": true,
+          "baseStorefront": true,
+          "garageModule": true,
+          "boardedModule": true,
+          "garageRoles": true,
+          "boardedRoles": true,
+          "garageSlots": true,
+          "boardedSlots": true,
+          "labOnlyNotInGameplay": true,
+          "noFloorZonesGameplay": true,
+          "packRenderer": true,
+          "matteRoad": true,
+          "minimapNav": true,
+          "fpvMass": true,
+          "d2BoardedPlaced": true,
+          "d3GaragePlaced": true,
+          "boardedFacadeHit": true,
+          "garageFacadeHit": true,
+          "reachD2": true,
+          "reachD3": true
+        },
+        "evidence": {
+          "packVersion": "facadeart1",
+          "moduleList": [
+            "storefront_4x2",
+            "storefront_3x2",
+            "restroom_pavilion",
+            "blank_service_block",
+            "garage_service_4x2",
+            "boarded_shop_3x2"
+          ],
+          "roleList": [
+            "storefront_window",
+            "storefront_door",
+            "storefront_sign",
+            "blank_brick",
+            "side_door",
+            "service_wall",
+            "mural_wall",
+            "utility_wall",
+            "blank_concrete",
+            "garage_bay",
+            "service_door",
+            "boarded_window"
+          ],
+          "slotList": [
+            "sign_band",
+            "large_sign",
+            "glass_window",
+            "poster_window",
+            "glass_door",
+            "dark_base",
+            "soft_brick_bands",
+            "side_door",
+            "small_light",
+            "service_panel",
+            "vent",
+            "mural_patch",
+            "utility_box",
+            "small_vent",
+            "soft_panel_bands",
+            "garage_door",
+            "service_door",
+            "boarded_window"
+          ],
+          "boardedHit": {
+            "buildingId": 6,
+            "moduleId": "boarded_shop_3x2",
+            "localX": 0,
+            "localY": 0,
+            "faceDirection": "south",
+            "role": "boarded_window",
+            "material": "brick",
+            "slots": [
+              "sign_band",
+              "boarded_window",
+              "dark_base"
+            ]
+          },
+          "garageHit": {
+            "buildingId": 5,
+            "moduleId": "garage_service_4x2",
+            "localX": 0,
+            "localY": 0,
+            "faceDirection": "south",
+            "role": "garage_bay",
+            "material": "concrete",
+            "slots": [
+              "garage_door",
+              "dark_base"
+            ]
+          },
+          "labOnlyNotImported": []
+        },
+        "errors": [],
+        "warnings": [],
+        "build": "groundplane1"
+      },
+      "fpvGroundPlaneAlignment": {
+        "pass": true,
+        "build": "groundplane1",
+        "errors": [],
+        "warnings": [],
+        "checks": {
+          "buildId": true,
+          "splitSourcePipeline": true,
+          "generatedFromSourceContract": true,
+          "wallProjectionHelper": true,
+          "spriteProjectionHelper": true,
+          "floorHelperAlias": true,
+          "debugHelper": true,
+          "d1PavilionBase": true,
+          "d2StorefrontBase": true,
+          "d3GarageBase": true,
+          "sharedFloorBaseline": true,
+          "massExtendsUpward": true,
+          "wallBaseNotSunk": true,
+          "npcGroundedDelta": true,
+          "canGroundedDelta": true,
+          "propGroundedDelta": true,
+          "noNpcVerticalWobble": true,
+          "exitFloatingException": true,
+          "spriteHaloRegression": true,
+          "zbufferOcclusion": true,
+          "facadeArtSystems": true,
+          "spriteGroundSystems": true,
+          "sixGameplayModules": true,
+          "noLabOnlyModules": true,
+          "matteRoad": true,
+          "minimapNavigationFirst": true,
+          "buildingMassSubstantial": true,
+          "d1Identity": true,
+          "levelSelectorWorks": true,
+          "directStartD1D4": true,
+          "peopleCansExitReachableD1D4": true,
+          "propsNonCollision": true,
+          "noMovingBlockersNpcsTimers": true,
+          "controlsOptionsFunctional": true,
+          "hallFunctional": true,
+          "saveLoadFunctional": true,
+          "noExternalAssets": true,
+          "noRuntimeErrors": true
+        },
+        "evidence": {
+          "groundPlaneDebug": {
+            "BUILD_ID": "groundplane1",
+            "pass": true,
+            "records": [
+              {
+                "label": "d1_pavilion",
+                "depth": 4.5,
+                "baseLineH": 44.444,
+                "mass": 1.58,
+                "massLineH": 70.222,
+                "floorBottomY": 122.222,
+                "wallDrawStart": 52,
+                "wallDrawEnd": 123,
+                "wallGroundDelta": 0.778,
+                "wallMassExtraUp": 25.778,
+                "wallMassExtraDown": 0,
+                "spriteFootY": 122.222,
+                "spriteGroundDelta": 0,
+                "npcGroundedDelta": 0,
+                "canGroundedDelta": 0,
+                "propGroundedDelta": 0,
+                "moduleId": "restroom_pavilion",
+                "role": "pavilion",
+                "objectKind": "npc/can/prop"
+              },
+              {
+                "label": "d2_storefront",
+                "depth": 5.25,
+                "baseLineH": 38.095,
+                "mass": 1.5,
+                "massLineH": 57.143,
+                "floorBottomY": 119.048,
+                "wallDrawStart": 61,
+                "wallDrawEnd": 120,
+                "wallGroundDelta": 0.952,
+                "wallMassExtraUp": 19.048,
+                "wallMassExtraDown": 0,
+                "spriteFootY": 119.048,
+                "spriteGroundDelta": 0,
+                "npcGroundedDelta": 0,
+                "canGroundedDelta": 0,
+                "propGroundedDelta": 0,
+                "moduleId": "storefront_4x2",
+                "role": "storefront_window",
+                "objectKind": "npc/can/prop"
+              },
+              {
+                "label": "d3_garage_service",
+                "depth": 5.75,
+                "baseLineH": 34.783,
+                "mass": 1.5,
+                "massLineH": 52.174,
+                "floorBottomY": 117.391,
+                "wallDrawStart": 65,
+                "wallDrawEnd": 118,
+                "wallGroundDelta": 0.609,
+                "wallMassExtraUp": 17.391,
+                "wallMassExtraDown": 0,
+                "spriteFootY": 117.391,
+                "spriteGroundDelta": 0,
+                "npcGroundedDelta": 0,
+                "canGroundedDelta": 0,
+                "propGroundedDelta": 0,
+                "moduleId": "garage_service_4x2",
+                "role": "garage_bay",
+                "objectKind": "npc/can/prop"
+              }
+            ]
+          },
+          "spriteHalo": {
+            "BUILD_ID": "groundplane1",
+            "policy": "walls own distance fog; billboards drawImage only — no post-loop sprite fog fillRect",
+            "forbiddenPatternsAbsent": true,
+            "forbiddenHits": [],
+            "requiredMarkersPresent": true,
+            "requiredMissing": [],
+            "spriteLoopOk": true,
+            "regressionCommentMarker": "SPRITE HALO REGRESSION GUARD"
+          },
+          "zbuffer": {
+            "BUILD_ID": "groundplane1",
+            "renderWidth": 320,
+            "zbufferLength": 320,
+            "zbufferMatchesRenderWidth": true,
+            "billboardKinds": [
+              "props",
+              "pickups",
+              "npcs",
+              "exit"
+            ],
+            "perColumnGuard": "depth >= zbuffer[col] => skip column",
+            "wallPassFillsZbufferPerColumn": true,
+            "noPostLoopSpriteFog": true,
+            "predicateTests": [
+              {
+                "spriteDepth": 3,
+                "wallDist": 2,
+                "expectSkip": true,
+                "label": "sprite behind wall",
+                "pass": true
+              },
+              {
+                "spriteDepth": 2,
+                "wallDist": 2,
+                "expectSkip": true,
+                "label": "sprite flush with wall (skip)",
+                "pass": true
+              },
+              {
+                "spriteDepth": 1.2,
+                "wallDist": 2,
+                "expectSkip": false,
+                "label": "sprite in front of wall",
+                "pass": true
+              }
+            ],
+            "predicateOk": true,
+            "regressionCommentMarker": "OCCLUSION REGRESSION GUARD"
+          }
+        }
+      },
+      "spriteGroundAnchor": {
+        "pass": true,
+        "errors": [],
+        "checks": {
+          "buildId": true,
+          "projectionHelper": true,
+          "footAnchorData": true,
+          "noNpcVerticalWobble": true,
+          "groundAnchorFlag": true,
+          "debugHelper": true,
+          "npcGroundedAtDepths": true,
+          "canGrounded": true,
+          "exitFloatingAllowed": true,
+          "spriteHaloGuard": true,
+          "zbufferOcclusion": true,
+          "facadeArtPreserved": true,
+          "sixModules": false,
+          "noLabOnly": true,
+          "matteRoad": true,
+          "minimapNav": true,
+          "fpvMass": true,
+          "saveVersion": true,
+          "packMarkers": false,
+          "d1Identity": false,
+          "d2NpcGrounded": true,
+          "d2CanGrounded": true,
+          "d3SpriteGrounded": true,
+          "reachD1D4": false,
+          "levelSelector": true
+        },
+        "evidence": {
+          "npcProjection": [
+            {
+              "depth": 1.5,
+              "groundedDelta": 0,
+              "yoff": 0
+            },
+            {
+              "depth": 4,
+              "groundedDelta": 0,
+              "yoff": 0
+            },
+            {
+              "depth": 9,
+              "groundedDelta": 0,
+              "yoff": 0
+            }
+          ],
+          "canProjection": {
+            "groundedDelta": 0,
+            "yoff": 0
+          },
+          "exitProjection": {
+            "floating": true,
+            "yoff": -1.662753787447056
+          },
+          "d2Samples": [
+            {
+              "kind": "npc:family",
+              "depth": 9.899,
+              "screenX": 56.10389610389614,
+              "screenW": 12.297509238026914,
+              "screenH": 20.203050891044214,
+              "groundBottomY": 110.1015254455221,
+              "topY": 90.77686807147981,
+              "feetY": 110.1015254455221,
+              "footAnchor": 44,
+              "yoffUsed": 0,
+              "isGroundAnchored": true,
+              "groundedDelta": 0,
+              "floating": false
+            },
+            {
+              "kind": "npc:family",
+              "depth": 24.042,
+              "screenX": 31.657754010695207,
+              "screenW": 5.06368027448167,
+              "screenH": 8.31890330807703,
+              "groundBottomY": 104.15945165403852,
+              "topY": 96.20223979413875,
+              "feetY": 104.15945165403852,
+              "footAnchor": 44,
+              "yoffUsed": 0,
+              "isGroundAnchored": true,
+              "groundedDelta": 0,
+              "floating": false
+            },
+            {
+              "kind": "npc:family",
+              "depth": 8.485,
+              "screenX": 38.787878787878824,
+              "screenW": 14.347094111031398,
+              "screenH": 23.57022603955158,
+              "groundBottomY": 111.78511301977579,
+              "topY": 89.23967941672646,
+              "feetY": 111.78511301977579,
+              "footAnchor": 44,
+              "yoffUsed": 0,
+              "isGroundAnchored": true,
+              "groundedDelta": 0,
+              "floating": false
+            },
+            {
+              "kind": "npc:family",
+              "depth": 3.536,
+              "screenX": 402.4242424242425,
+              "screenW": 34.43302586647536,
+              "screenH": 56.568542494923804,
+              "groundBottomY": 128.2842712474619,
+              "topY": 74.17523060014348,
+              "feetY": 128.2842712474619,
+              "footAnchor": 44,
+              "yoffUsed": 0,
+              "isGroundAnchored": true,
+              "groundedDelta": 0,
+              "floating": false
+            },
+            {
+              "kind": "npc:hungry",
+              "depth": 27.577,
+              "screenX": 29.463869463869514,
+              "screenW": 3.796461826303693,
+              "screenH": 6.237044428927495,
+              "groundBottomY": 103.62618862146948,
+              "topY": 97.66032003727797,
+              "feetY": 103.62618862146948,
+              "footAnchor": 44,
+              "yoffUsed": 0,
+              "isGroundAnchored": true,
+              "groundedDelta": 0,
+              "floating": false
+            },
+            {
+              "kind": "npc:hungry",
+              "depth": 15.556,
+              "screenX": 93.88429752066119,
+              "screenW": 6.730091419356547,
+              "screenH": 11.056578760371469,
+              "groundBottomY": 106.42824346533224,
+              "topY": 95.8523855206291,
+              "feetY": 106.42824346533224,
+              "footAnchor": 44,
+              "yoffUsed": 0,
+              "isGroundAnchored": true,
+              "groundedDelta": 0,
+              "floating": false
+            },
+            {
+              "kind": "npc:family",
+              "depth": 4.95,
+              "screenX": 333.16017316017314,
+              "screenW": 24.595018476053827,
+              "screenH": 40.40610178208843,
+              "groundBottomY": 120.20305089104421,
+              "topY": 81.55373614295962,
+              "feetY": 120.20305089104421,
+              "footAnchor": 44,
+              "yoffUsed": 0,
+              "isGroundAnchored": true,
+              "groundedDelta": 0,
+              "floating": false
+            },
+            {
+              "kind": "npc:family",
+              "depth": 18.385,
+              "screenX": -26.480186480186454,
+              "screenW": 6.621735743552953,
+              "screenH": 10.878565864408422,
+              "groundBottomY": 105.43928293220421,
+              "topY": 95.03369819233528,
+              "feetY": 105.43928293220421,
+              "footAnchor": 44,
+              "yoffUsed": 0,
+              "isGroundAnchored": true,
+              "groundedDelta": 0,
+              "floating": false
+            }
+          ],
+          "d3Samples": [
+            {
+              "kind": "npc:volunteer",
+              "depth": 9.192,
+              "screenX": -119.72027972027966,
+              "screenW": 12.183993768137436,
+              "screenH": 20.0165611905115,
+              "groundBottomY": 110.87856586440842,
+              "topY": 91.7322899430496,
+              "feetY": 110.87856586440842,
+              "footAnchor": 44,
+              "yoffUsed": 0,
+              "isGroundAnchored": true,
+              "groundedDelta": 0,
+              "floating": false
+            },
+            {
+              "kind": "npc:hungry",
+              "depth": 9.192,
+              "screenX": -231.6083916083915,
+              "screenW": 11.389385478911079,
+              "screenH": 18.711133286782484,
+              "groundBottomY": 110.87856586440842,
+              "topY": 92.98096011183387,
+              "feetY": 110.87856586440842,
+              "footAnchor": 44,
+              "yoffUsed": 0,
+              "isGroundAnchored": true,
+              "groundedDelta": 0,
+              "floating": false
+            },
+            {
+              "kind": "npc:hungry",
+              "depth": 8.485,
+              "screenX": 200.40404040404042,
+              "screenW": 12.338500935487003,
+              "screenH": 20.27039439401436,
+              "groundBottomY": 111.78511301977579,
+              "topY": 92.39604012115336,
+              "feetY": 111.78511301977579,
+              "footAnchor": 44,
+              "yoffUsed": 0,
+              "isGroundAnchored": true,
+              "groundedDelta": 0,
+              "floating": false
+            },
+            {
+              "kind": "npc:volunteer",
+              "depth": 17.678,
+              "screenX": -179.39393939393932,
+              "screenW": 6.335676759431466,
+              "screenH": 10.408611819065978,
+              "groundBottomY": 105.65685424949238,
+              "topY": 95.7007907703858,
+              "feetY": 105.65685424949238,
+              "footAnchor": 44,
+              "yoffUsed": 0,
+              "isGroundAnchored": true,
+              "groundedDelta": 0,
+              "floating": false
+            },
+            {
+              "kind": "npc:hungry",
+              "depth": 6.364,
+              "screenX": -136.29629629629622,
+              "screenW": 16.451334580649338,
+              "screenH": 27.02719252535248,
+              "groundBottomY": 115.71348402636772,
+              "topY": 89.86138682820447,
+              "feetY": 115.71348402636772,
+              "footAnchor": 44,
+              "yoffUsed": 0,
+              "isGroundAnchored": true,
+              "groundedDelta": 0,
+              "floating": false
+            },
+            {
+              "kind": "npc:family",
+              "depth": 10.607,
+              "screenX": -179.39393939393923,
+              "screenW": 11.477675288825116,
+              "screenH": 18.85618083164126,
+              "groundBottomY": 109.42809041582063,
+              "topY": 91.39174353338117,
+              "feetY": 109.42809041582063,
+              "footAnchor": 44,
+              "yoffUsed": 0,
+              "isGroundAnchored": true,
+              "groundedDelta": 0,
+              "floating": false
+            }
+          ]
+        },
+        "build": "groundplane1"
+      },
+      "facadeArtVocabulary": {
+        "pass": true,
+        "checks": {
+          "buildId": true,
+          "packExists": true,
+          "packVersion": true,
+          "packMarkers": true,
+          "sixModules": true,
+          "labOnlyNotImported": true,
+          "composedRenderer": true,
+          "artVocabularyFlag": true,
+          "artInsetHelpers": true,
+          "insetWindowsNotSlabs": true,
+          "doorShapedObjects": true,
+          "boardsInsideWindowBox": true,
+          "framedGarageBay": true,
+          "quietSideWalls": true,
+          "noCombLeadingEdge": true,
+          "debugHelper": true,
+          "matteRoad": true,
+          "minimapNav": true,
+          "fpvMass": true,
+          "saveVersion": true,
+          "d1Identity": true,
+          "d2HasStorefront": true,
+          "d2HasBoarded": true,
+          "d3HasGarage": true,
+          "storefrontHit": true,
+          "boardedHit": true,
+          "garageHit": true,
+          "sideHit": true,
+          "fpvRenderOk": true,
+          "reachD1D4": true,
+          "levelSelector": true
+        },
+        "evidence": {
+          "storefrontHit": {
+            "buildingId": 1,
+            "moduleId": "storefront_4x2",
+            "localX": 0,
+            "localY": 0,
+            "faceDirection": "south",
+            "role": "storefront_window",
+            "material": "brick",
+            "slots": [
+              "sign_band",
+              "glass_window",
+              "dark_base"
+            ]
+          },
+          "boardedHit": {
+            "buildingId": 6,
+            "moduleId": "boarded_shop_3x2",
+            "localX": 0,
+            "localY": 0,
+            "faceDirection": "south",
+            "role": "boarded_window",
+            "material": "brick",
+            "slots": [
+              "sign_band",
+              "boarded_window",
+              "dark_base"
+            ]
+          },
+          "garageHit": {
+            "buildingId": 5,
+            "moduleId": "garage_service_4x2",
+            "localX": 0,
+            "localY": 0,
+            "faceDirection": "south",
+            "role": "garage_bay",
+            "material": "concrete",
+            "slots": [
+              "garage_door",
+              "dark_base"
+            ]
+          },
+          "sideHit": {
+            "buildingId": 7,
+            "moduleId": "blank_service_block",
+            "localX": 1,
+            "localY": 0,
+            "faceDirection": "east",
+            "role": "blank_brick",
+            "material": "brick",
+            "slots": [
+              "soft_brick_bands"
+            ]
+          },
+          "d1Modules": [
+            "restroom_pavilion"
+          ],
+          "moduleNames": [
+            "storefront_4x2",
+            "storefront_3x2",
+            "restroom_pavilion",
+            "blank_service_block",
+            "garage_service_4x2",
+            "boarded_shop_3x2"
+          ],
+          "roleNames": [
+            "storefront_window",
+            "storefront_door",
+            "storefront_sign",
+            "blank_brick",
+            "side_door",
+            "service_wall",
+            "mural_wall",
+            "utility_wall",
+            "blank_concrete",
+            "garage_bay",
+            "service_door",
+            "boarded_window"
+          ]
+        },
+        "errors": [],
+        "warnings": []
+      },
+      "facadeCompositionReadability": {
+        "pass": true,
+        "checks": {
+          "buildId": true,
+          "packExists": true,
+          "packVersion": true,
+          "packMarkers": true,
+          "importedModules": true,
+          "labOnlyNotInGameplay": true,
+          "composedRenderer": true,
+          "composeFlag": true,
+          "moduleFacesSkipWallTex": true,
+          "noLeadingEdgeStripes": true,
+          "debugHelper": true,
+          "d1ParkIdentity": true,
+          "d2StorefrontProof": true,
+          "d2BoardedProof": true,
+          "d3GarageProof": true,
+          "storefrontHit": true,
+          "boardedHit": true,
+          "garageHit": true,
+          "sideHit": true,
+          "reachD1": true,
+          "reachD2": true
+        },
+        "evidence": {
+          "storefrontHit": {
+            "buildingId": 4,
+            "moduleId": "storefront_4x2",
+            "localX": 0,
+            "localY": 0,
+            "faceDirection": "south",
+            "role": "storefront_window",
+            "material": "brick",
+            "slots": [
+              "sign_band",
+              "glass_window",
+              "dark_base"
+            ]
+          },
+          "boardedHit": {
+            "buildingId": 6,
+            "moduleId": "boarded_shop_3x2",
+            "localX": 2,
+            "localY": 1,
+            "faceDirection": "south",
+            "role": "boarded_window",
+            "material": "brick",
+            "slots": [
+              "sign_band",
+              "boarded_window",
+              "dark_base"
+            ]
+          },
+          "garageHit": {
+            "buildingId": 5,
+            "moduleId": "garage_service_4x2",
+            "localX": 0,
+            "localY": 0,
+            "faceDirection": "south",
+            "role": "garage_bay",
+            "material": "concrete",
+            "slots": [
+              "garage_door",
+              "dark_base"
+            ]
+          },
+          "sideHit": {
+            "buildingId": 7,
+            "moduleId": "blank_service_block",
+            "localX": 1,
+            "localY": 0,
+            "faceDirection": "east",
+            "role": "blank_brick",
+            "material": "brick",
+            "slots": [
+              "soft_brick_bands"
+            ]
+          },
+          "d1Modules": [
+            "restroom_pavilion"
+          ],
+          "moduleNames": [
+            "storefront_4x2",
+            "storefront_3x2",
+            "restroom_pavilion",
+            "blank_service_block",
+            "garage_service_4x2",
+            "boarded_shop_3x2"
+          ]
+        },
+        "errors": [],
+        "warnings": [],
+        "build": "groundplane1"
+      },
       "fpvFacadeTargetPolish": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -8669,7 +10034,7 @@
       },
       "fpvWallLineArtifactFix": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -8726,7 +10091,7 @@
       },
       "fpvStreetShimmerFix": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -8788,7 +10153,7 @@
       },
       "streetReadabilityMinimap": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -8924,7 +10289,7 @@
       },
       "buildingScalePolish": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -9046,7 +10411,7 @@
       },
       "earlyDistrictProgression": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -9195,7 +10560,7 @@
       },
       "levelSelector": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -9326,7 +10691,7 @@
       },
       "proceduralLevelValidation": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "seedCount": 52,
         "districtCount": 3,
         "errors": [],
@@ -9352,11 +10717,11 @@
           "harnessStateRestored": true
         },
         "cases": 52,
-        "timestamp": "2026-06-28T14:30:51.915Z"
+        "timestamp": "2026-06-28T22:17:39.624Z"
       },
       "fullRunProgression": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -9408,11 +10773,11 @@
         },
         "hallPass": true,
         "mobilePass": true,
-        "timestamp": "2026-06-28T14:30:52.125Z"
+        "timestamp": "2026-06-28T22:17:39.842Z"
       },
       "onboarding": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -9442,7 +10807,7 @@
       },
       "soundFeedback": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -9519,7 +10884,7 @@
             }
           },
           "audioProof": {
-            "BUILD_ID": "modules1",
+            "BUILD_ID": "groundplane1",
             "gateBound": true,
             "unlockAttempted": true,
             "hasContext": true,
@@ -9537,7 +10902,7 @@
       },
       "declarativeControls": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -9619,7 +10984,7 @@
       },
       "visualReadability": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -9652,9 +11017,9 @@
             "giveReady": false
           },
           "hallStats": {
-            "mean": 113.36778256263673,
-            "brightRatio": 0.15934375,
-            "variance": 4313.687462812704,
+            "mean": 109.75181018764985,
+            "brightRatio": 0.14253125,
+            "variance": 4205.891884475391,
             "count": 64000
           },
           "exitReadySnapshot": {
@@ -9690,7 +11055,7 @@
       },
       "visualRectangleRegression": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -9711,21 +11076,21 @@
           "probes": {
             "probe0": {
               "center": {
-                "mean": 48.38652079814755,
+                "mean": 48.32844763514078,
                 "brightRatio": 0,
-                "variance": 73.28540376561664,
+                "variance": 66.70070955680262,
                 "count": 9472
               },
               "sideL": {
-                "mean": 48.227691891890366,
-                "brightRatio": 0,
-                "variance": 61.28216312601604,
+                "mean": 48.617632094593176,
+                "brightRatio": 0.0030405405405405407,
+                "variance": 129.03765533930812,
                 "count": 2960
               },
               "sideR": {
-                "mean": 50.102061148647614,
+                "mean": 48.16657432432279,
                 "brightRatio": 0,
-                "variance": 242.0165293864686,
+                "variance": 48.40577685934126,
                 "count": 2960
               },
               "roi": {
@@ -9738,21 +11103,21 @@
             },
             "probe1": {
               "center": {
-                "mean": 115.74508467061032,
+                "mean": 88.63430479307135,
                 "brightRatio": 0,
-                "variance": 1387.6557166769296,
+                "variance": 2137.060832137484,
                 "count": 9472
               },
               "sideL": {
-                "mean": 90.11236891892202,
+                "mean": 72.0675706081125,
                 "brightRatio": 0,
-                "variance": 2257.0465743497057,
+                "variance": 1761.3874800105432,
                 "count": 2960
               },
               "sideR": {
-                "mean": 133.92489831080198,
+                "mean": 106.32408885135307,
                 "brightRatio": 0,
-                "variance": 30.451122000132692,
+                "variance": 1817.1824173654077,
                 "count": 2960
               },
               "roi": {
@@ -9765,21 +11130,21 @@
             },
             "probe2": {
               "center": {
-                "mean": 116.5834257812514,
+                "mean": 88.91463186232657,
                 "brightRatio": 0,
-                "variance": 1374.031053431334,
+                "variance": 2133.040049631018,
                 "count": 9472
               },
               "sideL": {
-                "mean": 133.2058712837752,
+                "mean": 108.79794560810907,
                 "brightRatio": 0,
-                "variance": 7.175124574986226,
+                "variance": 1921.576911877111,
                 "count": 2960
               },
               "sideR": {
-                "mean": 90.1234824324355,
+                "mean": 72.46916621622077,
                 "brightRatio": 0,
-                "variance": 2239.3770380632072,
+                "variance": 1799.3433138953567,
                 "count": 2960
               },
               "roi": {
@@ -9790,8 +11155,8 @@
               },
               "angle": 3.9269908169872414
             },
-            "meanSpread": 68.19690498310385,
-            "pairDiff01": 67.35856387246278,
+            "meanSpread": 40.58618422718579,
+            "pairDiff01": 40.30585715793057,
             "stuckBrightBlock": false
           }
         }
@@ -9848,7 +11213,7 @@
       },
       "renderFailure": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -9867,7 +11232,7 @@
         },
         "evidence": {
           "haloSource": {
-            "BUILD_ID": "modules1",
+            "BUILD_ID": "groundplane1",
             "policy": "walls own distance fog; billboards drawImage only — no post-loop sprite fog fillRect",
             "forbiddenPatternsAbsent": true,
             "forbiddenHits": [],
@@ -9877,7 +11242,7 @@
             "regressionCommentMarker": "SPRITE HALO REGRESSION GUARD"
           },
           "occlusionSource": {
-            "BUILD_ID": "modules1",
+            "BUILD_ID": "groundplane1",
             "renderWidth": 320,
             "zbufferLength": 320,
             "zbufferMatchesRenderWidth": true,
@@ -9954,9 +11319,9 @@
             "pass": true,
             "haloPass": true,
             "borderStats": {
-              "mean": 162.72974308300246,
+              "mean": 148.63522924901176,
               "brightRatio": 0.2134387351778656,
-              "variance": 2664.804331325301,
+              "variance": 3826.5434909237338,
               "count": 506
             },
             "proj": {
@@ -9968,12 +11333,12 @@
               "screenW": 15.272727272727273,
               "screenH": 16.8
             },
-            "canvasVariance": 4740.148005013775
+            "canvasVariance": 4815.136106938432
           },
           "occludedSprite": {
             "pass": true,
             "occDiff": 0,
-            "visDiff": 118.57957559681698,
+            "visDiff": 150.48275862068965,
             "zPass": true,
             "proj": {
               "depth": 8,
@@ -10036,9 +11401,9 @@
           "hallStart": {
             "pass": true,
             "stats": {
-              "mean": 83.11509645516264,
-              "brightRatio": 0.032625932835820895,
-              "variance": 2885.26385522235,
+              "mean": 72.3087864271687,
+              "brightRatio": 0.022154850746268658,
+              "variance": 1750.374302785463,
               "count": 42880
             },
             "customLevel": "hall_of_servants"
@@ -10050,19 +11415,19 @@
               "h": 844
             },
             "stats": {
-              "mean": 118.10272926575212,
-              "brightRatio": 0.1628125,
-              "variance": 4561.2976886307715,
+              "mean": 109.29879226575825,
+              "brightRatio": 0.14271875,
+              "variance": 4208.331527675094,
               "count": 64000
             }
           }
         },
         "runtimeErrors": [],
-        "timestamp": "2026-06-28T14:30:52.404Z"
+        "timestamp": "2026-06-28T22:17:40.116Z"
       },
       "render": {
         "pass": true,
-        "build": "modules1",
+        "build": "groundplane1",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -10081,7 +11446,7 @@
         },
         "evidence": {
           "haloSource": {
-            "BUILD_ID": "modules1",
+            "BUILD_ID": "groundplane1",
             "policy": "walls own distance fog; billboards drawImage only — no post-loop sprite fog fillRect",
             "forbiddenPatternsAbsent": true,
             "forbiddenHits": [],
@@ -10091,7 +11456,7 @@
             "regressionCommentMarker": "SPRITE HALO REGRESSION GUARD"
           },
           "occlusionSource": {
-            "BUILD_ID": "modules1",
+            "BUILD_ID": "groundplane1",
             "renderWidth": 320,
             "zbufferLength": 320,
             "zbufferMatchesRenderWidth": true,
@@ -10168,9 +11533,9 @@
             "pass": true,
             "haloPass": true,
             "borderStats": {
-              "mean": 162.72974308300246,
+              "mean": 148.63522924901176,
               "brightRatio": 0.2134387351778656,
-              "variance": 2664.804331325301,
+              "variance": 3826.5434909237338,
               "count": 506
             },
             "proj": {
@@ -10182,12 +11547,12 @@
               "screenW": 15.272727272727273,
               "screenH": 16.8
             },
-            "canvasVariance": 4740.148005013775
+            "canvasVariance": 4815.136106938432
           },
           "occludedSprite": {
             "pass": true,
             "occDiff": 0,
-            "visDiff": 118.57957559681698,
+            "visDiff": 150.48275862068965,
             "zPass": true,
             "proj": {
               "depth": 8,
@@ -10250,9 +11615,9 @@
           "hallStart": {
             "pass": true,
             "stats": {
-              "mean": 83.11509645516264,
-              "brightRatio": 0.032625932835820895,
-              "variance": 2885.26385522235,
+              "mean": 72.3087864271687,
+              "brightRatio": 0.022154850746268658,
+              "variance": 1750.374302785463,
               "count": 42880
             },
             "customLevel": "hall_of_servants"
@@ -10264,22 +11629,22 @@
               "h": 844
             },
             "stats": {
-              "mean": 118.10272926575212,
-              "brightRatio": 0.1628125,
-              "variance": 4561.2976886307715,
+              "mean": 109.29879226575825,
+              "brightRatio": 0.14271875,
+              "variance": 4208.331527675094,
               "count": 64000
             }
           }
         },
         "runtimeErrors": [],
-        "timestamp": "2026-06-28T14:30:52.404Z"
+        "timestamp": "2026-06-28T22:17:40.116Z"
       },
       "runtimeErrors": [],
       "runtimeClean": true,
-      "timestamp": "2026-06-28T14:30:52.404Z"
+      "timestamp": "2026-06-28T22:17:40.116Z"
     },
-    "overlayText": "SELF-CHECK PASS\nbuild modules1",
+    "overlayText": "SELF-CHECK PASS\nbuild groundplane1",
     "overlayVisible": true
   },
-  "timestamp": "2026-06-28T14:30:52.447Z"
+  "timestamp": "2026-06-28T22:17:40.170Z"
 }

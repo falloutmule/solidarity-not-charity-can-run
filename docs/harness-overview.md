@@ -2,11 +2,11 @@
 
 SNC Can Run uses **in-browser self-checks** (`window.CR`) plus a **Playwright** driver that loads root **`index.html`** and collects proofs.
 
-**Gameplay baseline:** `BUILD_ID` `spriteground1` — see `PROJECT_STATUS.md`. **Build:** `npm run build` / `build:check` (see `src/README.md`).
+**Gameplay baseline:** `BUILD_ID` `groundplane1` — see `PROJECT_STATUS.md`. **Build:** `npm run build` / `build:check` (see `src/README.md`).
 
 ## In-browser (`window.CR`)
 
-- Functions like `CR.runLayoutSelfCheck()`, `CR.runFullSelfCheck()`, `CR.runSpriteGroundAnchorSelfCheck()`, `CR.crDebugSpriteProjection()`, `CR.runFacadeArtVocabularySelfCheck()`, `CR.runFacadeCompositionReadabilitySelfCheck()`, `CR.runFacadePackV2SafeModuleSelfCheck()`, `CR.runFacadePackBridgeSelfCheck()`, `CR.runBuildingModuleFacadeSelfCheck()`, `CR.runStreetReadabilityMinimapSelfCheck()`, `CR.runBuildingScalePolishSelfCheck()`, `CR.runLevelSelectorSelfCheck()`, `CR.runEarlyDistrictProgressionSelfCheck()`, `CR.runStreetBlockLevelSelfCheck()`, `CR.runD1ParkLandmarkSelfCheck()`, `CR.runOnboardingSelfCheck()`, `CR.runSoundFeedbackSelfCheck()`, `CR.runVisualReadabilitySelfCheck()`, `CR.runVisualRectangleRegressionSelfCheck()`, `CR.runDecorativePropsSelfCheck()`, `CR.runOptionsCleanupSelfCheck()`, `CR.runHallSelfCheck()`, etc.
+- Functions like `CR.runLayoutSelfCheck()`, `CR.runFullSelfCheck()`, `CR.runFpvGroundPlaneAlignmentSelfCheck()`, `CR.crDebugGroundPlaneAlignment()`, `CR.runSpriteGroundAnchorSelfCheck()`, `CR.crDebugSpriteProjection()`, `CR.runFacadeArtVocabularySelfCheck()`, `CR.runFacadeCompositionReadabilitySelfCheck()`, `CR.runFacadePackV2SafeModuleSelfCheck()`, `CR.runFacadePackBridgeSelfCheck()`, `CR.runBuildingModuleFacadeSelfCheck()`, `CR.runStreetReadabilityMinimapSelfCheck()`, `CR.runBuildingScalePolishSelfCheck()`, `CR.runLevelSelectorSelfCheck()`, `CR.runEarlyDistrictProgressionSelfCheck()`, `CR.runStreetBlockLevelSelfCheck()`, `CR.runD1ParkLandmarkSelfCheck()`, `CR.runOnboardingSelfCheck()`, `CR.runSoundFeedbackSelfCheck()`, `CR.runVisualReadabilitySelfCheck()`, `CR.runVisualRectangleRegressionSelfCheck()`, `CR.runDecorativePropsSelfCheck()`, `CR.runOptionsCleanupSelfCheck()`, `CR.runHallSelfCheck()`, etc.
 - URL: `?selfcheck=1` runs full check and shows PASS/FAIL overlay.
 - **`crWithTemporaryState`** — snapshots public state + `localStorage`, runs harness, restores so benchmarks do not leak.
 - **`__crRuntimeErrors`** — uncaught errors fail runtime-clean checks.
@@ -62,6 +62,8 @@ SNC Can Run uses **in-browser self-checks** (`window.CR`) plus a **Playwright** 
 | `proof-facade-pack-v2-safe.txt` | `CR_FACADE_PACK` snapshot (v2 safe modules) |
 | `proof-source-build-pipeline.json` | Playwright gate: `build:check` + manifest proof |
 | `proof-source-build-manifest.json` | Input/output SHA-256 from `tools/build-single-file.js` |
+| `proof-groundplane-alignment.json` / `proof-groundplane-debug.json` | FPV ground plane / wall base alignment |
+| `proof-groundplane-d2-npc-storefront.png` … `proof-groundplane-minimap-preserved.png` | D2/D3/D1 ground contact and minimap proofs |
 | `proof-sprite-ground-anchor.json` | Sprite ground anchor self-check |
 | `proof-facade-art-vocabulary.json` | Facade art vocabulary self-check |
 | `proof-facade-composition-readability.json` | Facade composition self-check |

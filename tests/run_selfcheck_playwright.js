@@ -1499,6 +1499,83 @@ async function facadePackV2SafeSection(page) {
   return { pass: v2.pass === true, facadePackV2Safe: v2 };
 }
 
+async function fpvGroundPlaneAlignmentSection(page) {
+  const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await waitGameReady(page);
+
+  const result = await page.evaluate(() => {
+    const r = CR.runFpvGroundPlaneAlignmentSelfCheck();
+    const debug = CR.crDebugGroundPlaneAlignment();
+    return { pass: r.pass === true && debug.pass === true, selfcheck: r, debug };
+  });
+  writeProof('proof-groundplane-alignment.json', result.selfcheck);
+  writeProof('proof-groundplane-debug.json', result.debug);
+
+  const shots = [
+    { d: 2, seed: 903202, file: 'proof-groundplane-d2-npc-storefront.png', mode: 'npc', mids: ['storefront_4x2', 'storefront_3x2', 'boarded_shop_3x2'] },
+    { d: 2, seed: 903202, file: 'proof-groundplane-d2-can-storefront.png', mode: 'can', mids: ['storefront_4x2', 'storefront_3x2', 'boarded_shop_3x2'] },
+    { d: 3, seed: 903203, file: 'proof-groundplane-d3-garage-service.png', mode: 'garage', mids: ['garage_service_4x2'] },
+    { d: 1, seed: 903101, file: 'proof-groundplane-d1-pavilion.png', mode: 'pavilion', mids: ['restroom_pavilion'] },
+  ];
+  for (const s of shots) {
+    await page.evaluate(({ d, seed, mode, mids }) => {
+      CR.crSetSelectedStartDistrict(d);
+      CR.startRun(seed);
+      CR.state = CR.STATE.PLAY;
+      CR.paused = false;
+      const G = CR.game;
+      function isRoad(x, y) {
+        return x >= 1 && y >= 1 && x < G.MAP_W - 1 && y < G.MAP_H - 1 && G.map[y] && G.map[y][x] === 0;
+      }
+      function findTarget() {
+        let fallback = null;
+        for (let y = 1; y < G.MAP_H - 5; y++) {
+          for (let x = 1; x < G.MAP_W - 1; x++) {
+            const c = G.buildingGrid && G.buildingGrid[y] && G.buildingGrid[y][x];
+            if (!c || mids.indexOf(c.mid) < 0) continue;
+            fallback = fallback || { x, y, mid: c.mid };
+            if (isRoad(x, y + 1) && isRoad(x, y + 2) && isRoad(x, y + 3)) return { x, y, mid: c.mid };
+          }
+        }
+        return fallback;
+      }
+      const t = findTarget();
+      if (t) {
+        const px = t.x + 0.5;
+        const py = Math.min(G.MAP_H - 2.2, t.y + 3.35);
+        const oy = Math.min(G.MAP_H - 2.6, t.y + 1.28);
+        CR.player.x = px;
+        CR.player.y = py;
+        CR.player.angle = -Math.PI / 2;
+        if (mode === 'npc') {
+          G.npcs = [{ x: px, y: oy, kind: 'hungry', need: 1, helped: false, wob: 0, thank: '' }];
+          G.pickups = [];
+        } else if (mode === 'can') {
+          G.pickups = [{ x: px, y: oy, taken: false, amt: 2, wob: 0 }];
+          G.npcs = [];
+        } else if (mode === 'pavilion') {
+          G.pickups = [{ x: px, y: oy, taken: false, amt: 2, wob: 0 }];
+        }
+        if (typeof window.updateAim === 'function') window.updateAim();
+      }
+    }, s);
+    await page.waitForTimeout(260);
+    await page.screenshot({ path: path.join(ROOT, s.file) });
+  }
+  await page.evaluate(() => {
+    CR.crSetSelectedStartDistrict(2);
+    CR.startRun(903202);
+    CR.state = CR.STATE.PLAY;
+    CR.paused = false;
+  });
+  await page.waitForTimeout(100);
+  await page.screenshot({ path: path.join(ROOT, 'proof-groundplane-minimap-preserved.png') });
+
+  return { pass: !!result.pass, errors: result.selfcheck.errors || [], screenshots: shots.map(s => s.file).concat(['proof-groundplane-minimap-preserved.png']) };
+}
+
 async function spriteGroundAnchorSection(page) {
   const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
   await page.setViewportSize({ width: 412, height: 915 });
@@ -2215,10 +2292,10 @@ function sourceBuildPipelineSection() {
     errors.push('missing proof-source-build-manifest.json');
   }
   const indexText = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
-  const buildIdOk = indexText.includes("const BUILD_ID = 'spriteground1'");
-  if (!buildIdOk) errors.push('BUILD_ID must remain spriteground1 for this pass');
+  const buildIdOk = indexText.includes("const BUILD_ID = 'groundplane1'");
+  if (!buildIdOk) errors.push('BUILD_ID must be groundplane1 for this pass');
   const pass = errors.length === 0 && proof && proof.check === 'pass';
-  const result = { pass, errors, buildId: 'spriteground1', proofSummary: proof ? { outputSha256: proof.outputSha256, outputBytes: proof.outputBytes, check: proof.check } : null };
+  const result = { pass, errors, buildId: 'groundplane1', proofSummary: proof ? { outputSha256: proof.outputSha256, outputBytes: proof.outputBytes, check: proof.check } : null };
   writeProof('proof-source-build-pipeline.json', result);
   return result;
 }
@@ -2270,6 +2347,7 @@ async function main() {
   const buildingModuleFacade = await buildingModuleFacadeSection(page);
   const facadePackBridge = await facadePackBridgeSection(page);
   const facadePackV2Safe = await facadePackV2SafeSection(page);
+  const fpvGroundPlaneAlignment = await fpvGroundPlaneAlignmentSection(page);
   const spriteGroundAnchor = await spriteGroundAnchorSection(page);
   const facadeArtVocabulary = await facadeArtVocabularySection(page);
   const facadeCompositionReadability = await facadeCompositionReadabilitySection(page);
@@ -2333,6 +2411,7 @@ async function main() {
     buildingModuleFacade.pass &&
     facadePackBridge.pass &&
     facadePackV2Safe.pass &&
+    fpvGroundPlaneAlignment.pass &&
     spriteGroundAnchor.pass &&
     facadeArtVocabulary.pass &&
     facadeCompositionReadability.pass &&
@@ -2395,6 +2474,7 @@ async function main() {
     buildingModuleFacade,
     facadePackBridge,
     facadePackV2Safe,
+    fpvGroundPlaneAlignment,
     spriteGroundAnchor,
     facadeArtVocabulary,
     facadeCompositionReadability,

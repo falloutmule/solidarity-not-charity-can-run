@@ -1,10 +1,10 @@
 {
   "pass": true,
-  "build": "park1",
+  "build": "groundplane1",
   "errors": [],
   "warnings": [],
   "checks": {
-    "buildIdPark1": true,
+    "buildIdBuildScale1": true,
     "footprintUnchanged": true,
     "mainRoadSpine": true,
     "sideBuildings": true,
@@ -24,10 +24,10 @@
         "MAP_W": 40,
         "MAP_H": 20,
         "metrics": {
-          "mainRoad": 418,
-          "buildings": 19,
+          "mainRoad": 413,
+          "buildings": 26,
           "alleys": 76,
-          "pockets": 171,
+          "pockets": 169,
           "GW": 40,
           "GH": 20
         }
@@ -39,10 +39,10 @@
         "MAP_W": 40,
         "MAP_H": 20,
         "metrics": {
-          "mainRoad": 418,
-          "buildings": 22,
+          "mainRoad": 342,
+          "buildings": 134,
           "alleys": 76,
-          "pockets": 168,
+          "pockets": 132,
           "GW": 40,
           "GH": 20
         }
@@ -54,10 +54,10 @@
         "MAP_W": 40,
         "MAP_H": 20,
         "metrics": {
-          "mainRoad": 342,
-          "buildings": 34,
+          "mainRoad": 266,
+          "buildings": 150,
           "alleys": 76,
-          "pockets": 232,
+          "pockets": 192,
           "GW": 40,
           "GH": 20
         }
@@ -69,10 +69,10 @@
         "MAP_W": 40,
         "MAP_H": 20,
         "metrics": {
-          "mainRoad": 342,
-          "buildings": 34,
+          "mainRoad": 266,
+          "buildings": 115,
           "alleys": 76,
-          "pockets": 232,
+          "pockets": 227,
           "GW": 40,
           "GH": 20
         }
@@ -85,9 +85,9 @@
         "MAP_H": 20,
         "metrics": {
           "mainRoad": 266,
-          "buildings": 56,
+          "buildings": 175,
           "alleys": 76,
-          "pockets": 286,
+          "pockets": 167,
           "GW": 40,
           "GH": 20
         }
@@ -99,10 +99,10 @@
         "MAP_W": 40,
         "MAP_H": 20,
         "metrics": {
-          "mainRoad": 342,
-          "buildings": 18,
+          "mainRoad": 337,
+          "buildings": 30,
           "alleys": 76,
-          "pockets": 248,
+          "pockets": 241,
           "GW": 40,
           "GH": 20
         }
@@ -115,9 +115,9 @@
         "MAP_H": 20,
         "metrics": {
           "mainRoad": 190,
-          "buildings": 87,
+          "buildings": 186,
           "alleys": 76,
-          "pockets": 331,
+          "pockets": 232,
           "GW": 40,
           "GH": 20
         }

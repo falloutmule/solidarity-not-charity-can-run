@@ -1618,7 +1618,7 @@ function runDeclarativeControlsSelfCheckBody(){
     checks.menuNotEditable = INPUT_CONFIG.controls.menu && INPUT_CONFIG.controls.menu.editable === false;
     if(!checks.menuNotEditable) errors.push('MENU must stay non-editable');
 
-    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || BUILD_ID === 'spriteground1';
+    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1');
         if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
 
     checks.saveFormatUnchanged = !('controlsLayout' in (options.data || options));
@@ -1669,7 +1669,7 @@ function runDecorativePropsSelfCheckBody(){
   const evidence = {};
   const err0 = window.__crRuntimeErrors.length;
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || BUILD_ID === 'spriteground1';
+    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1');
     if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
 
     checks.decorArrayExported = Array.isArray(DECOR_PROP_REQUIRED) && DECOR_PROP_REQUIRED.length === 12;
@@ -1779,7 +1779,7 @@ function runOptionsCleanupSelfCheckBody(){
   _controlEditActive = false;
   crShowControlEditChrome(false);
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || BUILD_ID === 'spriteground1';
+    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1');
         if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
 
     state = STATE.TITLE;
@@ -1932,7 +1932,7 @@ function runLevelSelectorSelfCheckBody(){
   mobileOverride = 'on';
   setMobileMode(true);
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || BUILD_ID === 'spriteground1';
+    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1');
     if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
     checks.saveVersionUnchanged = SAVE_VERSION === 1;
     checks.controlsSchemaUnchanged = CR_CONTROLS_LS_KEY === 'cannedRun.controls.v1';
@@ -2031,6 +2031,102 @@ function runLevelSelectorSelfCheckBody(){
 
 
 
+function runFpvGroundPlaneAlignmentSelfCheck(){
+  if(_crHarnessDepth > 0) return runFpvGroundPlaneAlignmentSelfCheckBody();
+  return crWithTemporaryState('fpvGroundPlaneAlignment', () => runFpvGroundPlaneAlignmentSelfCheckBody());
+}
+function runFpvGroundPlaneAlignmentSelfCheckBody(){
+  const errors = [];
+  const warnings = [];
+  const checks = {};
+  const evidence = {};
+  const tol = 1.01;
+  const err0 = window.__crRuntimeErrors.length;
+  const savedPick = selectedStartDistrict;
+  try{
+    checks.buildId = BUILD_ID === 'groundplane1';
+    checks.splitSourcePipeline = CR_SOURCE_BUILD_PIPELINE_ACTIVE === 1;
+    checks.generatedFromSourceContract = typeof crWallProjectionMetrics === 'function' && typeof crProjectedFloorY === 'function';
+    checks.wallProjectionHelper = typeof crWallProjectionMetrics === 'function';
+    checks.spriteProjectionHelper = typeof crProjectedGroundBottomY === 'function' && typeof crProjectBillboardSprite === 'function';
+    checks.floorHelperAlias = crProjectedGroundBottomY(4) === crProjectedFloorY(4);
+
+    const debug = crDebugGroundPlaneAlignment();
+    evidence.groundPlaneDebug = debug;
+    const recs = debug.records || [];
+    checks.debugHelper = typeof crDebugGroundPlaneAlignment === 'function' && debug.pass === true;
+    checks.d1PavilionBase = recs.some(r => r.label === 'd1_pavilion' && Math.abs(r.wallGroundDelta) <= tol);
+    checks.d2StorefrontBase = recs.some(r => r.label === 'd2_storefront' && Math.abs(r.wallGroundDelta) <= tol);
+    checks.d3GarageBase = recs.some(r => r.label === 'd3_garage_service' && Math.abs(r.wallGroundDelta) <= tol);
+    checks.sharedFloorBaseline = recs.length >= 3 && recs.every(r => Math.abs(r.spriteGroundDelta) <= 0.01 && Math.abs(r.wallGroundDelta) <= tol);
+    checks.massExtendsUpward = recs.length >= 3 && recs.every(r => r.wallMassExtraUp > 0 && r.wallMassExtraDown === 0 && r.wallDrawStart < r.floorBottomY && r.wallDrawEnd >= r.floorBottomY);
+    checks.wallBaseNotSunk = recs.every(r => Math.abs(r.wallGroundDelta) <= tol);
+    checks.npcGroundedDelta = recs.every(r => r.npcGroundedDelta === null || Math.abs(r.npcGroundedDelta) <= 0.01);
+    checks.canGroundedDelta = recs.every(r => r.canGroundedDelta === null || Math.abs(r.canGroundedDelta) <= 0.01);
+    checks.propGroundedDelta = recs.every(r => r.propGroundedDelta === null || Math.abs(r.propGroundedDelta) <= 0.01);
+
+    const src = typeof drawScene === 'function' ? String(drawScene) : '';
+    checks.noNpcVerticalWobble = !src.includes('Math.sin(now/300+s.obj.wob)*(screenH*0.03)') && src.includes('const yoff = 0');
+    const exitP = crProjectBillboardSprite(game.exit || { x: 0, y: 0 }, TEX.exit, HEIGHT.exit, 3, 0, 1000);
+    checks.exitFloatingException = !!exitP.floating && Math.abs(exitP.yoffUsed) > 0.01;
+
+    const halo = getSpriteHaloRegressionProof();
+    checks.spriteHaloRegression = !!halo.spriteLoopOk;
+    evidence.spriteHalo = halo;
+    const occ = getOcclusionZbufferProof();
+    checks.zbufferOcclusion = !!occ.predicateOk;
+    evidence.zbuffer = occ;
+
+    const mods = CR_FACADE_PACK && CR_FACADE_PACK.modules ? Object.keys(CR_FACADE_PACK.modules) : [];
+    checks.facadeArtSystems = !!CR_FACADE_ART_VOCABULARY && !!CR_FACADE_COMPOSE_READABILITY && typeof crDrawComposedFacadeFaceColumn === 'function';
+    checks.spriteGroundSystems = !!CR_SPRITE_GROUND_ANCHOR && !!(CR_SPRITE_ANCHOR && CR_SPRITE_ANCHOR.person && CR_SPRITE_ANCHOR.can);
+    checks.sixGameplayModules = ['storefront_4x2','storefront_3x2','restroom_pavilion','blank_service_block','garage_service_4x2','boarded_shop_3x2'].every(m => mods.indexOf(m) >= 0);
+    checks.noLabOnlyModules = ['two_story_storefront_4x2_visual','walkin_storefront_4x3','corner_shop_L'].every(m => mods.indexOf(m) < 0);
+    checks.matteRoad = CR_FPV_STREET_MATTE === true;
+    checks.minimapNavigationFirst = typeof crMinimapNavCellColor === 'function' && Array.isArray(CR_MINIMAP_NAV_PALETTE);
+    checks.buildingMassSubstantial = CR_BUILDING_FPV_MASS >= 1.45 && CR_BUILDING_FPV_MASS <= 1.55 && recs.every(r => r.mass >= 1.45);
+
+    game.run = { active: true, harnessOnly: true, customLevel: null };
+    genCity(903101, 1, '');
+    checks.d1Identity = !!(game.d1ParkLandmark || game.landmark);
+    let directStarts = true;
+    let reachOk = true;
+    let propsOk = true;
+    for(const d of [1,2,3,4]){
+      selectedStartDistrict = d;
+      startRun(913000 + d);
+      if(game.district !== d) directStarts = false;
+      const val = crHarnessValidateProceduralCase({ seed: 913000 + d, district: d, modifier: '' });
+      if(!val.ok) reachOk = false;
+      for(const p of game.props || []){ if(!canStand(p.x, p.y)) propsOk = false; }
+    }
+    checks.levelSelectorWorks = typeof crGetSelectedStartDistrict === 'function' && typeof crSetSelectedStartDistrict === 'function' && typeof crCycleSelectedStartDistrict === 'function';
+    checks.directStartD1D4 = directStarts;
+    checks.peopleCansExitReachableD1D4 = reachOk;
+    checks.propsNonCollision = propsOk;
+    checks.noMovingBlockersNpcsTimers = typeof game.movingBlockers === 'undefined';
+    checks.controlsOptionsFunctional = typeof crLoadControlOverrides === 'function' && typeof crPersistControlOverrides === 'function' && typeof crEnterControlEditMode === 'function';
+    checks.hallFunctional = typeof runHallSelfCheck === 'function';
+    checks.saveLoadFunctional = SAVE_VERSION === 1 && typeof SAVE.save === 'function' && typeof SAVE.load === 'function';
+    checks.noExternalAssets = document.querySelectorAll('script[src],link[rel="stylesheet"][href],audio[src],source[src]').length === 0;
+    checks.noRuntimeErrors = window.__crRuntimeErrors.length === err0;
+
+    const required = [
+      'buildId','splitSourcePipeline','generatedFromSourceContract','wallProjectionHelper','spriteProjectionHelper','floorHelperAlias','debugHelper','d1PavilionBase','d2StorefrontBase','d3GarageBase','sharedFloorBaseline','massExtendsUpward','wallBaseNotSunk','npcGroundedDelta','canGroundedDelta','propGroundedDelta','noNpcVerticalWobble','exitFloatingException','spriteHaloRegression','zbufferOcclusion','facadeArtSystems','spriteGroundSystems','sixGameplayModules','noLabOnlyModules','d1Identity','matteRoad','minimapNavigationFirst','buildingMassSubstantial','levelSelectorWorks','directStartD1D4','peopleCansExitReachableD1D4','propsNonCollision','noMovingBlockersNpcsTimers','controlsOptionsFunctional','hallFunctional','saveLoadFunctional','noExternalAssets','noRuntimeErrors'
+    ];
+    for(const k of required){ if(!checks[k]) errors.push('groundplane check failed: ' + k); }
+  }catch(e){
+    errors.push(String(e && e.message ? e.message : e));
+  } finally {
+    selectedStartDistrict = savedPick;
+    _selfCheckForcePortrait = false;
+    crForceSafeTitleAfterHarness();
+    drawMobileMenu();
+  }
+  const pass = errors.length === 0;
+  return { pass, build: BUILD_ID, errors, warnings, checks, evidence };
+}
+
 function runSpriteGroundAnchorSelfCheck(){
   if(_crHarnessDepth > 0) return runSpriteGroundAnchorSelfCheckBody();
   return crWithTemporaryState('spriteGroundAnchor', () => runSpriteGroundAnchorSelfCheckBody());
@@ -2041,7 +2137,7 @@ function runSpriteGroundAnchorSelfCheckBody(){
   const evidence = {};
   const tol = 0.75;
   try{
-    checks.buildId = BUILD_ID === 'spriteground1';
+    checks.buildId = (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1');
     if(!checks.buildId) errors.push('BUILD_ID must be spriteground1');
 
     const src = typeof drawScene === 'function' ? String(drawScene) : '';
@@ -2142,7 +2238,7 @@ function runFacadeArtVocabularySelfCheckBody(){
   const artSrc = String(crDrawComposedFacadeFaceColumn);
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildId = BUILD_ID === 'facadeart1' || BUILD_ID === 'spriteground1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || BUILD_ID === 'spriteground1';
+    checks.buildId = BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1') || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1');
     checks.packExists = typeof CR_FACADE_PACK === 'object' && CR_FACADE_PACK !== null;
     checks.packVersion = checks.packExists && CR_FACADE_PACK.version === 'facadeart1';
     checks.packMarkers = (function(){
@@ -2308,7 +2404,7 @@ function runFacadeCompositionReadabilitySelfCheckBody(){
   const drawSrc = String(drawScene);
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildId = BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || BUILD_ID === 'spriteground1';
+    checks.buildId = BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1');
     checks.packExists = typeof CR_FACADE_PACK === 'object' && CR_FACADE_PACK !== null;
     checks.packVersion = checks.packExists && (CR_FACADE_PACK.version === 'facadecompose1' || CR_FACADE_PACK.version === 'facadeart1');
     checks.packMarkers = (function(){
@@ -2466,7 +2562,7 @@ function runFacadePackV2SafeModuleSelfCheckBody(){
   const savedPick = selectedStartDistrict;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildId = BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || BUILD_ID === 'spriteground1';
+    checks.buildId = BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1');
     checks.v2SafeFlag = CR_FACADE_PACK_V2_SAFE >= 1;
     checks.packExists = typeof CR_FACADE_PACK === 'object' && CR_FACADE_PACK !== null;
     checks.packMarkers = (function(){
@@ -2601,7 +2697,7 @@ function runFacadePackBridgeSelfCheckBody(){
   crPrepareSelfCheckPortrait();
   try {
     const html = typeof CR_FACADE_PACK !== 'undefined' ? 'ok' : '';
-    checks.buildId = BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || BUILD_ID === 'spriteground1';
+    checks.buildId = BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1');
     checks.packExists = typeof CR_FACADE_PACK === 'object' && CR_FACADE_PACK !== null;
     checks.packVersion = checks.packExists && (CR_FACADE_PACK.version === 'facadepack1' || CR_FACADE_PACK.version === 'facadev2safe1' || CR_FACADE_PACK.version === 'facadecompose1' || CR_FACADE_PACK.version === 'facadeart1');
     checks.packMarkers = (function(){
@@ -2728,7 +2824,7 @@ function runBuildingModuleFacadeSelfCheckBody(){
   const savedPick = selectedStartDistrict;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdModules1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || BUILD_ID === 'spriteground1';
+    checks.buildIdModules1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1');
     checks.moduleFlag = CR_BUILDING_MODULE_FACADE >= 1;
     checks.moduleDefs = !!(CR_FACADE_PACK && CR_FACADE_PACK.modules && CR_FACADE_PACK.modules.storefront_4x2 && CR_FACADE_PACK.modules.storefront_3x2);
     checks.faceRoles = !!(CR_FACADE_PACK.modules.storefront_4x2.faces && CR_FACADE_PACK.modules.storefront_4x2.faces.south);
@@ -2835,7 +2931,7 @@ function runFpvFacadeTargetPolishSelfCheckBody(){
   const savedPick = selectedStartDistrict;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdFacadeFix1 = BUILD_ID === 'facadefix1' || BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || BUILD_ID === 'spriteground1';
+    checks.buildIdFacadeFix1 = BUILD_ID === 'facadefix1' || BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1');
     checks.facadePolishFlag = CR_FPV_FACADE_TARGET_POLISH >= 1;
     checks.fpvMassPreserved = CR_BUILDING_FPV_MASS >= 1.45 && CR_BUILDING_FPV_MASS <= 1.55;
     checks.coarseWallTexBroad = CR_FPV_WALL_TEX_COARSE >= 12;
@@ -2945,7 +3041,7 @@ function runFpvWallLineArtifactFixSelfCheckBody(){
   const savedPick = selectedStartDistrict;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdWallLineStack = BUILD_ID === 'wallfix1' || BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || BUILD_ID === 'spriteground1';
+    checks.buildIdWallLineStack = BUILD_ID === 'wallfix1' || BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1');
     checks.fpvMassPreserved = CR_BUILDING_FPV_MASS >= 1.45 && CR_BUILDING_FPV_MASS <= 1.55;
     checks.coarseWallTex = typeof CR_FPV_WALL_TEX_COARSE === 'number' && CR_FPV_WALL_TEX_COARSE >= 6;
     checks.wallLineFixFlag = CR_FPV_WALL_LINE_FIX >= 1;
@@ -3059,7 +3155,7 @@ function runFpvStreetShimmerFixSelfCheckBody(){
   const savedPick = selectedStartDistrict;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdShimmerFix1 = BUILD_ID === 'shimmerfix1' || BUILD_ID === 'wallfix1' || BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || BUILD_ID === 'spriteground1';
+    checks.buildIdShimmerFix1 = BUILD_ID === 'shimmerfix1' || BUILD_ID === 'wallfix1' || BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1');
     checks.fpvMassPreserved = CR_BUILDING_FPV_MASS >= 1.45 && CR_BUILDING_FPV_MASS <= 1.55;
     checks.matteStreetMode = CR_FPV_STREET_MATTE === true && CR_FPV_STREET_SHIMMER_FIX >= 1;
     checks.minimapNavPreserved = typeof crMinimapNavCellColor === 'function' && Array.isArray(CR_MINIMAP_NAV_PALETTE);
@@ -3176,7 +3272,7 @@ function runStreetReadabilityMinimapSelfCheckBody(){
   const savedPick = selectedStartDistrict;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdStreetRead1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || BUILD_ID === 'spriteground1';
+    checks.buildIdStreetRead1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1');
     if(!checks.buildIdStreetRead1) errors.push('BUILD_ID must be facadefix1 (minimap contract)');
     checks.footprint40x20 = true;
     checks.buildingMassPreserved = CR_BUILDING_FPV_MASS >= 1.45 && CR_BUILDING_FPV_MASS <= 1.55;
@@ -3299,7 +3395,7 @@ function runBuildingScalePolishSelfCheckBody(){
   const savedPick = selectedStartDistrict;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || BUILD_ID === 'spriteground1';
+    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1');
     if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
     checks.fpvMassConstant = CR_BUILDING_FPV_MASS >= 1.45 && CR_BUILDING_FPV_MASS <= 1.55;
     checks.footprint40x20 = true;
@@ -3415,7 +3511,7 @@ function runEarlyDistrictProgressionSelfCheckBody(){
   const err0 = window.__crRuntimeErrors.length;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || BUILD_ID === 'spriteground1';
+    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1');
     if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
     checks.footprintUnchanged = true;
     checks.saveVersionUnchanged = SAVE_VERSION === 1;
@@ -3514,7 +3610,7 @@ function runD1ParkLandmarkSelfCheckBody(){
   const err0 = window.__crRuntimeErrors.length;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || BUILD_ID === 'spriteground1';
+    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1');
     if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
 
     const matrix = [
@@ -3630,7 +3726,7 @@ function runStreetBlockLevelSelfCheckBody(){
   const err0 = window.__crRuntimeErrors.length;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || BUILD_ID === 'spriteground1';
+    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1');
     if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
 
     const matrix = [
@@ -3717,6 +3813,7 @@ function runFullSelfCheckInner(){
   const buildingModuleFacade = runBuildingModuleFacadeSelfCheck();
   const facadePackBridge = runFacadePackBridgeSelfCheck();
   const facadePackV2Safe = runFacadePackV2SafeModuleSelfCheck();
+  const fpvGroundPlaneAlignment = runFpvGroundPlaneAlignmentSelfCheck();
   const spriteGroundAnchor = runSpriteGroundAnchorSelfCheck();
   const facadeArtVocabulary = runFacadeArtVocabularySelfCheck();
   const facadeCompositionReadability = runFacadeCompositionReadabilitySelfCheck();
@@ -3738,7 +3835,7 @@ function runFullSelfCheckInner(){
   const levels = runLevelSelfCheck();
   const renderFailure = runRenderFailureSelfCheck();
   const runtimeClean = window.__crRuntimeErrors.length === err0;
-  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && decorativeProps.pass && optionsCleanup.pass && mobileControlReliability.pass && movementCollision.pass && reachability.pass && streetBlockLevel.pass && d1ParkLandmark.pass && buildingModuleFacade.pass && facadePackBridge.pass && facadePackV2Safe.pass && spriteGroundAnchor.pass && facadeArtVocabulary.pass && facadeCompositionReadability.pass && fpvFacadeTargetPolish.pass && fpvWallLineArtifactFix.pass && fpvStreetShimmerFix.pass && streetReadabilityMinimap.pass && buildingScalePolish.pass && earlyDistrictProgression.pass && levelSelector.pass && proceduralLevelValidation.pass && fullRunProgression.pass && onboarding.pass && soundFeedback.pass && declarativeControls.pass && visualReadability.pass && visualRectangleRegression.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
+  const pass = layout.pass && viewportSafeArea.pass && portraitUsability.pass && settingsSafety.pass && decorativeProps.pass && optionsCleanup.pass && mobileControlReliability.pass && movementCollision.pass && reachability.pass && streetBlockLevel.pass && d1ParkLandmark.pass && buildingModuleFacade.pass && facadePackBridge.pass && facadePackV2Safe.pass && fpvGroundPlaneAlignment.pass && spriteGroundAnchor.pass && facadeArtVocabulary.pass && facadeCompositionReadability.pass && fpvFacadeTargetPolish.pass && fpvWallLineArtifactFix.pass && fpvStreetShimmerFix.pass && streetReadabilityMinimap.pass && buildingScalePolish.pass && earlyDistrictProgression.pass && levelSelector.pass && proceduralLevelValidation.pass && fullRunProgression.pass && onboarding.pass && soundFeedback.pass && declarativeControls.pass && visualReadability.pass && visualRectangleRegression.pass && input.pass && levels.pass && renderFailure.pass && runtimeClean;
   return {
     pass,
     build: BUILD_ID,
@@ -3756,6 +3853,7 @@ function runFullSelfCheckInner(){
     buildingModuleFacade,
     facadePackBridge,
     facadePackV2Safe,
+    fpvGroundPlaneAlignment,
     spriteGroundAnchor,
     facadeArtVocabulary,
     facadeCompositionReadability,
@@ -3913,7 +4011,7 @@ function runSoundFeedbackSelfCheckBody(){
   try {
     checks.functionExists = typeof runSoundFeedbackSelfCheck === 'function';
     checks.contract = !!(CR_SOUND_FEEDBACK && CR_SOUND_FEEDBACK.style === 'sound1' && CR_SOUND_FEEDBACK.webAudio === true);
-    checks.buildIdOptionsClean1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || BUILD_ID === 'spriteground1';
+    checks.buildIdOptionsClean1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1');
     checks.crTriggerExists = typeof crTriggerSoundCue === 'function';
     checks.crSoundEnabledFn = typeof crSoundEnabled === 'function';
     checks.noExternalAudioTags = document.querySelectorAll('audio,source[src]').length === 0;
@@ -3982,7 +4080,7 @@ function runVisualReadabilitySelfCheckBody(){
   mobileOverride = true;
   try {
     checks.functionExists = typeof runVisualReadabilitySelfCheck === 'function';
-    checks.buildIdOptionsClean1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || BUILD_ID === 'spriteground1';
+    checks.buildIdOptionsClean1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1');
     checks.visualContract = !!(CR_VISUAL_READABILITY && CR_VISUAL_READABILITY.style === 'visualfix1');
     checks.noScreenPathStripe = CR_VISUAL_READABILITY.floorPathStripe === false;
     checks.pickupTex = !!TEX.can;
@@ -4115,7 +4213,7 @@ function runVisualRectangleRegressionSelfCheckBody(){
   mobileOverride = true;
   try {
     checks.functionExists = typeof runVisualRectangleRegressionSelfCheck === 'function';
-    checks.buildIdOptionsClean1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || BUILD_ID === 'spriteground1';
+    checks.buildIdOptionsClean1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1');
     checks.noScreenPathStripe = !!(CR_VISUAL_READABILITY && CR_VISUAL_READABILITY.floorPathStripe === false);
     if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be shimmerfix1');
     if(!checks.noScreenPathStripe) errors.push('screen-space path stripe flag must be false');
@@ -6206,7 +6304,7 @@ globalThis.CR = window.CR = {
   get mobileMode(){ return mobileMode; },
   crGetSelectedStartDistrict,crCycleSelectedStartDistrict,crSetSelectedStartDistrict,crTitleMenuSelectableRows,titleMenuRowLabel,crMinimapNavCellColor,
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
-  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runDecorativePropsSelfCheck,runOptionsCleanupSelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runStreetBlockLevelSelfCheck,runD1ParkLandmarkSelfCheck,runBuildingModuleFacadeSelfCheck,runFacadePackBridgeSelfCheck,runFacadePackV2SafeModuleSelfCheck,runSpriteGroundAnchorSelfCheck,crDebugSpriteProjection,runFacadeArtVocabularySelfCheck,runFacadeCompositionReadabilitySelfCheck,crDebugDescribeFacadeHit,runFpvFacadeTargetPolishSelfCheck,runFpvWallLineArtifactFixSelfCheck,runFpvStreetShimmerFixSelfCheck,runStreetReadabilityMinimapSelfCheck,runBuildingScalePolishSelfCheck,runEarlyDistrictProgressionSelfCheck,runLevelSelectorSelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
+  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runDecorativePropsSelfCheck,runOptionsCleanupSelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runStreetBlockLevelSelfCheck,runD1ParkLandmarkSelfCheck,runBuildingModuleFacadeSelfCheck,runFacadePackBridgeSelfCheck,runFacadePackV2SafeModuleSelfCheck,runFpvGroundPlaneAlignmentSelfCheck,runSpriteGroundAnchorSelfCheck,crDebugGroundPlaneAlignment,crProjectedFloorY,crWallProjectionMetrics,crDebugSpriteProjection,runFacadeArtVocabularySelfCheck,runFacadeCompositionReadabilitySelfCheck,crDebugDescribeFacadeHit,runFpvFacadeTargetPolishSelfCheck,runFpvWallLineArtifactFixSelfCheck,runFpvStreetShimmerFixSelfCheck,runStreetReadabilityMinimapSelfCheck,runBuildingScalePolishSelfCheck,runEarlyDistrictProgressionSelfCheck,runLevelSelectorSelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
   CR_VISUAL_READABILITY,CR_SOUND_FEEDBACK,DECOR_PROP_REQUIRED,INPUT_CONFIG,CR_CONTROLS_LS_KEY,crTriggerSoundCue,crSoundEnabled,crSoundFeedbackCueIds,crLoadControlOverrides,crPersistControlOverrides,crResetControlLayoutOverrides,crClearControlOverrides,crEnterControlEditMode,crFinishControlEditMode,crControlHitTest,crSnapshotLayoutNorms,crPrepareSelfCheckPortrait,crStepEditControlSize,crSelectEditControl,
   getCrVisualHarnessSnapshot(){ return _crVisualHarnessSnapshot; },
   showOnboardingHelp,dismissOnboardingHelp,crOpenFirstRunHelpIfNeeded,

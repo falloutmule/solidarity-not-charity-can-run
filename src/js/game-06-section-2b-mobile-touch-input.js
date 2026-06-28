@@ -8,7 +8,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'spriteground1';
+const BUILD_ID = 'groundplane1';
 const CR_FPV_STREET_SHIMMER_FIX = 1;
 const CR_FPV_STREET_MATTE = true;
 const CR_FPV_WALL_LINE_FIX = 1;
@@ -18,6 +18,10 @@ const CR_FACADE_PACK_BRIDGE = 1;
 const CR_FACADE_PACK_V2_SAFE = 1;
 const CR_FACADE_COMPOSE_READABILITY = 1;
 const CR_FACADE_ART_VOCABULARY = 1;
+/** Floor-anchored FPV wall mass / sprite contact plane alignment. */
+const CR_FPV_GROUND_PLANE_ALIGNMENT = 1;
+/** Split-source pipeline active: edit src/ and regenerate root index.html with npm run build. */
+const CR_SOURCE_BUILD_PIPELINE_ACTIVE = 1;
 /** Coarse FPV wall texture U sampling (reduces vertical stripe/moiré on buildings). */
 const CR_FPV_WALL_TEX_COARSE = 16;
 /** Visual readability contract (render/HUD only; gameplay unchanged). */

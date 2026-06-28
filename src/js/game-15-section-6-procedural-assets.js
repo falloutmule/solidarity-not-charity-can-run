@@ -976,9 +976,103 @@ const CR_SPRITE_ANCHOR = {
   crate: { footY: 18, textureH: 22, floating: false },
   exit: { footY: 76, textureH: 80, floating: true }
 };
-function crProjectedGroundBottomY(depth){
+function crProjectedFloorY(depth){
   const lineH = RH / Math.max(0.12, depth);
   return RH / 2 + lineH / 2;
+}
+function crProjectedGroundBottomY(depth){
+  return crProjectedFloorY(depth);
+}
+function crWallProjectionMetrics(depth, mass){
+  const d = Math.max(0.05, depth);
+  const baseLineH = RH / d;
+  const m = Math.max(0.05, mass || 1);
+  const massLineH = baseLineH * m;
+  const floorBottomY = RH / 2 + baseLineH / 2;
+  return {
+    depth: d,
+    baseLineH,
+    mass: m,
+    massLineH,
+    floorBottomY,
+    wallDrawEnd: Math.ceil(floorBottomY),
+    wallDrawStart: Math.floor(floorBottomY - massLineH),
+    upwardExtra: Math.max(0, massLineH - baseLineH),
+    downwardExtra: 0
+  };
+}
+function crFindFirstModuleCell(moduleId){
+  if(!game.buildingGrid) return null;
+  for(let y=1;y<game.MAP_H-1;y++){
+    for(let x=1;x<game.MAP_W-1;x++){
+      const c = game.buildingGrid[y] && game.buildingGrid[y][x];
+      if(c && c.mid === moduleId) return { x, y, cell: c };
+    }
+  }
+  return null;
+}
+function crGroundPlaneWallRecord(label, depth, mapX, mapY, wt, moduleId, role){
+  const mass = crWallVisualMassScale(mapX, mapY, wt);
+  const wall = crWallProjectionMetrics(depth, mass);
+  const fake = { x: player.x + Math.cos(player.angle) * depth, y: player.y + Math.sin(player.angle) * depth };
+  const sprite = crProjectBillboardSprite(fake, TEX.hungry, HEIGHT.hungry, depth, 0, 0);
+  const can = crProjectBillboardSprite(fake, TEX.can, HEIGHT.can, depth, 0, 0);
+  const prop = crProjectBillboardSprite(fake, propTex('crate'), HEIGHT.crate || 0.5, depth, 0, 0);
+  return {
+    label,
+    depth: +depth.toFixed(3),
+    baseLineH: +wall.baseLineH.toFixed(3),
+    mass: +wall.mass.toFixed(3),
+    massLineH: +wall.massLineH.toFixed(3),
+    floorBottomY: +wall.floorBottomY.toFixed(3),
+    wallDrawStart: wall.wallDrawStart,
+    wallDrawEnd: wall.wallDrawEnd,
+    wallGroundDelta: +(wall.wallDrawEnd - wall.floorBottomY).toFixed(3),
+    wallMassExtraUp: +wall.upwardExtra.toFixed(3),
+    wallMassExtraDown: +wall.downwardExtra.toFixed(3),
+    spriteFootY: +sprite.feetY.toFixed(3),
+    spriteGroundDelta: +(sprite.feetY - wall.floorBottomY).toFixed(3),
+    npcGroundedDelta: sprite.groundedDelta,
+    canGroundedDelta: can.groundedDelta,
+    propGroundedDelta: prop.groundedDelta,
+    moduleId,
+    role,
+    objectKind: 'npc/can/prop'
+  };
+}
+function crDebugGroundPlaneAlignment(){
+  const saved = { seed: game.seed, district: game.district, modifier: game.modifier, x: player.x, y: player.y, angle: player.angle, state };
+  const records = [];
+  try{
+    game.run = game.run || { active: true, harnessOnly: true, customLevel: null };
+    game.run.active = true;
+    game.run.harnessOnly = true;
+    game.run.customLevel = null;
+    genCity(903101, 1, '');
+    const lm = game.d1ParkLandmark;
+    if(lm){
+      records.push(crGroundPlaneWallRecord('d1_pavilion', 4.5, lm.x0, lm.y0, WALL.BUILDING, 'restroom_pavilion', 'pavilion'));
+    }
+    genCity(903202, 2, '');
+    const d2 = crFindFirstModuleCell('storefront_4x2') || crFindFirstModuleCell('storefront_3x2') || crFindFirstModuleCell('boarded_shop_3x2');
+    if(d2){
+      const role = crGetBuildingFaceRole(d2.x, d2.y, 'south') || 'storefront_base';
+      records.push(crGroundPlaneWallRecord('d2_storefront', 5.25, d2.x, d2.y, WALL.BUILDING, d2.cell.mid, role));
+    }
+    genCity(903203, 3, '');
+    const d3 = crFindFirstModuleCell('garage_service_4x2');
+    if(d3){
+      const role = crGetBuildingFaceRole(d3.x, d3.y, 'south') || 'garage_base';
+      records.push(crGroundPlaneWallRecord('d3_garage_service', 5.75, d3.x, d3.y, WALL.BUILDING, d3.cell.mid, role));
+    }
+  } finally {
+    try{
+      genCity(saved.seed || 42, saved.district || 1, saved.modifier || '');
+      player.x = saved.x; player.y = saved.y; player.angle = saved.angle; state = saved.state;
+    }catch(_e){}
+  }
+  const pass = records.length >= 3 && records.every(r => Math.abs(r.wallGroundDelta) <= 1.01 && Math.abs(r.spriteGroundDelta) <= 0.01 && r.wallMassExtraUp > 0 && r.wallMassExtraDown === 0);
+  return { BUILD_ID, pass, records };
 }
 function crGetSpriteFootAnchor(tex, obj){
   if(tex === TEX.exit || (obj && obj === game.exit)) return Object.assign({}, CR_SPRITE_ANCHOR.exit);
