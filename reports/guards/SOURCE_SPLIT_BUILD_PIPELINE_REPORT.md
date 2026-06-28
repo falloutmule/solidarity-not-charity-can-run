@@ -1,7 +1,7 @@
 # Source split / single-file build pipeline report
 
 **BUILD_ID:** `spriteground1` (unchanged — rebuilt `index.html` matches pre-split bytes)  
-**Gameplay commit:** *(after push)*  
+**Gameplay commit:** `35c74cc`  
 **Previous baseline:** `spriteground1` / `820b67c`  
 **Backup:** `index.before-source-split-build-pipeline.html` (local)
 
@@ -31,4 +31,6 @@ Proof: **`proof-source-build-manifest.json`**
 
 ## CI / play URLs
 
-*(Filled after push.)*
+- CI: https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28335691487 — **success**
+- Play: https://falloutmule.github.io/solidarity-not-charity-can-run/?v=35c74cc&mobile=on&portraitlayout=1
+- Self-check: https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=35c74cc&mobile=on&portraitlayout=1

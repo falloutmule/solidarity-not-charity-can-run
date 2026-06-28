@@ -5,7 +5,7 @@
 | **Gameplay baseline** | `BUILD_ID` **`spriteground1`** (unchanged) |
 | **Infrastructure** | Split-source build pipeline (`src/` → `index.html`) |
 | **Previous gameplay commit** | `820b67c` |
-| **Gameplay commit** | *(after push)* |
+| **Gameplay commit** | `35c74cc` (infrastructure only) |
 
 ## Play / self-check
 
