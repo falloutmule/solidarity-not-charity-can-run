@@ -1,9 +1,9 @@
 {
   "pass": true,
-  "build": "levelselect1",
+  "build": "modules1",
   "layout": {
     "pass": true,
-    "build": "levelselect1",
+    "build": "modules1",
     "errors": [],
     "warnings": [
       "intentional SPRINT/LOOK overlap"
@@ -125,7 +125,7 @@
   },
   "viewportSafeArea": {
     "pass": true,
-    "build": "levelselect1",
+    "build": "modules1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -199,7 +199,7 @@
       "left": 0
     },
     "viewport": {
-      "BUILD_ID": "levelselect1",
+      "BUILD_ID": "modules1",
       "inner": {
         "w": 390,
         "h": 844
@@ -243,11 +243,11 @@
       "cw": 390,
       "ch": 844
     },
-    "timestamp": "2026-06-27T18:45:35.703Z"
+    "timestamp": "2026-06-28T14:28:34.792Z"
   },
   "portraitUsability": {
     "pass": true,
-    "build": "levelselect1",
+    "build": "modules1",
     "errors": [],
     "warnings": [],
     "thresholds": {
@@ -371,7 +371,7 @@
   },
   "settingsSafety": {
     "pass": true,
-    "build": "levelselect1",
+    "build": "modules1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -392,11 +392,11 @@
   },
   "decorativeProps": {
     "pass": true,
-    "build": "levelselect1",
+    "build": "modules1",
     "errors": [],
     "warnings": [],
     "checks": {
-      "buildIdLevelSelect1": true,
+      "buildIdBuildScale1": true,
       "decorArrayExported": true,
       "allKindsDefined": true,
       "propDimsReasonable": true,
@@ -412,8 +412,8 @@
     },
     "evidence": {
       "placementSig": {
-        "count": 14,
-        "kinds": "bench|bench|bench|bench|mailbox|mailbox|signboard|signboard|signboard|signboard|signboard|signboard|utility_box|utility_box"
+        "count": 11,
+        "kinds": "bench|bench|bench|bench|mailbox|mailbox|mailbox|mailbox|signboard|signboard|utility_box"
       }
     },
     "requiredKinds": [
@@ -433,11 +433,11 @@
   },
   "optionsCleanup": {
     "pass": true,
-    "build": "levelselect1",
+    "build": "modules1",
     "errors": [],
     "warnings": [],
     "checks": {
-      "buildIdLevelSelect1": true,
+      "buildIdBuildScale1": true,
       "optionsOpens": true,
       "obsoleteAbsent": true,
       "sectionControls": true,
@@ -461,12 +461,12 @@
       "lsKeyUnchanged": true
     },
     "evidence": {
-      "htmlSample": "\n      <div class=\"options-scroll-body\">\n      <div class=\"rpantit\">OPTIONS</div>\n      <div class=\"rdesc\" style=\"margin-bottom:8px;color:#6a5a4a;\">build levelselect1</div>\n      <div class=\"options-section-hdr\">CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-edit-controls\">EDIT CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-reset-controls\">RESET CONTROLS</div>\n      <div clas"
+      "htmlSample": "\n      <div class=\"options-scroll-body\">\n      <div class=\"rpantit\">OPTIONS</div>\n      <div class=\"rdesc\" style=\"margin-bottom:8px;color:#6a5a4a;\">build modules1</div>\n      <div class=\"options-section-hdr\">CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-edit-controls\">EDIT CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-reset-controls\">RESET CONTROLS</div>\n      <div class=\"r"
     }
   },
   "mobileControlReliability": {
     "pass": true,
-    "build": "levelselect1",
+    "build": "modules1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -488,7 +488,7 @@
         "joyActive": false
       },
       "sprint": {
-        "burstUntil": 1.6060999999046326,
+        "burstUntil": 1.5592999999523163,
         "stamBefore": 60,
         "stamAfter": 40
       },
@@ -501,7 +501,7 @@
   },
   "movementCollision": {
     "pass": true,
-    "build": "levelselect1",
+    "build": "modules1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -562,7 +562,7 @@
   },
   "reachability": {
     "pass": true,
-    "build": "levelselect1",
+    "build": "modules1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -581,7 +581,7 @@
       "harnessStateRestored": true
     },
     "measurements": {
-      "normalReachableCells": 669,
+      "normalReachableCells": 650,
       "hallReachableCells": 253,
       "unreachableNormalPickups": 0,
       "unreachableNormalNpcs": 0,
@@ -590,11 +590,11 @@
   },
   "streetBlockLevel": {
     "pass": true,
-    "build": "levelselect1",
+    "build": "modules1",
     "errors": [],
     "warnings": [],
     "checks": {
-      "buildIdLevelSelect1": true,
+      "buildIdBuildScale1": true,
       "footprintUnchanged": true,
       "mainRoadSpine": true,
       "sideBuildings": true,
@@ -614,10 +614,10 @@
           "MAP_W": 40,
           "MAP_H": 20,
           "metrics": {
-            "mainRoad": 418,
-            "buildings": 14,
+            "mainRoad": 413,
+            "buildings": 26,
             "alleys": 76,
-            "pockets": 176,
+            "pockets": 169,
             "GW": 40,
             "GH": 20
           }
@@ -630,9 +630,9 @@
           "MAP_H": 20,
           "metrics": {
             "mainRoad": 342,
-            "buildings": 78,
+            "buildings": 134,
             "alleys": 76,
-            "pockets": 188,
+            "pockets": 132,
             "GW": 40,
             "GH": 20
           }
@@ -645,9 +645,9 @@
           "MAP_H": 20,
           "metrics": {
             "mainRoad": 266,
-            "buildings": 68,
+            "buildings": 150,
             "alleys": 76,
-            "pockets": 274,
+            "pockets": 192,
             "GW": 40,
             "GH": 20
           }
@@ -660,9 +660,9 @@
           "MAP_H": 20,
           "metrics": {
             "mainRoad": 266,
-            "buildings": 53,
+            "buildings": 115,
             "alleys": 76,
-            "pockets": 289,
+            "pockets": 227,
             "GW": 40,
             "GH": 20
           }
@@ -675,9 +675,9 @@
           "MAP_H": 20,
           "metrics": {
             "mainRoad": 266,
-            "buildings": 78,
+            "buildings": 175,
             "alleys": 76,
-            "pockets": 264,
+            "pockets": 167,
             "GW": 40,
             "GH": 20
           }
@@ -689,10 +689,10 @@
           "MAP_W": 40,
           "MAP_H": 20,
           "metrics": {
-            "mainRoad": 342,
-            "buildings": 17,
+            "mainRoad": 337,
+            "buildings": 30,
             "alleys": 76,
-            "pockets": 249,
+            "pockets": 241,
             "GW": 40,
             "GH": 20
           }
@@ -705,9 +705,9 @@
           "MAP_H": 20,
           "metrics": {
             "mainRoad": 190,
-            "buildings": 91,
+            "buildings": 186,
             "alleys": 76,
-            "pockets": 327,
+            "pockets": 232,
             "GW": 40,
             "GH": 20
           }
@@ -717,11 +717,11 @@
   },
   "d1ParkLandmark": {
     "pass": true,
-    "build": "levelselect1",
+    "build": "modules1",
     "errors": [],
     "warnings": [],
     "checks": {
-      "buildIdLevelSelect1": true,
+      "buildIdBuildScale1": true,
       "footprintUnchanged": true,
       "d1LandmarkPresent": true,
       "d1ParkCommunityProps": true,
@@ -742,10 +742,10 @@
           "MAP_W": 40,
           "MAP_H": 20,
           "metrics": {
-            "mainRoad": 418,
-            "buildings": 14,
+            "mainRoad": 413,
+            "buildings": 26,
             "alleys": 76,
-            "pockets": 176,
+            "pockets": 169,
             "GW": 40,
             "GH": 20
           },
@@ -753,22 +753,22 @@
             "identity": "restroom_pavilion",
             "x0": 16,
             "y0": 2,
-            "x1": 20,
-            "y1": 4,
-            "cells": 13,
+            "x1": 22,
+            "y1": 5,
+            "cells": 26,
             "northSide": true,
-            "doorY": 4,
+            "doorY": 5,
             "doorX0": 18,
             "doorX1": 19
           },
           "propSummary": {
             "kinds": {
-              "bench": 2,
-              "signboard": 3,
               "scrub_bush": 2,
-              "mailbox": 1,
+              "bench": 3,
+              "mailbox": 2,
               "cooler": 1,
               "crate_stack": 1,
+              "shopping_cart": 1,
               "agave": 1,
               "tarp_bundle": 1
             },
@@ -783,36 +783,36 @@
           "MAP_W": 40,
           "MAP_H": 20,
           "metrics": {
-            "mainRoad": 342,
-            "buildings": 17,
+            "mainRoad": 337,
+            "buildings": 30,
             "alleys": 76,
-            "pockets": 249,
+            "pockets": 241,
             "GW": 40,
             "GH": 20
           },
           "landmark": {
             "identity": "restroom_pavilion",
             "x0": 18,
-            "y0": 15,
-            "x1": 22,
+            "y0": 14,
+            "x1": 24,
             "y1": 17,
-            "cells": 13,
+            "cells": 26,
             "northSide": false,
-            "doorY": 15,
+            "doorY": 14,
             "doorX0": 20,
             "doorX1": 21
           },
           "propSummary": {
             "kinds": {
-              "bench": 1,
-              "signboard": 2,
               "scrub_bush": 2,
+              "bench": 1,
               "mailbox": 2,
               "cooler": 1,
               "crate_stack": 1,
               "shopping_cart": 1,
               "agave": 1,
-              "tarp_bundle": 1
+              "tarp_bundle": 1,
+              "signboard": 2
             },
             "parkish": 11,
             "total": 12
@@ -825,37 +825,37 @@
           "MAP_W": 40,
           "MAP_H": 20,
           "metrics": {
-            "mainRoad": 415,
-            "buildings": 14,
+            "mainRoad": 406,
+            "buildings": 27,
             "alleys": 76,
-            "pockets": 179,
+            "pockets": 175,
             "GW": 40,
             "GH": 20
           },
           "landmark": {
             "identity": "restroom_pavilion",
             "x0": 17,
-            "y0": 15,
-            "x1": 21,
+            "y0": 14,
+            "x1": 23,
             "y1": 17,
-            "cells": 13,
+            "cells": 26,
             "northSide": false,
-            "doorY": 15,
+            "doorY": 14,
             "doorX0": 19,
             "doorX1": 20
           },
           "propSummary": {
             "kinds": {
-              "bench": 2,
-              "signboard": 2,
+              "bench": 4,
+              "mural_panel": 1,
               "scrub_bush": 2,
-              "mailbox": 2,
               "cooler": 1,
               "shopping_cart": 1,
               "agave": 1,
-              "tarp_bundle": 1
+              "tarp_bundle": 1,
+              "mailbox": 1
             },
-            "parkish": 11,
+            "parkish": 10,
             "total": 12
           }
         },
@@ -867,33 +867,498 @@
           "MAP_H": 20,
           "metrics": {
             "mainRoad": 342,
-            "buildings": 79,
+            "buildings": 126,
             "alleys": 76,
-            "pockets": 187,
+            "pockets": 140,
             "GW": 40,
             "GH": 20
           },
           "landmark": null,
           "propSummary": {
             "kinds": {
-              "bench": 5,
-              "signboard": 5,
-              "mailbox": 3
+              "utility_box": 2,
+              "signboard": 2,
+              "bench": 4,
+              "scrub_bush": 1,
+              "mailbox": 2
             },
-            "parkish": 13,
-            "total": 13
+            "parkish": 11,
+            "total": 11
           }
         }
       ]
     }
   },
-  "earlyDistrictProgression": {
+  "buildingModuleFacade": {
     "pass": true,
-    "build": "levelselect1",
+    "checks": {
+      "buildIdModules1": true,
+      "moduleFlag": true,
+      "moduleDefs": true,
+      "faceRoles": true,
+      "roleOverlay": true,
+      "roleLookup": true,
+      "matteRoadPreserved": true,
+      "minimapNavPreserved": true,
+      "fpvMassPreserved": true,
+      "d2StorefrontModule": true,
+      "sideBackFaces": true,
+      "sideDoorOncePerModule": true,
+      "wallHitRoleLookup": true,
+      "d3SideBackPlacement": true,
+      "d1PavilionModule": true,
+      "fpvRenderOk": true,
+      "reachabilityD1D4": true,
+      "levelSelectorCycle": true,
+      "saveVersionUnchanged": true,
+      "controlsSchemaUnchanged": true,
+      "noMovingBlockers": true,
+      "runtimeClean": true
+    },
+    "errors": [],
+    "warnings": [],
+    "evidence": {
+      "reference": "snc-building-module-lab.html (concept only)",
+      "modules": [
+        "storefront_4x2",
+        "storefront_4x2",
+        "storefront_4x2",
+        "storefront_4x2"
+      ]
+    }
+  },
+  "fpvFacadeTargetPolish": {
+    "pass": true,
+    "build": "modules1",
     "errors": [],
     "warnings": [],
     "checks": {
-      "buildIdLevelSelect1": true,
+      "buildIdFacadeFix1": true,
+      "facadePolishFlag": true,
+      "fpvMassPreserved": true,
+      "coarseWallTexBroad": true,
+      "worldFacadePanels": true,
+      "facadeSystem": true,
+      "noPerColumnFacadeCue": true,
+      "matteRoadPreserved": true,
+      "minimapNavPreserved": true,
+      "fpvRenderD1D3": true,
+      "fpvD2D3Storefront": true,
+      "minimapPaletteLimited": true,
+      "levelSelectorCycle": true,
+      "reachabilityD1D4": true,
+      "propsNonCollision": true,
+      "saveVersionUnchanged": true,
+      "controlsSchemaUnchanged": true,
+      "noMovingBlockers": true,
+      "runtimeClean": true,
+      "optionsOpens": true
+    },
+    "evidence": {
+      "visualReference": "Travis before/after reference (broad panels, no comb lines)",
+      "districts": [
+        {
+          "district": 1,
+          "MAP_W": 40,
+          "MAP_H": 20
+        },
+        {
+          "district": 2,
+          "MAP_W": 40,
+          "MAP_H": 20
+        },
+        {
+          "district": 3,
+          "MAP_W": 40,
+          "MAP_H": 20
+        }
+      ]
+    }
+  },
+  "fpvWallLineArtifactFix": {
+    "pass": true,
+    "build": "modules1",
+    "errors": [],
+    "warnings": [],
+    "checks": {
+      "buildIdWallLineStack": true,
+      "fpvMassPreserved": true,
+      "coarseWallTex": true,
+      "wallLineFixFlag": true,
+      "facadeWorldBands": true,
+      "coarseTexSampler": true,
+      "noGarageCombLines": true,
+      "matteRoadPreserved": true,
+      "minimapNavPreserved": true,
+      "fpvRenderD1D3": true,
+      "minimapPaletteLimited": true,
+      "levelSelectorCycle": true,
+      "reachabilityD1D4": true,
+      "propsNonCollision": true,
+      "saveVersionUnchanged": true,
+      "controlsSchemaUnchanged": true,
+      "noMovingBlockers": true,
+      "runtimeClean": true,
+      "optionsOpens": true
+    },
+    "evidence": {
+      "districts": [
+        {
+          "district": 1,
+          "MAP_W": 40,
+          "MAP_H": 20
+        },
+        {
+          "district": 2,
+          "MAP_W": 40,
+          "MAP_H": 20
+        },
+        {
+          "district": 3,
+          "MAP_W": 40,
+          "MAP_H": 20
+        }
+      ],
+      "wallContract": {
+        "coarseWallTex": 16,
+        "facadeWorldBands": true,
+        "coarseTexSampler": true
+      },
+      "minimapColors": [
+        "#353b44",
+        "#444a54",
+        "#38424f",
+        "#6a6258"
+      ]
+    }
+  },
+  "fpvStreetShimmerFix": {
+    "pass": true,
+    "build": "modules1",
+    "errors": [],
+    "warnings": [],
+    "checks": {
+      "buildIdShimmerFix1": true,
+      "fpvMassPreserved": true,
+      "matteStreetMode": true,
+      "minimapNavPreserved": true,
+      "noReflectiveHorizonBands": true,
+      "bottomMatteTintOnly": true,
+      "saveVersionUnchanged": true,
+      "controlsSchemaUnchanged": true,
+      "noMovingBlockers": true,
+      "levelSelectorBelowNewRun": true,
+      "levelSelectorCycle": true,
+      "fpvRenderStorefrontDistricts": true,
+      "minimapPaletteLimited": true,
+      "footprint40x20": true,
+      "reachabilityD1D4": true,
+      "propsNonCollision": true,
+      "runtimeClean": true,
+      "optionsOpens": true
+    },
+    "evidence": {
+      "districts": [
+        {
+          "district": 2,
+          "MAP_W": 40,
+          "MAP_H": 20
+        },
+        {
+          "district": 3,
+          "MAP_W": 40,
+          "MAP_H": 20
+        }
+      ],
+      "minimapColors": [
+        "#353b44",
+        "#444a54",
+        "#38424f",
+        "#6a6258"
+      ],
+      "cueContract": {
+        "noReflectiveHorizonBands": true,
+        "bottomMatteTintOnly": true
+      },
+      "selector": {
+        "labels": [
+          "NEW RUN",
+          "START DISTRICT: D1",
+          "CONTINUE (no save)",
+          "SEEDED RUN",
+          "SNC HALL OF SERVANTS",
+          "STATS",
+          "LEADERBOARDS",
+          "OPTIONS / HELP"
+        ]
+      }
+    }
+  },
+  "streetReadabilityMinimap": {
+    "pass": true,
+    "build": "modules1",
+    "errors": [],
+    "warnings": [],
+    "checks": {
+      "buildIdStreetRead1": true,
+      "footprint40x20": true,
+      "buildingMassPreserved": true,
+      "saveVersionUnchanged": true,
+      "controlsSchemaUnchanged": true,
+      "noMovingBlockers": true,
+      "minimapNavHelperExists": true,
+      "minimapNavPaletteLimited": true,
+      "levelSelectorBelowNewRun": true,
+      "levelSelectorCycle": true,
+      "d1LandmarkPresent": true,
+      "d1OpenSimple": true,
+      "d2StorefrontMass": true,
+      "d3AlleysPresent": true,
+      "d4PocketsPresent": true,
+      "minimapNavigationPalette": true,
+      "reachabilityD1D4": true,
+      "propsNonCollision": true,
+      "runtimeClean": true,
+      "optionsOpens": true
+    },
+    "evidence": {
+      "districts": [
+        {
+          "seed": 890201,
+          "district": 1,
+          "metrics": {
+            "mainRoad": 413,
+            "buildings": 28,
+            "alleys": 76,
+            "pockets": 167,
+            "GW": 40,
+            "GH": 20
+          },
+          "landmarkCells": 26
+        },
+        {
+          "seed": 890202,
+          "district": 2,
+          "metrics": {
+            "mainRoad": 342,
+            "buildings": 124,
+            "alleys": 76,
+            "pockets": 142,
+            "GW": 40,
+            "GH": 20
+          },
+          "landmarkCells": 0
+        },
+        {
+          "seed": 890203,
+          "district": 3,
+          "metrics": {
+            "mainRoad": 266,
+            "buildings": 151,
+            "alleys": 76,
+            "pockets": 191,
+            "GW": 40,
+            "GH": 20
+          },
+          "landmarkCells": 0
+        },
+        {
+          "seed": 890204,
+          "district": 4,
+          "metrics": {
+            "mainRoad": 266,
+            "buildings": 135,
+            "alleys": 76,
+            "pockets": 207,
+            "GW": 40,
+            "GH": 20
+          },
+          "landmarkCells": 0
+        }
+      ],
+      "minimapSamples": [
+        {
+          "district": 1,
+          "colors": [
+            "#353b44",
+            "#444a54",
+            "#3a4048",
+            "#756a5c",
+            "#38424f"
+          ]
+        },
+        {
+          "district": 2,
+          "colors": [
+            "#353b44",
+            "#444a54",
+            "#6a6258",
+            "#38424f"
+          ]
+        },
+        {
+          "district": 3,
+          "colors": [
+            "#353b44",
+            "#444a54",
+            "#6a6258",
+            "#38424f"
+          ]
+        },
+        {
+          "district": 4,
+          "colors": [
+            "#353b44",
+            "#444a54",
+            "#6a6258",
+            "#3a4048",
+            "#38424f"
+          ]
+        }
+      ],
+      "selector": {
+        "labels": [
+          "NEW RUN",
+          "START DISTRICT: D1",
+          "CONTINUE (no save)",
+          "SEEDED RUN",
+          "SNC HALL OF SERVANTS",
+          "STATS",
+          "LEADERBOARDS",
+          "OPTIONS / HELP"
+        ]
+      }
+    }
+  },
+  "buildingScalePolish": {
+    "pass": true,
+    "build": "modules1",
+    "errors": [],
+    "warnings": [],
+    "checks": {
+      "buildIdBuildScale1": true,
+      "fpvMassConstant": true,
+      "footprint40x20": true,
+      "saveVersionUnchanged": true,
+      "controlsSchemaUnchanged": true,
+      "noMovingBlockers": true,
+      "levelSelectorBelowNewRun": true,
+      "levelSelectorCycle": true,
+      "d1LandmarkSubstantial": true,
+      "d1OpenSimple": true,
+      "d2MoreMassThanD1": true,
+      "d2StorefrontBands": true,
+      "d3AlleysReadable": true,
+      "d4PocketsReachable": true,
+      "reachabilityD1D4": true,
+      "propsNonCollision": true,
+      "runtimeClean": true,
+      "optionsOpens": true
+    },
+    "evidence": {
+      "districts": [
+        {
+          "seed": 880101,
+          "district": 1,
+          "modifier": "",
+          "MAP_W": 40,
+          "MAP_H": 20,
+          "metrics": {
+            "mainRoad": 413,
+            "buildings": 26,
+            "alleys": 76,
+            "pockets": 169,
+            "GW": 40,
+            "GH": 20
+          },
+          "landmarkCells": 26,
+          "landmark": {
+            "identity": "restroom_pavilion",
+            "x0": 16,
+            "y0": 2,
+            "x1": 22,
+            "y1": 5,
+            "cells": 26,
+            "northSide": true,
+            "doorY": 5,
+            "doorX0": 18,
+            "doorX1": 19
+          }
+        },
+        {
+          "seed": 880102,
+          "district": 2,
+          "modifier": "",
+          "MAP_W": 40,
+          "MAP_H": 20,
+          "metrics": {
+            "mainRoad": 342,
+            "buildings": 134,
+            "alleys": 76,
+            "pockets": 132,
+            "GW": 40,
+            "GH": 20
+          },
+          "landmarkCells": 0,
+          "landmark": null
+        },
+        {
+          "seed": 880103,
+          "district": 3,
+          "modifier": "",
+          "MAP_W": 40,
+          "MAP_H": 20,
+          "metrics": {
+            "mainRoad": 266,
+            "buildings": 150,
+            "alleys": 76,
+            "pockets": 192,
+            "GW": 40,
+            "GH": 20
+          },
+          "landmarkCells": 0,
+          "landmark": null
+        },
+        {
+          "seed": 880104,
+          "district": 4,
+          "modifier": "",
+          "MAP_W": 40,
+          "MAP_H": 20,
+          "metrics": {
+            "mainRoad": 266,
+            "buildings": 115,
+            "alleys": 76,
+            "pockets": 227,
+            "GW": 40,
+            "GH": 20
+          },
+          "landmarkCells": 0,
+          "landmark": null
+        }
+      ],
+      "selector": {
+        "labels": [
+          "NEW RUN",
+          "START DISTRICT: D1",
+          "CONTINUE (no save)",
+          "SEEDED RUN",
+          "SNC HALL OF SERVANTS",
+          "STATS",
+          "LEADERBOARDS",
+          "OPTIONS / HELP"
+        ],
+        "cycleOk": true
+      }
+    }
+  },
+  "earlyDistrictProgression": {
+    "pass": true,
+    "build": "modules1",
+    "errors": [],
+    "warnings": [],
+    "checks": {
+      "buildIdBuildScale1": true,
       "footprintUnchanged": true,
       "saveVersionUnchanged": true,
       "controlsSchemaUnchanged": true,
@@ -921,10 +1386,10 @@
           "MAP_W": 40,
           "MAP_H": 20,
           "metrics": {
-            "mainRoad": 418,
-            "buildings": 14,
+            "mainRoad": 413,
+            "buildings": 26,
             "alleys": 76,
-            "pockets": 176,
+            "pockets": 169,
             "GW": 40,
             "GH": 20
           },
@@ -942,11 +1407,11 @@
             "identity": "restroom_pavilion",
             "x0": 16,
             "y0": 2,
-            "x1": 20,
-            "y1": 4,
-            "cells": 13,
+            "x1": 22,
+            "y1": 5,
+            "cells": 26,
             "northSide": true,
-            "doorY": 4,
+            "doorY": 5,
             "doorX0": 18,
             "doorX1": 19
           },
@@ -960,9 +1425,9 @@
           "MAP_H": 20,
           "metrics": {
             "mainRoad": 342,
-            "buildings": 78,
+            "buildings": 134,
             "alleys": 76,
-            "pockets": 188,
+            "pockets": 132,
             "GW": 40,
             "GH": 20
           },
@@ -977,7 +1442,7 @@
             "ALLEY": 0
           },
           "landmark": null,
-          "propCount": 11
+          "propCount": 8
         },
         {
           "seed": 880103,
@@ -987,9 +1452,9 @@
           "MAP_H": 20,
           "metrics": {
             "mainRoad": 266,
-            "buildings": 68,
+            "buildings": 150,
             "alleys": 76,
-            "pockets": 274,
+            "pockets": 192,
             "GW": 40,
             "GH": 20
           },
@@ -1004,7 +1469,7 @@
             "ALLEY": 0
           },
           "landmark": null,
-          "propCount": 14
+          "propCount": 12
         },
         {
           "seed": 880104,
@@ -1014,9 +1479,9 @@
           "MAP_H": 20,
           "metrics": {
             "mainRoad": 266,
-            "buildings": 53,
+            "buildings": 115,
             "alleys": 76,
-            "pockets": 289,
+            "pockets": 227,
             "GW": 40,
             "GH": 20
           },
@@ -1031,18 +1496,18 @@
             "ALLEY": 0
           },
           "landmark": null,
-          "propCount": 14
+          "propCount": 13
         }
       ]
     }
   },
   "levelSelector": {
     "pass": true,
-    "build": "levelselect1",
+    "build": "modules1",
     "errors": [],
     "warnings": [],
     "checks": {
-      "buildIdLevelSelect1": true,
+      "buildIdBuildScale1": true,
       "saveVersionUnchanged": true,
       "controlsSchemaUnchanged": true,
       "defaultDistrictD1": true,
@@ -1065,10 +1530,10 @@
           "MAP_H": 20,
           "reachOk": true,
           "metrics": {
-            "mainRoad": 418,
-            "buildings": 14,
+            "mainRoad": 413,
+            "buildings": 27,
             "alleys": 76,
-            "pockets": 176,
+            "pockets": 168,
             "GW": 40,
             "GH": 20
           },
@@ -1076,25 +1541,24 @@
             "identity": "restroom_pavilion",
             "x0": 18,
             "y0": 2,
-            "x1": 22,
-            "y1": 4,
-            "cells": 13,
+            "x1": 24,
+            "y1": 5,
+            "cells": 26,
             "northSide": true,
-            "doorY": 4,
+            "doorY": 5,
             "doorX0": 20,
             "doorX1": 21
           },
           "propSum": {
             "kinds": {
               "scrub_bush": 2,
-              "bench": 1,
-              "signboard": 1,
-              "mailbox": 2,
+              "bench": 2,
               "cooler": 1,
               "crate_stack": 1,
               "shopping_cart": 1,
               "agave": 1,
               "tarp_bundle": 1,
+              "mailbox": 2,
               "utility_box": 1
             },
             "parkish": 11,
@@ -1110,9 +1574,9 @@
           "reachOk": true,
           "metrics": {
             "mainRoad": 342,
-            "buildings": 82,
+            "buildings": 127,
             "alleys": 76,
-            "pockets": 184,
+            "pockets": 139,
             "GW": 40,
             "GH": 20
           },
@@ -1128,9 +1592,9 @@
           "reachOk": true,
           "metrics": {
             "mainRoad": 266,
-            "buildings": 74,
+            "buildings": 141,
             "alleys": 76,
-            "pockets": 268,
+            "pockets": 201,
             "GW": 40,
             "GH": 20
           },
@@ -1146,9 +1610,9 @@
           "reachOk": true,
           "metrics": {
             "mainRoad": 266,
-            "buildings": 55,
+            "buildings": 128,
             "alleys": 76,
-            "pockets": 287,
+            "pockets": 214,
             "GW": 40,
             "GH": 20
           },
@@ -1170,7 +1634,7 @@
   },
   "proceduralLevelValidation": {
     "pass": true,
-    "build": "levelselect1",
+    "build": "modules1",
     "seedCount": 52,
     "districtCount": 3,
     "errors": [],
@@ -1179,8 +1643,8 @@
       "levelsChecked": 52,
       "levelsPassed": 52,
       "levelsFailed": 0,
-      "minReachableCells": 594,
-      "maxReachableCells": 671,
+      "minReachableCells": 515,
+      "maxReachableCells": 658,
       "totalUnreachablePickups": 0,
       "totalUnreachableNpcs": 0
     },
@@ -1196,11 +1660,11 @@
       "harnessStateRestored": true
     },
     "cases": 52,
-    "timestamp": "2026-06-27T18:45:47.113Z"
+    "timestamp": "2026-06-28T14:28:47.917Z"
   },
   "fullRunProgression": {
     "pass": true,
-    "build": "levelselect1",
+    "build": "modules1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -1223,7 +1687,7 @@
       "district": 2,
       "collectedCount": 7,
       "quota": 5,
-      "reachableCells": 665,
+      "reachableCells": 652,
       "saveKeysTouched": [
         "cannedRun.save.v1"
       ],
@@ -1232,7 +1696,7 @@
         "seed": 880018,
         "helped": 0,
         "quota": 5,
-        "px": 15.5,
+        "px": 14.5,
         "py": 7.5,
         "cans": 1,
         "taken": true,
@@ -1243,7 +1707,7 @@
         "district": 1,
         "seed": 880018,
         "helped": 0,
-        "px": 15.5,
+        "px": 14.5,
         "py": 7.5,
         "cans": 1,
         "taken": false,
@@ -1252,11 +1716,11 @@
     },
     "hallPass": true,
     "mobilePass": true,
-    "timestamp": "2026-06-27T18:45:47.336Z"
+    "timestamp": "2026-06-28T14:28:48.126Z"
   },
   "onboarding": {
     "pass": true,
-    "build": "levelselect1",
+    "build": "modules1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -1286,7 +1750,7 @@
   },
   "soundFeedback": {
     "pass": true,
-    "build": "levelselect1",
+    "build": "modules1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -1363,7 +1827,7 @@
         }
       },
       "audioProof": {
-        "BUILD_ID": "levelselect1",
+        "BUILD_ID": "modules1",
         "gateBound": true,
         "unlockAttempted": false,
         "hasContext": true,
@@ -1381,7 +1845,7 @@
   },
   "declarativeControls": {
     "pass": true,
-    "build": "levelselect1",
+    "build": "modules1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -1421,7 +1885,7 @@
       "noStuckAfterEdit": true,
       "inSafeViewport": true,
       "menuNotEditable": true,
-      "buildIdLevelSelect1": true,
+      "buildIdBuildScale1": true,
       "saveFormatUnchanged": true
     },
     "evidence": {
@@ -1463,7 +1927,7 @@
   },
   "visualReadability": {
     "pass": true,
-    "build": "levelselect1",
+    "build": "modules1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -1496,9 +1960,9 @@
         "giveReady": false
       },
       "hallStats": {
-        "mean": 114.06569442200221,
-        "brightRatio": 0.168828125,
-        "variance": 4377.35977422135,
+        "mean": 113.33697878138638,
+        "brightRatio": 0.161609375,
+        "variance": 4324.609284219732,
         "count": 64000
       },
       "exitReadySnapshot": {
@@ -1534,7 +1998,7 @@
   },
   "visualRectangleRegression": {
     "pass": true,
-    "build": "levelselect1",
+    "build": "modules1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -1555,21 +2019,21 @@
       "probes": {
         "probe0": {
           "center": {
-            "mean": 53.2247135768639,
+            "mean": 48.3877245565935,
             "brightRatio": 0,
-            "variance": 112.05487737900444,
+            "variance": 73.5185349018505,
             "count": 9472
           },
           "sideL": {
-            "mean": 53.16663513513656,
+            "mean": 48.227691891890366,
             "brightRatio": 0,
-            "variance": 106.86522827228113,
+            "variance": 61.28216312601604,
             "count": 2960
           },
           "sideR": {
-            "mean": 53.16663513513656,
+            "mean": 50.11889391891789,
             "brightRatio": 0,
-            "variance": 106.86522827228113,
+            "variance": 245.0904472475177,
             "count": 2960
           },
           "roi": {
@@ -1582,21 +2046,21 @@
         },
         "probe1": {
           "center": {
-            "mean": 91.48936845437632,
+            "mean": 116.613087098814,
             "brightRatio": 0,
-            "variance": 2167.617358266081,
+            "variance": 1424.050385153617,
             "count": 9472
           },
           "sideL": {
-            "mean": 61.98784864865149,
+            "mean": 90.52236891892197,
             "brightRatio": 0,
-            "variance": 1317.7205927122213,
+            "variance": 2296.79736706254,
             "count": 2960
           },
           "sideR": {
-            "mean": 108.87218682432541,
+            "mean": 135.4345057432344,
             "brightRatio": 0,
-            "variance": 1875.7031009884092,
+            "variance": 16.43825817023767,
             "count": 2960
           },
           "roi": {
@@ -1609,21 +2073,21 @@
         },
         "probe2": {
           "center": {
-            "mean": 91.41075126687636,
+            "mean": 117.56113323479484,
             "brightRatio": 0,
-            "variance": 2147.5331871632993,
+            "variance": 1409.3172041144383,
             "count": 9472
           },
           "sideL": {
-            "mean": 109.29189121621718,
+            "mean": 133.22929155404555,
             "brightRatio": 0,
-            "variance": 1872.977990496926,
+            "variance": 27.445301539658082,
             "count": 2960
           },
           "sideR": {
-            "mean": 75.19977432432864,
+            "mean": 90.77598952703008,
             "brightRatio": 0,
-            "variance": 1777.1976254260774,
+            "variance": 2302.0684352954727,
             "count": 2960
           },
           "roi": {
@@ -1634,8 +2098,8 @@
           },
           "angle": 3.9269908169872414
         },
-        "meanSpread": 38.26465487751242,
-        "pairDiff01": 38.26465487751242,
+        "meanSpread": 69.17340867820134,
+        "pairDiff01": 68.22536254222051,
         "stuckBrightBlock": false
       }
     }
@@ -1692,7 +2156,7 @@
   },
   "renderFailure": {
     "pass": true,
-    "build": "levelselect1",
+    "build": "modules1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -1711,7 +2175,7 @@
     },
     "evidence": {
       "haloSource": {
-        "BUILD_ID": "levelselect1",
+        "BUILD_ID": "modules1",
         "policy": "walls own distance fog; billboards drawImage only — no post-loop sprite fog fillRect",
         "forbiddenPatternsAbsent": true,
         "forbiddenHits": [],
@@ -1721,7 +2185,7 @@
         "regressionCommentMarker": "SPRITE HALO REGRESSION GUARD"
       },
       "occlusionSource": {
-        "BUILD_ID": "levelselect1",
+        "BUILD_ID": "modules1",
         "renderWidth": 320,
         "zbufferLength": 320,
         "zbufferMatchesRenderWidth": true,
@@ -1798,9 +2262,9 @@
         "pass": true,
         "haloPass": true,
         "borderStats": {
-          "mean": 147.9031521739125,
+          "mean": 162.80736956521648,
           "brightRatio": 0.2134387351778656,
-          "variance": 4015.0982262634147,
+          "variance": 2668.6366580511663,
           "count": 506
         },
         "proj": {
@@ -1812,12 +2276,12 @@
           "screenW": 15.272727272727273,
           "screenH": 16.8
         },
-        "canvasVariance": 4683.78281348211
+        "canvasVariance": 4765.327285304231
       },
       "occludedSprite": {
         "pass": true,
         "occDiff": 0,
-        "visDiff": 140.08753315649867,
+        "visDiff": 118.57957559681698,
         "zPass": true,
         "proj": {
           "depth": 8,
@@ -1880,9 +2344,9 @@
       "hallStart": {
         "pass": true,
         "stats": {
-          "mean": 75.24583090011102,
-          "brightRatio": 0.029524253731343285,
-          "variance": 1888.7666951161257,
+          "mean": 82.76734853071791,
+          "brightRatio": 0.029384328358208957,
+          "variance": 2825.953378996878,
           "count": 42880
         },
         "customLevel": "hall_of_servants"
@@ -1894,19 +2358,19 @@
           "h": 844
         },
         "stats": {
-          "mean": 113.46709010950197,
-          "brightRatio": 0.165890625,
-          "variance": 4328.027316289495,
+          "mean": 117.86973815637872,
+          "brightRatio": 0.160640625,
+          "variance": 4537.890021642664,
           "count": 64000
         }
       }
     },
     "runtimeErrors": [],
-    "timestamp": "2026-06-27T18:45:47.624Z"
+    "timestamp": "2026-06-28T14:28:48.402Z"
   },
   "render": {
     "pass": true,
-    "build": "levelselect1",
+    "build": "modules1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -1925,7 +2389,7 @@
     },
     "evidence": {
       "haloSource": {
-        "BUILD_ID": "levelselect1",
+        "BUILD_ID": "modules1",
         "policy": "walls own distance fog; billboards drawImage only — no post-loop sprite fog fillRect",
         "forbiddenPatternsAbsent": true,
         "forbiddenHits": [],
@@ -1935,7 +2399,7 @@
         "regressionCommentMarker": "SPRITE HALO REGRESSION GUARD"
       },
       "occlusionSource": {
-        "BUILD_ID": "levelselect1",
+        "BUILD_ID": "modules1",
         "renderWidth": 320,
         "zbufferLength": 320,
         "zbufferMatchesRenderWidth": true,
@@ -2012,9 +2476,9 @@
         "pass": true,
         "haloPass": true,
         "borderStats": {
-          "mean": 147.9031521739125,
+          "mean": 162.80736956521648,
           "brightRatio": 0.2134387351778656,
-          "variance": 4015.0982262634147,
+          "variance": 2668.6366580511663,
           "count": 506
         },
         "proj": {
@@ -2026,12 +2490,12 @@
           "screenW": 15.272727272727273,
           "screenH": 16.8
         },
-        "canvasVariance": 4683.78281348211
+        "canvasVariance": 4765.327285304231
       },
       "occludedSprite": {
         "pass": true,
         "occDiff": 0,
-        "visDiff": 140.08753315649867,
+        "visDiff": 118.57957559681698,
         "zPass": true,
         "proj": {
           "depth": 8,
@@ -2094,9 +2558,9 @@
       "hallStart": {
         "pass": true,
         "stats": {
-          "mean": 75.24583090011102,
-          "brightRatio": 0.029524253731343285,
-          "variance": 1888.7666951161257,
+          "mean": 82.76734853071791,
+          "brightRatio": 0.029384328358208957,
+          "variance": 2825.953378996878,
           "count": 42880
         },
         "customLevel": "hall_of_servants"
@@ -2108,17 +2572,17 @@
           "h": 844
         },
         "stats": {
-          "mean": 113.46709010950197,
-          "brightRatio": 0.165890625,
-          "variance": 4328.027316289495,
+          "mean": 117.86973815637872,
+          "brightRatio": 0.160640625,
+          "variance": 4537.890021642664,
           "count": 64000
         }
       }
     },
     "runtimeErrors": [],
-    "timestamp": "2026-06-27T18:45:47.624Z"
+    "timestamp": "2026-06-28T14:28:48.402Z"
   },
   "runtimeErrors": [],
   "runtimeClean": true,
-  "timestamp": "2026-06-27T18:45:47.624Z"
+  "timestamp": "2026-06-28T14:28:48.402Z"
 }
