@@ -2,8 +2,8 @@
 
 **Previous baseline:** `buildingsmooth1` / `0b41159`
 **New BUILD_ID:** `facadetexture1`
-**Gameplay commit:** `PENDING` — `fix(render): use continuous facade textures`
-**CI URLs:** selfcheck `PENDING`; Pages `PENDING`
+**Gameplay commit:** `c511936` — `fix(render): use continuous facade textures`
+**CI URLs:** selfcheck https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28372414445; Pages https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28372413468
 
 ## Visual issue addressed
 
@@ -123,5 +123,5 @@ Local proof summary:
 
 ## URLs
 
-- Play: `PENDING`
-- Self-check: `PENDING`
+- Play: `https://falloutmule.github.io/solidarity-not-charity-can-run/?v=c511936&mobile=on&portraitlayout=1`
+- Self-check: `https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=c511936&mobile=on&portraitlayout=1`

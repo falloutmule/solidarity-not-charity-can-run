@@ -5,12 +5,12 @@
 | **Gameplay baseline** | `BUILD_ID` **`facadetexture1`** |
 | **Previous gameplay baseline** | `buildingsmooth1` / `0b41159`; `facadefinal1` / `0761c94`; `groundplane1` / `9d48802`; split infra `35c74cc` |
 | **Infrastructure** | Split-source build pipeline (`src/` → `index.html`) |
-| **Gameplay commit** | `PENDING` — continuous facade texture / no panel gaps |
+| **Gameplay commit** | `c511936` — `fix(render): use continuous facade textures` |
 
 ## Play / self-check
 
-- Play: `https://falloutmule.github.io/solidarity-not-charity-can-run/?v=<commit>&mobile=on&portraitlayout=1`
-- Self-check: `https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=<commit>&mobile=on&portraitlayout=1`
+- Play: `https://falloutmule.github.io/solidarity-not-charity-can-run/?v=c511936&mobile=on&portraitlayout=1`
+- Self-check: `https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=c511936&mobile=on&portraitlayout=1`
 
 ## Build workflow
 
@@ -24,5 +24,5 @@ See **`src/README.md`**, **`reports/guards/SOURCE_SPLIT_BUILD_PIPELINE_REPORT.md
 
 ## Continuous facade texture CI
 
-- Selfcheck: PENDING
-- Pages: PENDING
+- Selfcheck: https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28372414445
+- Pages: https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28372413468
