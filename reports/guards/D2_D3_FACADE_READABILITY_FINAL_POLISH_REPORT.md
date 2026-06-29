@@ -2,8 +2,8 @@
 
 **Previous baseline:** `groundplane1` / `9d48802`
 **New BUILD_ID:** `facadefinal1`
-**Gameplay commit:** pending local commit
-**CI URLs:** pending GitHub Actions run
+**Gameplay commit:** `c8dc483` — `fix(render): polish D2 D3 facade readability`
+**CI URLs:** selfcheck https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28343655976; Pages https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28343655808
 
 ## Visual issue addressed
 
@@ -88,5 +88,5 @@ Local results:
 
 ## URLs
 
-- Play: pending commit URL
-- Self-check: pending commit URL
+- Play: https://falloutmule.github.io/solidarity-not-charity-can-run/?v=c8dc483&mobile=on&portraitlayout=1
+- Self-check: https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=c8dc483&mobile=on&portraitlayout=1
