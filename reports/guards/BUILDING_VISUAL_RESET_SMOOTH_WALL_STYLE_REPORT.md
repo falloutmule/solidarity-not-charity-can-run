@@ -2,8 +2,8 @@
 
 **Previous baseline:** `facadefinal1` / `0761c94`
 **New BUILD_ID:** `buildingsmooth1`
-**Gameplay commit:** pending
-**CI URLs:** pending until pushed workflow completes
+**Gameplay commit:** `f540b3d` — `fix(render): smooth building wall style`
+**CI URLs:** selfcheck https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28345431654; Pages https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28345431405
 
 ## Visual issue addressed
 
@@ -102,5 +102,5 @@ The configured AI vision backends were unavailable during local review (`grok-4.
 
 ## URLs
 
-- Play: pending until final commit
-- Self-check: pending until final commit
+- Play: https://falloutmule.github.io/solidarity-not-charity-can-run/?v=f540b3d&mobile=on&portraitlayout=1
+- Self-check: https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=f540b3d&mobile=on&portraitlayout=1

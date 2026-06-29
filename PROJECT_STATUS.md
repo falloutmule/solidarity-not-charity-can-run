@@ -5,7 +5,7 @@
 | **Gameplay baseline** | `BUILD_ID` **`buildingsmooth1`** |
 | **Previous gameplay baseline** | `facadefinal1` / `0761c94`; `groundplane1` / `9d48802`; split infra `35c74cc` |
 | **Infrastructure** | Split-source build pipeline (`src/` → `index.html`) |
-| **Gameplay commit** | pending — building visual reset / smooth wall style |
+| **Gameplay commit** | `f540b3d` — building visual reset / smooth wall style |
 
 ## Play / self-check
 
@@ -24,5 +24,5 @@ See **`src/README.md`**, **`reports/guards/SOURCE_SPLIT_BUILD_PIPELINE_REPORT.md
 
 ## Buildingsmooth CI
 
-- Selfcheck: pending
-- Pages: pending
+- Selfcheck: https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28345431654
+- Pages: https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28345431405
