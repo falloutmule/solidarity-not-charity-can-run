@@ -1,0 +1,91 @@
+{
+  "BUILD_ID": "facadefinal1",
+  "facadePackVersion": "facadeart1",
+  "currentModuleList": [
+    "storefront_4x2",
+    "storefront_3x2",
+    "restroom_pavilion",
+    "blank_service_block",
+    "garage_service_4x2",
+    "boarded_shop_3x2"
+  ],
+  "roleList": [
+    "storefront_window",
+    "storefront_door",
+    "storefront_sign",
+    "blank_brick",
+    "side_door",
+    "service_wall",
+    "mural_wall",
+    "utility_wall",
+    "blank_concrete",
+    "garage_bay",
+    "service_door",
+    "boarded_window"
+  ],
+  "d2StorefrontFace": {
+    "x": 4,
+    "y": 2,
+    "buildingId": 1,
+    "moduleId": "storefront_4x2",
+    "localX": 0,
+    "localY": 0,
+    "faceDirection": "south",
+    "role": "storefront_window",
+    "material": "brick",
+    "slots": [
+      "sign_band",
+      "glass_window",
+      "dark_base"
+    ]
+  },
+  "d2BoardedShopFace": {
+    "x": 22,
+    "y": 2,
+    "buildingId": 3,
+    "moduleId": "boarded_shop_3x2",
+    "localX": 0,
+    "localY": 0,
+    "faceDirection": "south",
+    "role": "boarded_window",
+    "material": "brick",
+    "slots": [
+      "sign_band",
+      "boarded_window",
+      "dark_base"
+    ]
+  },
+  "d3GarageServiceFace": {
+    "x": 7,
+    "y": 16,
+    "buildingId": 5,
+    "moduleId": "garage_service_4x2",
+    "localX": 0,
+    "localY": 0,
+    "faceDirection": "south",
+    "role": "garage_bay",
+    "material": "concrete",
+    "slots": [
+      "garage_door",
+      "dark_base"
+    ]
+  },
+  "d3SideBackFace": {
+    "x": 15,
+    "y": 2,
+    "buildingId": 7,
+    "moduleId": "blank_service_block",
+    "localX": 1,
+    "localY": 0,
+    "faceDirection": "east",
+    "role": "blank_brick",
+    "material": "brick",
+    "slots": [
+      "soft_brick_bands"
+    ]
+  },
+  "groundplaneHelpersActive": true,
+  "spritegroundHelpersActive": true,
+  "noLabOnlyModules": true,
+  "pass": true
+}

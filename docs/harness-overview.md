@@ -64,6 +64,8 @@ SNC Can Run uses **in-browser self-checks** (`window.CR`) plus a **Playwright** 
 | `proof-source-build-manifest.json` | Input/output SHA-256 from `tools/build-single-file.js` |
 | `proof-groundplane-alignment.json` / `proof-groundplane-debug.json` | FPV ground plane / wall base alignment |
 | `proof-groundplane-d2-npc-storefront.png` … `proof-groundplane-minimap-preserved.png` | D2/D3/D1 ground contact and minimap proofs |
+| `proof-facadefinal-readability.json` / `proof-facadefinal-debug.json` | D2/D3 facade readability final polish |
+| `proof-facadefinal-d2-storefront.png` … `proof-facadefinal-minimap-preserved.png` | Final D2 storefront, D2 boarded shop, D3 garage/service, D3 side/back, D1, groundplane, and minimap proof shots |
 | `proof-sprite-ground-anchor.json` | Sprite ground anchor self-check |
 | `proof-facade-art-vocabulary.json` | Facade art vocabulary self-check |
 | `proof-facade-composition-readability.json` | Facade composition self-check |

@@ -1576,6 +1576,115 @@ async function fpvGroundPlaneAlignmentSection(page) {
   return { pass: !!result.pass, errors: result.selfcheck.errors || [], screenshots: shots.map(s => s.file).concat(['proof-groundplane-minimap-preserved.png']) };
 }
 
+async function d2D3FacadeReadabilityFinalSection(page) {
+  const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await waitGameReady(page);
+
+  const result = await page.evaluate(() => {
+    const selfcheck = CR.runD2D3FacadeReadabilityFinalSelfCheck();
+    const debug = CR.crDebugFacadeReadabilityFinal();
+    return { pass: selfcheck.pass === true && debug.pass === true, selfcheck, debug };
+  });
+  writeProof('proof-facadefinal-readability.json', result.selfcheck);
+  writeProof('proof-facadefinal-debug.json', result.debug);
+
+  const shots = [
+    { d: 2, seed: 914201, file: 'proof-facadefinal-d2-storefront.png', mode: 'storefront' },
+    { d: 2, seed: 914201, file: 'proof-facadefinal-d2-boarded-shop.png', mode: 'boarded' },
+    { d: 3, seed: 914203, file: 'proof-facadefinal-d3-garage-service.png', mode: 'garage' },
+    { d: 3, seed: 914203, file: 'proof-facadefinal-d3-side-back.png', mode: 'side' },
+    { d: 1, seed: 914101, file: 'proof-facadefinal-d1-preserved.png', mode: 'd1' },
+    { d: 2, seed: 914201, file: 'proof-facadefinal-groundplane-preserved.png', mode: 'ground' },
+  ];
+  for (const s of shots) {
+    await page.evaluate(({ d, seed, mode }) => {
+      CR.crSetSelectedStartDistrict(d);
+      CR.startRun(seed);
+      CR.state = CR.STATE.PLAY;
+      CR.paused = false;
+      const G = CR.game;
+      function roleOk(role) {
+        if (mode === 'storefront') return role === 'storefront_window' || role === 'storefront_door' || role === 'storefront_sign';
+        if (mode === 'boarded') return role === 'boarded_window' || role === 'storefront_door';
+        if (mode === 'garage') return role === 'garage_bay' || role === 'service_door' || role === 'utility_wall';
+        if (mode === 'side') return role === 'side_door' || role === 'service_wall' || role === 'blank_brick' || role === 'blank_concrete' || role === 'utility_wall';
+        if (mode === 'd1') return role === 'storefront_window' || role === 'storefront_door' || role === 'mural_wall' || role === 'utility_wall';
+        return role === 'storefront_window' || role === 'storefront_door' || role === 'boarded_window';
+      }
+      function moduleOk(mid) {
+        if (mode === 'storefront' || mode === 'ground') return mid === 'storefront_4x2' || mid === 'storefront_3x2';
+        if (mode === 'boarded') return mid === 'boarded_shop_3x2';
+        if (mode === 'garage') return mid === 'garage_service_4x2';
+        if (mode === 'side') return mid === 'garage_service_4x2' || mid === 'blank_service_block' || mid === 'storefront_4x2' || mid === 'storefront_3x2';
+        if (mode === 'd1') return mid === 'restroom_pavilion';
+        return false;
+      }
+      const preferredFaces = mode === 'side' ? ['east','west','north','south'] : ['south','north','east','west'];
+      let target = null;
+      for (let y = 1; y < G.MAP_H - 1 && !target; y++) {
+        for (let x = 1; x < G.MAP_W - 1 && !target; x++) {
+          const c = G.buildingGrid && G.buildingGrid[y] && G.buildingGrid[y][x];
+          if (!c || !moduleOk(c.mid)) continue;
+          for (const face of preferredFaces) {
+            const desc = CR.crDebugDescribeFacadeHit(x, y, face);
+            if (desc && roleOk(desc.role)) { target = { x, y, face, mid: c.mid, role: desc.role }; break; }
+          }
+        }
+      }
+      function placeFor(t) {
+        if (!t) return false;
+        const dirs = {
+          south: { dx: 0, dy: 1, angle: -Math.PI / 2 },
+          north: { dx: 0, dy: -1, angle: Math.PI / 2 },
+          east: { dx: 1, dy: 0, angle: Math.PI },
+          west: { dx: -1, dy: 0, angle: 0 },
+        };
+        const dir = dirs[t.face] || dirs.south;
+        for (const dist of [3.2, 2.6, 2.0, 1.45, 3.8, 4.4]) {
+          const px = t.x + 0.5 + dir.dx * dist;
+          const py = t.y + 0.5 + dir.dy * dist;
+          if (px > 1 && py > 1 && px < G.MAP_W - 1 && py < G.MAP_H - 1 && (typeof canStand !== 'function' || canStand(px, py))) {
+            CR.player.x = px;
+            CR.player.y = py;
+            CR.player.angle = dir.angle;
+            CR.player.dir = dir.angle;
+            return true;
+          }
+        }
+        CR.player.x = Math.max(1.5, Math.min(G.MAP_W - 1.5, t.x + 0.5 + dir.dx * 2.6));
+        CR.player.y = Math.max(1.5, Math.min(G.MAP_H - 1.5, t.y + 0.5 + dir.dy * 2.6));
+        CR.player.angle = dir.angle;
+        CR.player.dir = dir.angle;
+        return true;
+      }
+      placeFor(target);
+      if (mode === 'ground' && target) {
+        const dirs = { south: [0, 1], north: [0, -1], east: [1, 0], west: [-1, 0] };
+        const dxy = dirs[target.face] || [0, 1];
+        const ox = target.x + 0.5 + dxy[0] * 1.08;
+        const oy = target.y + 0.5 + dxy[1] * 1.08;
+        G.npcs = [{ x: ox - dxy[1] * 0.18, y: oy + dxy[0] * 0.18, kind: 'hungry', need: 1, helped: false, wob: 0, thank: '' }];
+        G.pickups = [{ x: ox + dxy[1] * 0.26, y: oy - dxy[0] * 0.26, taken: false, amt: 2, wob: 0 }];
+      }
+      if (typeof window.updateAim === 'function') window.updateAim();
+    }, s);
+    await page.waitForTimeout(260);
+    await page.screenshot({ path: path.join(ROOT, s.file) });
+  }
+  await page.evaluate(() => {
+    CR.crSetSelectedStartDistrict(2);
+    CR.startRun(914201);
+    CR.state = CR.STATE.PLAY;
+    CR.paused = false;
+  });
+  await page.waitForTimeout(100);
+  await page.screenshot({ path: path.join(ROOT, 'proof-facadefinal-minimap-preserved.png') });
+
+  return { pass: !!result.pass, errors: result.selfcheck.errors || [], screenshots: shots.map(s => s.file).concat(['proof-facadefinal-minimap-preserved.png']) };
+}
+
 async function spriteGroundAnchorSection(page) {
   const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
   await page.setViewportSize({ width: 412, height: 915 });
@@ -2292,11 +2401,12 @@ function sourceBuildPipelineSection() {
     errors.push('missing proof-source-build-manifest.json');
   }
   const indexText = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
-  const buildIdOk = indexText.includes("const BUILD_ID = 'groundplane1'");
-  if (!buildIdOk) errors.push('BUILD_ID must be groundplane1 for this pass');
+  const buildIdOk = indexText.includes("const BUILD_ID = 'facadefinal1'");
+  if (!buildIdOk) errors.push('BUILD_ID must be facadefinal1 for this pass');
   const pass = errors.length === 0 && proof && proof.check === 'pass';
-  const result = { pass, errors, buildId: 'groundplane1', proofSummary: proof ? { outputSha256: proof.outputSha256, outputBytes: proof.outputBytes, check: proof.check } : null };
+  const result = { pass, errors, buildId: 'facadefinal1', proofSummary: proof ? { outputSha256: proof.outputSha256, outputBytes: proof.outputBytes, check: proof.check } : null };
   writeProof('proof-source-build-pipeline.json', result);
+
   return result;
 }
 
@@ -2348,6 +2458,7 @@ async function main() {
   const facadePackBridge = await facadePackBridgeSection(page);
   const facadePackV2Safe = await facadePackV2SafeSection(page);
   const fpvGroundPlaneAlignment = await fpvGroundPlaneAlignmentSection(page);
+  const d2D3FacadeReadabilityFinal = await d2D3FacadeReadabilityFinalSection(page);
   const spriteGroundAnchor = await spriteGroundAnchorSection(page);
   const facadeArtVocabulary = await facadeArtVocabularySection(page);
   const facadeCompositionReadability = await facadeCompositionReadabilitySection(page);
@@ -2412,6 +2523,7 @@ async function main() {
     facadePackBridge.pass &&
     facadePackV2Safe.pass &&
     fpvGroundPlaneAlignment.pass &&
+    d2D3FacadeReadabilityFinal.pass &&
     spriteGroundAnchor.pass &&
     facadeArtVocabulary.pass &&
     facadeCompositionReadability.pass &&
@@ -2475,6 +2587,7 @@ async function main() {
     facadePackBridge,
     facadePackV2Safe,
     fpvGroundPlaneAlignment,
+    d2D3FacadeReadabilityFinal,
     spriteGroundAnchor,
     facadeArtVocabulary,
     facadeCompositionReadability,

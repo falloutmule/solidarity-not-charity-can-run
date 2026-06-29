@@ -1,9 +1,9 @@
 {
   "pass": true,
-  "build": "groundplane1",
+  "build": "facadefinal1",
   "decorativeProps": {
     "pass": true,
-    "build": "groundplane1",
+    "build": "facadefinal1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -47,5 +47,5 @@
     "proof-decorative-props-world.png",
     "proof-decorative-props-closeup.png"
   ],
-  "timestamp": "2026-06-28T22:15:48.672Z"
+  "timestamp": "2026-06-29T01:34:01.646Z"
 }
