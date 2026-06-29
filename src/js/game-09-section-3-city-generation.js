@@ -945,7 +945,7 @@ function crDebugBuildingSmoothStyle(){
   const base = crDebugFacadeReadabilityFinal();
   const artSrc = (typeof crDrawSmoothBuildingMaterialBase === 'function' ? String(crDrawSmoothBuildingMaterialBase) : '') + '\\n' + (typeof crDrawSmoothBuildingFaceColumn === 'function' ? String(crDrawSmoothBuildingFaceColumn) : '') + '\\n' + (typeof crDrawComposedFacadeFaceColumn === 'function' ? String(crDrawComposedFacadeFaceColumn) : '');
   const checks = {
-    buildId: BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1',
+    buildId: BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1',
     smoothFlag: typeof CR_BUILDING_SMOOTH_STYLE !== 'undefined' && CR_BUILDING_SMOOTH_STYLE === 1,
     smoothHelper: typeof crDrawSmoothBuildingFaceColumn === 'function' && typeof crDrawSmoothBuildingMaterialBase === 'function',
     facadePackStillExists: !!(CR_FACADE_PACK && CR_FACADE_PACK.modules && CR_FACADE_PACK.roles),
@@ -989,7 +989,7 @@ function crDebugContinuousFacadeTexture(){
   }
   const drawSrc = (typeof crDrawComposedFacadeFaceColumn === 'function' ? String(crDrawComposedFacadeFaceColumn) : '') + '\n' + (typeof crDrawContinuousFacadeTextureColumn === 'function' ? String(crDrawContinuousFacadeTextureColumn) : '');
   const checks = {
-    buildId: BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1',
+    buildId: BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1',
     calmWallsPropsFirstMode: BUILD_ID !== 'calmwalls1' || (typeof CR_CALM_WALLS_PROPS_FIRST !== 'undefined' && CR_CALM_WALLS_PROPS_FIRST === 1 && drawSrc.indexOf('crDrawCalmPropsFirstWallColumn') >= 0),
     simpleWallsBaselineMode: BUILD_ID !== 'simplewalls1' || (typeof CR_SIMPLE_WALLS_BASELINE !== 'undefined' && CR_SIMPLE_WALLS_BASELINE === 1 && drawSrc.indexOf('crDrawSimpleWallColumn') >= 0),
     atlasExists: !!atlas && keys.length >= 7,
@@ -1314,7 +1314,7 @@ function crStreetPropKindForDistrict(zone, district, r){
 }
 
 function crPlaceDistrictCommunityProps(d, r, meta, map, reach, used, takeCandidate, roadCands, pocketCands, alleyCands, candidates){
-  const propCount = 6 + d + ((r()*4)|0);
+  let propCount = 6 + d + ((r()*4)|0);
   const preferRoad = [roadCands, pocketCands, candidates];
   const preferAlley = [pocketCands, alleyCands, roadCands, candidates];
   const prefer = d >= 4 ? preferAlley : (d === 3 ? [pocketCands, alleyCands, roadCands, candidates] : preferRoad);
@@ -1330,6 +1330,30 @@ function crPlaceDistrictCommunityProps(d, r, meta, map, reach, used, takeCandida
     const kind = crStreetPropKindForDistrict(zone, d, r);
     game.props.push({ x: spot[0], y: spot[1], kind, wob: r()*6.28 });
     if(zone === 'MAIN_ROAD') roadPlaced++;
+  }
+  if(typeof CR_PROPS1_RESTORE_PROP_DENSITY !== 'undefined' && CR_PROPS1_RESTORE_PROP_DENSITY === 1 && (d === 2 || d === 3)){
+    const minTotal = 14;
+    const minRoad = 5;
+    let roadCount = 0;
+    for(const p of game.props){ if(crStreetZoneAt(p.x|0, p.y|0, meta) === 'MAIN_ROAD') roadCount++; }
+    while(game.props.length < minTotal){
+      const spot = takeCandidate(0.30, 0.5, used, [roadCands, pocketCands, candidates]);
+      if(!spot) break;
+      used.push(spot);
+      const tx = spot[0]|0, ty = spot[1]|0;
+      const zone = crStreetZoneAt(tx, ty, meta);
+      const kind = crStreetPropKindForDistrict(zone, d, r);
+      game.props.push({ x: spot[0], y: spot[1], kind, wob: r()*6.28 });
+      if(zone === 'MAIN_ROAD') roadCount++;
+    }
+    while(roadCount < minRoad && roadCands.length){
+      const spot = takeCandidate(0.30, 0.5, used, [roadCands, candidates]);
+      if(!spot) break;
+      used.push(spot);
+      const kind = crStreetPropKindForDistrict('MAIN_ROAD', d, r);
+      game.props.push({ x: spot[0], y: spot[1], kind, wob: r()*6.28 });
+      roadCount++;
+    }
   }
 }
 function applyStreetBlockGrammar(map, shade, GW, GH, district, modifier, r){
@@ -1605,7 +1629,7 @@ function crPlaceD1ParkCommunityProps(r, meta, map, reach, used, takeCandidate, r
     used.push([x, y]);
     game.props.push({ x, y, kind, wob: r() * 6.28 });
   }
-  while(game.props.length < 12){
+  while(game.props.length < 14){
     const spot = takeCandidate(0.30, 0.8, used, [roadCands, pocketCands, candidates]);
     if(!spot) break;
     used.push(spot);
@@ -1636,6 +1660,25 @@ function crD1ParkPropSummary(props){
     if(parkKinds.indexOf(p.kind) >= 0) parkish++;
   }
   return { kinds, parkish, total: (props || []).length };
+}
+
+function crDebugPropDensity(){
+  const meta = game.streetLayoutMeta;
+  let roadProps = 0, nearStart = 0;
+  const sx = player.x, sy = player.y;
+  for(const p of game.props || []){
+    if(meta && crStreetZoneAt(p.x|0, p.y|0, meta) === 'MAIN_ROAD') roadProps++;
+    if(Math.hypot(p.x - sx, p.y - sy) <= 8) nearStart++;
+  }
+  return {
+    BUILD_ID,
+    propCount: (game.props || []).length,
+    roadPropCount: roadProps,
+    propsNearPlayerStart: nearStart,
+    pickupCount: (game.pickups || []).length,
+    npcCount: (game.npcs || []).length,
+    district: game.district
+  };
 }
 function genCity(seed, district, modifier){
   RNG = mulberry32((seed ^ 0x9e3779b9) + district*2654435761);

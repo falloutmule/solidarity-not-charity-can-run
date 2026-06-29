@@ -11,9 +11,17 @@ function crIsFlatBuildingWallType(wt){
          wt === WALL.SIGNAGE ||
          wt === WALL.MURAL;
 }
-function crDrawFlatBuildingWallColumn(ctx, col, drawStart, sliceH){
+function crSimpleMaterialWallColor(wt){
+  if(wt === WALL.CONCRETE) return 'rgba(150,144,134,0.90)';
+  if(wt === WALL.BRICK)    return 'rgba(150,108,84,0.90)';
+  if(wt === WALL.GLASS)    return 'rgba(54,66,80,0.90)';
+  if(wt === WALL.GARAGE)   return 'rgba(150,144,134,0.90)';
+  if(wt === WALL.SIGNAGE || wt === WALL.MURAL) return 'rgba(176,160,130,0.90)';
+  return 'rgba(184,166,128,0.90)';
+}
+function crDrawFlatBuildingWallColumn(ctx, col, drawStart, sliceH, wt){
   if(sliceH < 1) return;
-  ctx.fillStyle = 'rgba(150,142,126,0.88)';
+  ctx.fillStyle = crSimpleMaterialWallColor(wt);
   ctx.fillRect(col, drawStart, 1, sliceH);
 }
 function drawScene(now){
@@ -70,8 +78,8 @@ function drawScene(now){
     const texX = crCoarseWallTexX(wallX, side, rdx, rdy, wt);
     const facadeRole = crResolveBuildingFaceRole(mapX, mapY, side, stepX, stepY);
     const flatBuildingWall =
-      typeof CR_FLAT_BUILDING_WALLS_BASELINE !== 'undefined' &&
-      CR_FLAT_BUILDING_WALLS_BASELINE === 1 &&
+      ((typeof CR_PROPS1_RESTORE_SIMPLE_MATERIALS !== 'undefined' && CR_PROPS1_RESTORE_SIMPLE_MATERIALS === 1) ||
+       (typeof CR_FLAT_BUILDING_WALLS_BASELINE !== 'undefined' && CR_FLAT_BUILDING_WALLS_BASELINE === 1)) &&
       crIsFlatBuildingWallType(wt);
     const tex = WALL_TEX[facadeRole ? WALL.BUILDING : wt] || WALL_TEX[WALL.BUILDING];
     const texSampleW = (wt === WALL.FENCE) ? 2 : CR_FPV_WALL_TEX_COARSE;
@@ -83,7 +91,7 @@ function drawScene(now){
     }
 
     if(flatBuildingWall){
-      crDrawFlatBuildingWallColumn(bctx, col, drawStart, sliceH);
+      crDrawFlatBuildingWallColumn(bctx, col, drawStart, sliceH, wt);
     } else if(facadeRole){
       crDrawComposedFacadeFaceColumn(bctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX, facadeRole);
     } else {
