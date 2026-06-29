@@ -553,6 +553,24 @@ function crDrawContinuousFacadeTextureColumn(ctx, col, drawStart, sliceH, textur
   ctx.imageSmoothingEnabled = oldSmooth;
 }
 
+function crSimpleWallColor(materialKey, kind){
+  if(materialKey === 'concrete' || kind === 'garage_front') return 'rgba(145,142,132,0.86)';
+  if(materialKey === 'brick' || kind === 'boarded_front') return 'rgba(142,110,88,0.86)';
+  if(kind === 'side' || kind === 'service_front') return 'rgba(154,148,134,0.86)';
+  if(kind === 'pavilion_front') return 'rgba(150,148,130,0.86)';
+  return 'rgba(166,154,132,0.86)';
+}
+function crDrawSimpleWallColumn(ctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX, roleId){
+  if(sliceH < 1) return;
+  const faceDir = crWallHitFaceDir(side, stepX, stepY);
+  const fc = crUpdateFacadeFaceU(mapX, mapY, faceDir, wallX);
+  const roleKey = crNormalizeFacadeRoleId((fc && fc.roleId) || roleId || '');
+  const role = CR_FACADE_PACK.roles[roleKey] || null;
+  const kind = fc ? crFacadeComposeKind(fc.moduleId, faceDir) : 'service_front';
+  ctx.fillStyle = crSimpleWallColor(role && role.material, kind);
+  ctx.fillRect(col, drawStart, 1, sliceH);
+}
+
 function crCalmWallPalette(materialKey, kind){
   if(kind === 'pavilion_front'){
     return { wall:'rgba(146,144,126,0.84)', top:'rgba(54,70,50,0.10)', base:'rgba(36,42,32,0.18)', patch:'rgba(225,224,196,0.035)', decal:'rgba(70,96,78,0.12)', dark:'rgba(48,58,44,0.16)' };
@@ -803,6 +821,10 @@ function crDrawSmoothBuildingFaceColumn(ctx, col, drawStart, sliceH, mapX, mapY,
 }
 
 function crDrawComposedFacadeFaceColumn(ctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX, roleId){
+  if(typeof CR_SIMPLE_WALLS_BASELINE !== 'undefined' && CR_SIMPLE_WALLS_BASELINE === 1){
+    crDrawSimpleWallColumn(ctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX, roleId);
+    return;
+  }
   if(typeof CR_CALM_WALLS_PROPS_FIRST !== 'undefined' && CR_CALM_WALLS_PROPS_FIRST === 1){
     crDrawCalmPropsFirstWallColumn(ctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX, roleId);
     return;
@@ -923,7 +945,7 @@ function crDebugBuildingSmoothStyle(){
   const base = crDebugFacadeReadabilityFinal();
   const artSrc = (typeof crDrawSmoothBuildingMaterialBase === 'function' ? String(crDrawSmoothBuildingMaterialBase) : '') + '\\n' + (typeof crDrawSmoothBuildingFaceColumn === 'function' ? String(crDrawSmoothBuildingFaceColumn) : '') + '\\n' + (typeof crDrawComposedFacadeFaceColumn === 'function' ? String(crDrawComposedFacadeFaceColumn) : '');
   const checks = {
-    buildId: BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1',
+    buildId: BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1',
     smoothFlag: typeof CR_BUILDING_SMOOTH_STYLE !== 'undefined' && CR_BUILDING_SMOOTH_STYLE === 1,
     smoothHelper: typeof crDrawSmoothBuildingFaceColumn === 'function' && typeof crDrawSmoothBuildingMaterialBase === 'function',
     facadePackStillExists: !!(CR_FACADE_PACK && CR_FACADE_PACK.modules && CR_FACADE_PACK.roles),
@@ -967,8 +989,9 @@ function crDebugContinuousFacadeTexture(){
   }
   const drawSrc = (typeof crDrawComposedFacadeFaceColumn === 'function' ? String(crDrawComposedFacadeFaceColumn) : '') + '\n' + (typeof crDrawContinuousFacadeTextureColumn === 'function' ? String(crDrawContinuousFacadeTextureColumn) : '');
   const checks = {
-    buildId: BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1',
+    buildId: BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1',
     calmWallsPropsFirstMode: BUILD_ID !== 'calmwalls1' || (typeof CR_CALM_WALLS_PROPS_FIRST !== 'undefined' && CR_CALM_WALLS_PROPS_FIRST === 1 && drawSrc.indexOf('crDrawCalmPropsFirstWallColumn') >= 0),
+    simpleWallsBaselineMode: BUILD_ID !== 'simplewalls1' || (typeof CR_SIMPLE_WALLS_BASELINE !== 'undefined' && CR_SIMPLE_WALLS_BASELINE === 1 && drawSrc.indexOf('crDrawSimpleWallColumn') >= 0),
     atlasExists: !!atlas && keys.length >= 7,
     storefront4x2TextureExists: !!atlas.storefront_4x2_south,
     storefront3x2TextureExists: !!atlas.storefront_3x2_south,
@@ -996,6 +1019,7 @@ function crDebugContinuousFacadeTexture(){
     sampleSideBackTextureMapping: sampleMap(base.d3SideBackFace),
     faceUSamplingContinuous: checks.faceUSamplingContinuous,
     calmWallsPropsFirstMode: checks.calmWallsPropsFirstMode,
+    simpleWallsBaselineMode: checks.simpleWallsBaselineMode,
     panelInsetRendererBypassedForModuleFaces: checks.panelInsetRendererBypassedForModuleFaces,
     noLabOnlyModules: checks.noLabOnlyModules,
     checks

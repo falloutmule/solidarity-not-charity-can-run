@@ -8,7 +8,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'calmwalls1';
+const BUILD_ID = 'simplewalls1';
 const CR_FPV_STREET_SHIMMER_FIX = 1;
 const CR_FPV_STREET_MATTE = true;
 const CR_FPV_WALL_LINE_FIX = 1;
@@ -24,8 +24,10 @@ const CR_D2_D3_FACADE_READABILITY_FINAL = 1;
 const CR_BUILDING_SMOOTH_STYLE = 1;
 /** Continuous facade texture pass retained for compatibility/debug; calmwalls1 bypasses it visibly. */
 const CR_CONTINUOUS_FACADE_TEXTURES = 1;
-/** Props-first calm wall pass: quiet wall mass, rare decals, scene identity via sprites/props. */
+/** Props-first calm wall pass retained for compatibility/debug; simplewalls1 bypasses its bands visibly. */
 const CR_CALM_WALLS_PROPS_FIRST = 1;
+/** Simple wall baseline pass: one material color per building wall column; no decals, bands, or facade atlases. */
+const CR_SIMPLE_WALLS_BASELINE = 1;
 /** Floor-anchored FPV wall mass / sprite contact plane alignment. */
 const CR_FPV_GROUND_PLANE_ALIGNMENT = 1;
 /** Split-source pipeline active: edit src/ and regenerate root index.html with npm run build. */
