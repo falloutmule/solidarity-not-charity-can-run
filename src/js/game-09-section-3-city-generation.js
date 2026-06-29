@@ -553,6 +553,77 @@ function crDrawContinuousFacadeTextureColumn(ctx, col, drawStart, sliceH, textur
   ctx.imageSmoothingEnabled = oldSmooth;
 }
 
+function crCalmWallPalette(materialKey, kind){
+  if(kind === 'pavilion_front'){
+    return { wall:'rgba(146,144,126,0.84)', top:'rgba(54,70,50,0.10)', base:'rgba(36,42,32,0.18)', patch:'rgba(225,224,196,0.035)', decal:'rgba(70,96,78,0.12)', dark:'rgba(48,58,44,0.16)' };
+  }
+  if(kind === 'garage_front' || materialKey === 'concrete'){
+    return { wall:'rgba(148,148,138,0.84)', top:'rgba(78,78,72,0.09)', base:'rgba(40,40,36,0.17)', patch:'rgba(230,230,214,0.030)', decal:'rgba(62,68,66,0.13)', dark:'rgba(54,56,52,0.16)' };
+  }
+  if(kind === 'boarded_front'){
+    return { wall:'rgba(150,128,104,0.84)', top:'rgba(82,64,48,0.08)', base:'rgba(42,32,26,0.16)', patch:'rgba(238,214,178,0.030)', decal:'rgba(90,72,54,0.13)', dark:'rgba(58,46,36,0.17)' };
+  }
+  if(kind === 'side' || kind === 'service_front'){
+    return { wall:'rgba(154,148,134,0.84)', top:'rgba(76,70,62,0.08)', base:'rgba(38,34,30,0.15)', patch:'rgba(238,228,204,0.028)', decal:'rgba(70,74,70,0.11)', dark:'rgba(52,48,42,0.14)' };
+  }
+  if(materialKey === 'brick'){
+    return { wall:'rgba(144,110,88,0.84)', top:'rgba(84,62,48,0.08)', base:'rgba(42,30,24,0.16)', patch:'rgba(238,206,176,0.030)', decal:'rgba(84,74,62,0.13)', dark:'rgba(54,40,32,0.15)' };
+  }
+  return { wall:'rgba(166,154,132,0.84)', top:'rgba(92,82,66,0.08)', base:'rgba(42,34,28,0.15)', patch:'rgba(248,232,198,0.030)', decal:'rgba(70,82,84,0.11)', dark:'rgba(54,46,38,0.14)' };
+}
+function crCalmWallBand(ctx, col, pw, fu, x0, x1, y0, y1, fill){
+  if(!crFacadeArtFuIn(fu, x0, x1) || y1 <= y0) return false;
+  crFacadeArtColBand(ctx, col, pw, y0, y1, fill);
+  return true;
+}
+function crDrawCalmPropsFirstWallColumn(ctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX, roleId){
+  if(sliceH < 8) return;
+  const faceDir = crWallHitFaceDir(side, stepX, stepY);
+  const fc = crUpdateFacadeFaceU(mapX, mapY, faceDir, wallX);
+  const roleKey = crNormalizeFacadeRoleId((fc && fc.roleId) || roleId || '');
+  const role = CR_FACADE_PACK.roles[roleKey] || null;
+  const moduleId = fc ? fc.moduleId : '';
+  const kind = fc ? crFacadeComposeKind(moduleId, faceDir) : 'service_front';
+  const fu = fc ? Math.max(0, Math.min(0.999, fc.faceU)) : Math.max(0, Math.min(0.999, wallX - Math.floor(wallX)));
+  const pal = crCalmWallPalette(role && role.material, kind);
+  const pw = 1;
+  const y0 = drawStart;
+  const y1 = drawStart + sliceH;
+  const zTop = y0 + sliceH * 0.050;
+  const zBase = y0 + sliceH * 0.890;
+
+  ctx.fillStyle = pal.wall;
+  ctx.fillRect(col, y0, pw, sliceH);
+  crFacadeArtColBand(ctx, col, pw, zTop, zTop + Math.max(1, sliceH * 0.025), pal.top);
+  crFacadeArtColBand(ctx, col, pw, zBase, y0 + sliceH * 0.955, pal.base);
+
+  // Broad, low-contrast stucco variation. These are intentionally not facade cells.
+  crCalmWallBand(ctx, col, pw, fu, 0.08, 0.34, y0 + sliceH * 0.22, y0 + sliceH * 0.46, pal.patch);
+  crCalmWallBand(ctx, col, pw, fu, 0.56, 0.86, y0 + sliceH * 0.52, y0 + sliceH * 0.78, 'rgba(70,58,44,0.030)');
+
+  // Sparse decals only: small, flat, low-contrast marks painted onto the wall mass.
+  if(kind === 'storefront_front'){
+    crCalmWallBand(ctx, col, pw, fu, 0.24, 0.56, y0 + sliceH * 0.180, y0 + sliceH * 0.235, 'rgba(138,112,70,0.13)');
+    crCalmWallBand(ctx, col, pw, fu, 0.18, 0.52, y0 + sliceH * 0.405, y0 + sliceH * 0.535, 'rgba(56,74,80,0.16)');
+    crCalmWallBand(ctx, col, pw, fu, 0.70, 0.81, y0 + sliceH * 0.360, y0 + sliceH * 0.835, 'rgba(54,46,38,0.22)');
+    crCalmWallBand(ctx, col, pw, fu, 0.875, 0.925, y0 + sliceH * 0.610, y0 + sliceH * 0.695, 'rgba(56,60,56,0.13)');
+  } else if(kind === 'boarded_front'){
+    crCalmWallBand(ctx, col, pw, fu, 0.22, 0.39, y0 + sliceH * 0.455, y0 + sliceH * 0.585, 'rgba(58,52,44,0.14)');
+    crCalmWallBand(ctx, col, pw, fu, 0.225, 0.385, y0 + sliceH * 0.488, y0 + sliceH * 0.520, 'rgba(116,88,62,0.22)');
+    crCalmWallBand(ctx, col, pw, fu, 0.66, 0.77, y0 + sliceH * 0.390, y0 + sliceH * 0.835, 'rgba(54,44,36,0.19)');
+  } else if(kind === 'garage_front'){
+    crCalmWallBand(ctx, col, pw, fu, 0.20, 0.34, y0 + sliceH * 0.560, y0 + sliceH * 0.650, pal.decal);
+    crCalmWallBand(ctx, col, pw, fu, 0.68, 0.78, y0 + sliceH * 0.435, y0 + sliceH * 0.835, 'rgba(58,56,50,0.16)');
+    crCalmWallBand(ctx, col, pw, fu, 0.84, 0.90, y0 + sliceH * 0.570, y0 + sliceH * 0.655, 'rgba(62,72,70,0.10)');
+  } else if(kind === 'pavilion_front'){
+    crCalmWallBand(ctx, col, pw, fu, 0.24, 0.35, y0 + sliceH * 0.380, y0 + sliceH * 0.830, pal.dark);
+    crCalmWallBand(ctx, col, pw, fu, 0.58, 0.71, y0 + sliceH * 0.500, y0 + sliceH * 0.650, pal.decal);
+  } else {
+    crCalmWallBand(ctx, col, pw, fu, 0.62, 0.72, y0 + sliceH * 0.560, y0 + sliceH * 0.650, pal.decal);
+    crCalmWallBand(ctx, col, pw, fu, 0.18, 0.28, y0 + sliceH * 0.480, y0 + sliceH * 0.540, 'rgba(92,92,84,0.08)');
+  }
+}
+
 function crDrawSmoothBuildingMaterialBase(ctx, col, y0, sliceH, pw, materialKey, kind){
   const pal = crSmoothWallPalette(materialKey, kind);
   ctx.fillStyle = pal.wall;
@@ -732,6 +803,10 @@ function crDrawSmoothBuildingFaceColumn(ctx, col, drawStart, sliceH, mapX, mapY,
 }
 
 function crDrawComposedFacadeFaceColumn(ctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX, roleId){
+  if(typeof CR_CALM_WALLS_PROPS_FIRST !== 'undefined' && CR_CALM_WALLS_PROPS_FIRST === 1){
+    crDrawCalmPropsFirstWallColumn(ctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX, roleId);
+    return;
+  }
   if(typeof CR_CONTINUOUS_FACADE_TEXTURES !== 'undefined' && CR_CONTINUOUS_FACADE_TEXTURES === 1){
     const faceDir = crWallHitFaceDir(side, stepX, stepY);
     const fc = crUpdateFacadeFaceU(mapX, mapY, faceDir, wallX);
@@ -848,7 +923,7 @@ function crDebugBuildingSmoothStyle(){
   const base = crDebugFacadeReadabilityFinal();
   const artSrc = (typeof crDrawSmoothBuildingMaterialBase === 'function' ? String(crDrawSmoothBuildingMaterialBase) : '') + '\\n' + (typeof crDrawSmoothBuildingFaceColumn === 'function' ? String(crDrawSmoothBuildingFaceColumn) : '') + '\\n' + (typeof crDrawComposedFacadeFaceColumn === 'function' ? String(crDrawComposedFacadeFaceColumn) : '');
   const checks = {
-    buildId: BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1',
+    buildId: BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1',
     smoothFlag: typeof CR_BUILDING_SMOOTH_STYLE !== 'undefined' && CR_BUILDING_SMOOTH_STYLE === 1,
     smoothHelper: typeof crDrawSmoothBuildingFaceColumn === 'function' && typeof crDrawSmoothBuildingMaterialBase === 'function',
     facadePackStillExists: !!(CR_FACADE_PACK && CR_FACADE_PACK.modules && CR_FACADE_PACK.roles),
@@ -892,7 +967,8 @@ function crDebugContinuousFacadeTexture(){
   }
   const drawSrc = (typeof crDrawComposedFacadeFaceColumn === 'function' ? String(crDrawComposedFacadeFaceColumn) : '') + '\n' + (typeof crDrawContinuousFacadeTextureColumn === 'function' ? String(crDrawContinuousFacadeTextureColumn) : '');
   const checks = {
-    buildId: BUILD_ID === 'facadetexture1',
+    buildId: BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1',
+    calmWallsPropsFirstMode: BUILD_ID !== 'calmwalls1' || (typeof CR_CALM_WALLS_PROPS_FIRST !== 'undefined' && CR_CALM_WALLS_PROPS_FIRST === 1 && drawSrc.indexOf('crDrawCalmPropsFirstWallColumn') >= 0),
     atlasExists: !!atlas && keys.length >= 7,
     storefront4x2TextureExists: !!atlas.storefront_4x2_south,
     storefront3x2TextureExists: !!atlas.storefront_3x2_south,
@@ -919,6 +995,7 @@ function crDebugContinuousFacadeTexture(){
     sampleD3GarageTextureMapping: sampleMap(base.d3GarageServiceFace),
     sampleSideBackTextureMapping: sampleMap(base.d3SideBackFace),
     faceUSamplingContinuous: checks.faceUSamplingContinuous,
+    calmWallsPropsFirstMode: checks.calmWallsPropsFirstMode,
     panelInsetRendererBypassedForModuleFaces: checks.panelInsetRendererBypassedForModuleFaces,
     noLabOnlyModules: checks.noLabOnlyModules,
     checks
