@@ -2,10 +2,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Gameplay baseline** | `BUILD_ID` **`facadefinal1`** |
-| **Previous gameplay baseline** | `groundplane1` / `9d48802`; split infra `35c74cc` |
+| **Gameplay baseline** | `BUILD_ID` **`buildingsmooth1`** |
+| **Previous gameplay baseline** | `facadefinal1` / `0761c94`; `groundplane1` / `9d48802`; split infra `35c74cc` |
 | **Infrastructure** | Split-source build pipeline (`src/` → `index.html`) |
-| **Gameplay commit** | `c8dc483` — D2/D3 facade readability final polish |
+| **Gameplay commit** | pending — building visual reset / smooth wall style |
 
 ## Play / self-check
 
@@ -20,9 +20,9 @@ npm run build:check  # verify index.html matches src/
 npm run test:selfcheck
 ```
 
-See **`src/README.md`**, **`reports/guards/SOURCE_SPLIT_BUILD_PIPELINE_REPORT.md`**, **`reports/guards/FPV_GROUND_PLANE_ALIGNMENT_REPORT.md`**, and **`reports/guards/D2_D3_FACADE_READABILITY_FINAL_POLISH_REPORT.md`**.
+See **`src/README.md`**, **`reports/guards/SOURCE_SPLIT_BUILD_PIPELINE_REPORT.md`**, **`reports/guards/FPV_GROUND_PLANE_ALIGNMENT_REPORT.md`**, **`reports/guards/D2_D3_FACADE_READABILITY_FINAL_POLISH_REPORT.md`**, and **`reports/guards/BUILDING_VISUAL_RESET_SMOOTH_WALL_STYLE_REPORT.md`**.
 
-## Facadefinal CI
+## Buildingsmooth CI
 
-- Selfcheck: https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28343655976
-- Pages: https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28343655808
+- Selfcheck: pending
+- Pages: pending

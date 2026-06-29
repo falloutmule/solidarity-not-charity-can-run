@@ -8,7 +8,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'facadefinal1';
+const BUILD_ID = 'buildingsmooth1';
 const CR_FPV_STREET_SHIMMER_FIX = 1;
 const CR_FPV_STREET_MATTE = true;
 const CR_FPV_WALL_LINE_FIX = 1;
@@ -20,6 +20,8 @@ const CR_FACADE_COMPOSE_READABILITY = 1;
 const CR_FACADE_ART_VOCABULARY = 1;
 /** Final D2/D3 facade readability polish: composed facades use inset framed, phone-readable shapes. */
 const CR_D2_D3_FACADE_READABILITY_FINAL = 1;
+/** Building visual reset: smooth, low-noise wall masses with sparse readable cues. */
+const CR_BUILDING_SMOOTH_STYLE = 1;
 /** Floor-anchored FPV wall mass / sprite contact plane alignment. */
 const CR_FPV_GROUND_PLANE_ALIGNMENT = 1;
 /** Split-source pipeline active: edit src/ and regenerate root index.html with npm run build. */

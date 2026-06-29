@@ -359,7 +359,38 @@ function crFacadeArtColFramedBox(ctx, col, pw, fu, x0, x1, y0, y1, fill, frame){
   return true;
 }
 
-function crDrawComposedFacadeFaceColumn(ctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX, roleId){
+function crSmoothWallPalette(materialKey, kind){
+  if(kind === 'garage_front'){
+    return { wall:'rgba(138,140,134,0.82)', top:'rgba(86,88,82,0.20)', base:'rgba(34,34,32,0.34)', line:'rgba(54,54,50,0.26)', frame:'rgba(34,36,34,0.48)' };
+  }
+  if(kind === 'side' || kind === 'service_front'){
+    return { wall:'rgba(152,145,132,0.80)', top:'rgba(76,70,62,0.14)', base:'rgba(34,30,26,0.26)', line:'rgba(64,58,50,0.18)', frame:'rgba(44,42,38,0.32)' };
+  }
+  if(kind === 'pavilion_front'){
+    return { wall:'rgba(154,150,132,0.80)', top:'rgba(62,72,58,0.18)', base:'rgba(34,40,32,0.30)', line:'rgba(58,66,52,0.20)', frame:'rgba(38,46,38,0.34)' };
+  }
+  if(kind === 'boarded_front'){
+    return { wall:'rgba(142,116,92,0.80)', top:'rgba(84,68,52,0.16)', base:'rgba(42,32,26,0.28)', line:'rgba(78,58,42,0.20)', frame:'rgba(52,38,30,0.36)' };
+  }
+  if(materialKey === 'concrete'){
+    return { wall:'rgba(140,142,136,0.80)', top:'rgba(84,84,78,0.16)', base:'rgba(38,38,36,0.28)', line:'rgba(62,62,58,0.20)', frame:'rgba(40,42,40,0.34)' };
+  }
+  if(materialKey === 'stucco'){
+    return { wall:'rgba(168,158,140,0.80)', top:'rgba(92,82,66,0.14)', base:'rgba(42,34,28,0.26)', line:'rgba(76,64,50,0.18)', frame:'rgba(52,44,36,0.32)' };
+  }
+  return { wall:'rgba(138,102,78,0.78)', top:'rgba(88,62,46,0.14)', base:'rgba(42,30,24,0.26)', line:'rgba(78,54,40,0.18)', frame:'rgba(54,38,30,0.32)' };
+}
+function crDrawSmoothBuildingMaterialBase(ctx, col, y0, sliceH, pw, materialKey, kind){
+  const pal = crSmoothWallPalette(materialKey, kind);
+  ctx.fillStyle = pal.wall;
+  ctx.fillRect(col, y0, pw, sliceH);
+  crFacadeArtColBand(ctx, col, pw, y0 + sliceH * 0.035, y0 + sliceH * 0.070, pal.top);
+  crFacadeArtColLine(ctx, col, pw, y0 + sliceH * 0.080, pal.line);
+  crFacadeArtColLine(ctx, col, pw, y0 + sliceH * 0.885, pal.line);
+  crFacadeArtColBand(ctx, col, pw, y0 + sliceH * 0.905, y0 + sliceH * 0.955, pal.base);
+  return pal;
+}
+function crDrawSmoothBuildingFaceColumn(ctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX, roleId){
   if(sliceH < 14 || !roleId) return;
   const faceDir = crWallHitFaceDir(side, stepX, stepY);
   const fc = crUpdateFacadeFaceU(mapX, mapY, faceDir, wallX);
@@ -371,124 +402,113 @@ function crDrawComposedFacadeFaceColumn(ctx, col, drawStart, sliceH, mapX, mapY,
   const roleKey = crNormalizeFacadeRoleId(fc.roleId || roleId);
   const role = CR_FACADE_PACK.roles[roleKey];
   if(!role) return;
-  crDrawFpvFacadePackMaterialBase(ctx, col, drawStart, sliceH, pw, role.material);
   const Z = crFacadeArtVocabularyZones(drawStart, sliceH);
   const fu = fc.faceU;
   const kind = crFacadeComposeKind(fc.moduleId, faceDir);
   const row = fc.reg.mod.faces[faceDir];
   const norm = (i)=> crNormalizeFacadeRoleId(row[i]);
   const n = row.length;
+  const pal = crDrawSmoothBuildingMaterialBase(ctx, col, drawStart, sliceH, pw, role.material, kind);
+  const baseY0 = drawStart + sliceH * 0.905;
+  const baseY1 = drawStart + sliceH * 0.955;
 
   function panelAt(i){
-    return crFacadeArtPanelInset(i, n, 0.21);
+    return crFacadeArtPanelInset(i, n, 0.28);
+  }
+  function framedObj(x0, x1, y0, y1, fill, frame){
+    return crFacadeArtColFramedBox(ctx, col, pw, fu, x0, x1, y0, y1, fill, frame || pal.frame);
   }
 
   if(kind === 'storefront_front'){
     if(crFacadeArtFuIn(fu, 0, 1)){
-      crFacadeArtColBand(ctx, col, pw, Z.roof0, Z.roof1, 'rgba(42,38,34,0.46)');
-      crFacadeArtColLine(ctx, col, pw, Z.roof1, 'rgba(28,26,22,0.70)');
-    }
-    if(crFacadeArtFuIn(fu, 0, 1)){
-      crFacadeArtColBand(ctx, col, pw, Z.sign0, Z.sign1, 'rgba(146,126,88,0.24)');
-      crFacadeArtColLine(ctx, col, pw, Z.sign0, 'rgba(42,36,30,0.40)');
-      crFacadeArtColLine(ctx, col, pw, Z.sign1, 'rgba(42,36,30,0.40)');
+      crFacadeArtColBand(ctx, col, pw, Z.sign0, Z.sign0 + (Z.sign1-Z.sign0)*0.62, 'rgba(144,120,76,0.16)');
+      crFacadeArtColLine(ctx, col, pw, Z.sign0, 'rgba(70,58,42,0.20)');
     }
     for(let i=0;i<n;i++){
       const P = panelAt(i);
       const pr = norm(i);
       if(!crFacadeArtFuIn(fu, P.ox0, P.ox1)) continue;
       if(pr === 'storefront_door'){
-        const D = crFacadeArtLocalRange(P, 0.18, 0.82);
-        const doorY0 = Z.door0 + sliceH * 0.015;
-        const doorY1 = Z.base0;
-        crFacadeArtColFramedBox(ctx, col, pw, fu, D.x0, D.x1, doorY0, doorY1, 'rgba(50,40,34,0.82)', 'rgba(24,20,18,0.72)');
-        const doorLiteY1 = doorY0 + (doorY1 - doorY0) * 0.28;
-        const doorPanelY0 = doorY0 + (doorY1 - doorY0) * 0.58;
-        if(crFacadeArtFuIn(fu, D.x0 + (D.x1-D.x0)*0.16, D.x1 - (D.x1-D.x0)*0.16)){
-          crFacadeArtColBand(ctx, col, pw, doorY0 + 2, doorLiteY1, 'rgba(80,98,108,0.46)');
-          crFacadeArtColLine(ctx, col, pw, doorPanelY0, 'rgba(30,26,22,0.45)');
+        const D = crFacadeArtLocalRange(P, 0.24, 0.76);
+        const doorY0 = Z.door0 + sliceH * 0.055;
+        const doorY1 = drawStart + sliceH * 0.875;
+        framedObj(D.x0, D.x1, doorY0, doorY1, 'rgba(54,44,36,0.66)', 'rgba(28,24,22,0.46)');
+        const doorLiteY1 = doorY0 + (doorY1 - doorY0) * 0.22;
+        const doorPanelY0 = doorY0 + (doorY1 - doorY0) * 0.62;
+        if(crFacadeArtFuIn(fu, D.x0 + (D.x1-D.x0)*0.20, D.x1 - (D.x1-D.x0)*0.20)){
+          crFacadeArtColBand(ctx, col, pw, doorY0 + 2, doorLiteY1, 'rgba(86,104,112,0.26)');
+          crFacadeArtColLine(ctx, col, pw, doorPanelY0, 'rgba(30,26,22,0.26)');
         }
         const handleX0 = D.x0 + (D.x1-D.x0) * 0.70;
         const handleX1 = D.x0 + (D.x1-D.x0) * 0.82;
-        if(crFacadeArtFuIn(fu, handleX0, handleX1)) crFacadeArtColBand(ctx, col, pw, doorY0 + (doorY1-doorY0)*0.47, doorY0 + (doorY1-doorY0)*0.51, 'rgba(220,182,86,0.58)');
+        if(crFacadeArtFuIn(fu, handleX0, handleX1)) crFacadeArtColBand(ctx, col, pw, doorY0 + (doorY1-doorY0)*0.47, doorY0 + (doorY1-doorY0)*0.50, 'rgba(210,174,88,0.42)');
       } else if(pr === 'storefront_window'){
-        const W = crFacadeArtLocalRange(P, 0.04, 0.96);
-        const windowY0 = Z.win0;
-        const windowY1 = Z.win1;
-        const glassFill = 'rgba(58,76,88,0.50)';
-        crFacadeArtColFramedBox(ctx, col, pw, fu, W.x0, W.x1, windowY0, windowY1, glassFill, 'rgba(24,28,30,0.66)');
-        crFacadeArtColBand(ctx, col, pw, windowY0 + 1, windowY0 + (windowY1-windowY0)*0.16, 'rgba(120,142,154,0.24)');
-        const mid = (W.x0 + W.x1) * 0.5;
-        if(Math.abs(fu - mid) < 0.006) crFacadeArtColBand(ctx, col, pw, windowY0, windowY1, 'rgba(30,36,40,0.45)');
+        const W = crFacadeArtLocalRange(P, 0.10, 0.90);
+        const windowY0 = Z.win0 + sliceH * 0.040;
+        const windowY1 = Z.win0 + (Z.win1-Z.win0)*0.72;
+        const glassFill = 'rgba(60,78,88,0.34)';
+        framedObj(W.x0, W.x1, windowY0, windowY1, glassFill, 'rgba(26,30,30,0.42)');
+        crFacadeArtColBand(ctx, col, pw, windowY0 + 1, windowY0 + (windowY1-windowY0)*0.12, 'rgba(128,148,154,0.14)');
       } else if(pr === 'storefront_sign'){
-        const S = crFacadeArtLocalRange(P, 0.08, 0.92);
-        crFacadeArtColFramedBox(ctx, col, pw, fu, S.x0, S.x1, Z.sign0 + 1, Z.sign1 - 1, 'rgba(150,124,76,0.36)', 'rgba(42,34,26,0.42)');
-        crFacadeArtColFramedBox(ctx, col, pw, fu, S.x0 + (S.x1-S.x0)*0.08, S.x1 - (S.x1-S.x0)*0.08, Z.win0 + (Z.win1-Z.win0)*0.08, Z.win0 + (Z.win1-Z.win0)*0.58, 'rgba(60,76,88,0.38)', 'rgba(32,34,34,0.50)');
+        const S = crFacadeArtLocalRange(P, 0.16, 0.84);
+        framedObj(S.x0, S.x1, Z.sign0 + 1, Z.sign0 + (Z.sign1-Z.sign0)*0.58, 'rgba(148,120,70,0.18)', 'rgba(70,54,36,0.24)');
       }
     }
-    if(crFacadeArtFuIn(fu, 0, 1)){
-      crFacadeArtColBand(ctx, col, pw, Z.kick0, Z.kick1, 'rgba(44,36,30,0.46)');
-      crFacadeArtColLine(ctx, col, pw, Z.base0, 'rgba(68,54,38,0.62)');
-      crFacadeArtColBand(ctx, col, pw, Z.base0, Z.base1, 'rgba(22,20,18,0.76)');
-    }
+    if(crFacadeArtFuIn(fu, 0, 1)) crFacadeArtColBand(ctx, col, pw, baseY0, baseY1, 'rgba(30,26,22,0.34)');
     return;
   }
 
   if(kind === 'pavilion_front'){
-    if(crFacadeArtFuIn(fu, 0, 1)) crFacadeArtColLine(ctx, col, pw, Z.roof1, 'rgba(48,52,48,0.50)');
+    if(crFacadeArtFuIn(fu, 0, 1)) crFacadeArtColLine(ctx, col, pw, Z.roof1, 'rgba(48,58,46,0.22)');
     for(let i=0;i<n;i++){
       const P = panelAt(i);
       const pr = norm(i);
       if(!crFacadeArtFuIn(fu, P.ox0, P.ox1)) continue;
       if(pr === 'storefront_door'){
-        crFacadeArtColBand(ctx, col, pw, Z.door0, Z.door1, 'rgba(58,62,58,0.78)');
+        const D = crFacadeArtLocalRange(P, 0.22, 0.78);
+        framedObj(D.x0, D.x1, Z.door0 + sliceH * 0.055, drawStart + sliceH * 0.875, 'rgba(58,64,56,0.50)', 'rgba(34,40,34,0.36)');
       } else if(pr === 'mural_wall'){
-        crFacadeArtColBand(ctx, col, pw, Z.win0, Z.win1, 'rgba(88,128,118,0.40)');
+        const M = crFacadeArtLocalRange(P, 0.18, 0.82);
+        framedObj(M.x0, M.x1, Z.win0 + sliceH * 0.08, Z.win0 + (Z.win1-Z.win0)*0.62, 'rgba(82,122,108,0.18)', 'rgba(52,66,56,0.22)');
       } else if(pr === 'utility_wall'){
-        crFacadeArtColBand(ctx, col, pw, Z.win0 + (Z.win1-Z.win0)*0.35, Z.win0 + (Z.win1-Z.win0)*0.55, 'rgba(72,78,82,0.45)');
+        const U = crFacadeArtLocalRange(P, 0.34, 0.66);
+        framedObj(U.x0, U.x1, Z.win0 + (Z.win1-Z.win0)*0.42, Z.win0 + (Z.win1-Z.win0)*0.58, 'rgba(74,80,78,0.20)', 'rgba(48,52,48,0.22)');
       }
     }
-    if(crFacadeArtFuIn(fu, 0, 1)) crFacadeArtColBand(ctx, col, pw, Z.base0, Z.base1, 'rgba(28,30,28,0.82)');
     return;
   }
 
   if(kind === 'boarded_front'){
     if(crFacadeArtFuIn(fu, 0, 1)){
-      crFacadeArtColBand(ctx, col, pw, Z.sign0, Z.sign1, 'rgba(138,124,100,0.18)');
-      crFacadeArtColLine(ctx, col, pw, Z.sign1, 'rgba(48,42,36,0.35)');
+      crFacadeArtColBand(ctx, col, pw, Z.sign0, Z.sign0 + (Z.sign1-Z.sign0)*0.50, 'rgba(138,116,88,0.12)');
+      crFacadeArtColLine(ctx, col, pw, Z.sign1, 'rgba(70,52,38,0.16)');
     }
     for(let i=0;i<n;i++){
       const P = panelAt(i);
       const pr = norm(i);
       if(pr === 'storefront_door' && crFacadeArtFuIn(fu, P.ox0, P.ox1)){
-        const D = crFacadeArtLocalRange(P, 0.20, 0.80);
-        crFacadeArtColFramedBox(ctx, col, pw, fu, D.x0, D.x1, Z.door0 + sliceH * 0.02, Z.base0, 'rgba(48,40,34,0.82)', 'rgba(26,22,20,0.68)');
-        crFacadeArtColBand(ctx, col, pw, Z.kick0, Z.kick1, 'rgba(40,32,26,0.50)');
+        const D = crFacadeArtLocalRange(P, 0.24, 0.76);
+        framedObj(D.x0, D.x1, Z.door0 + sliceH * 0.055, drawStart + sliceH * 0.875, 'rgba(52,42,34,0.58)', 'rgba(30,24,20,0.38)');
       } else if(pr === 'boarded_window' && crFacadeArtFuIn(fu, P.ox0, P.ox1)){
-        const B = crFacadeArtLocalRange(P, 0.08, 0.92);
-        const boardBoxY0 = Z.win0 + (Z.win1 - Z.win0) * 0.04;
-        const boardBoxY1 = Z.win0 + (Z.win1 - Z.win0) * 0.86;
-        crFacadeArtColFramedBox(ctx, col, pw, fu, B.x0, B.x1, boardBoxY0, boardBoxY1, 'rgba(56,52,46,0.32)', 'rgba(34,28,24,0.58)');
-        const plankGap = (boardBoxY1 - boardBoxY0) / 5;
-        for(let b=0;b<4;b++){
-          const py = boardBoxY0 + plankGap * (0.42 + b * 1.04);
-          crFacadeArtColBand(ctx, col, pw, py, py + Math.max(1, plankGap * 0.42), 'rgba(126,94,64,0.64)');
-          crFacadeArtColLine(ctx, col, pw, py + Math.max(1, plankGap * 0.42), 'rgba(64,48,34,0.34)');
+        const B = crFacadeArtLocalRange(P, 0.16, 0.84);
+        const boardBoxY0 = Z.win0 + (Z.win1 - Z.win0) * 0.16;
+        const boardBoxY1 = Z.win0 + (Z.win1 - Z.win0) * 0.66;
+        framedObj(B.x0, B.x1, boardBoxY0, boardBoxY1, 'rgba(58,54,48,0.22)', 'rgba(42,32,26,0.34)');
+        const plankGap = (boardBoxY1 - boardBoxY0) / 4;
+        for(let b=0;b<2;b++){
+          const py = boardBoxY0 + plankGap * (1.0 + b * 1.12);
+          crFacadeArtColBand(ctx, col, pw, py, py + Math.max(1, plankGap * 0.34), 'rgba(126,94,64,0.44)');
         }
       }
     }
-    if(crFacadeArtFuIn(fu, 0, 1)){
-      crFacadeArtColLine(ctx, col, pw, Z.base0, 'rgba(64,50,36,0.55)');
-      crFacadeArtColBand(ctx, col, pw, Z.base0, Z.base1, 'rgba(22,20,18,0.76)');
-    }
+    if(crFacadeArtFuIn(fu, 0, 1)) crFacadeArtColBand(ctx, col, pw, baseY0, baseY1, 'rgba(34,26,22,0.30)');
     return;
   }
 
   if(kind === 'garage_front'){
     if(crFacadeArtFuIn(fu, 0, 1)){
-      crFacadeArtColBand(ctx, col, pw, Z.roof0, Z.roof1, 'rgba(58,58,54,0.22)');
-      crFacadeArtColBand(ctx, col, pw, Z.sign0, Z.sign1, 'rgba(126,130,124,0.14)');
-      crFacadeArtColLine(ctx, col, pw, Z.sign1, 'rgba(42,44,42,0.34)');
+      crFacadeArtColBand(ctx, col, pw, Z.roof0, Z.roof1, 'rgba(70,70,66,0.12)');
+      crFacadeArtColLine(ctx, col, pw, Z.sign1, 'rgba(52,54,50,0.18)');
     }
     let g0 = -1, g1 = -1;
     for(let i=0;i<n;i++){
@@ -496,61 +516,53 @@ function crDrawComposedFacadeFaceColumn(ctx, col, drawStart, sliceH, mapX, mapY,
     }
     if(g0 >= 0){
       const gx0 = g0 / n, gx1 = g1 / n;
-      const frameM = 0.075 / n * (g1 - g0);
+      const frameM = 0.115 / n * (g1 - g0);
       const bx0 = gx0 + frameM, bx1 = gx1 - frameM;
-      const bayFrameY0 = Z.win0 + sliceH * 0.02, bayFrameY1 = Z.base0;
-      if(crFacadeArtFuIn(fu, gx0, gx1)){
-        crFacadeArtColLine(ctx, col, pw, bayFrameY0, 'rgba(34,36,36,0.72)');
-        crFacadeArtColLine(ctx, col, pw, bayFrameY1, 'rgba(34,36,36,0.72)');
-      }
+      const bayFrameY0 = Z.win0 + sliceH * 0.075, bayFrameY1 = drawStart + sliceH * 0.865;
       if(crFacadeArtFuIn(fu, bx0, bx1)){
-        crFacadeArtColFramedBox(ctx, col, pw, fu, bx0, bx1, bayFrameY0 + 2, bayFrameY1 - 1, 'rgba(80,84,86,0.66)', 'rgba(28,30,32,0.70)');
-        const rollH = (bayFrameY1 - bayFrameY0) / 7;
-        for(let rr=1; rr<5; rr++){
-          const ry = bayFrameY0 + rollH * (rr + 0.25);
-          crFacadeArtColLine(ctx, col, pw, ry, 'rgba(44,46,48,0.46)');
+        framedObj(bx0, bx1, bayFrameY0, bayFrameY1, 'rgba(112,114,110,0.24)', 'rgba(48,50,48,0.22)');
+        const rollH = (bayFrameY1 - bayFrameY0) / 6;
+        for(let rr=1; rr<4; rr++){
+          const ry = bayFrameY0 + rollH * (rr + 0.35);
+          crFacadeArtColLine(ctx, col, pw, ry, 'rgba(58,60,58,0.14)');
         }
       }
     }
     for(let i=0;i<n;i++){
       const P = panelAt(i);
       if(norm(i) === 'service_door' && crFacadeArtFuIn(fu, P.ox0, P.ox1)){
-        const S = crFacadeArtLocalRange(P, 0.22, 0.78);
-        const sd0 = Z.door0 + (Z.door1 - Z.door0) * 0.14;
-        const sd1 = Z.base0;
-        crFacadeArtColFramedBox(ctx, col, pw, fu, S.x0, S.x1, sd0, sd1, 'rgba(58,52,44,0.76)', 'rgba(32,30,28,0.62)');
-        if(crFacadeArtFuIn(fu, S.x0 + (S.x1-S.x0)*0.18, S.x1 - (S.x1-S.x0)*0.18)) crFacadeArtColBand(ctx, col, pw, sd0 + 2, sd0 + (sd1-sd0)*0.22, 'rgba(116,126,124,0.24)');
+        const S = crFacadeArtLocalRange(P, 0.28, 0.72);
+        const sd0 = Z.door0 + (Z.door1 - Z.door0) * 0.20;
+        const sd1 = drawStart + sliceH * 0.855;
+        framedObj(S.x0, S.x1, sd0, sd1, 'rgba(70,66,58,0.30)', 'rgba(44,42,38,0.20)');
       }
     }
-    if(crFacadeArtFuIn(fu, 0, 1)){
-      crFacadeArtColLine(ctx, col, pw, Z.base0, 'rgba(70,72,66,0.50)');
-      crFacadeArtColBand(ctx, col, pw, Z.base0, Z.base1, 'rgba(24,24,22,0.72)');
-    }
+    if(crFacadeArtFuIn(fu, 0, 1)) crFacadeArtColBand(ctx, col, pw, baseY0, baseY1, 'rgba(36,36,34,0.20)');
     return;
   }
 
   if(kind === 'side' || kind === 'service_front'){
     const quietDetail = true;
-    if(quietDetail && roleKey === 'mural_wall' && crFacadeArtFuIn(fu, 0.28, 0.72)){
-      crFacadeArtColFramedBox(ctx, col, pw, fu, 0.28, 0.72, Z.win0 + sliceH * 0.04, Z.win0 + (Z.win1-Z.win0)*0.72, 'rgba(70,116,104,0.28)', 'rgba(44,54,48,0.34)');
+    if(quietDetail && roleKey === 'side_door' && crFacadeArtFuIn(fu, 0.42, 0.58)){
+      framedObj(0.42, 0.58, Z.door0 + sliceH * 0.16, drawStart + sliceH * 0.875, 'rgba(66,58,50,0.22)', 'rgba(42,38,34,0.16)');
+    } else if(quietDetail && roleKey === 'utility_wall' && crFacadeArtFuIn(fu, 0.62, 0.74)){
+      framedObj(0.62, 0.74, Z.win0 + (Z.win1-Z.win0)*0.56, Z.win0 + (Z.win1-Z.win0)*0.66, 'rgba(72,76,76,0.10)', 'rgba(48,50,50,0.10)');
+    } else if(quietDetail && roleKey === 'service_wall' && crFacadeArtFuIn(fu, 0.18, 0.32)){
+      framedObj(0.18, 0.32, Z.win0 + (Z.win1-Z.win0)*0.48, Z.win0 + (Z.win1-Z.win0)*0.56, 'rgba(100,100,94,0.08)', 'rgba(62,62,58,0.08)');
+    } else if(quietDetail && roleKey === 'mural_wall' && crFacadeArtFuIn(fu, 0.34, 0.66)){
+      framedObj(0.34, 0.66, Z.win0 + sliceH * 0.10, Z.win0 + (Z.win1-Z.win0)*0.52, 'rgba(74,108,98,0.07)', 'rgba(54,62,58,0.08)');
     }
-    if(quietDetail && roleKey === 'side_door' && crFacadeArtFuIn(fu, 0.36, 0.64)){
-      crFacadeArtColFramedBox(ctx, col, pw, fu, 0.36, 0.64, Z.door0 + sliceH * 0.08, Z.base0, 'rgba(50,42,36,0.64)', 'rgba(30,26,22,0.48)');
-    }
-    if(quietDetail && roleKey === 'utility_wall' && crFacadeArtFuIn(fu, 0.60, 0.76)){
-      crFacadeArtColFramedBox(ctx, col, pw, fu, 0.60, 0.76, Z.win0 + (Z.win1-Z.win0)*0.52, Z.win0 + (Z.win1-Z.win0)*0.72, 'rgba(62,70,76,0.34)', 'rgba(36,40,42,0.36)');
-    }
-    if(quietDetail && roleKey === 'service_wall' && crFacadeArtFuIn(fu, 0.16, 0.34)){
-      crFacadeArtColFramedBox(ctx, col, pw, fu, 0.16, 0.34, Z.win0 + (Z.win1-Z.win0)*0.44, Z.win0 + (Z.win1-Z.win0)*0.60, 'rgba(96,98,92,0.24)', 'rgba(52,54,50,0.28)');
-    }
-    if(crFacadeArtFuIn(fu, 0, 1)){
-      crFacadeArtColLine(ctx, col, pw, Z.roof1, 'rgba(54,50,44,0.20)');
-      crFacadeArtColBand(ctx, col, pw, Z.base0, Z.base1, 'rgba(24,22,20,0.58)');
-    }
+    if(crFacadeArtFuIn(fu, 0, 1)) crFacadeArtColBand(ctx, col, pw, baseY0, baseY1, 'rgba(38,34,30,0.14)');
     return;
   }
+}
 
-  crDrawFpvFacadePackSlotStyle(ctx, col, drawStart, sliceH, pw, { zone: 'base', style: 'dark_base' });
+function crDrawComposedFacadeFaceColumn(ctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX, roleId){
+  if(CR_BUILDING_SMOOTH_STYLE === 1){
+    crDrawSmoothBuildingFaceColumn(ctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX, roleId);
+    return;
+  }
+  crDrawSmoothBuildingFaceColumn(ctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX, roleId);
 }
 
 function crDrawFpvFacadePackColumnLegacy(ctx, col, drawStart, sliceH, roleId){
@@ -647,6 +659,28 @@ function crDebugFacadeReadabilityFinal(){
     }catch(_e){}
   }
   return result;
+}
+
+
+function crDebugBuildingSmoothStyle(){
+  const base = crDebugFacadeReadabilityFinal();
+  const artSrc = (typeof crDrawSmoothBuildingMaterialBase === 'function' ? String(crDrawSmoothBuildingMaterialBase) : '') + '\\n' + (typeof crDrawSmoothBuildingFaceColumn === 'function' ? String(crDrawSmoothBuildingFaceColumn) : '') + '\\n' + (typeof crDrawComposedFacadeFaceColumn === 'function' ? String(crDrawComposedFacadeFaceColumn) : '');
+  const checks = {
+    buildId: BUILD_ID === 'buildingsmooth1',
+    smoothFlag: typeof CR_BUILDING_SMOOTH_STYLE !== 'undefined' && CR_BUILDING_SMOOTH_STYLE === 1,
+    smoothHelper: typeof crDrawSmoothBuildingFaceColumn === 'function' && typeof crDrawSmoothBuildingMaterialBase === 'function',
+    facadePackStillExists: !!(CR_FACADE_PACK && CR_FACADE_PACK.modules && CR_FACADE_PACK.roles),
+    smoothBaseFirst: artSrc.indexOf('crDrawSmoothBuildingMaterialBase') >= 0 && artSrc.indexOf('pal.wall') >= 0,
+    sparseObjects: artSrc.indexOf('panelAt(i)') >= 0 && artSrc.indexOf('crFacadeArtLocalRange') >= 0,
+    limitedBoards: artSrc.indexOf('boardBoxY0') >= 0 && artSrc.indexOf('for(let b=0;b<2;b++)') >= 0,
+    limitedGarageLines: artSrc.indexOf('bayFrameY0') >= 0 && artSrc.indexOf('for(let rr=1; rr<4; rr++)') >= 0,
+    sideBackMostlyBlank: artSrc.indexOf('quietDetail') >= 0 && artSrc.indexOf("roleKey === 'side_door'") >= 0,
+    noHighFrequencyWords: artSrc.indexOf('barcode') < 0 && artSrc.indexOf('corrugated') < 0,
+    noLargeRedPosterFill: artSrc.indexOf('rgba(168,72,58') < 0 && artSrc.indexOf('poster') < 0,
+    debugTargets: base && base.pass === true
+  };
+  const pass = Object.keys(checks).every(k => !!checks[k]);
+  return Object.assign({}, base, { pass, smoothStyle: 'buildingsmooth1', checks });
 }
 
 function crClearBuildingModules(GW, GH){

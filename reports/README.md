@@ -1,7 +1,7 @@
 # Reports — SNC Can Run
 
 Main hub for guard cards, reference studies, history, proofs, and backups.  
-**Gameplay baseline:** `facadefinal1` — see **`../PROJECT_STATUS.md`**. **Source:** edit `src/`, run `npm run build`.
+**Gameplay baseline:** `buildingsmooth1` — see **`../PROJECT_STATUS.md`**. **Source:** edit `src/`, run `npm run build`.
 
 Reports were moved out of the repo root so GitHub shows only the game + core docs.
 
@@ -47,6 +47,7 @@ Reports were moved out of the repo root so GitHub shows only the game + core doc
 | 35 | Facade composition / readability | [guards/FACADE_COMPOSITION_READABILITY_REPORT.md](guards/FACADE_COMPOSITION_READABILITY_REPORT.md) | `facadecompose1` | `crDrawComposedFacadeFaceColumn` + `proof-facadecompose-*.png` |
 | 40 | FPV ground plane / wall base alignment | [guards/FPV_GROUND_PLANE_ALIGNMENT_REPORT.md](guards/FPV_GROUND_PLANE_ALIGNMENT_REPORT.md) | `groundplane1` | `CR.runFpvGroundPlaneAlignmentSelfCheck` + `proof-groundplane-*.png/json` |
 | 41 | D2/D3 facade readability final polish | [guards/D2_D3_FACADE_READABILITY_FINAL_POLISH_REPORT.md](guards/D2_D3_FACADE_READABILITY_FINAL_POLISH_REPORT.md) | `facadefinal1` | `CR.runD2D3FacadeReadabilityFinalSelfCheck` + `proof-facadefinal-*.png/json` | Yes (facade art/readability only) |
+| 42 | Building visual reset / smooth wall style | [guards/BUILDING_VISUAL_RESET_SMOOTH_WALL_STYLE_REPORT.md](guards/BUILDING_VISUAL_RESET_SMOOTH_WALL_STYLE_REPORT.md) | `buildingsmooth1` | `CR.runBuildingSmoothStyleSelfCheck` + `proof-buildingsmooth-*.png/json` | Yes (building wall art only) |
 | 39 | Source split / single-file build pipeline | [guards/SOURCE_SPLIT_BUILD_PIPELINE_REPORT.md](guards/SOURCE_SPLIT_BUILD_PIPELINE_REPORT.md) | `spriteground1` | `npm run build:check` + `proof-source-build-manifest.json` |
 | 38 | Sprite ground anchor / human scale | [guards/SPRITE_GROUND_ANCHOR_HUMAN_SCALE_REPORT.md](guards/SPRITE_GROUND_ANCHOR_HUMAN_SCALE_REPORT.md) | `spriteground1` | Foot anchor + `CR.runSpriteGroundAnchorSelfCheck` + `proof-spriteground-*.png` |
 | 37 | Facade art vocabulary / human scale | [guards/FACADE_ART_VOCABULARY_HUMAN_SCALE_REPORT.md](guards/FACADE_ART_VOCABULARY_HUMAN_SCALE_REPORT.md) | `facadeart1` | Inset slot drawing + `CR.runFacadeArtVocabularySelfCheck` + `proof-facadeart-*.png` |

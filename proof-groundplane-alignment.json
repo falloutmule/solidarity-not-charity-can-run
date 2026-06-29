@@ -1,6 +1,6 @@
 {
   "pass": true,
-  "build": "facadefinal1",
+  "build": "buildingsmooth1",
   "errors": [],
   "warnings": [],
   "checks": {
@@ -45,7 +45,7 @@
   },
   "evidence": {
     "groundPlaneDebug": {
-      "BUILD_ID": "facadefinal1",
+      "BUILD_ID": "buildingsmooth1",
       "pass": true,
       "records": [
         {
@@ -114,7 +114,7 @@
       ]
     },
     "spriteHalo": {
-      "BUILD_ID": "facadefinal1",
+      "BUILD_ID": "buildingsmooth1",
       "policy": "walls own distance fog; billboards drawImage only — no post-loop sprite fog fillRect",
       "forbiddenPatternsAbsent": true,
       "forbiddenHits": [],
@@ -124,7 +124,7 @@
       "regressionCommentMarker": "SPRITE HALO REGRESSION GUARD"
     },
     "zbuffer": {
-      "BUILD_ID": "facadefinal1",
+      "BUILD_ID": "buildingsmooth1",
       "renderWidth": 320,
       "zbufferLength": 320,
       "zbufferMatchesRenderWidth": true,

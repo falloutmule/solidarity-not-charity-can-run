@@ -2,11 +2,11 @@
 
 SNC Can Run uses **in-browser self-checks** (`window.CR`) plus a **Playwright** driver that loads root **`index.html`** and collects proofs.
 
-**Gameplay baseline:** `BUILD_ID` `groundplane1` — see `PROJECT_STATUS.md`. **Build:** `npm run build` / `build:check` (see `src/README.md`).
+**Gameplay baseline:** `BUILD_ID` `buildingsmooth1` — see `PROJECT_STATUS.md`. **Build:** `npm run build` / `build:check` (see `src/README.md`).
 
 ## In-browser (`window.CR`)
 
-- Functions like `CR.runLayoutSelfCheck()`, `CR.runFullSelfCheck()`, `CR.runFpvGroundPlaneAlignmentSelfCheck()`, `CR.crDebugGroundPlaneAlignment()`, `CR.runSpriteGroundAnchorSelfCheck()`, `CR.crDebugSpriteProjection()`, `CR.runFacadeArtVocabularySelfCheck()`, `CR.runFacadeCompositionReadabilitySelfCheck()`, `CR.runFacadePackV2SafeModuleSelfCheck()`, `CR.runFacadePackBridgeSelfCheck()`, `CR.runBuildingModuleFacadeSelfCheck()`, `CR.runStreetReadabilityMinimapSelfCheck()`, `CR.runBuildingScalePolishSelfCheck()`, `CR.runLevelSelectorSelfCheck()`, `CR.runEarlyDistrictProgressionSelfCheck()`, `CR.runStreetBlockLevelSelfCheck()`, `CR.runD1ParkLandmarkSelfCheck()`, `CR.runOnboardingSelfCheck()`, `CR.runSoundFeedbackSelfCheck()`, `CR.runVisualReadabilitySelfCheck()`, `CR.runVisualRectangleRegressionSelfCheck()`, `CR.runDecorativePropsSelfCheck()`, `CR.runOptionsCleanupSelfCheck()`, `CR.runHallSelfCheck()`, etc.
+- Functions like `CR.runLayoutSelfCheck()`, `CR.runFullSelfCheck()`, `CR.runBuildingSmoothStyleSelfCheck()`, `CR.crDebugBuildingSmoothStyle()`, `CR.runFpvGroundPlaneAlignmentSelfCheck()`, `CR.crDebugGroundPlaneAlignment()`, `CR.runSpriteGroundAnchorSelfCheck()`, `CR.crDebugSpriteProjection()`, `CR.runFacadeArtVocabularySelfCheck()`, `CR.runFacadeCompositionReadabilitySelfCheck()`, `CR.runFacadePackV2SafeModuleSelfCheck()`, `CR.runFacadePackBridgeSelfCheck()`, `CR.runBuildingModuleFacadeSelfCheck()`, `CR.runStreetReadabilityMinimapSelfCheck()`, `CR.runBuildingScalePolishSelfCheck()`, `CR.runLevelSelectorSelfCheck()`, `CR.runEarlyDistrictProgressionSelfCheck()`, `CR.runStreetBlockLevelSelfCheck()`, `CR.runD1ParkLandmarkSelfCheck()`, `CR.runOnboardingSelfCheck()`, `CR.runSoundFeedbackSelfCheck()`, `CR.runVisualReadabilitySelfCheck()`, `CR.runVisualRectangleRegressionSelfCheck()`, `CR.runDecorativePropsSelfCheck()`, `CR.runOptionsCleanupSelfCheck()`, `CR.runHallSelfCheck()`, etc.
 - URL: `?selfcheck=1` runs full check and shows PASS/FAIL overlay.
 - **`crWithTemporaryState`** — snapshots public state + `localStorage`, runs harness, restores so benchmarks do not leak.
 - **`__crRuntimeErrors`** — uncaught errors fail runtime-clean checks.
@@ -66,6 +66,8 @@ SNC Can Run uses **in-browser self-checks** (`window.CR`) plus a **Playwright** 
 | `proof-groundplane-d2-npc-storefront.png` … `proof-groundplane-minimap-preserved.png` | D2/D3/D1 ground contact and minimap proofs |
 | `proof-facadefinal-readability.json` / `proof-facadefinal-debug.json` | D2/D3 facade readability final polish |
 | `proof-facadefinal-d2-storefront.png` … `proof-facadefinal-minimap-preserved.png` | Final D2 storefront, D2 boarded shop, D3 garage/service, D3 side/back, D1, groundplane, and minimap proof shots |
+| `proof-buildingsmooth-style.json` / `proof-buildingsmooth-debug.json` | Building visual reset / smooth wall style |
+| `proof-buildingsmooth-d2-road-view.png` … `proof-buildingsmooth-minimap-preserved.png` | Smooth D2 road/close wall, D2 storefront/boarded, D3 garage/side, D1, groundplane, and minimap proof shots |
 | `proof-sprite-ground-anchor.json` | Sprite ground anchor self-check |
 | `proof-facade-art-vocabulary.json` | Facade art vocabulary self-check |
 | `proof-facade-composition-readability.json` | Facade composition self-check |

@@ -1,9 +1,9 @@
 {
   "pass": true,
-  "build": "facadefinal1",
+  "build": "buildingsmooth1",
   "decorativeProps": {
     "pass": true,
-    "build": "facadefinal1",
+    "build": "buildingsmooth1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -47,5 +47,5 @@
     "proof-decorative-props-world.png",
     "proof-decorative-props-closeup.png"
   ],
-  "timestamp": "2026-06-29T01:34:01.646Z"
+  "timestamp": "2026-06-29T02:41:09.718Z"
 }

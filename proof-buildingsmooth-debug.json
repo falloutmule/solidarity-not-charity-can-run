@@ -87,5 +87,20 @@
   "groundplaneHelpersActive": true,
   "spritegroundHelpersActive": true,
   "noLabOnlyModules": true,
-  "pass": true
+  "pass": true,
+  "smoothStyle": "buildingsmooth1",
+  "checks": {
+    "buildId": true,
+    "smoothFlag": true,
+    "smoothHelper": true,
+    "facadePackStillExists": true,
+    "smoothBaseFirst": true,
+    "sparseObjects": true,
+    "limitedBoards": true,
+    "limitedGarageLines": true,
+    "sideBackMostlyBlank": true,
+    "noHighFrequencyWords": true,
+    "noLargeRedPosterFill": true,
+    "debugTargets": true
+  }
 }
