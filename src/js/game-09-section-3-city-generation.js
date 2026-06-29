@@ -380,6 +380,179 @@ function crSmoothWallPalette(materialKey, kind){
   }
   return { wall:'rgba(138,102,78,0.78)', top:'rgba(88,62,46,0.14)', base:'rgba(42,30,24,0.26)', line:'rgba(78,54,40,0.18)', frame:'rgba(54,38,30,0.32)' };
 }
+let CR_FACADE_TEXTURES = null;
+const CR_FACADE_TEXTURE_MAPPING = {
+  storefront_4x2: { south: 'storefront_4x2_south', north: 'service_back', east: 'blank_side', west: 'blank_side' },
+  storefront_3x2: { south: 'storefront_3x2_south', north: 'service_back', east: 'blank_side', west: 'blank_side' },
+  boarded_shop_3x2: { south: 'boarded_shop_3x2_south', north: 'service_back', east: 'blank_side', west: 'blank_side' },
+  garage_service_4x2: { south: 'garage_service_4x2_south', north: 'service_back', east: 'blank_side', west: 'blank_side' },
+  blank_service_block: { south: 'service_back', north: 'service_back', east: 'blank_side', west: 'blank_side' },
+  restroom_pavilion: { south: 'pavilion_front', north: 'pavilion_front', east: 'blank_side', west: 'blank_side' }
+};
+
+function crFacadeTextureCanvas(key, w, h){
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  c._crFacadeTextureKey = key;
+  const x = c.getContext('2d');
+  x.imageSmoothingEnabled = false;
+  return { canvas: c, ctx: x };
+}
+function crFacadeTextureRect(ctx, x, y, w, h, fill, stroke){
+  ctx.fillStyle = fill;
+  ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
+  if(stroke){
+    ctx.strokeStyle = stroke;
+    ctx.lineWidth = 1;
+    ctx.strokeRect(Math.round(x) + 0.5, Math.round(y) + 0.5, Math.max(1, Math.round(w)) - 1, Math.max(1, Math.round(h)) - 1);
+  }
+}
+function crFacadeTextureBase(ctx, w, h, pal){
+  ctx.fillStyle = pal.wall;
+  ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = pal.top;
+  ctx.fillRect(0, Math.round(h * 0.035), w, Math.max(3, Math.round(h * 0.045)));
+  ctx.fillStyle = pal.line;
+  ctx.fillRect(0, Math.round(h * 0.105), w, 1);
+  ctx.fillRect(0, Math.round(h * 0.875), w, 1);
+  ctx.fillStyle = pal.base;
+  ctx.fillRect(0, Math.round(h * 0.905), w, Math.max(5, Math.round(h * 0.055)));
+  ctx.fillStyle = pal.mottle || 'rgba(255,255,255,0.035)';
+  for(let i=0;i<5;i++){
+    const y = Math.round(h * (0.18 + i * 0.135));
+    ctx.fillRect((i * 37) % Math.max(1, w - 36), y, Math.min(72, w), 1);
+  }
+}
+function crPaintStorefrontFacadeTexture(key, cellCount){
+  const w = cellCount === 4 ? 256 : 240;
+  const h = 128;
+  const o = crFacadeTextureCanvas(key, w, h);
+  const ctx = o.ctx;
+  crFacadeTextureBase(ctx, w, h, { wall:'#8f7058', top:'rgba(68,50,38,0.16)', base:'rgba(34,26,21,0.30)', line:'rgba(66,50,38,0.22)', mottle:'rgba(245,220,180,0.035)' });
+  crFacadeTextureRect(ctx, 12, 15, w - 24, 17, 'rgba(143,112,66,0.28)', 'rgba(72,56,38,0.18)');
+  const roles = cellCount === 4 ? ['storefront_window','storefront_door','storefront_window','storefront_sign'] : ['storefront_window','storefront_door','storefront_sign'];
+  const cw = w / roles.length;
+  for(let i=0;i<roles.length;i++){
+    const role = roles[i];
+    const x0 = i * cw;
+    if(role === 'storefront_window'){
+      const bx = x0 + cw * 0.22, by = 48, bw = cw * 0.56, bh = 33;
+      crFacadeTextureRect(ctx, bx, by, bw, bh, 'rgba(58,78,88,0.44)', 'rgba(30,34,34,0.38)');
+      ctx.fillStyle = 'rgba(150,170,166,0.13)';
+      ctx.fillRect(Math.round(bx + 3), Math.round(by + 3), Math.round(bw - 6), 3);
+    } else if(role === 'storefront_door'){
+      const dx = x0 + cw * 0.30, dy = 39, dw = cw * 0.40, dh = 73;
+      crFacadeTextureRect(ctx, dx, dy, dw, dh, 'rgba(50,42,35,0.72)', 'rgba(26,23,20,0.42)');
+      crFacadeTextureRect(ctx, dx + dw * 0.18, dy + 7, dw * 0.64, 20, 'rgba(70,92,98,0.30)', null);
+      ctx.fillStyle = 'rgba(218,176,86,0.46)';
+      ctx.fillRect(Math.round(dx + dw * 0.72), Math.round(dy + dh * 0.50), 2, 2);
+    } else if(role === 'storefront_sign'){
+      crFacadeTextureRect(ctx, x0 + cw * 0.24, 18, cw * 0.52, 11, 'rgba(156,124,72,0.28)', 'rgba(82,64,42,0.20)');
+      crFacadeTextureRect(ctx, x0 + cw * 0.28, 54, cw * 0.44, 24, 'rgba(74,86,84,0.20)', 'rgba(44,46,42,0.22)');
+    }
+  }
+  return o.canvas;
+}
+function crPaintBoardedShopTexture(){
+  const w = 240, h = 128;
+  const o = crFacadeTextureCanvas('boarded_shop_3x2_south', w, h);
+  const ctx = o.ctx;
+  crFacadeTextureBase(ctx, w, h, { wall:'#8b705b', top:'rgba(74,54,40,0.14)', base:'rgba(40,30,24,0.30)', line:'rgba(72,52,38,0.18)', mottle:'rgba(240,210,170,0.030)' });
+  crFacadeTextureRect(ctx, w * 0.34, 16, w * 0.32, 13, 'rgba(135,106,76,0.11)', 'rgba(68,50,36,0.08)');
+  const cw = w / 3;
+  for(let i=0;i<3;i++){
+    const x0 = i * cw;
+    if(i === 1){
+      crFacadeTextureRect(ctx, x0 + cw * 0.30, 40, cw * 0.40, 72, 'rgba(54,44,36,0.66)', 'rgba(30,24,20,0.38)');
+    } else {
+      const bx = x0 + cw * 0.19, by = 53, bw = cw * 0.62, bh = 35;
+      crFacadeTextureRect(ctx, bx, by, bw, bh, 'rgba(62,54,46,0.24)', 'rgba(42,32,26,0.30)');
+      for(let b=0;b<3;b++){
+        ctx.fillStyle = b === 1 ? 'rgba(124,92,64,0.52)' : 'rgba(112,80,56,0.46)';
+        ctx.fillRect(Math.round(bx + 3), Math.round(by + 6 + b * 10), Math.round(bw - 6), 5);
+      }
+    }
+  }
+  return o.canvas;
+}
+function crPaintGarageServiceTexture(){
+  const w = 256, h = 128;
+  const o = crFacadeTextureCanvas('garage_service_4x2_south', w, h);
+  const ctx = o.ctx;
+  crFacadeTextureBase(ctx, w, h, { wall:'#8f9189', top:'rgba(78,80,76,0.14)', base:'rgba(38,38,36,0.26)', line:'rgba(58,60,56,0.20)', mottle:'rgba(230,230,220,0.030)' });
+  crFacadeTextureRect(ctx, 19, 43, 110, 65, 'rgba(104,106,102,0.34)', 'rgba(46,48,46,0.24)');
+  ctx.fillStyle = 'rgba(60,62,60,0.16)';
+  for(let y=53;y<98;y+=11) ctx.fillRect(25, y, 98, 1);
+  crFacadeTextureRect(ctx, 162, 47, 32, 61, 'rgba(70,66,58,0.34)', 'rgba(44,42,38,0.22)');
+  ctx.fillStyle = 'rgba(220,198,128,0.28)';
+  ctx.fillRect(184, 78, 3, 3);
+  crFacadeTextureRect(ctx, 213, 67, 17, 15, 'rgba(68,76,78,0.16)', 'rgba(48,52,52,0.12)');
+  return o.canvas;
+}
+function crPaintQuietWallTexture(key, wall, accent){
+  const w = 128, h = 128;
+  const o = crFacadeTextureCanvas(key, w, h);
+  const ctx = o.ctx;
+  crFacadeTextureBase(ctx, w, h, { wall, top:'rgba(70,62,52,0.10)', base:'rgba(38,32,28,0.18)', line:'rgba(60,52,44,0.12)', mottle:'rgba(245,230,210,0.025)' });
+  if(key === 'service_back'){
+    crFacadeTextureRect(ctx, 25, 66, 16, 12, accent, 'rgba(44,44,40,0.10)');
+    crFacadeTextureRect(ctx, 88, 48, 9, 34, 'rgba(66,58,50,0.18)', 'rgba(44,38,34,0.12)');
+  } else {
+    crFacadeTextureRect(ctx, 76, 58, 18, 9, accent, 'rgba(44,44,40,0.08)');
+  }
+  return o.canvas;
+}
+function crPaintPavilionTexture(){
+  const w = 320, h = 128;
+  const o = crFacadeTextureCanvas('pavilion_front', w, h);
+  const ctx = o.ctx;
+  crFacadeTextureBase(ctx, w, h, { wall:'#96927e', top:'rgba(58,72,54,0.18)', base:'rgba(38,44,34,0.25)', line:'rgba(58,66,52,0.18)', mottle:'rgba(230,232,204,0.030)' });
+  crFacadeTextureRect(ctx, 20, 18, w - 40, 13, 'rgba(70,88,62,0.18)', 'rgba(46,58,42,0.14)');
+  crFacadeTextureRect(ctx, 82, 44, 35, 68, 'rgba(62,68,58,0.48)', 'rgba(34,40,34,0.26)');
+  crFacadeTextureRect(ctx, 135, 44, 35, 68, 'rgba(62,68,58,0.48)', 'rgba(34,40,34,0.26)');
+  crFacadeTextureRect(ctx, 222, 58, 42, 23, 'rgba(82,122,108,0.13)', 'rgba(52,66,56,0.12)');
+  return o.canvas;
+}
+function crBuildFacadeTextureAtlas(){
+  if(CR_FACADE_TEXTURES) return CR_FACADE_TEXTURES;
+  const store = {};
+  store.storefront_4x2_south = crPaintStorefrontFacadeTexture('storefront_4x2_south', 4);
+  store.storefront_3x2_south = crPaintStorefrontFacadeTexture('storefront_3x2_south', 3);
+  store.boarded_shop_3x2_south = crPaintBoardedShopTexture();
+  store.garage_service_4x2_south = crPaintGarageServiceTexture();
+  store.blank_side = crPaintQuietWallTexture('blank_side', '#97907f', 'rgba(72,76,74,0.12)');
+  store.service_back = crPaintQuietWallTexture('service_back', '#928a7a', 'rgba(82,86,82,0.14)');
+  store.pavilion_front = crPaintPavilionTexture();
+  store.fallback_smooth_wall = crPaintQuietWallTexture('fallback_smooth_wall', '#9b907c', 'rgba(82,86,82,0.10)');
+  CR_FACADE_TEXTURES = store;
+  return CR_FACADE_TEXTURES;
+}
+function crFacadeTextureKeyForFace(moduleId, faceDir, roleId){
+  const role = crNormalizeFacadeRoleId(roleId || '');
+  if(moduleId === 'restroom_pavilion' && (faceDir === 'south' || faceDir === 'north')) return 'pavilion_front';
+  if(role === 'storefront_window' || role === 'storefront_door' || role === 'storefront_sign'){
+    return moduleId === 'storefront_3x2' ? 'storefront_3x2_south' : 'storefront_4x2_south';
+  }
+  if(role === 'boarded_window') return 'boarded_shop_3x2_south';
+  if(role === 'garage_bay' || (moduleId === 'garage_service_4x2' && (role === 'service_door' || role === 'utility_wall') && (faceDir === 'south' || faceDir === 'north'))) return 'garage_service_4x2_south';
+  const map = CR_FACADE_TEXTURE_MAPPING[moduleId] || null;
+  return (map && map[faceDir]) || (faceDir === 'east' || faceDir === 'west' ? 'blank_side' : 'service_back');
+}
+function crGetFacadeTextureForFace(moduleId, faceDir, roleId){
+  const atlas = crBuildFacadeTextureAtlas();
+  const key = crFacadeTextureKeyForFace(moduleId, faceDir, roleId);
+  return atlas[key] || atlas.fallback_smooth_wall;
+}
+function crDrawContinuousFacadeTextureColumn(ctx, col, drawStart, sliceH, texture, faceU){
+  if(sliceH < 1 || !texture) return;
+  const u = Math.max(0, Math.min(0.999, Number(faceU) || 0));
+  const texX = Math.max(0, Math.min(texture.width - 1, Math.floor(u * texture.width)));
+  const oldSmooth = ctx.imageSmoothingEnabled;
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(texture, texX, 0, 1, texture.height, col, drawStart, 1, sliceH);
+  ctx.imageSmoothingEnabled = oldSmooth;
+}
+
 function crDrawSmoothBuildingMaterialBase(ctx, col, y0, sliceH, pw, materialKey, kind){
   const pal = crSmoothWallPalette(materialKey, kind);
   ctx.fillStyle = pal.wall;
@@ -390,6 +563,7 @@ function crDrawSmoothBuildingMaterialBase(ctx, col, y0, sliceH, pw, materialKey,
   crFacadeArtColBand(ctx, col, pw, y0 + sliceH * 0.905, y0 + sliceH * 0.955, pal.base);
   return pal;
 }
+
 function crDrawSmoothBuildingFaceColumn(ctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX, roleId){
   if(sliceH < 14 || !roleId) return;
   const faceDir = crWallHitFaceDir(side, stepX, stepY);
@@ -558,6 +732,14 @@ function crDrawSmoothBuildingFaceColumn(ctx, col, drawStart, sliceH, mapX, mapY,
 }
 
 function crDrawComposedFacadeFaceColumn(ctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX, roleId){
+  if(typeof CR_CONTINUOUS_FACADE_TEXTURES !== 'undefined' && CR_CONTINUOUS_FACADE_TEXTURES === 1){
+    const faceDir = crWallHitFaceDir(side, stepX, stepY);
+    const fc = crUpdateFacadeFaceU(mapX, mapY, faceDir, wallX);
+    const texture = fc ? crGetFacadeTextureForFace(fc.moduleId, faceDir, fc.roleId || roleId) : crBuildFacadeTextureAtlas().fallback_smooth_wall;
+    const faceU = fc ? fc.faceU : (wallX - Math.floor(wallX));
+    crDrawContinuousFacadeTextureColumn(ctx, col, drawStart, sliceH, texture, faceU);
+    return;
+  }
   if(CR_BUILDING_SMOOTH_STYLE === 1){
     crDrawSmoothBuildingFaceColumn(ctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX, roleId);
     return;
@@ -666,7 +848,7 @@ function crDebugBuildingSmoothStyle(){
   const base = crDebugFacadeReadabilityFinal();
   const artSrc = (typeof crDrawSmoothBuildingMaterialBase === 'function' ? String(crDrawSmoothBuildingMaterialBase) : '') + '\\n' + (typeof crDrawSmoothBuildingFaceColumn === 'function' ? String(crDrawSmoothBuildingFaceColumn) : '') + '\\n' + (typeof crDrawComposedFacadeFaceColumn === 'function' ? String(crDrawComposedFacadeFaceColumn) : '');
   const checks = {
-    buildId: BUILD_ID === 'buildingsmooth1',
+    buildId: BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1',
     smoothFlag: typeof CR_BUILDING_SMOOTH_STYLE !== 'undefined' && CR_BUILDING_SMOOTH_STYLE === 1,
     smoothHelper: typeof crDrawSmoothBuildingFaceColumn === 'function' && typeof crDrawSmoothBuildingMaterialBase === 'function',
     facadePackStillExists: !!(CR_FACADE_PACK && CR_FACADE_PACK.modules && CR_FACADE_PACK.roles),
@@ -680,7 +862,67 @@ function crDebugBuildingSmoothStyle(){
     debugTargets: base && base.pass === true
   };
   const pass = Object.keys(checks).every(k => !!checks[k]);
-  return Object.assign({}, base, { pass, smoothStyle: 'buildingsmooth1', checks });
+  return Object.assign({}, base, { pass, smoothStyle: BUILD_ID, checks });
+}
+
+function crDebugContinuousFacadeTexture(){
+  const atlas = crBuildFacadeTextureAtlas();
+  const keys = Object.keys(atlas || {});
+  const sizes = {};
+  for(const k of keys){ sizes[k] = { width: atlas[k].width, height: atlas[k].height }; }
+  const mappings = {};
+  const modules = CR_FACADE_PACK && CR_FACADE_PACK.modules ? Object.keys(CR_FACADE_PACK.modules) : [];
+  for(const mid of modules){
+    mappings[mid] = {};
+    for(const face of ['south','north','east','west']){
+      const mod = CR_FACADE_PACK.modules[mid];
+      const row = mod && mod.faces && mod.faces[face];
+      const role = row && row.length ? crNormalizeFacadeRoleId(row[0]) : null;
+      const key = crFacadeTextureKeyForFace(mid, face, role);
+      const tex = atlas[key] || atlas.fallback_smooth_wall;
+      mappings[mid][face] = { textureKey: key, width: tex.width, height: tex.height, sampleRole: role };
+    }
+  }
+  const base = crDebugFacadeReadabilityFinal();
+  function sampleMap(hit){
+    if(!hit) return null;
+    const key = crFacadeTextureKeyForFace(hit.moduleId, hit.faceDirection, hit.role);
+    const tex = atlas[key] || atlas.fallback_smooth_wall;
+    return Object.assign({}, hit, { textureKey: key, textureSize: { width: tex.width, height: tex.height } });
+  }
+  const drawSrc = (typeof crDrawComposedFacadeFaceColumn === 'function' ? String(crDrawComposedFacadeFaceColumn) : '') + '\n' + (typeof crDrawContinuousFacadeTextureColumn === 'function' ? String(crDrawContinuousFacadeTextureColumn) : '');
+  const checks = {
+    buildId: BUILD_ID === 'facadetexture1',
+    atlasExists: !!atlas && keys.length >= 7,
+    storefront4x2TextureExists: !!atlas.storefront_4x2_south,
+    storefront3x2TextureExists: !!atlas.storefront_3x2_south,
+    boardedShopTextureExists: !!atlas.boarded_shop_3x2_south,
+    garageServiceTextureExists: !!atlas.garage_service_4x2_south,
+    sideBackTextureExists: !!atlas.blank_side && !!atlas.service_back,
+    faceUSamplingContinuous: drawSrc.indexOf('faceU') >= 0 && drawSrc.indexOf('crDrawContinuousFacadeTextureColumn') >= 0 && drawSrc.indexOf('Math.floor(u * texture.width)') >= 0,
+    panelInsetRendererBypassedForModuleFaces: drawSrc.indexOf('crFacadeArtPanelInset') < 0 && drawSrc.indexOf('crDrawContinuousFacadeTextureColumn') >= 0,
+    liveFramedPanelBoxesBypassedForModuleFaces: drawSrc.indexOf('crFacadeArtColFramedBox') < 0 && drawSrc.indexOf('framedObj(') < 0,
+    facadePackMetadataExists: !!(CR_FACADE_PACK && CR_FACADE_PACK.modules && CR_FACADE_PACK.roles),
+    sixGameplayModulesUnchanged: ['storefront_4x2','storefront_3x2','restroom_pavilion','blank_service_block','garage_service_4x2','boarded_shop_3x2'].every(m => modules.indexOf(m) >= 0) && modules.length === 6,
+    noLabOnlyModules: ['two_story_storefront_4x2_visual','walkin_storefront_4x3','corner_shop_L'].every(m => modules.indexOf(m) < 0),
+    debugTargets: base && base.pass === true
+  };
+  const pass = Object.keys(checks).every(k => !!checks[k]);
+  return {
+    BUILD_ID,
+    pass,
+    textureAtlasKeys: keys,
+    textureSizes: sizes,
+    moduleToTextureMappings: mappings,
+    sampleD2StorefrontTextureMapping: sampleMap(base.d2StorefrontFace),
+    sampleD2BoardedShopTextureMapping: sampleMap(base.d2BoardedShopFace),
+    sampleD3GarageTextureMapping: sampleMap(base.d3GarageServiceFace),
+    sampleSideBackTextureMapping: sampleMap(base.d3SideBackFace),
+    faceUSamplingContinuous: checks.faceUSamplingContinuous,
+    panelInsetRendererBypassedForModuleFaces: checks.panelInsetRendererBypassedForModuleFaces,
+    noLabOnlyModules: checks.noLabOnlyModules,
+    checks
+  };
 }
 
 function crClearBuildingModules(GW, GH){

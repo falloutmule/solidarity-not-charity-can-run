@@ -1,9 +1,9 @@
 {
   "pass": true,
-  "build": "buildingsmooth1",
+  "build": "facadetexture1",
   "layout": {
     "pass": true,
-    "build": "buildingsmooth1",
+    "build": "facadetexture1",
     "errors": [],
     "warnings": [
       "intentional SPRINT/LOOK overlap"
@@ -125,7 +125,7 @@
   },
   "viewportSafeArea": {
     "pass": true,
-    "build": "buildingsmooth1",
+    "build": "facadetexture1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -199,7 +199,7 @@
       "left": 0
     },
     "viewport": {
-      "BUILD_ID": "buildingsmooth1",
+      "BUILD_ID": "facadetexture1",
       "inner": {
         "w": 390,
         "h": 844
@@ -243,11 +243,11 @@
       "cw": 390,
       "ch": 844
     },
-    "timestamp": "2026-06-29T02:40:20.184Z"
+    "timestamp": "2026-06-29T12:31:01.880Z"
   },
   "portraitUsability": {
     "pass": true,
-    "build": "buildingsmooth1",
+    "build": "facadetexture1",
     "errors": [],
     "warnings": [],
     "thresholds": {
@@ -371,7 +371,7 @@
   },
   "settingsSafety": {
     "pass": true,
-    "build": "buildingsmooth1",
+    "build": "facadetexture1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -392,7 +392,7 @@
   },
   "decorativeProps": {
     "pass": true,
-    "build": "buildingsmooth1",
+    "build": "facadetexture1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -433,7 +433,7 @@
   },
   "optionsCleanup": {
     "pass": true,
-    "build": "buildingsmooth1",
+    "build": "facadetexture1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -461,12 +461,12 @@
       "lsKeyUnchanged": true
     },
     "evidence": {
-      "htmlSample": "\n      <div class=\"options-scroll-body\">\n      <div class=\"rpantit\">OPTIONS</div>\n      <div class=\"rdesc\" style=\"margin-bottom:8px;color:#6a5a4a;\">build buildingsmooth1</div>\n      <div class=\"options-section-hdr\">CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-edit-controls\">EDIT CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-reset-controls\">RESET CONTROLS</div>\n      <div c"
+      "htmlSample": "\n      <div class=\"options-scroll-body\">\n      <div class=\"rpantit\">OPTIONS</div>\n      <div class=\"rdesc\" style=\"margin-bottom:8px;color:#6a5a4a;\">build facadetexture1</div>\n      <div class=\"options-section-hdr\">CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-edit-controls\">EDIT CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-reset-controls\">RESET CONTROLS</div>\n      <div cl"
     }
   },
   "mobileControlReliability": {
     "pass": true,
-    "build": "buildingsmooth1",
+    "build": "facadetexture1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -488,7 +488,7 @@
         "joyActive": false
       },
       "sprint": {
-        "burstUntil": 1.5721000000238419,
+        "burstUntil": 1.5922999999523162,
         "stamBefore": 60,
         "stamAfter": 40
       },
@@ -501,7 +501,7 @@
   },
   "movementCollision": {
     "pass": true,
-    "build": "buildingsmooth1",
+    "build": "facadetexture1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -562,7 +562,7 @@
   },
   "reachability": {
     "pass": true,
-    "build": "buildingsmooth1",
+    "build": "facadetexture1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -590,7 +590,7 @@
   },
   "streetBlockLevel": {
     "pass": true,
-    "build": "buildingsmooth1",
+    "build": "facadetexture1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -717,7 +717,7 @@
   },
   "d1ParkLandmark": {
     "pass": true,
-    "build": "buildingsmooth1",
+    "build": "facadetexture1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -1155,11 +1155,11 @@
     },
     "errors": [],
     "warnings": [],
-    "build": "buildingsmooth1"
+    "build": "facadetexture1"
   },
   "fpvGroundPlaneAlignment": {
     "pass": true,
-    "build": "buildingsmooth1",
+    "build": "facadetexture1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -1204,7 +1204,7 @@
     },
     "evidence": {
       "groundPlaneDebug": {
-        "BUILD_ID": "buildingsmooth1",
+        "BUILD_ID": "facadetexture1",
         "pass": true,
         "records": [
           {
@@ -1273,7 +1273,7 @@
         ]
       },
       "spriteHalo": {
-        "BUILD_ID": "buildingsmooth1",
+        "BUILD_ID": "facadetexture1",
         "policy": "walls own distance fog; billboards drawImage only — no post-loop sprite fog fillRect",
         "forbiddenPatternsAbsent": true,
         "forbiddenHits": [],
@@ -1283,7 +1283,7 @@
         "regressionCommentMarker": "SPRITE HALO REGRESSION GUARD"
       },
       "zbuffer": {
-        "BUILD_ID": "buildingsmooth1",
+        "BUILD_ID": "facadetexture1",
         "renderWidth": 320,
         "zbufferLength": 320,
         "zbufferMatchesRenderWidth": true,
@@ -1326,7 +1326,7 @@
   },
   "d2D3FacadeReadabilityFinal": {
     "pass": true,
-    "build": "buildingsmooth1",
+    "build": "facadetexture1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -1370,7 +1370,7 @@
     },
     "evidence": {
       "debug": {
-        "BUILD_ID": "buildingsmooth1",
+        "BUILD_ID": "facadetexture1",
         "facadePackVersion": "facadeart1",
         "currentModuleList": [
           "storefront_4x2",
@@ -1461,7 +1461,7 @@
         "pass": true
       },
       "groundplane": {
-        "BUILD_ID": "buildingsmooth1",
+        "BUILD_ID": "facadetexture1",
         "pass": true,
         "records": [
           {
@@ -1555,7 +1555,7 @@
   },
   "buildingSmoothStyle": {
     "pass": true,
-    "build": "buildingsmooth1",
+    "build": "facadetexture1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -1599,7 +1599,7 @@
     },
     "evidence": {
       "debug": {
-        "BUILD_ID": "buildingsmooth1",
+        "BUILD_ID": "facadetexture1",
         "facadePackVersion": "facadeart1",
         "currentModuleList": [
           "storefront_4x2",
@@ -1688,7 +1688,7 @@
         "spritegroundHelpersActive": true,
         "noLabOnlyModules": true,
         "pass": true,
-        "smoothStyle": "buildingsmooth1",
+        "smoothStyle": "facadetexture1",
         "checks": {
           "buildId": true,
           "smoothFlag": true,
@@ -1705,7 +1705,439 @@
         }
       },
       "groundplane": {
-        "BUILD_ID": "buildingsmooth1",
+        "BUILD_ID": "facadetexture1",
+        "pass": true,
+        "records": [
+          {
+            "label": "d1_pavilion",
+            "depth": 4.5,
+            "baseLineH": 44.444,
+            "mass": 1.58,
+            "massLineH": 70.222,
+            "floorBottomY": 122.222,
+            "wallDrawStart": 52,
+            "wallDrawEnd": 123,
+            "wallGroundDelta": 0.778,
+            "wallMassExtraUp": 25.778,
+            "wallMassExtraDown": 0,
+            "spriteFootY": 122.222,
+            "spriteGroundDelta": 0,
+            "npcGroundedDelta": 0,
+            "canGroundedDelta": 0,
+            "propGroundedDelta": 0,
+            "moduleId": "restroom_pavilion",
+            "role": "pavilion",
+            "objectKind": "npc/can/prop"
+          },
+          {
+            "label": "d2_storefront",
+            "depth": 5.25,
+            "baseLineH": 38.095,
+            "mass": 1.5,
+            "massLineH": 57.143,
+            "floorBottomY": 119.048,
+            "wallDrawStart": 61,
+            "wallDrawEnd": 120,
+            "wallGroundDelta": 0.952,
+            "wallMassExtraUp": 19.048,
+            "wallMassExtraDown": 0,
+            "spriteFootY": 119.048,
+            "spriteGroundDelta": 0,
+            "npcGroundedDelta": 0,
+            "canGroundedDelta": 0,
+            "propGroundedDelta": 0,
+            "moduleId": "storefront_4x2",
+            "role": "storefront_window",
+            "objectKind": "npc/can/prop"
+          },
+          {
+            "label": "d3_garage_service",
+            "depth": 5.75,
+            "baseLineH": 34.783,
+            "mass": 1.5,
+            "massLineH": 52.174,
+            "floorBottomY": 117.391,
+            "wallDrawStart": 65,
+            "wallDrawEnd": 118,
+            "wallGroundDelta": 0.609,
+            "wallMassExtraUp": 17.391,
+            "wallMassExtraDown": 0,
+            "spriteFootY": 117.391,
+            "spriteGroundDelta": 0,
+            "npcGroundedDelta": 0,
+            "canGroundedDelta": 0,
+            "propGroundedDelta": 0,
+            "moduleId": "garage_service_4x2",
+            "role": "garage_bay",
+            "objectKind": "npc/can/prop"
+          }
+        ]
+      },
+      "modules": [
+        "storefront_4x2",
+        "storefront_3x2",
+        "restroom_pavilion",
+        "blank_service_block",
+        "garage_service_4x2",
+        "boarded_shop_3x2"
+      ]
+    }
+  },
+  "continuousFacadeTexture": {
+    "pass": true,
+    "build": "facadetexture1",
+    "errors": [],
+    "warnings": [],
+    "checks": {
+      "buildId": true,
+      "splitSourcePipeline": true,
+      "rootIndexGeneratedFromSource": true,
+      "npmBuildCheckPasses": true,
+      "textureAtlasExists": true,
+      "storefront4x2Texture": true,
+      "storefront3x2Texture": true,
+      "boardedShopTexture": true,
+      "garageServiceTexture": true,
+      "sideBackTexture": true,
+      "raycasterSamplesFacadeTexturesByContinuousFaceU": true,
+      "panelInsetNotPrimaryModuleRendering": true,
+      "liveFramedPanelBoxesNotPrimaryModuleRendering": true,
+      "facadePackMetadataStillExists": true,
+      "currentSixGameplayModulesUnchanged": true,
+      "noLabOnlyModulesImported": true,
+      "groundplaneHelpersStillExist": true,
+      "spriteAnchorsStillExist": true,
+      "npcCanPropGrounding": true,
+      "wallBaseFloorAlignment": true,
+      "d2StorefrontProofTarget": true,
+      "d2BoardedShopProofTarget": true,
+      "d3GarageServiceProofTarget": true,
+      "sideBackProofTarget": true,
+      "closeWallViewNoVisiblePanelGapDominance": true,
+      "d1IdentityParkPlazaPavilion": true,
+      "matteRoadPreserved": true,
+      "minimapNavigationFirst": true,
+      "buildingMassSubstantial": true,
+      "levelSelectorWorks": true,
+      "directStartD1D4": true,
+      "peopleCansExitReachableD1D4": true,
+      "propsRemainNonCollision": true,
+      "noMovingBlockersNpcsTimers": true,
+      "controlsOptionsEditControlsFunctional": true,
+      "hallFunctional": true,
+      "saveLoadFunctional": true,
+      "noExternalAssets": true,
+      "noRuntimeErrors": true
+    },
+    "evidence": {
+      "debug": {
+        "BUILD_ID": "facadetexture1",
+        "pass": true,
+        "textureAtlasKeys": [
+          "storefront_4x2_south",
+          "storefront_3x2_south",
+          "boarded_shop_3x2_south",
+          "garage_service_4x2_south",
+          "blank_side",
+          "service_back",
+          "pavilion_front",
+          "fallback_smooth_wall"
+        ],
+        "textureSizes": {
+          "storefront_4x2_south": {
+            "width": 256,
+            "height": 128
+          },
+          "storefront_3x2_south": {
+            "width": 240,
+            "height": 128
+          },
+          "boarded_shop_3x2_south": {
+            "width": 240,
+            "height": 128
+          },
+          "garage_service_4x2_south": {
+            "width": 256,
+            "height": 128
+          },
+          "blank_side": {
+            "width": 128,
+            "height": 128
+          },
+          "service_back": {
+            "width": 128,
+            "height": 128
+          },
+          "pavilion_front": {
+            "width": 320,
+            "height": 128
+          },
+          "fallback_smooth_wall": {
+            "width": 128,
+            "height": 128
+          }
+        },
+        "moduleToTextureMappings": {
+          "storefront_4x2": {
+            "south": {
+              "textureKey": "storefront_4x2_south",
+              "width": 256,
+              "height": 128,
+              "sampleRole": "storefront_window"
+            },
+            "north": {
+              "textureKey": "service_back",
+              "width": 128,
+              "height": 128,
+              "sampleRole": "service_wall"
+            },
+            "east": {
+              "textureKey": "blank_side",
+              "width": 128,
+              "height": 128,
+              "sampleRole": "side_door"
+            },
+            "west": {
+              "textureKey": "blank_side",
+              "width": 128,
+              "height": 128,
+              "sampleRole": "blank_brick"
+            }
+          },
+          "storefront_3x2": {
+            "south": {
+              "textureKey": "storefront_3x2_south",
+              "width": 240,
+              "height": 128,
+              "sampleRole": "storefront_window"
+            },
+            "north": {
+              "textureKey": "service_back",
+              "width": 128,
+              "height": 128,
+              "sampleRole": "service_wall"
+            },
+            "east": {
+              "textureKey": "blank_side",
+              "width": 128,
+              "height": 128,
+              "sampleRole": "blank_brick"
+            },
+            "west": {
+              "textureKey": "blank_side",
+              "width": 128,
+              "height": 128,
+              "sampleRole": "blank_brick"
+            }
+          },
+          "restroom_pavilion": {
+            "south": {
+              "textureKey": "pavilion_front",
+              "width": 320,
+              "height": 128,
+              "sampleRole": "storefront_window"
+            },
+            "north": {
+              "textureKey": "pavilion_front",
+              "width": 320,
+              "height": 128,
+              "sampleRole": "blank_brick"
+            },
+            "east": {
+              "textureKey": "blank_side",
+              "width": 128,
+              "height": 128,
+              "sampleRole": "blank_brick"
+            },
+            "west": {
+              "textureKey": "blank_side",
+              "width": 128,
+              "height": 128,
+              "sampleRole": "blank_brick"
+            }
+          },
+          "blank_service_block": {
+            "south": {
+              "textureKey": "service_back",
+              "width": 128,
+              "height": 128,
+              "sampleRole": "blank_brick"
+            },
+            "north": {
+              "textureKey": "service_back",
+              "width": 128,
+              "height": 128,
+              "sampleRole": "utility_wall"
+            },
+            "east": {
+              "textureKey": "blank_side",
+              "width": 128,
+              "height": 128,
+              "sampleRole": "blank_brick"
+            },
+            "west": {
+              "textureKey": "blank_side",
+              "width": 128,
+              "height": 128,
+              "sampleRole": "blank_brick"
+            }
+          },
+          "garage_service_4x2": {
+            "south": {
+              "textureKey": "garage_service_4x2_south",
+              "width": 256,
+              "height": 128,
+              "sampleRole": "garage_bay"
+            },
+            "north": {
+              "textureKey": "service_back",
+              "width": 128,
+              "height": 128,
+              "sampleRole": "blank_concrete"
+            },
+            "east": {
+              "textureKey": "blank_side",
+              "width": 128,
+              "height": 128,
+              "sampleRole": "blank_concrete"
+            },
+            "west": {
+              "textureKey": "blank_side",
+              "width": 128,
+              "height": 128,
+              "sampleRole": "blank_concrete"
+            }
+          },
+          "boarded_shop_3x2": {
+            "south": {
+              "textureKey": "boarded_shop_3x2_south",
+              "width": 240,
+              "height": 128,
+              "sampleRole": "boarded_window"
+            },
+            "north": {
+              "textureKey": "service_back",
+              "width": 128,
+              "height": 128,
+              "sampleRole": "blank_brick"
+            },
+            "east": {
+              "textureKey": "blank_side",
+              "width": 128,
+              "height": 128,
+              "sampleRole": "blank_brick"
+            },
+            "west": {
+              "textureKey": "blank_side",
+              "width": 128,
+              "height": 128,
+              "sampleRole": "blank_brick"
+            }
+          }
+        },
+        "sampleD2StorefrontTextureMapping": {
+          "x": 4,
+          "y": 2,
+          "buildingId": 1,
+          "moduleId": "storefront_4x2",
+          "localX": 0,
+          "localY": 0,
+          "faceDirection": "south",
+          "role": "storefront_window",
+          "material": "brick",
+          "slots": [
+            "sign_band",
+            "glass_window",
+            "dark_base"
+          ],
+          "textureKey": "storefront_4x2_south",
+          "textureSize": {
+            "width": 256,
+            "height": 128
+          }
+        },
+        "sampleD2BoardedShopTextureMapping": {
+          "x": 22,
+          "y": 2,
+          "buildingId": 3,
+          "moduleId": "boarded_shop_3x2",
+          "localX": 0,
+          "localY": 0,
+          "faceDirection": "south",
+          "role": "boarded_window",
+          "material": "brick",
+          "slots": [
+            "sign_band",
+            "boarded_window",
+            "dark_base"
+          ],
+          "textureKey": "boarded_shop_3x2_south",
+          "textureSize": {
+            "width": 240,
+            "height": 128
+          }
+        },
+        "sampleD3GarageTextureMapping": {
+          "x": 7,
+          "y": 16,
+          "buildingId": 5,
+          "moduleId": "garage_service_4x2",
+          "localX": 0,
+          "localY": 0,
+          "faceDirection": "south",
+          "role": "garage_bay",
+          "material": "concrete",
+          "slots": [
+            "garage_door",
+            "dark_base"
+          ],
+          "textureKey": "garage_service_4x2_south",
+          "textureSize": {
+            "width": 256,
+            "height": 128
+          }
+        },
+        "sampleSideBackTextureMapping": {
+          "x": 15,
+          "y": 2,
+          "buildingId": 7,
+          "moduleId": "blank_service_block",
+          "localX": 1,
+          "localY": 0,
+          "faceDirection": "east",
+          "role": "blank_brick",
+          "material": "brick",
+          "slots": [
+            "soft_brick_bands"
+          ],
+          "textureKey": "blank_side",
+          "textureSize": {
+            "width": 128,
+            "height": 128
+          }
+        },
+        "faceUSamplingContinuous": true,
+        "panelInsetRendererBypassedForModuleFaces": true,
+        "noLabOnlyModules": true,
+        "checks": {
+          "buildId": true,
+          "atlasExists": true,
+          "storefront4x2TextureExists": true,
+          "storefront3x2TextureExists": true,
+          "boardedShopTextureExists": true,
+          "garageServiceTextureExists": true,
+          "sideBackTextureExists": true,
+          "faceUSamplingContinuous": true,
+          "panelInsetRendererBypassedForModuleFaces": true,
+          "liveFramedPanelBoxesBypassedForModuleFaces": true,
+          "facadePackMetadataExists": true,
+          "sixGameplayModulesUnchanged": true,
+          "noLabOnlyModules": true,
+          "debugTargets": true
+        }
+      },
+      "groundplane": {
+        "BUILD_ID": "facadetexture1",
         "pass": true,
         "records": [
           {
@@ -2054,7 +2486,7 @@
         }
       ]
     },
-    "build": "buildingsmooth1"
+    "build": "facadetexture1"
   },
   "facadeArtVocabulary": {
     "pass": true,
@@ -2267,11 +2699,11 @@
     },
     "errors": [],
     "warnings": [],
-    "build": "buildingsmooth1"
+    "build": "facadetexture1"
   },
   "fpvFacadeTargetPolish": {
     "pass": true,
-    "build": "buildingsmooth1",
+    "build": "facadetexture1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -2319,7 +2751,7 @@
   },
   "fpvWallLineArtifactFix": {
     "pass": true,
-    "build": "buildingsmooth1",
+    "build": "facadetexture1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -2376,7 +2808,7 @@
   },
   "fpvStreetShimmerFix": {
     "pass": true,
-    "build": "buildingsmooth1",
+    "build": "facadetexture1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -2438,7 +2870,7 @@
   },
   "streetReadabilityMinimap": {
     "pass": true,
-    "build": "buildingsmooth1",
+    "build": "facadetexture1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -2574,7 +3006,7 @@
   },
   "buildingScalePolish": {
     "pass": true,
-    "build": "buildingsmooth1",
+    "build": "facadetexture1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -2696,7 +3128,7 @@
   },
   "earlyDistrictProgression": {
     "pass": true,
-    "build": "buildingsmooth1",
+    "build": "facadetexture1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -2845,7 +3277,7 @@
   },
   "levelSelector": {
     "pass": true,
-    "build": "buildingsmooth1",
+    "build": "facadetexture1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -2976,7 +3408,7 @@
   },
   "proceduralLevelValidation": {
     "pass": true,
-    "build": "buildingsmooth1",
+    "build": "facadetexture1",
     "seedCount": 52,
     "districtCount": 3,
     "errors": [],
@@ -3002,11 +3434,11 @@
       "harnessStateRestored": true
     },
     "cases": 52,
-    "timestamp": "2026-06-29T02:40:36.839Z"
+    "timestamp": "2026-06-29T12:31:19.363Z"
   },
   "fullRunProgression": {
     "pass": true,
-    "build": "buildingsmooth1",
+    "build": "facadetexture1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -3058,11 +3490,11 @@
     },
     "hallPass": true,
     "mobilePass": true,
-    "timestamp": "2026-06-29T02:40:37.054Z"
+    "timestamp": "2026-06-29T12:31:19.583Z"
   },
   "onboarding": {
     "pass": true,
-    "build": "buildingsmooth1",
+    "build": "facadetexture1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -3092,7 +3524,7 @@
   },
   "soundFeedback": {
     "pass": true,
-    "build": "buildingsmooth1",
+    "build": "facadetexture1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -3169,7 +3601,7 @@
         }
       },
       "audioProof": {
-        "BUILD_ID": "buildingsmooth1",
+        "BUILD_ID": "facadetexture1",
         "gateBound": true,
         "unlockAttempted": false,
         "hasContext": true,
@@ -3187,7 +3619,7 @@
   },
   "declarativeControls": {
     "pass": true,
-    "build": "buildingsmooth1",
+    "build": "facadetexture1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -3269,7 +3701,7 @@
   },
   "visualReadability": {
     "pass": true,
-    "build": "buildingsmooth1",
+    "build": "facadetexture1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -3302,9 +3734,9 @@
         "giveReady": false
       },
       "hallStats": {
-        "mean": 109.8266707813993,
-        "brightRatio": 0.14415625,
-        "variance": 4218.7795885336445,
+        "mean": 109.86439770327425,
+        "brightRatio": 0.14396875,
+        "variance": 4219.761508531839,
         "count": 64000
       },
       "exitReadySnapshot": {
@@ -3340,7 +3772,7 @@
   },
   "visualRectangleRegression": {
     "pass": true,
-    "build": "buildingsmooth1",
+    "build": "facadetexture1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -3388,21 +3820,21 @@
         },
         "probe1": {
           "center": {
-            "mean": 89.56893570523312,
+            "mean": 89.27100781249737,
             "brightRatio": 0,
-            "variance": 2220.8942582539894,
+            "variance": 2198.6706482160066,
             "count": 9472
           },
           "sideL": {
-            "mean": 72.76443040540995,
+            "mean": 72.26160979730174,
             "brightRatio": 0,
-            "variance": 1850.583911257324,
+            "variance": 1788.2238080967284,
             "count": 2960
           },
           "sideR": {
-            "mean": 109.34181351351418,
+            "mean": 105.96548209459634,
             "brightRatio": 0,
-            "variance": 1972.6200903240137,
+            "variance": 1801.8967933449462,
             "count": 2960
           },
           "roi": {
@@ -3415,21 +3847,21 @@
         },
         "probe2": {
           "center": {
-            "mean": 90.21007706925275,
+            "mean": 89.37608994932012,
             "brightRatio": 0,
-            "variance": 2247.777727857643,
+            "variance": 2178.9270018906172,
             "count": 9472
           },
           "sideL": {
-            "mean": 108.18513445946039,
+            "mean": 110.77161587837854,
             "brightRatio": 0,
-            "variance": 1893.470764348163,
+            "variance": 2026.4957028379458,
             "count": 2960
           },
           "sideR": {
-            "mean": 72.99023851351818,
+            "mean": 72.78617567568034,
             "brightRatio": 0,
-            "variance": 1866.6980513228375,
+            "variance": 1841.7051490387285,
             "count": 2960
           },
           "roi": {
@@ -3440,8 +3872,8 @@
           },
           "angle": 3.9269908169872414
         },
-        "meanSpread": 41.881629434111964,
-        "pairDiff01": 41.24048807009233,
+        "meanSpread": 41.047642314179335,
+        "pairDiff01": 40.94256017735659,
         "stuckBrightBlock": false
       }
     }
@@ -3498,7 +3930,7 @@
   },
   "renderFailure": {
     "pass": true,
-    "build": "buildingsmooth1",
+    "build": "facadetexture1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -3517,7 +3949,7 @@
     },
     "evidence": {
       "haloSource": {
-        "BUILD_ID": "buildingsmooth1",
+        "BUILD_ID": "facadetexture1",
         "policy": "walls own distance fog; billboards drawImage only — no post-loop sprite fog fillRect",
         "forbiddenPatternsAbsent": true,
         "forbiddenHits": [],
@@ -3527,7 +3959,7 @@
         "regressionCommentMarker": "SPRITE HALO REGRESSION GUARD"
       },
       "occlusionSource": {
-        "BUILD_ID": "buildingsmooth1",
+        "BUILD_ID": "facadetexture1",
         "renderWidth": 320,
         "zbufferLength": 320,
         "zbufferMatchesRenderWidth": true,
@@ -3604,9 +4036,9 @@
         "pass": true,
         "haloPass": true,
         "borderStats": {
-          "mean": 149.06018972332018,
+          "mean": 148.8570553359683,
           "brightRatio": 0.2134387351778656,
-          "variance": 3842.92542882171,
+          "variance": 3838.118031870456,
           "count": 506
         },
         "proj": {
@@ -3618,7 +4050,7 @@
           "screenW": 15.272727272727273,
           "screenH": 16.8
         },
-        "canvasVariance": 4824.938313112873
+        "canvasVariance": 4829.298158976454
       },
       "occludedSprite": {
         "pass": true,
@@ -3686,9 +4118,9 @@
       "hallStart": {
         "pass": true,
         "stats": {
-          "mean": 75.94197646914783,
-          "brightRatio": 0.02178171641791045,
-          "variance": 2129.0260012946533,
+          "mean": 76.61109675832735,
+          "brightRatio": 0.02173507462686567,
+          "variance": 2214.7520806866423,
           "count": 42880
         },
         "customLevel": "hall_of_servants"
@@ -3700,19 +4132,19 @@
           "h": 844
         },
         "stats": {
-          "mean": 111.73302959387637,
-          "brightRatio": 0.14246875,
-          "variance": 4284.861795167922,
+          "mean": 112.18134018762161,
+          "brightRatio": 0.1424375,
+          "variance": 4310.306243133933,
           "count": 64000
         }
       }
     },
     "runtimeErrors": [],
-    "timestamp": "2026-06-29T02:40:37.345Z"
+    "timestamp": "2026-06-29T12:31:19.871Z"
   },
   "render": {
     "pass": true,
-    "build": "buildingsmooth1",
+    "build": "facadetexture1",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -3731,7 +4163,7 @@
     },
     "evidence": {
       "haloSource": {
-        "BUILD_ID": "buildingsmooth1",
+        "BUILD_ID": "facadetexture1",
         "policy": "walls own distance fog; billboards drawImage only — no post-loop sprite fog fillRect",
         "forbiddenPatternsAbsent": true,
         "forbiddenHits": [],
@@ -3741,7 +4173,7 @@
         "regressionCommentMarker": "SPRITE HALO REGRESSION GUARD"
       },
       "occlusionSource": {
-        "BUILD_ID": "buildingsmooth1",
+        "BUILD_ID": "facadetexture1",
         "renderWidth": 320,
         "zbufferLength": 320,
         "zbufferMatchesRenderWidth": true,
@@ -3818,9 +4250,9 @@
         "pass": true,
         "haloPass": true,
         "borderStats": {
-          "mean": 149.06018972332018,
+          "mean": 148.8570553359683,
           "brightRatio": 0.2134387351778656,
-          "variance": 3842.92542882171,
+          "variance": 3838.118031870456,
           "count": 506
         },
         "proj": {
@@ -3832,7 +4264,7 @@
           "screenW": 15.272727272727273,
           "screenH": 16.8
         },
-        "canvasVariance": 4824.938313112873
+        "canvasVariance": 4829.298158976454
       },
       "occludedSprite": {
         "pass": true,
@@ -3900,9 +4332,9 @@
       "hallStart": {
         "pass": true,
         "stats": {
-          "mean": 75.94197646914783,
-          "brightRatio": 0.02178171641791045,
-          "variance": 2129.0260012946533,
+          "mean": 76.61109675832735,
+          "brightRatio": 0.02173507462686567,
+          "variance": 2214.7520806866423,
           "count": 42880
         },
         "customLevel": "hall_of_servants"
@@ -3914,17 +4346,17 @@
           "h": 844
         },
         "stats": {
-          "mean": 111.73302959387637,
-          "brightRatio": 0.14246875,
-          "variance": 4284.861795167922,
+          "mean": 112.18134018762161,
+          "brightRatio": 0.1424375,
+          "variance": 4310.306243133933,
           "count": 64000
         }
       }
     },
     "runtimeErrors": [],
-    "timestamp": "2026-06-29T02:40:37.345Z"
+    "timestamp": "2026-06-29T12:31:19.871Z"
   },
   "runtimeErrors": [],
   "runtimeClean": true,
-  "timestamp": "2026-06-29T02:40:37.345Z"
+  "timestamp": "2026-06-29T12:31:19.871Z"
 }

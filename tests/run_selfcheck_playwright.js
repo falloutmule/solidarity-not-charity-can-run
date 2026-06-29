@@ -1814,6 +1814,134 @@ async function buildingSmoothStyleSection(page) {
   return { pass: !!result.pass, errors: result.selfcheck.errors || [], screenshots: shots.map(s => s.file).concat(['proof-buildingsmooth-minimap-preserved.png']) };
 }
 
+async function continuousFacadeTextureSection(page) {
+  const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
+  await page.setViewportSize({ width: 412, height: 915 });
+  await page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
+  await waitGameReady(page);
+
+  const result = await page.evaluate(() => {
+    const selfcheck = CR.runContinuousFacadeTextureSelfCheck();
+    const debug = CR.crDebugContinuousFacadeTexture();
+    return { pass: selfcheck.pass === true && debug.pass === true, selfcheck, debug };
+  });
+  writeProof('proof-facadetexture-continuous.json', result.selfcheck);
+  writeProof('proof-facadetexture-debug.json', result.debug);
+
+  const shots = [
+    { d: 2, seed: 934201, file: 'proof-facadetexture-d2-road-view.png', mode: 'road' },
+    { d: 2, seed: 934201, file: 'proof-facadetexture-d2-close-wall.png', mode: 'close' },
+    { d: 2, seed: 934201, file: 'proof-facadetexture-d2-storefront.png', mode: 'storefront' },
+    { d: 2, seed: 934201, file: 'proof-facadetexture-d2-boarded-shop.png', mode: 'boarded' },
+    { d: 3, seed: 934203, file: 'proof-facadetexture-d3-garage-service.png', mode: 'garage' },
+    { d: 3, seed: 934203, file: 'proof-facadetexture-d3-side-wall.png', mode: 'side' },
+    { d: 1, seed: 934101, file: 'proof-facadetexture-d1-preserved.png', mode: 'd1' },
+    { d: 2, seed: 934201, file: 'proof-facadetexture-groundplane-preserved.png', mode: 'ground' },
+  ];
+  for (const s of shots) {
+    await page.evaluate(({ d, seed, mode }) => {
+      CR.crSetSelectedStartDistrict(d);
+      CR.startRun(seed);
+      CR.state = CR.STATE.PLAY;
+      CR.paused = false;
+      const G = CR.game;
+      function standOk(x, y) {
+        return x > 1 && y > 1 && x < G.MAP_W - 1 && y < G.MAP_H - 1 && (typeof canStand !== 'function' || canStand(x, y));
+      }
+      if (mode === 'road') {
+        let best = { y: Math.floor(G.MAP_H / 2), score: -1 };
+        for (let y = 1; y < G.MAP_H - 1; y++) {
+          let score = 0;
+          for (let x = 2; x < G.MAP_W - 2; x++) if (standOk(x + 0.5, y + 0.5)) score++;
+          if (score > best.score) best = { y, score };
+        }
+        CR.player.x = 3.5;
+        CR.player.y = best.y + 0.5;
+        CR.player.angle = 0;
+        CR.player.dir = 0;
+        return;
+      }
+      function roleOk(role) {
+        if (mode === 'storefront' || mode === 'close') return role === 'storefront_window' || role === 'storefront_door' || role === 'storefront_sign';
+        if (mode === 'boarded') return role === 'boarded_window' || role === 'storefront_door';
+        if (mode === 'garage') return role === 'garage_bay' || role === 'service_door' || role === 'utility_wall';
+        if (mode === 'side') return role === 'side_door' || role === 'service_wall' || role === 'blank_brick' || role === 'blank_concrete' || role === 'utility_wall';
+        if (mode === 'd1') return role === 'storefront_window' || role === 'storefront_door' || role === 'mural_wall' || role === 'utility_wall';
+        return role === 'storefront_window' || role === 'storefront_door' || role === 'boarded_window';
+      }
+      function moduleOk(mid) {
+        if (mode === 'storefront' || mode === 'close' || mode === 'ground') return mid === 'storefront_4x2' || mid === 'storefront_3x2';
+        if (mode === 'boarded') return mid === 'boarded_shop_3x2';
+        if (mode === 'garage') return mid === 'garage_service_4x2';
+        if (mode === 'side') return mid === 'garage_service_4x2' || mid === 'blank_service_block' || mid === 'storefront_4x2' || mid === 'storefront_3x2';
+        if (mode === 'd1') return mid === 'restroom_pavilion';
+        return false;
+      }
+      const preferredFaces = mode === 'side' ? ['east','west','north','south'] : ['south','north','east','west'];
+      let target = null;
+      for (let y = 1; y < G.MAP_H - 1 && !target; y++) {
+        for (let x = 1; x < G.MAP_W - 1 && !target; x++) {
+          const c = G.buildingGrid && G.buildingGrid[y] && G.buildingGrid[y][x];
+          if (!c || !moduleOk(c.mid)) continue;
+          for (const face of preferredFaces) {
+            const desc = CR.crDebugDescribeFacadeHit(x, y, face);
+            if (desc && roleOk(desc.role)) { target = { x, y, face, mid: c.mid, role: desc.role }; break; }
+          }
+        }
+      }
+      function placeFor(t) {
+        if (!t) return false;
+        const dirs = {
+          south: { dx: 0, dy: 1, angle: -Math.PI / 2 },
+          north: { dx: 0, dy: -1, angle: Math.PI / 2 },
+          east: { dx: 1, dy: 0, angle: Math.PI },
+          west: { dx: -1, dy: 0, angle: 0 },
+        };
+        const dir = dirs[t.face] || dirs.south;
+        const distances = mode === 'close' ? [1.18, 1.35, 1.55, 1.85, 2.25, 3.0] : [3.2, 2.6, 2.0, 1.45, 3.8, 4.4];
+        for (const dist of distances) {
+          const px = t.x + 0.5 + dir.dx * dist;
+          const py = t.y + 0.5 + dir.dy * dist;
+          if (standOk(px, py)) {
+            CR.player.x = px;
+            CR.player.y = py;
+            CR.player.angle = dir.angle;
+            CR.player.dir = dir.angle;
+            return true;
+          }
+        }
+        CR.player.x = Math.max(1.5, Math.min(G.MAP_W - 1.5, t.x + 0.5 + dir.dx * 2.0));
+        CR.player.y = Math.max(1.5, Math.min(G.MAP_H - 1.5, t.y + 0.5 + dir.dy * 2.0));
+        CR.player.angle = dir.angle;
+        CR.player.dir = dir.angle;
+        return true;
+      }
+      placeFor(target);
+      if (mode === 'ground' && target) {
+        const dirs = { south: [0, 1], north: [0, -1], east: [1, 0], west: [-1, 0] };
+        const dxy = dirs[target.face] || [0, 1];
+        const ox = target.x + 0.5 + dxy[0] * 1.08;
+        const oy = target.y + 0.5 + dxy[1] * 1.08;
+        G.npcs = [{ x: ox - dxy[1] * 0.18, y: oy + dxy[0] * 0.18, kind: 'hungry', need: 1, helped: false, wob: 0, thank: '' }];
+        G.pickups = [{ x: ox + dxy[1] * 0.26, y: oy - dxy[0] * 0.26, taken: false, amt: 2, wob: 0 }];
+      }
+      if (typeof window.updateAim === 'function') window.updateAim();
+    }, s);
+    await page.waitForTimeout(260);
+    await page.screenshot({ path: path.join(ROOT, s.file) });
+  }
+  await page.evaluate(() => {
+    CR.crSetSelectedStartDistrict(2);
+    CR.startRun(934201);
+    CR.state = CR.STATE.PLAY;
+    CR.paused = false;
+  });
+  await page.waitForTimeout(100);
+  await page.screenshot({ path: path.join(ROOT, 'proof-facadetexture-minimap-preserved.png') });
+
+  return { pass: !!result.pass, errors: result.selfcheck.errors || [], screenshots: shots.map(s => s.file).concat(['proof-facadetexture-minimap-preserved.png']) };
+}
+
 async function spriteGroundAnchorSection(page) {
   const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
   await page.setViewportSize({ width: 412, height: 915 });
@@ -2530,10 +2658,10 @@ function sourceBuildPipelineSection() {
     errors.push('missing proof-source-build-manifest.json');
   }
   const indexText = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
-  const buildIdOk = indexText.includes("const BUILD_ID = 'buildingsmooth1'");
-  if (!buildIdOk) errors.push('BUILD_ID must be buildingsmooth1 for this pass');
+  const buildIdOk = indexText.includes("const BUILD_ID = 'facadetexture1'");
+  if (!buildIdOk) errors.push('BUILD_ID must be facadetexture1 for this pass');
   const pass = errors.length === 0 && proof && proof.check === 'pass';
-  const result = { pass, errors, buildId: 'buildingsmooth1', proofSummary: proof ? { outputSha256: proof.outputSha256, outputBytes: proof.outputBytes, check: proof.check } : null };
+  const result = { pass, errors, buildId: 'facadetexture1', proofSummary: proof ? { outputSha256: proof.outputSha256, outputBytes: proof.outputBytes, check: proof.check } : null };
   writeProof('proof-source-build-pipeline.json', result);
 
   return result;
@@ -2589,6 +2717,7 @@ async function main() {
   const fpvGroundPlaneAlignment = await fpvGroundPlaneAlignmentSection(page);
   const d2D3FacadeReadabilityFinal = await d2D3FacadeReadabilityFinalSection(page);
   const buildingSmoothStyle = await buildingSmoothStyleSection(page);
+  const continuousFacadeTexture = await continuousFacadeTextureSection(page);
   const spriteGroundAnchor = await spriteGroundAnchorSection(page);
   const facadeArtVocabulary = await facadeArtVocabularySection(page);
   const facadeCompositionReadability = await facadeCompositionReadabilitySection(page);
@@ -2655,6 +2784,7 @@ async function main() {
     fpvGroundPlaneAlignment.pass &&
     d2D3FacadeReadabilityFinal.pass &&
     buildingSmoothStyle.pass &&
+    continuousFacadeTexture.pass &&
     spriteGroundAnchor.pass &&
     facadeArtVocabulary.pass &&
     facadeCompositionReadability.pass &&
@@ -2720,6 +2850,7 @@ async function main() {
     fpvGroundPlaneAlignment,
     d2D3FacadeReadabilityFinal,
     buildingSmoothStyle,
+    continuousFacadeTexture,
     spriteGroundAnchor,
     facadeArtVocabulary,
     facadeCompositionReadability,

@@ -1,0 +1,306 @@
+{
+  "BUILD_ID": "facadetexture1",
+  "pass": true,
+  "textureAtlasKeys": [
+    "storefront_4x2_south",
+    "storefront_3x2_south",
+    "boarded_shop_3x2_south",
+    "garage_service_4x2_south",
+    "blank_side",
+    "service_back",
+    "pavilion_front",
+    "fallback_smooth_wall"
+  ],
+  "textureSizes": {
+    "storefront_4x2_south": {
+      "width": 256,
+      "height": 128
+    },
+    "storefront_3x2_south": {
+      "width": 240,
+      "height": 128
+    },
+    "boarded_shop_3x2_south": {
+      "width": 240,
+      "height": 128
+    },
+    "garage_service_4x2_south": {
+      "width": 256,
+      "height": 128
+    },
+    "blank_side": {
+      "width": 128,
+      "height": 128
+    },
+    "service_back": {
+      "width": 128,
+      "height": 128
+    },
+    "pavilion_front": {
+      "width": 320,
+      "height": 128
+    },
+    "fallback_smooth_wall": {
+      "width": 128,
+      "height": 128
+    }
+  },
+  "moduleToTextureMappings": {
+    "storefront_4x2": {
+      "south": {
+        "textureKey": "storefront_4x2_south",
+        "width": 256,
+        "height": 128,
+        "sampleRole": "storefront_window"
+      },
+      "north": {
+        "textureKey": "service_back",
+        "width": 128,
+        "height": 128,
+        "sampleRole": "service_wall"
+      },
+      "east": {
+        "textureKey": "blank_side",
+        "width": 128,
+        "height": 128,
+        "sampleRole": "side_door"
+      },
+      "west": {
+        "textureKey": "blank_side",
+        "width": 128,
+        "height": 128,
+        "sampleRole": "blank_brick"
+      }
+    },
+    "storefront_3x2": {
+      "south": {
+        "textureKey": "storefront_3x2_south",
+        "width": 240,
+        "height": 128,
+        "sampleRole": "storefront_window"
+      },
+      "north": {
+        "textureKey": "service_back",
+        "width": 128,
+        "height": 128,
+        "sampleRole": "service_wall"
+      },
+      "east": {
+        "textureKey": "blank_side",
+        "width": 128,
+        "height": 128,
+        "sampleRole": "blank_brick"
+      },
+      "west": {
+        "textureKey": "blank_side",
+        "width": 128,
+        "height": 128,
+        "sampleRole": "blank_brick"
+      }
+    },
+    "restroom_pavilion": {
+      "south": {
+        "textureKey": "pavilion_front",
+        "width": 320,
+        "height": 128,
+        "sampleRole": "storefront_window"
+      },
+      "north": {
+        "textureKey": "pavilion_front",
+        "width": 320,
+        "height": 128,
+        "sampleRole": "blank_brick"
+      },
+      "east": {
+        "textureKey": "blank_side",
+        "width": 128,
+        "height": 128,
+        "sampleRole": "blank_brick"
+      },
+      "west": {
+        "textureKey": "blank_side",
+        "width": 128,
+        "height": 128,
+        "sampleRole": "blank_brick"
+      }
+    },
+    "blank_service_block": {
+      "south": {
+        "textureKey": "service_back",
+        "width": 128,
+        "height": 128,
+        "sampleRole": "blank_brick"
+      },
+      "north": {
+        "textureKey": "service_back",
+        "width": 128,
+        "height": 128,
+        "sampleRole": "utility_wall"
+      },
+      "east": {
+        "textureKey": "blank_side",
+        "width": 128,
+        "height": 128,
+        "sampleRole": "blank_brick"
+      },
+      "west": {
+        "textureKey": "blank_side",
+        "width": 128,
+        "height": 128,
+        "sampleRole": "blank_brick"
+      }
+    },
+    "garage_service_4x2": {
+      "south": {
+        "textureKey": "garage_service_4x2_south",
+        "width": 256,
+        "height": 128,
+        "sampleRole": "garage_bay"
+      },
+      "north": {
+        "textureKey": "service_back",
+        "width": 128,
+        "height": 128,
+        "sampleRole": "blank_concrete"
+      },
+      "east": {
+        "textureKey": "blank_side",
+        "width": 128,
+        "height": 128,
+        "sampleRole": "blank_concrete"
+      },
+      "west": {
+        "textureKey": "blank_side",
+        "width": 128,
+        "height": 128,
+        "sampleRole": "blank_concrete"
+      }
+    },
+    "boarded_shop_3x2": {
+      "south": {
+        "textureKey": "boarded_shop_3x2_south",
+        "width": 240,
+        "height": 128,
+        "sampleRole": "boarded_window"
+      },
+      "north": {
+        "textureKey": "service_back",
+        "width": 128,
+        "height": 128,
+        "sampleRole": "blank_brick"
+      },
+      "east": {
+        "textureKey": "blank_side",
+        "width": 128,
+        "height": 128,
+        "sampleRole": "blank_brick"
+      },
+      "west": {
+        "textureKey": "blank_side",
+        "width": 128,
+        "height": 128,
+        "sampleRole": "blank_brick"
+      }
+    }
+  },
+  "sampleD2StorefrontTextureMapping": {
+    "x": 4,
+    "y": 2,
+    "buildingId": 1,
+    "moduleId": "storefront_4x2",
+    "localX": 0,
+    "localY": 0,
+    "faceDirection": "south",
+    "role": "storefront_window",
+    "material": "brick",
+    "slots": [
+      "sign_band",
+      "glass_window",
+      "dark_base"
+    ],
+    "textureKey": "storefront_4x2_south",
+    "textureSize": {
+      "width": 256,
+      "height": 128
+    }
+  },
+  "sampleD2BoardedShopTextureMapping": {
+    "x": 22,
+    "y": 2,
+    "buildingId": 3,
+    "moduleId": "boarded_shop_3x2",
+    "localX": 0,
+    "localY": 0,
+    "faceDirection": "south",
+    "role": "boarded_window",
+    "material": "brick",
+    "slots": [
+      "sign_band",
+      "boarded_window",
+      "dark_base"
+    ],
+    "textureKey": "boarded_shop_3x2_south",
+    "textureSize": {
+      "width": 240,
+      "height": 128
+    }
+  },
+  "sampleD3GarageTextureMapping": {
+    "x": 7,
+    "y": 16,
+    "buildingId": 5,
+    "moduleId": "garage_service_4x2",
+    "localX": 0,
+    "localY": 0,
+    "faceDirection": "south",
+    "role": "garage_bay",
+    "material": "concrete",
+    "slots": [
+      "garage_door",
+      "dark_base"
+    ],
+    "textureKey": "garage_service_4x2_south",
+    "textureSize": {
+      "width": 256,
+      "height": 128
+    }
+  },
+  "sampleSideBackTextureMapping": {
+    "x": 15,
+    "y": 2,
+    "buildingId": 7,
+    "moduleId": "blank_service_block",
+    "localX": 1,
+    "localY": 0,
+    "faceDirection": "east",
+    "role": "blank_brick",
+    "material": "brick",
+    "slots": [
+      "soft_brick_bands"
+    ],
+    "textureKey": "blank_side",
+    "textureSize": {
+      "width": 128,
+      "height": 128
+    }
+  },
+  "faceUSamplingContinuous": true,
+  "panelInsetRendererBypassedForModuleFaces": true,
+  "noLabOnlyModules": true,
+  "checks": {
+    "buildId": true,
+    "atlasExists": true,
+    "storefront4x2TextureExists": true,
+    "storefront3x2TextureExists": true,
+    "boardedShopTextureExists": true,
+    "garageServiceTextureExists": true,
+    "sideBackTextureExists": true,
+    "faceUSamplingContinuous": true,
+    "panelInsetRendererBypassedForModuleFaces": true,
+    "liveFramedPanelBoxesBypassedForModuleFaces": true,
+    "facadePackMetadataExists": true,
+    "sixGameplayModulesUnchanged": true,
+    "noLabOnlyModules": true,
+    "debugTargets": true
+  }
+}
