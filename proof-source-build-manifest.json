@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-29T20:22:49.773Z",
+  "generatedAt": "2026-06-29T21:57:37.670Z",
   "output": "index.html",
-  "outputSha256": "7736792917b7119d6919f4189a38f02dbf4bceecfdff3e997298aab916562c0f",
-  "outputBytes": 634091,
+  "outputSha256": "4e4d74233a4fbcc49680aca9b16993c4c401373b079c09564d57afc4f8a88e36",
+  "outputBytes": 635962,
   "inputs": [
     {
       "path": "src/template.html",
@@ -51,8 +51,8 @@
     },
     {
       "path": "src/js/game-06-section-2b-mobile-touch-input.js",
-      "sha256": "caeefae3a59fc1806298a011cfadb91e6c93dd99bb76b6d14cbab6ff4d068426",
-      "bytes": 55822
+      "sha256": "d82b33c9d51c3b3d47f7e91919b257e1a429880dd1e30ad1a1f285ecfc81560c",
+      "bytes": 55990
     },
     {
       "path": "src/js/game-07-section-2c-responsive-mobile-menu-html-overlay.js",
@@ -66,8 +66,8 @@
     },
     {
       "path": "src/js/game-09-section-3-city-generation.js",
-      "sha256": "0ad4395f1a96dc837a8b1d66fadd231c013aaffe9a8c0ee2087ddaf55bf473ad",
-      "bytes": 82677
+      "sha256": "55ec20571c408565cf0cbc3092bd253e3aa953d54fdba8a28caa414869986636",
+      "bytes": 82735
     },
     {
       "path": "src/js/game-10-section-3b.js",
@@ -101,8 +101,8 @@
     },
     {
       "path": "src/js/game-16-section-7-render.js",
-      "sha256": "986337a5c6ddc677275e4e4375ade7b2e96c62db9792d30e014506eb263c2dad",
-      "bytes": 8721
+      "sha256": "af7e7933d52a5c515e1a76ab57070698280b9a7c5ac02f6b16e200b2fbbe3aba",
+      "bytes": 9614
     },
     {
       "path": "src/js/game-17-section-8-minimap.js",
@@ -131,8 +131,8 @@
     },
     {
       "path": "src/js/game-22-section-13-main-loop.js",
-      "sha256": "47203f9e008ea38d4a801558cb0021ca5e8046d2da6adcbe93174515d76f0229",
-      "bytes": 317565
+      "sha256": "46b1d12ba96265038170a5158ba9e08b1b8cfa85bd56553778cd3794eed8a25b",
+      "bytes": 318319
     }
   ],
   "nodeVersion": "v24.14.0",

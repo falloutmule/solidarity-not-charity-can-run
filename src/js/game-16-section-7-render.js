@@ -2,6 +2,20 @@
 // SECTION 7 — RENDER
 // ---------------------------------------------------------------------------
 let _crSpriteGroundHarnessSamples = [];
+function crIsFlatBuildingWallType(wt){
+  return wt === WALL.BUILDING ||
+         wt === WALL.BRICK ||
+         wt === WALL.GLASS ||
+         wt === WALL.GARAGE ||
+         wt === WALL.CONCRETE ||
+         wt === WALL.SIGNAGE ||
+         wt === WALL.MURAL;
+}
+function crDrawFlatBuildingWallColumn(ctx, col, drawStart, sliceH){
+  if(sliceH < 1) return;
+  ctx.fillStyle = 'rgba(150,142,126,0.88)';
+  ctx.fillRect(col, drawStart, 1, sliceH);
+}
 function drawScene(now){
   if(_crHarnessDepth > 0) _crSpriteGroundHarnessSamples = [];
 
@@ -55,13 +69,22 @@ function drawScene(now){
     wallX -= Math.floor(wallX);
     const texX = crCoarseWallTexX(wallX, side, rdx, rdy, wt);
     const facadeRole = crResolveBuildingFaceRole(mapX, mapY, side, stepX, stepY);
+    const flatBuildingWall =
+      typeof CR_FLAT_BUILDING_WALLS_BASELINE !== 'undefined' &&
+      CR_FLAT_BUILDING_WALLS_BASELINE === 1 &&
+      crIsFlatBuildingWallType(wt);
     const tex = WALL_TEX[facadeRole ? WALL.BUILDING : wt] || WALL_TEX[WALL.BUILDING];
     const texSampleW = (wt === WALL.FENCE) ? 2 : CR_FPV_WALL_TEX_COARSE;
 
-    let sh = (game.wallShade[mapY]?(0.94+0.06*(game.wallShade[mapY][mapX]||0.5)):1);
-    if(side===1) sh*=0.72;
+    let sh = 1;
+    if(!flatBuildingWall){
+      sh = (game.wallShade[mapY]?(0.94+0.06*(game.wallShade[mapY][mapX]||0.5)):1);
+      if(side===1) sh*=0.72;
+    }
 
-    if(facadeRole){
+    if(flatBuildingWall){
+      crDrawFlatBuildingWallColumn(bctx, col, drawStart, sliceH);
+    } else if(facadeRole){
       crDrawComposedFacadeFaceColumn(bctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX, facadeRole);
     } else {
       bctx.drawImage(tex, texX, 0, texSampleW, TEXSIZE, col, drawStart, 1, sliceH);
@@ -69,7 +92,9 @@ function drawScene(now){
         crDrawFpvWorldFacadePanel(bctx, col, drawStart, sliceH, wt, mapX, mapY, side, wallX);
       }
     }
-    if(sh<1){ bctx.fillStyle=`rgba(0,0,0,${(1-sh).toFixed(3)})`; bctx.fillRect(col,drawStart,1,sliceH); }
+    if(flatBuildingWall){
+      if(side===1){ bctx.fillStyle='rgba(0,0,0,0.08)'; bctx.fillRect(col,drawStart,1,sliceH); }
+    } else if(sh<1){ bctx.fillStyle=`rgba(0,0,0,${(1-sh).toFixed(3)})`; bctx.fillRect(col,drawStart,1,sliceH); }
     const f = Math.min(1, d/visRange)*fogStrength;
     if(f>0){ bctx.fillStyle=`rgba(${fog[0]},${fog[1]},${fog[2]},${f.toFixed(3)})`; bctx.fillRect(col,drawStart,1,sliceH); }
   }
