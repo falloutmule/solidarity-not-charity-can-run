@@ -3926,6 +3926,101 @@ function crDebugPropDensity(){
     district: game.district
   };
 }
+
+/** solidwalls-frontproof1 — proof-only: building mass directly ahead of player (does not alter genCity). */
+const CR_SOLIDWALLS_FRONTPROOF_NAME = 'solidwalls-frontproof1';
+
+function crRoadMidY(){
+  const meta = game.streetLayoutMeta;
+  if(meta && meta.roadY0 != null && meta.roadY1 != null) return (meta.roadY0 + meta.roadY1) / 2;
+  return Math.floor((game.MAP_H || STREET_FOOTPRINT_H) / 2);
+}
+
+function crApplySolidwallsFrontProofHarness(opts){
+  opts = opts || {};
+  const map = game.map, shade = game.wallShade;
+  if(!map || !shade) return { ok: false, error: 'no map' };
+  const GW = game.MAP_W, GH = game.MAP_H;
+  const meta = game.streetLayoutMeta || { roadY0: 8, roadY1: 11, GW, GH };
+  const ry0 = meta.roadY0, ry1 = meta.roadY1;
+  game.roadY0 = ry0;
+  game.roadY1 = ry1;
+
+  const bx0 = 10, bx1 = 17;
+  const by0 = Math.max(2, ry0 - 2), by1 = Math.min(GH - 2, ry1 + 2);
+  const py = (ry0 + ry1) / 2 + 0.5;
+
+  for(let y = ry0; y <= ry1; y++){
+    for(let x = 2; x <= 9; x++){
+      if(y >= 0 && y < GH && x >= 0 && x < GW){
+        map[y][x] = 0;
+        shade[y][x] = 0.38;
+      }
+    }
+  }
+
+  for(let y = by0; y <= by1; y++){
+    for(let x = bx0; x <= bx1; x++){
+      map[y][x] = WALL.BUILDING;
+      shade[y][x] = 0.48;
+    }
+  }
+  for(let x = bx0 + 1; x <= bx1 - 1; x++){
+    map[by1][x] = WALL.BRICK;
+    shade[by1][x] = 0.52;
+  }
+  map[by0][bx1] = WALL.BRICK;
+  shade[by0][bx1] = 0.52;
+  map[by0][bx1 - 1] = WALL.CONCRETE;
+  shade[by0][bx1 - 1] = 0.5;
+
+  player.x = opts.px != null ? opts.px : 6.5;
+  player.y = opts.py != null ? opts.py : py;
+  player.angle = opts.angle != null ? opts.angle : 0;
+  if(typeof player.dir === 'number') player.dir = player.angle;
+
+  const keep = opts.keepEntities !== false;
+  if(keep){
+    if(!game.props || !game.props.length){
+      game.props = [
+        { x: 5.2, y: py - 0.6, kind: 'crate_stack', wob: 0 },
+        { x: 4.6, y: py + 0.5, kind: 'utility_box', wob: 0.3 },
+      ];
+    } else {
+      game.props[0].x = 5.2; game.props[0].y = py - 0.5;
+      if(game.props[1]){ game.props[1].x = 4.6; game.props[1].y = py + 0.5; }
+    }
+    if(!game.pickups || !game.pickups.length){
+      game.pickups = [{ x: 7.8, y: py, taken: false, amt: 2, wob: 0.2 }];
+    } else {
+      const c = game.pickups.find(p => !p.taken) || game.pickups[0];
+      c.x = 7.8; c.y = py; c.taken = false;
+    }
+    if(!game.npcs || !game.npcs.length){
+      game.npcs = [{ x: 8.2, y: py + 0.35, kind: 'hungry', need: 1, helped: false, wob: 0.5 }];
+    } else {
+      game.npcs[0].x = 8.2; game.npcs[0].y = py + 0.35;
+    }
+  }
+
+  if(game.run){
+    game.run.harnessOnly = true;
+    game.run.customLevel = null;
+  }
+
+  return {
+    ok: true,
+    harness: CR_SOLIDWALLS_FRONTPROOF_NAME,
+    BUILD_ID,
+    CR_SOLID_WALLS_OPAQUE_BASELINE: typeof CR_SOLID_WALLS_OPAQUE_BASELINE !== 'undefined' ? CR_SOLID_WALLS_OPAQUE_BASELINE : null,
+    player: { x: player.x, y: player.y, angle: player.angle },
+    block: { bx0, bx1, by0, by1 },
+    materials: { face: 'BUILDING', sideBrick: 'BRICK', accent: 'CONCRETE' },
+    roadY0: ry0, roadY1: ry1,
+    density: typeof crDebugPropDensity === 'function' ? crDebugPropDensity() : null,
+  };
+}
+
 function genCity(seed, district, modifier){
   RNG = mulberry32((seed ^ 0x9e3779b9) + district*2654435761);
   const r = RNG;
@@ -14136,7 +14231,7 @@ globalThis.CR = window.CR = {
   get mobileMode(){ return mobileMode; },
   crGetSelectedStartDistrict,crCycleSelectedStartDistrict,crSetSelectedStartDistrict,crTitleMenuSelectableRows,titleMenuRowLabel,crMinimapNavCellColor,
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
-  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runDecorativePropsSelfCheck,runOptionsCleanupSelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runStreetBlockLevelSelfCheck,runD1ParkLandmarkSelfCheck,runBuildingModuleFacadeSelfCheck,runFacadePackBridgeSelfCheck,runFacadePackV2SafeModuleSelfCheck,runFpvGroundPlaneAlignmentSelfCheck,runD2D3FacadeReadabilityFinalSelfCheck,runBuildingSmoothStyleSelfCheck,runContinuousFacadeTextureSelfCheck,runSpriteGroundAnchorSelfCheck,crDebugGroundPlaneAlignment,crDebugFacadeReadabilityFinal,crDebugBuildingSmoothStyle,crDebugContinuousFacadeTexture,crBuildFacadeTextureAtlas,crGetFacadeTextureForFace,crProjectedFloorY,crWallProjectionMetrics,crDebugSpriteProjection,runFacadeArtVocabularySelfCheck,runFacadeCompositionReadabilitySelfCheck,crDebugDescribeFacadeHit,runFpvFacadeTargetPolishSelfCheck,runFpvWallLineArtifactFixSelfCheck,runFpvStreetShimmerFixSelfCheck,runStreetReadabilityMinimapSelfCheck,runBuildingScalePolishSelfCheck,runEarlyDistrictProgressionSelfCheck,runLevelSelectorSelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
+  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runDecorativePropsSelfCheck,runOptionsCleanupSelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runStreetBlockLevelSelfCheck,runD1ParkLandmarkSelfCheck,runBuildingModuleFacadeSelfCheck,runFacadePackBridgeSelfCheck,runFacadePackV2SafeModuleSelfCheck,runFpvGroundPlaneAlignmentSelfCheck,runD2D3FacadeReadabilityFinalSelfCheck,runBuildingSmoothStyleSelfCheck,runContinuousFacadeTextureSelfCheck,runSpriteGroundAnchorSelfCheck,crDebugGroundPlaneAlignment,crDebugFacadeReadabilityFinal,crDebugBuildingSmoothStyle,crDebugContinuousFacadeTexture,crDebugPropDensity,crApplySolidwallsFrontProofHarness,CR_SOLIDWALLS_FRONTPROOF_NAME,crBuildFacadeTextureAtlas,crGetFacadeTextureForFace,crProjectedFloorY,crWallProjectionMetrics,crDebugSpriteProjection,runFacadeArtVocabularySelfCheck,runFacadeCompositionReadabilitySelfCheck,crDebugDescribeFacadeHit,runFpvFacadeTargetPolishSelfCheck,runFpvWallLineArtifactFixSelfCheck,runFpvStreetShimmerFixSelfCheck,runStreetReadabilityMinimapSelfCheck,runBuildingScalePolishSelfCheck,runEarlyDistrictProgressionSelfCheck,runLevelSelectorSelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
   CR_VISUAL_READABILITY,CR_SOUND_FEEDBACK,DECOR_PROP_REQUIRED,INPUT_CONFIG,CR_CONTROLS_LS_KEY,crTriggerSoundCue,crSoundEnabled,crSoundFeedbackCueIds,crLoadControlOverrides,crPersistControlOverrides,crResetControlLayoutOverrides,crClearControlOverrides,crEnterControlEditMode,crFinishControlEditMode,crControlHitTest,crSnapshotLayoutNorms,crPrepareSelfCheckPortrait,crStepEditControlSize,crSelectEditControl,
   getCrVisualHarnessSnapshot(){ return _crVisualHarnessSnapshot; },
   showOnboardingHelp,dismissOnboardingHelp,crOpenFirstRunHelpIfNeeded,
