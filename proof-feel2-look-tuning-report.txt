@@ -1,0 +1,21 @@
+feel2 mobile portrait LOOK tuning
+=================================
+
+Scope: portrait mobile LOOK apply path only (crApplyLookPadDx → mobileLookSens).
+feel1 pointer/touch dedupe unchanged. No graphics, walls, sprint, MOVE, landscape.
+
+Constants (unchanged unless noted):
+- BASE_MOBILE_TURN_SENS = 0.0062 rad/px (at lookSpeed 1.0x)
+- PORTRAIT_LOOK_BOOST = 1.72 (feel1 portrait multiplier)
+- FEEL2_PORTRAIT_LOOK_SOFTEN = 0.85 (feel2 only)
+
+Portrait effective multiplier:
+- feel1: 1.72
+- feel2: 1.72 × 0.85 = 1.462 (~15.0% lower than feel1)
+
+Default options (lookSpeed 1.0x):
+- mobileTurnSens = BASE_MOBILE_TURN_SENS × 1 = 0.0062
+- feel1 effective portrait LOOK sens = 0.0062 × 1.72 = 0.010664 rad/px
+- feel2 effective portrait LOOK sens = 0.0062 × 1.462 = 0.0090644 rad/px
+
+Verification: crGetFeel2LookTuningProof() in harness / Playwright after mobile=on&portraitlayout=1.

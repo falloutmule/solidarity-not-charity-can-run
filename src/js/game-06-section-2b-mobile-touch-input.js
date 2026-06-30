@@ -8,7 +8,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'feel1';
+const BUILD_ID = 'feel2';
 const CR_FPV_STREET_SHIMMER_FIX = 1;
 const CR_FPV_STREET_MATTE = true;
 const CR_FPV_WALL_LINE_FIX = 1;
@@ -117,6 +117,8 @@ let ms_element = null; // reference to SPRINT button for visual state updates
 const BASE_MOBILE_TURN_SENS = 0.0062; // per-pixel rad; 1.0x ≈ prior MED. Portrait adds extra boost via mobileLookSens().
 const LOOK_SPEED_STEPS = [0.75,1,1.25,1.5,2,2.5,3,4,5,6,8,10];
 const PORTRAIT_LOOK_BOOST = 1.72; // small LOOK circle needs more gain than landscape drag zone
+/** feel2: soften portrait LOOK ~15% vs feel1 (touch dedupe unchanged). */
+const FEEL2_PORTRAIT_LOOK_SOFTEN = 0.85;
 const LEGACY_LOOK_TO_SPEED = {low:0.75, med:1, high:1.5, fast:2.5};
 const JOY_SIZE_STEPS = [80, 90, 100, 110, 120, 130, 140, 150, 165, 180, 200, 220];
 const BTN_SIZE_STEPS = [60, 70, 80, 85, 95, 100, 110, 120, 130, 145, 160, 175];
@@ -615,11 +617,36 @@ function bumpControlHeight(){
   drawMobileMenu();
 }
 function lookSensFromSpeed(v){ return BASE_MOBILE_TURN_SENS * (Number(v)||1); }
+function crPortraitLookSensMultiplier(){
+  if(!mobileMode) return 1;
+  if(isMobilePortrait()){
+    let mult = PORTRAIT_LOOK_BOOST;
+    if(BUILD_ID === 'feel2') mult *= FEEL2_PORTRAIT_LOOK_SOFTEN;
+    return mult;
+  }
+  return 1.06;
+}
 function mobileLookSens(){
   const s = options.mobileTurnSens;
   if(!mobileMode) return s;
-  if(isMobilePortrait()) return s * PORTRAIT_LOOK_BOOST;
-  return s * 1.06;
+  return s * crPortraitLookSensMultiplier();
+}
+function crGetFeel2LookTuningProof(){
+  const optSens = options.mobileTurnSens;
+  const mult = crPortraitLookSensMultiplier();
+  const feel1Mult = isMobilePortrait() ? PORTRAIT_LOOK_BOOST : (mobileMode ? 1.06 : 1);
+  return {
+    BUILD_ID,
+    BASE_MOBILE_TURN_SENS,
+    PORTRAIT_LOOK_BOOST,
+    FEEL2_PORTRAIT_LOOK_SOFTEN: BUILD_ID === 'feel2' ? FEEL2_PORTRAIT_LOOK_SOFTEN : null,
+    portraitLookMultiplier: mult,
+    effectiveMobileLookSens: optSens * mult,
+    feel1PortraitMultiplier: feel1Mult,
+    percentReductionVsFeel1Portrait: BUILD_ID === 'feel2' ? Math.round((1 - FEEL2_PORTRAIT_LOOK_SOFTEN) * 1000) / 10 : 0,
+    mobileTurnSens: optSens,
+    lookSpeed: options.lookSpeed,
+  };
 }
 function lookSpeedLabel(v){ const n=Number(v)||1; return (Number.isInteger(n)?n.toFixed(1):String(n)) + 'x'; }
 function percentLabel(v){ return Math.round((Number(v)||0)*100)+'%'; }
