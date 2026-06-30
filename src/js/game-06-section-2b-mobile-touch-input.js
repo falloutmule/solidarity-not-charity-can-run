@@ -8,7 +8,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'solidwalls1';
+const BUILD_ID = 'feel1';
 const CR_FPV_STREET_SHIMMER_FIX = 1;
 const CR_FPV_STREET_MATTE = true;
 const CR_FPV_WALL_LINE_FIX = 1;
@@ -96,6 +96,18 @@ function mobileInputActive(){
 const tzone = { active:false, id:null, lastX:0 };
 // Dedicated LOOK circle (#mlookpad) — tracked by touch identifier for multi-touch
 const lookTouch = { id:null, lastX:0 };
+/** Incremented when a LOOK pad drag applies angle (tests / dedupe verification). */
+let _crLookPadApplyCount = 0;
+function crResetLookPadApplyCount(){ _crLookPadApplyCount = 0; }
+function crGetLookPadApplyCount(){ return _crLookPadApplyCount; }
+/** Single apply site for #mlookpad horizontal look drag (deadband unchanged). */
+function crApplyLookPadDx(dx){
+  if(state!==STATE.PLAY || paused) return false;
+  if(Math.abs(dx) <= 0.2) return false;
+  player.angle += dx * mobileLookSens();
+  _crLookPadApplyCount++;
+  return true;
+}
 let lookHintUsed = false;
 let lookHintShownAt = 0;
 const LOOK_HINT_TIMEOUT_MS = 5000;
@@ -1030,14 +1042,14 @@ function bindMobileControls(){
     if(lpadTouchPtr && e.pointerId === lpadTouchPtr.id){
       e.preventDefault(); e.stopPropagation();
       const dx = e.clientX - lpadTouchPtr.lastX;
-      if(Math.abs(dx) > 0.2){ lpadTouchPtr.lastX = e.clientX; lookTouch.lastX = e.clientX; player.angle += dx * mobileLookSens(); }
+      if(crApplyLookPadDx(dx)){ lpadTouchPtr.lastX = e.clientX; lookTouch.lastX = e.clientX; }
       return;
     }
     if(e.pointerType === 'touch') return;
     if(!lpadMousePtr || e.pointerId !== lpadMousePtr.id) return;
     e.preventDefault(); e.stopPropagation();
     const dx = e.clientX - lpadMousePtr.startX;
-    if(Math.abs(dx) > 0.2){ lpadMousePtr.startX = e.clientX; player.angle += dx * mobileLookSens(); }
+    if(crApplyLookPadDx(dx)) lpadMousePtr.startX = e.clientX;
     touchDebug({type:'look_circle_move', orient:isMobilePortrait()?'port':'land', dx, angle:player.angle});
   },{passive:false});
 
@@ -1206,11 +1218,13 @@ function bindMobileControls(){
       if(lookTouch.id !== null && t.identifier === lookTouch.id){
         handled = true;
         if(state===STATE.PLAY && !paused){
-          const dx = t.clientX - lookTouch.lastX;
-          if(Math.abs(dx) > 0.2){
-            lookTouch.lastX = t.clientX;
-            player.angle += dx * mobileLookSens();
-            touchDebug({type:'look_circle_touch_move', orient:isMobilePortrait()?'port':'land', dx, angle:player.angle, joyId:joy.id, lookId:lookTouch.id});
+          // Pointer capture on #mlookpad owns touch/pen drags; skip doc touchmove dup (Chrome Android).
+          if(lpadTouchPtr === null){
+            const dx = t.clientX - lookTouch.lastX;
+            if(crApplyLookPadDx(dx)){
+              lookTouch.lastX = t.clientX;
+              touchDebug({type:'look_circle_touch_move', orient:isMobilePortrait()?'port':'land', dx, angle:player.angle, joyId:joy.id, lookId:lookTouch.id});
+            }
           }
         }
       }

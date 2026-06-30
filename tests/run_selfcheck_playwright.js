@@ -2658,10 +2658,11 @@ function sourceBuildPipelineSection() {
     errors.push('missing proof-source-build-manifest.json');
   }
   const indexText = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
-  const buildIdOk = indexText.includes("const BUILD_ID = 'solidwalls1'");
-  if (!buildIdOk) errors.push('BUILD_ID must be solidwalls1 for this pass');
+  const buildIdOk = indexText.includes("const BUILD_ID = 'feel1'") || indexText.includes("const BUILD_ID = 'solidwalls1'");
+  if (!buildIdOk) errors.push('BUILD_ID must be feel1 or solidwalls1 for this pass');
   const pass = errors.length === 0 && proof && proof.check === 'pass';
-  const result = { pass, errors, buildId: 'solidwalls1', proofSummary: proof ? { outputSha256: proof.outputSha256, outputBytes: proof.outputBytes, check: proof.check } : null };
+  const buildIdMatch = indexText.match(/const BUILD_ID = '([^']+)'/);
+  const result = { pass, errors, buildId: buildIdMatch ? buildIdMatch[1] : null, proofSummary: proof ? { outputSha256: proof.outputSha256, outputBytes: proof.outputBytes, check: proof.check } : null };
   writeProof('proof-source-build-pipeline.json', result);
 
   return result;

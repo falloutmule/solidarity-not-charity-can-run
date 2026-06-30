@@ -1,0 +1,12 @@
+feel1 mobile LOOK dedupe
+========================
+
+Change: single crApplyLookPadDx() for #mlookpad look drags.
+When lpadTouchPtr is active (pointer capture path), document touchmove
+no longer applies the same lookTouch drag (Chrome Android dup fix).
+
+BUILD_ID: feel1 (solidwalls1 wall flags unchanged)
+
+Probe: node tests/verify_look_dedupe_probe.js
+
+Perfprobe: unchanged, still ?perfprobe=1 gated.
