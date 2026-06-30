@@ -12,12 +12,12 @@ function crIsFlatBuildingWallType(wt){
          wt === WALL.MURAL;
 }
 function crSimpleMaterialWallColor(wt){
-  if(wt === WALL.CONCRETE) return 'rgba(150,144,134,0.90)';
-  if(wt === WALL.BRICK)    return 'rgba(150,108,84,0.90)';
-  if(wt === WALL.GLASS)    return 'rgba(54,66,80,0.90)';
-  if(wt === WALL.GARAGE)   return 'rgba(150,144,134,0.90)';
-  if(wt === WALL.SIGNAGE || wt === WALL.MURAL) return 'rgba(176,160,130,0.90)';
-  return 'rgba(184,166,128,0.90)';
+  if(wt === WALL.CONCRETE) return '#969084';
+  if(wt === WALL.BRICK)    return '#966c54';
+  if(wt === WALL.GLASS)    return '#364250';
+  if(wt === WALL.GARAGE)   return '#969084';
+  if(wt === WALL.SIGNAGE || wt === WALL.MURAL) return '#b8a680';
+  return '#b8a680';
 }
 function crDrawFlatBuildingWallColumn(ctx, col, drawStart, sliceH, wt){
   if(sliceH < 1) return;

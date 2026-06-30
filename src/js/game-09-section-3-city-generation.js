@@ -945,7 +945,7 @@ function crDebugBuildingSmoothStyle(){
   const base = crDebugFacadeReadabilityFinal();
   const artSrc = (typeof crDrawSmoothBuildingMaterialBase === 'function' ? String(crDrawSmoothBuildingMaterialBase) : '') + '\\n' + (typeof crDrawSmoothBuildingFaceColumn === 'function' ? String(crDrawSmoothBuildingFaceColumn) : '') + '\\n' + (typeof crDrawComposedFacadeFaceColumn === 'function' ? String(crDrawComposedFacadeFaceColumn) : '');
   const checks = {
-    buildId: BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1',
+    buildId: BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1',
     smoothFlag: typeof CR_BUILDING_SMOOTH_STYLE !== 'undefined' && CR_BUILDING_SMOOTH_STYLE === 1,
     smoothHelper: typeof crDrawSmoothBuildingFaceColumn === 'function' && typeof crDrawSmoothBuildingMaterialBase === 'function',
     facadePackStillExists: !!(CR_FACADE_PACK && CR_FACADE_PACK.modules && CR_FACADE_PACK.roles),
@@ -989,7 +989,7 @@ function crDebugContinuousFacadeTexture(){
   }
   const drawSrc = (typeof crDrawComposedFacadeFaceColumn === 'function' ? String(crDrawComposedFacadeFaceColumn) : '') + '\n' + (typeof crDrawContinuousFacadeTextureColumn === 'function' ? String(crDrawContinuousFacadeTextureColumn) : '');
   const checks = {
-    buildId: BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1',
+    buildId: BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1',
     calmWallsPropsFirstMode: BUILD_ID !== 'calmwalls1' || (typeof CR_CALM_WALLS_PROPS_FIRST !== 'undefined' && CR_CALM_WALLS_PROPS_FIRST === 1 && drawSrc.indexOf('crDrawCalmPropsFirstWallColumn') >= 0),
     simpleWallsBaselineMode: BUILD_ID !== 'simplewalls1' || (typeof CR_SIMPLE_WALLS_BASELINE !== 'undefined' && CR_SIMPLE_WALLS_BASELINE === 1 && drawSrc.indexOf('crDrawSimpleWallColumn') >= 0),
     atlasExists: !!atlas && keys.length >= 7,
@@ -1403,6 +1403,8 @@ function applyStreetBlockGrammar(map, shade, GW, GH, district, modifier, r){
     const doBand = storefrontBands || (d===1 && r()<0.28);
     if(!doBand) return;
     const faceY = side==='north' ? yEnd-1 : yStart;
+    // Choose one material for this entire block segment (per-block grouping)
+    const segMaterial = storefrontBands && d<=3 ? (r() < 0.4 ? WALL.GLASS : WALL.BUILDING) : crPickWallType(r);
     if(storefrontBands){
       const facadeRows = d===2 ? 3 : (d>=3 ? 4 : 1);
       for(let fr=0; fr<facadeRows; fr++){
@@ -1411,7 +1413,7 @@ function applyStreetBlockGrammar(map, shade, GW, GH, district, modifier, r){
         for(let x=bx0+inset; x<=bx1-inset; x++){
           if(spineXs.indexOf(x)>=0) continue;
           if(fr===0 || r() < 0.62 + d*0.06){
-            map[fy][x]= storefrontBands && d<=3 && fr<=1 ? crPickStorefrontWall(r) : crPickWallType(r);
+            map[fy][x]= segMaterial;
             shade[fy][x]=r();
           }
         }
@@ -1422,7 +1424,7 @@ function applyStreetBlockGrammar(map, shade, GW, GH, district, modifier, r){
       const distFromFace = side==='north' ? (faceY - y) : (y - faceY);
       const localFill = distFromFace <= 2 ? fillRate * 1.15 : fillRate;
       if(r()<Math.min(0.9, localFill)){
-        map[y][x]=crPickWallType(r); shade[y][x]=r();
+        map[y][x]= segMaterial; shade[y][x]=r();
       }
     }
     if(d===2 && r()<shallowPocketRate){

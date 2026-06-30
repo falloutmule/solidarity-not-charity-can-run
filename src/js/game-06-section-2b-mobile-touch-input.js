@@ -8,7 +8,7 @@ const inp = {
   sprint:false, give:false, map:false, pause:false,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'props1restore1';
+const BUILD_ID = 'solidwalls1';
 const CR_FPV_STREET_SHIMMER_FIX = 1;
 const CR_FPV_STREET_MATTE = true;
 const CR_FPV_WALL_LINE_FIX = 1;
@@ -32,6 +32,8 @@ const CR_SIMPLE_WALLS_BASELINE = 1;
 const CR_PROPS1_RESTORE_SIMPLE_MATERIALS = 1;
 /** Props-first restore: guaranteed minimum prop density near main road / player start. */
 const CR_PROPS1_RESTORE_PROP_DENSITY = 1;
+/** solidwalls1: opaque hex building fills + per-segment map material grouping (no transparent wall mass). */
+const CR_SOLID_WALLS_OPAQUE_BASELINE = 1;
 /** Floor-anchored FPV wall mass / sprite contact plane alignment. */
 const CR_FPV_GROUND_PLANE_ALIGNMENT = 1;
 /** Split-source pipeline active: edit src/ and regenerate root index.html with npm run build. */
