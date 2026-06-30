@@ -30,7 +30,13 @@ function crCycleSelectedStartDistrict(){
   return selectedStartDistrict;
 }
 function crSetSelectedStartDistrict(d){
-  selectedStartDistrict = Math.max(1, Math.min(4, d|0 || 1));
+  if(typeof d === 'string'){
+    const m = d.trim().match(/^D?([1-4])$/i);
+    if(m) selectedStartDistrict = parseInt(m[1], 10);
+    else selectedStartDistrict = Math.max(1, Math.min(4, parseInt(d, 10) || 1));
+  } else {
+    selectedStartDistrict = Math.max(1, Math.min(4, d|0 || 1));
+  }
   return selectedStartDistrict;
 }
 function crTitleMenuSelectableRows(){

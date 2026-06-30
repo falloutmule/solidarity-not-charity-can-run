@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-30T10:54:54.986Z",
+  "generatedAt": "2026-06-30T12:26:00.082Z",
   "output": "index.html",
-  "outputSha256": "d2b923f92c1e4374be97454edc524b8de76e853dc17dfdfb6a0cf7dff10d374d",
-  "outputBytes": 644188,
+  "outputSha256": "a0cab7dee037834c555deeb2f91e5251cf020c13780dd6564869d11fd523a995",
+  "outputBytes": 651364,
   "inputs": [
     {
       "path": "src/template.html",
@@ -121,8 +121,8 @@
     },
     {
       "path": "src/js/game-20-section-11-update-input.js",
-      "sha256": "bd8b6de7dfbbf96ba9857bb6900f829a533170c23a07db7447cf31e4f4e80066",
-      "bytes": 21566
+      "sha256": "a4033bf40c9949f3038456654b3e8180a1cf4ca2f739a081f6c1c2a369e461c0",
+      "bytes": 21793
     },
     {
       "path": "src/js/game-21-section-12-overlays.js",
@@ -130,9 +130,14 @@
       "bytes": 15385
     },
     {
+      "path": "src/js/game-21a-section-12b-perf-probe.js",
+      "sha256": "ce9d8f6bd9a9b209de8662ce07187f8a4d3f61570568dba594d25d4c9962448d",
+      "bytes": 6790
+    },
+    {
       "path": "src/js/game-22-section-13-main-loop.js",
-      "sha256": "85f47c2b8d6ae8d0b7c3bf80be79e07fe588a0dba2a72110ae20f9c4ed5084ac",
-      "bytes": 320801
+      "sha256": "cf7e9ebd3204f89b48071fb05473ccb1396f977070c514668fec2a5968eb3640",
+      "bytes": 320963
     }
   ],
   "nodeVersion": "v24.14.0",

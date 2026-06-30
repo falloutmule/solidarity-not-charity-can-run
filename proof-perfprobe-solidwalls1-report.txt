@@ -1,0 +1,18 @@
+solidwalls1 gated perfprobe overlay
+===================================
+
+Enable (public):
+  ?v=<sha>&mobile=on&portraitlayout=1&perfprobe=1
+
+Optional reset on load: &perfreset=1
+In-game: tap top-left overlay box to reset rolling stats.
+
+Shows: BUILD_ID, FPS, frame avg/p95/worst, >33ms/>50ms counts,
+drawScene/minimap/chrome/hud ms, sprite count, district, seed,
+canvas/css size, dpr, mob/port layout.
+
+No overlay without perfprobe=1.
+
+D2 fix: crSetSelectedStartDistrict accepts 2, '2', 'D2'.
+
+Local proof: proof-perfprobe-solidwalls1-play.png (D1 seed 646848659).

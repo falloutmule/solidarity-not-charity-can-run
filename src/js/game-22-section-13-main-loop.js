@@ -244,6 +244,8 @@ function playfieldLayout(){
 }
 let last=performance.now();
 function frame(now){
+  if(CR_PERF_PROBE) crPerfProbeEnsureInstalled();
+  if(CR_PERF_PROBE) crPerfProbeFrameStart(now);
   if(_crHarnessDepth === 0) crGuardHarnessLeakOutsideCheck();
   const dt=Math.min(0.05,(now-last)/1000); last=now;
   update(dt);
@@ -302,6 +304,7 @@ function frame(now){
     drawOverlays();
     drawMobileMenu();
   }
+  if(CR_PERF_PROBE && ctx) crPerfProbeDrawOverlay(ctx, now);
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);

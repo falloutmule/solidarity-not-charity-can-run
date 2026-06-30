@@ -29,6 +29,7 @@
     "src/js/game-19-section-10-gameplay-actions.js",
     "src/js/game-20-section-11-update-input.js",
     "src/js/game-21-section-12-overlays.js",
+    "src/js/game-21a-section-12b-perf-probe.js",
     "src/js/game-22-section-13-main-loop.js"
   ],
   "output": "index.html",
