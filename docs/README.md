@@ -10,6 +10,7 @@ Navigation for maintainers and Hermes handoffs.
 | [mobile-layout-and-controls.md](mobile-layout-and-controls.md) | Frozen portrait UI + control guards |
 | [q1k3-lessons.md](q1k3-lessons.md) | q1k3 reference; what we borrowed |
 | [handoff-rules.md](handoff-rules.md) | Travis / Hermes working contract |
+| [raycast-engine-architecture.md](raycast-engine-architecture.md) | Canvas 2D raycaster baseline, invariants, render order |
 
 ## Reusable Hermes skill (standalone repo)
 
