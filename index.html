@@ -7230,7 +7230,6 @@ function update(dt){
 
   if(state!==STATE.PLAY || paused || onboardingOpen) return;
 
-  crApplyPendingInputActions();
   const act = crRefreshSemanticActionMap();
 
   game.timeLeft -= dt;
@@ -8191,13 +8190,75 @@ function playfieldLayout(){
   const dw = RW*scale, dh = RH*scale;
   return {scale,dw,dh,ox:(cw-dw)/2,oy:(ch-dh)/2,portrait:false,playH:ch,cropH:dh};
 }
+
+const CR_FIXED_STEP_DT = 1 / 60;
+const CR_FIXED_STEP_MAX_FRAME_DT = 0.25;
+const CR_FIXED_STEP_MAX_STEPS_PER_FRAME = 5;
+
+let crFixedStepAccumulator = 0;
+let crFixedStepLastFrameDt = 0;
+let crFixedStepLastSteps = 0;
+let crFixedStepDroppedFrames = 0;
+
+function crResetFixedStepSimulation(){
+  crFixedStepAccumulator = 0;
+  crFixedStepLastFrameDt = 0;
+  crFixedStepLastSteps = 0;
+  crFixedStepDroppedFrames = 0;
+}
+
+function crClampFixedFrameDt(dt){
+  if(!Number.isFinite(dt) || dt < 0) return 0;
+  return Math.min(dt, CR_FIXED_STEP_MAX_FRAME_DT);
+}
+
+function crStepSimulationFixed(frameDt){
+  const dt = crClampFixedFrameDt(frameDt);
+  crFixedStepLastFrameDt = dt;
+  crFixedStepAccumulator += dt;
+
+  let steps = 0;
+  while(crFixedStepAccumulator >= CR_FIXED_STEP_DT && steps < CR_FIXED_STEP_MAX_STEPS_PER_FRAME){
+    update(CR_FIXED_STEP_DT);
+    crFixedStepAccumulator -= CR_FIXED_STEP_DT;
+    steps++;
+  }
+
+  if(steps >= CR_FIXED_STEP_MAX_STEPS_PER_FRAME && crFixedStepAccumulator >= CR_FIXED_STEP_DT){
+    crFixedStepDroppedFrames++;
+    crFixedStepAccumulator = 0;
+  }
+
+  crFixedStepLastSteps = steps;
+  return {
+    dt,
+    steps,
+    accumulator: crFixedStepAccumulator,
+    droppedFrames: crFixedStepDroppedFrames,
+  };
+}
+
+function crGetFixedStepState(){
+  return {
+    enabled: true,
+    stepDt: CR_FIXED_STEP_DT,
+    maxFrameDt: CR_FIXED_STEP_MAX_FRAME_DT,
+    maxStepsPerFrame: CR_FIXED_STEP_MAX_STEPS_PER_FRAME,
+    accumulator: crFixedStepAccumulator,
+    lastFrameDt: crFixedStepLastFrameDt,
+    lastSteps: crFixedStepLastSteps,
+    droppedFrames: crFixedStepDroppedFrames,
+  };
+}
+
 let last=performance.now();
 function frame(now){
   if(CR_PERF_PROBE) crPerfProbeEnsureInstalled();
   if(CR_PERF_PROBE) crPerfProbeFrameStart(now);
   if(_crHarnessDepth === 0) crGuardHarnessLeakOutsideCheck();
-  const dt=Math.min(0.05,(now-last)/1000); last=now;
-  update(dt);
+  const rawDt = (now-last)/1000; last=now;
+  crApplyPendingInputActions();
+  crStepSimulationFixed(rawDt);
 
   if(state===STATE.PLAY || state===STATE.UPGRADE){
     // full game scene render
@@ -14061,6 +14122,166 @@ function runWorldLayerAdapterSelfCheck(){
   }
 }
 
+function runFixedStepSimulationSelfCheck(){
+  return crWithTemporaryState('fixedStepSimulation', () => {
+    const errors = [];
+    const evidence = {};
+    const MOVE_TOLERANCE = 0.08;
+    const err0 = window.__crRuntimeErrors.length;
+
+    function prepWalkMap(){
+      crHarnessInstallMicroMap([
+        '.....',
+        '.....',
+        '.....',
+        '.....',
+        '.....',
+      ]);
+      player.x = 2.5;
+      player.y = 2.5;
+      player.angle = Math.PI / 2;
+      for(const k of Object.keys(keys)) delete keys[k];
+      clearMoveInput();
+    }
+
+    function simMoveFrames(n, frameDt){
+      prepWalkMap();
+      crResetFixedStepSimulation();
+      keys['KeyW'] = true;
+      const x0 = player.x, y0 = player.y;
+      for(let i = 0; i < n; i++) crStepSimulationFixed(frameDt);
+      delete keys['KeyW'];
+      return Math.hypot(player.x - x0, player.y - y0);
+    }
+
+    const st0 = crGetFixedStepState();
+    const checks = {
+      fixedStepEnabled: st0.enabled === true,
+      stepDtIsOneSixtieth: Math.abs(st0.stepDt - 1 / 60) < 1e-9,
+      frameDtClamped: false,
+      maxStepsBounded: false,
+      accumulatorDoesNotExplode: true,
+      movement60hzConsistent: false,
+      movement30hzConsistent: false,
+      backgroundSpikeDoesNotTeleport: false,
+      collisionStillStopsAtWall: false,
+      sprintStaminaConsistent: false,
+      giveDoesNotRepeatAcrossSubsteps: false,
+      lookDeltaNotMultiplied: false,
+      semanticActionsStillPresent: typeof getSemanticActionMap === 'function',
+      viewportAuthorityStillPasses: false,
+      raycasterInvariantStillPasses: false,
+      worldAdapterStillPasses: false,
+      runtimeClean: true,
+    };
+
+    try {
+      startRun(9100);
+      state = STATE.PLAY;
+      paused = false;
+      onboardingOpen = false;
+      game.timeLeft = 999;
+
+      const d60 = simMoveFrames(60, 1 / 60);
+      const d30 = simMoveFrames(30, 1 / 30);
+      const d15 = simMoveFrames(15, 1 / 15);
+      evidence.moveDist60 = d60;
+      evidence.moveDist30 = d30;
+      evidence.moveDist15 = d15;
+      checks.movement60hzConsistent = Math.abs(d60 - d30) <= MOVE_TOLERANCE;
+      checks.movement30hzConsistent = Math.abs(d60 - d15) <= MOVE_TOLERANCE;
+
+      prepWalkMap();
+      crResetFixedStepSimulation();
+      const pxSpike = player.x, pySpike = player.y;
+      const time0 = game.timeLeft;
+      const spike = crStepSimulationFixed(1.25);
+      evidence.spike = spike;
+      checks.frameDtClamped = spike.dt <= CR_FIXED_STEP_MAX_FRAME_DT + 1e-9;
+      checks.maxStepsBounded = spike.steps <= CR_FIXED_STEP_MAX_STEPS_PER_FRAME;
+      checks.backgroundSpikeDoesNotTeleport = Math.hypot(player.x - pxSpike, player.y - pySpike) < 1.2;
+      checks.accumulatorDoesNotExplode = crFixedStepAccumulator < CR_FIXED_STEP_DT + 1e-6;
+      evidence.timeLeftDrop = time0 - game.timeLeft;
+      if(evidence.timeLeftDrop > spike.steps * CR_FIXED_STEP_DT + 0.06){
+        errors.push('timeLeft dropped too much on spike frame');
+      }
+
+      prepWalkMap();
+      crHarnessInstallMicroMap(['###', '#.#', '###']);
+      player.x = 1.5;
+      player.y = 1.0;
+      crResetFixedStepSimulation();
+      keys['KeyW'] = true;
+      for(let i = 0; i < 120; i++) crStepSimulationFixed(1 / 60);
+      delete keys['KeyW'];
+      checks.collisionStillStopsAtWall = !World.cellSolidAt(player.x, player.y);
+
+      prepWalkMap();
+      crResetFixedStepSimulation();
+      player.stamina = player.maxStamina;
+      keys['ShiftLeft'] = true;
+      keys['KeyW'] = true;
+      const stam0 = player.stamina;
+      crStepSimulationFixed(1 / 30);
+      evidence.sprintDropOneFrame = stam0 - player.stamina;
+      delete keys['ShiftLeft'];
+      delete keys['KeyW'];
+      checks.sprintStaminaConsistent = evidence.sprintDropOneFrame > 0.01;
+
+      let giveCalls = 0;
+      const giveOrig = giveCan;
+      giveCan = function(){
+        giveCalls++;
+        return giveOrig();
+      };
+      try {
+        inp.give = true;
+        inp._lastGive = false;
+        crResetFixedStepSimulation();
+        for(let i = 0; i < 8; i++) update(CR_FIXED_STEP_DT);
+        checks.giveDoesNotRepeatAcrossSubsteps = giveCalls <= 1;
+      } finally {
+        giveCan = giveOrig;
+        inp.give = false;
+        inp._lastGive = false;
+      }
+
+      prepWalkMap();
+      crResetFixedStepSimulation();
+      const ang0 = player.angle;
+      inp.lookDeltaRad = 0.25;
+      crApplyPendingInputActions();
+      const ang1 = player.angle;
+      crStepSimulationFixed(0.5);
+      const ang2 = player.angle;
+      evidence.lookApplied = ang1 - ang0;
+      evidence.lookAfterSteps = ang2 - ang1;
+      checks.lookDeltaNotMultiplied =
+        Math.abs(evidence.lookApplied - 0.25) < 0.03 &&
+        Math.abs(evidence.lookAfterSteps) < 0.02;
+
+      checks.viewportAuthorityStillPasses = runViewportAuthoritySelfCheck().pass;
+      checks.worldAdapterStillPasses = runWorldLayerAdapterSelfCheck().pass;
+      checks.raycasterInvariantStillPasses = runRaycasterInvariantSelfCheck().pass;
+      checks.runtimeClean = window.__crRuntimeErrors.length === err0;
+      if(!checks.runtimeClean) errors.push('runtime errors during fixed-step selfcheck');
+    } catch(e){
+      errors.push(String(e && e.message ? e.message : e));
+    }
+
+    const pass = errors.length === 0 && Object.values(checks).every(Boolean);
+    return {
+      pass,
+      build: BUILD_ID,
+      errors,
+      checks,
+      evidence,
+      fixedStep: crGetFixedStepState(),
+      timestamp: new Date().toISOString(),
+    };
+  });
+}
+
 function runFixedStepBaselineSelfCheck(){
   const errors = [];
   const evidence = {};
@@ -15144,8 +15365,9 @@ globalThis.CR = window.CR = {
   set paused(v){ paused=!!v; },
   get mobileMode(){ return mobileMode; },
   crGetSelectedStartDistrict,crCycleSelectedStartDistrict,crSetSelectedStartDistrict,crTitleMenuSelectableRows,titleMenuRowLabel,crMinimapNavCellColor,
-  startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
-  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,crGetViewportAuthority,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runViewportAuthoritySelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runDecorativePropsSelfCheck,runOptionsCleanupSelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runStreetBlockLevelSelfCheck,runD1ParkLandmarkSelfCheck,runBuildingModuleFacadeSelfCheck,runFacadePackBridgeSelfCheck,runFacadePackV2SafeModuleSelfCheck,runFpvGroundPlaneAlignmentSelfCheck,runD2D3FacadeReadabilityFinalSelfCheck,runBuildingSmoothStyleSelfCheck,runContinuousFacadeTextureSelfCheck,runSpriteGroundAnchorSelfCheck,crDebugGroundPlaneAlignment,crDebugFacadeReadabilityFinal,crDebugBuildingSmoothStyle,crDebugContinuousFacadeTexture,crDebugPropDensity,crApplySolidwallsFrontProofHarness,CR_SOLIDWALLS_FRONTPROOF_NAME,crBuildFacadeTextureAtlas,crGetFacadeTextureForFace,crProjectedFloorY,crWallProjectionMetrics,crDebugSpriteProjection,runFacadeArtVocabularySelfCheck,runFacadeCompositionReadabilitySelfCheck,crDebugDescribeFacadeHit,runFpvFacadeTargetPolishSelfCheck,runFpvWallLineArtifactFixSelfCheck,runFpvStreetShimmerFixSelfCheck,runStreetReadabilityMinimapSelfCheck,runBuildingScalePolishSelfCheck,runEarlyDistrictProgressionSelfCheck,runLevelSelectorSelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runSemanticActionMapSelfCheck,runInputNoDirectMutationGuardSelfCheck,runWorldLayerAdapterSelfCheck,runFixedStepBaselineSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRaycasterInvariantSelfCheck,crDebugRaycastFrame,World,getSemanticActionMap,crRefreshSemanticActionMap,crApplyPendingInputActions,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
+  startRun,restartRun,continueRun,endRun,completeRun,giveCan,update,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
+  crResetFixedStepSimulation,crStepSimulationFixed,crGetFixedStepState,crClampFixedFrameDt,
+  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,crGetViewportAuthority,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runViewportAuthoritySelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runDecorativePropsSelfCheck,runOptionsCleanupSelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runStreetBlockLevelSelfCheck,runD1ParkLandmarkSelfCheck,runBuildingModuleFacadeSelfCheck,runFacadePackBridgeSelfCheck,runFacadePackV2SafeModuleSelfCheck,runFpvGroundPlaneAlignmentSelfCheck,runD2D3FacadeReadabilityFinalSelfCheck,runBuildingSmoothStyleSelfCheck,runContinuousFacadeTextureSelfCheck,runSpriteGroundAnchorSelfCheck,crDebugGroundPlaneAlignment,crDebugFacadeReadabilityFinal,crDebugBuildingSmoothStyle,crDebugContinuousFacadeTexture,crDebugPropDensity,crApplySolidwallsFrontProofHarness,CR_SOLIDWALLS_FRONTPROOF_NAME,crBuildFacadeTextureAtlas,crGetFacadeTextureForFace,crProjectedFloorY,crWallProjectionMetrics,crDebugSpriteProjection,runFacadeArtVocabularySelfCheck,runFacadeCompositionReadabilitySelfCheck,crDebugDescribeFacadeHit,runFpvFacadeTargetPolishSelfCheck,runFpvWallLineArtifactFixSelfCheck,runFpvStreetShimmerFixSelfCheck,runStreetReadabilityMinimapSelfCheck,runBuildingScalePolishSelfCheck,runEarlyDistrictProgressionSelfCheck,runLevelSelectorSelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runSemanticActionMapSelfCheck,runInputNoDirectMutationGuardSelfCheck,runWorldLayerAdapterSelfCheck,runFixedStepSimulationSelfCheck,runFixedStepBaselineSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRaycasterInvariantSelfCheck,crDebugRaycastFrame,World,getSemanticActionMap,crRefreshSemanticActionMap,crApplyPendingInputActions,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
   CR_VISUAL_READABILITY,CR_SOUND_FEEDBACK,DECOR_PROP_REQUIRED,INPUT_CONFIG,CR_CONTROLS_LS_KEY,crTriggerSoundCue,crSoundEnabled,crSoundFeedbackCueIds,crLoadControlOverrides,crPersistControlOverrides,crResetControlLayoutOverrides,crClearControlOverrides,crEnterControlEditMode,crFinishControlEditMode,crControlHitTest,crSnapshotLayoutNorms,crPrepareSelfCheckPortrait,crStepEditControlSize,crSelectEditControl,
   getCrVisualHarnessSnapshot(){ return _crVisualHarnessSnapshot; },
   showOnboardingHelp,dismissOnboardingHelp,crOpenFirstRunHelpIfNeeded,

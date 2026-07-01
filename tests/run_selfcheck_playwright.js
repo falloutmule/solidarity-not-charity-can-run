@@ -2729,6 +2729,9 @@ async function main() {
   const fixedStepBaseline = await page.evaluate(() => CR.runFixedStepBaselineSelfCheck());
   writeProof('proof-fixed-step-baseline.json', fixedStepBaseline);
 
+  const fixedStepSimulation = await page.evaluate(() => CR.runFixedStepSimulationSelfCheck());
+  writeProof('proof-fixed-step-simulation.json', fixedStepSimulation);
+
   const raycastDebug = await page.evaluate(() => {
     CR.startRun(42);
     CR.state = CR.STATE.PLAY;
@@ -2823,6 +2826,7 @@ async function main() {
     inputGuard.pass === true &&
     worldAdapter.pass === true &&
     fixedStepBaseline.pass === true &&
+    fixedStepSimulation.pass === true &&
     dock.pass &&
     pointer.pass &&
     resilience.pass &&

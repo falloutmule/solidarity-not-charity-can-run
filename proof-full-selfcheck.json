@@ -248,7 +248,7 @@
       "cw": 390,
       "ch": 844
     },
-    "timestamp": "2026-07-01T23:23:54.503Z"
+    "timestamp": "2026-07-01T23:37:26.004Z"
   },
   "portraitUsability": {
     "pass": true,
@@ -493,7 +493,7 @@
         "joyActive": false
       },
       "sprint": {
-        "burstUntil": 1.5525,
+        "burstUntil": 1.5896999999284744,
         "stamBefore": 60,
         "stamAfter": 40
       },
@@ -3450,7 +3450,7 @@
       "harnessStateRestored": true
     },
     "cases": 52,
-    "timestamp": "2026-07-01T23:24:11.885Z"
+    "timestamp": "2026-07-01T23:37:43.334Z"
   },
   "fullRunProgression": {
     "pass": true,
@@ -3506,7 +3506,7 @@
     },
     "hallPass": true,
     "mobilePass": true,
-    "timestamp": "2026-07-01T23:24:12.102Z"
+    "timestamp": "2026-07-01T23:37:43.553Z"
   },
   "onboarding": {
     "pass": true,
@@ -3750,9 +3750,9 @@
         "giveReady": false
       },
       "hallStats": {
-        "mean": 114.93304626575556,
-        "brightRatio": 0.142640625,
-        "variance": 4230.157560344563,
+        "mean": 114.94550134388041,
+        "brightRatio": 0.14234375,
+        "variance": 4228.443853152665,
         "count": 64000
       },
       "exitReadySnapshot": {
@@ -4066,7 +4066,7 @@
           "screenW": 15.272727272727273,
           "screenH": 16.8
         },
-        "canvasVariance": 4868.057922033983
+        "canvasVariance": 4876.169534431994
       },
       "occludedSprite": {
         "pass": true,
@@ -4134,9 +4134,9 @@
       "hallStart": {
         "pass": true,
         "stats": {
-          "mean": 79.87698922567866,
-          "brightRatio": 0.02152518656716418,
-          "variance": 2336.551868010238,
+          "mean": 79.7231043376189,
+          "brightRatio": 0.021082089552238805,
+          "variance": 2316.414553799515,
           "count": 42880
         },
         "customLevel": "hall_of_servants"
@@ -4148,15 +4148,15 @@
           "h": 844
         },
         "stats": {
-          "mean": 114.93942740638023,
-          "brightRatio": 0.142296875,
-          "variance": 4228.001568460381,
+          "mean": 114.8363245313804,
+          "brightRatio": 0.142,
+          "variance": 4221.744880072784,
           "count": 64000
         }
       }
     },
     "runtimeErrors": [],
-    "timestamp": "2026-07-01T23:24:12.368Z"
+    "timestamp": "2026-07-01T23:37:43.824Z"
   },
   "render": {
     "pass": true,
@@ -4280,7 +4280,7 @@
           "screenW": 15.272727272727273,
           "screenH": 16.8
         },
-        "canvasVariance": 4868.057922033983
+        "canvasVariance": 4876.169534431994
       },
       "occludedSprite": {
         "pass": true,
@@ -4348,9 +4348,9 @@
       "hallStart": {
         "pass": true,
         "stats": {
-          "mean": 79.87698922567866,
-          "brightRatio": 0.02152518656716418,
-          "variance": 2336.551868010238,
+          "mean": 79.7231043376189,
+          "brightRatio": 0.021082089552238805,
+          "variance": 2316.414553799515,
           "count": 42880
         },
         "customLevel": "hall_of_servants"
@@ -4362,17 +4362,17 @@
           "h": 844
         },
         "stats": {
-          "mean": 114.93942740638023,
-          "brightRatio": 0.142296875,
-          "variance": 4228.001568460381,
+          "mean": 114.8363245313804,
+          "brightRatio": 0.142,
+          "variance": 4221.744880072784,
           "count": 64000
         }
       }
     },
     "runtimeErrors": [],
-    "timestamp": "2026-07-01T23:24:12.368Z"
+    "timestamp": "2026-07-01T23:37:43.824Z"
   },
   "runtimeErrors": [],
   "runtimeClean": true,
-  "timestamp": "2026-07-01T23:24:12.369Z"
+  "timestamp": "2026-07-01T23:37:43.824Z"
 }

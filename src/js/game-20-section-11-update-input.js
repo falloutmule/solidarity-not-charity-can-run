@@ -400,7 +400,6 @@ function update(dt){
 
   if(state!==STATE.PLAY || paused || onboardingOpen) return;
 
-  crApplyPendingInputActions();
   const act = crRefreshSemanticActionMap();
 
   game.timeLeft -= dt;

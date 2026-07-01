@@ -23,7 +23,9 @@ SNC Can Run uses **in-browser self-checks** (`window.CR`) plus a **Playwright** 
 |------|------|
 | `proof-playwright-summary.json` | Full suite |
 | `proof-raycaster-invariant.json` | Raycaster architecture invariants (z-buffer, render order, halo) |
-| `proof-portrait-usability.json` | Portrait layout |
+| `proof-fixed-step-baseline.json` | Variable-dt `update()` baseline metrics (harness) |
+| `proof-fixed-step-simulation.json` | Fixed 1/60s accumulator via `crStepSimulationFixed` (Playwright `corePass`) |
+| `proof-viewport-authority.json` | Viewport / DPR / safe-area authority |
 | `proof-mobile-control-reliability.json` | Mobile controls |
 | `proof-movement-collision.json` | Collision |
 | `proof-reachability.json` | LOS / BFS |

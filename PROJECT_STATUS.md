@@ -33,3 +33,8 @@ See **`src/README.md`**, **`reports/guards/SOURCE_SPLIT_BUILD_PIPELINE_REPORT.md
 - Viewport authority, semantic actions, input guard, `World` adapter, fixed-step baseline, raycast debug proofs in Playwright `corePass`
 - Report: `reports/guards/ENGINE_HARDENING_PHASE_REPORT.md`
 - Fixed-step **simulation rewrite** (card 5) deferred; baseline in `proof-fixed-step-baseline.json`
+
+## Fixed-step simulation (2026-07-01, Card 5)
+
+- **1/60s accumulator** in `frame()` via `crStepSimulationFixed`; look applied once per frame before stepping.
+- Proof: `proof-fixed-step-simulation.json` (Playwright `corePass`); report: `reports/guards/FIXED_STEP_SIMULATION_REPORT.md`.
