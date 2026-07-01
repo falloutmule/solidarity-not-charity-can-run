@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>SNC Can Run — Customizable Control Scheme</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #101012;
+      --panel: #191a1d;
+      --panel2: #24262b;
+      --ink: #f1eee5;
+      --muted: #b9b2a3;
+      --line: #3b3d44;
+      --accent: #ffd166;
+      --good: #7bd88f;
+      --warn: #ff9f6e;
+      --bad: #ff6b6b;
+      --blue: #8ecae6;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--ink); font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    body { padding: 24px; }
+    main { max-width: 1100px; margin: 0 auto; }
+    h1, h2, h3 { line-height: 1.15; margin: 0 0 12px; }
+    h1 { font-size: clamp(2rem, 4vw, 4rem); letter-spacing: -0.04em; }
+    h2 { margin-top: 34px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 1.55rem; }
+    h3 { margin-top: 22px; color: var(--accent); }
+    p { color: var(--muted); }
+    strong { color: var(--ink); }
+    code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+    code { color: var(--accent); }
+    pre { overflow: auto; padding: 16px; border-radius: 14px; background: #0b0c0f; border: 1px solid var(--line); }
+    table { width: 100%; border-collapse: collapse; margin: 14px 0 24px; }
+    th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+    th { color: var(--accent); background: #15161a; }
+    ul { color: var(--muted); }
+    li + li { margin-top: 6px; }
+    .hero { padding: 26px; border: 1px solid var(--line); border-radius: 22px; background: linear-gradient(135deg, #202226, #111214); }
+    .tagrow { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 0; }
+    .tag { border: 1px solid var(--line); background: #111; border-radius: 999px; padding: 5px 10px; color: var(--muted); font-size: 0.9rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 16px; }
+    .card h3 { margin-top: 0; }
+    .good { color: var(--good); }
+    .warn { color: var(--warn); }
+    .bad { color: var(--bad); }
+    .blue { color: var(--blue); }
+    .phone-wrap { display: grid; place-items: center; margin: 18px 0 26px; }
+    .phone {
+      width: min(420px, 92vw);
+      aspect-ratio: 9 / 19.5;
+      border: 10px solid #050505;
+      border-radius: 34px;
+      background: #050505;
+      box-shadow: 0 18px 50px rgba(0,0,0,.45);
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: 53% 6% 9% 32%;
+      position: relative;
+    }
+    .play { background: linear-gradient(#29313a, #1f2226); display: grid; place-items: center; color: #d4d0c3; font-weight: 700; letter-spacing: .08em; }
+    .stats { background: #16171a; display: flex; align-items: center; justify-content: space-around; font-size: .74rem; color: #ddd2b7; border-top: 1px solid #303139; }
+    .mapbar { background: #101114; display: grid; place-items: center; border-top: 1px solid #303139; }
+    .minimap { width: 48%; height: 70%; border: 2px solid #5f6b65; border-radius: 9px; background: radial-gradient(circle at 65% 45%, #f0d36d 0 4px, transparent 5px), repeating-linear-gradient(45deg, #29352e 0 8px, #222a25 8px 16px); display: grid; place-items: center; font-size: .65rem; color: #f1eee5; }
+    .deck { position: relative; background: #090a0c; border-top: 1px solid #303139; }
+    .control { position: absolute; border: 2px solid rgba(255,255,255,.28); background: rgba(255,255,255,.08); color: #fff; font-weight: 800; display: grid; place-items: center; text-align: center; user-select: none; }
+    .move { left: 7%; bottom: 12%; width: 32%; aspect-ratio: 1; border-radius: 50%; }
+    .move::after { content: ""; width: 42%; aspect-ratio: 1; border-radius: 50%; background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.25); }
+    .look { right: 5%; top: 7%; width: 26%; height: 44%; border-radius: 16px; color: #d4ecff; }
+    .give { right: 35%; top: 8%; width: 23%; height: 24%; border-radius: 14px; }
+    .sprint { right: 35%; bottom: 14%; width: 23%; height: 24%; border-radius: 14px; color: #ffddb2; }
+    .menu { right: 5%; bottom: 14%; width: 26%; height: 24%; border-radius: 14px; color: #ffd166; }
+    .note { padding: 12px 14px; background: #131418; border-left: 4px solid var(--accent); border-radius: 10px; color: var(--muted); }
+    .small { font-size: .92rem; color: var(--muted); }
+    @media print {
+      body { background: white; color: black; }
+      .hero, .card, pre { background: white; color: black; box-shadow: none; }
+      p, li, .small { color: #333; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <section class="hero">
+    <h1>SNC Can Run — Customizable Control Scheme</h1>
+    <p><strong>Design target:</strong> portrait-first mobile controls for <em>Solidarity Not Charity Can Run</em>, using the current project direction: stacked phone layout, gameplay window on top, control deck below, MOVE bottom-left, minimap bottom-center, right-side LOOK/actions, MENU-as-pause on phone, and an editable control profile system.</p>
+    <div class="tagrow">
+      <span class="tag">portrait-first</span>
+      <span class="tag">customizable</span>
+      <span class="tag">safe-area aware</span>
+      <span class="tag">pointer events</span>
+      <span class="tag">no fragile hold-sprint</span>
+      <span class="tag">Hermes/Codex-safe</span>
+    </div>
+  </section>
+
+  <h2>1. Core recommendation</h2>
+  <p>The control scheme should keep the SNC identity already emerging in the project instead of switching to a generic dual-stick shooter layout.</p>
+  <div class="grid">
+    <div class="card">
+      <h3>Default layout</h3>
+      <p><strong>Top:</strong> landscape-style 3D play window. <strong>Bottom:</strong> dedicated control deck. This prevents the old “black middle” problem where controls visually existed but felt detached from play.</p>
+    </div>
+    <div class="card">
+      <h3>MOVE stays bottom-left</h3>
+      <p>The left thumb owns movement only. It should never share space with minimap, pause/menu, sprint, or give.</p>
+    </div>
+    <div class="card">
+      <h3>LOOK becomes right-side strip</h3>
+      <p>LOOK should be a thumb strip / aim zone on the right, not tiny arrows. It can support tap, drag, and hold-turn behavior.</p>
+    </div>
+    <div class="card">
+      <h3>Actions are buttons, not gestures</h3>
+      <p>GIVE / USE and SPRINT need large explicit controls. Sprint should be burst/toggle, not a fragile hold.</p>
+    </div>
+  </div>
+
+  <h2>2. Portrait layout map</h2>
+  <div class="phone-wrap">
+    <div class="phone" aria-label="Portrait phone control diagram">
+      <div class="play">GAMEPLAY WINDOW</div>
+      <div class="stats"><span>HEALTH</span><span>STAMINA</span><span>CANS</span><span>TIME</span></div>
+      <div class="mapbar"><div class="minimap">MINIMAP TAB</div></div>
+      <div class="deck">
+        <div class="control move" aria-label="Move joystick"></div>
+        <div class="control look">LOOK<br><span class="small">drag/tap</span></div>
+        <div class="control give">GIVE</div>
+        <div class="control sprint">SPRINT</div>
+        <div class="control menu">MENU</div>
+      </div>
+    </div>
+  </div>
+  <p class="note">Important: control-height editing should move only the control deck, not randomly compress the play window, minimap, or stats band. The minimap/stat band should be a stable layer.</p>
+
+  <h2>3. Action map</h2>
+  <table>
+    <thead>
+      <tr><th>Action</th><th>Mobile default</th><th>Desktop default</th><th>Behavior</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Move</strong></td><td>Bottom-left virtual joystick</td><td>WASD / arrow keys</td><td>Analog vector on phone, digital vector on keyboard. Resets on pointerup, pointercancel, blur, pause, and scene change.</td></tr>
+      <tr><td><strong>Look / turn</strong></td><td>Right-side vertical strip; drag to turn; tap upper/lower/left/right zones if needed</td><td>Mouse drag or Q/E / ←/→</td><td>Reliable turning is more important than visual arrows. Treat the whole strip as a look surface.</td></tr>
+      <tr><td><strong>Give / interact</strong></td><td>Large GIVE button near right thumb</td><td>E / Space</td><td>Context action: give can, talk, confirm, pick up, use exit.</td></tr>
+      <tr><td><strong>Sprint</strong></td><td>Large SPRINT button; burst or toggle</td><td>Shift</td><td>Never require long thumb hold. Recommended: tap = short burst, double tap = toggle sprint mode.</td></tr>
+      <tr><td><strong>Menu / pause</strong></td><td>MENU button in control deck</td><td>Esc / P</td><td>On phone, MENU opens pause/options. Hide redundant PAUSE if MENU already does it.</td></tr>
+      <tr><td><strong>Minimap</strong></td><td>Bottom-center sliding tab</td><td>M</td><td>Tap to expand/collapse. Should not steal movement or action touches.</td></tr>
+      <tr><td><strong>Fullscreen</strong></td><td>Optional menu item</td><td>Optional menu item</td><td>Enhancement only. Game must remain playable without fullscreen.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>4. Customization model</h2>
+  <p>Customization should be declarative. The game reads a saved profile, lays out controls from data, and writes changes back through the Options → Edit Controls flow.</p>
+
+  <h3>Editable fields</h3>
+  <table>
+    <thead>
+      <tr><th>Setting</th><th>Allowed control</th><th>Why it matters</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Position</td><td>drag in edit mode</td><td>Lets different hand sizes and phone sizes work.</td></tr>
+      <tr><td>Size</td><td>+ / − buttons or slider</td><td>Matches existing resize direction and avoids tiny action buttons.</td></tr>
+      <tr><td>Opacity</td><td>0.25–0.90</td><td>Prevents controls from covering the scene while preserving visibility.</td></tr>
+      <tr><td>Dock height</td><td>small / normal / tall</td><td>Supports big thumbs without breaking the play window.</td></tr>
+      <tr><td>Left-handed mode</td><td>mirror layout</td><td>Moves actions left and joystick right for left-handed players.</td></tr>
+      <tr><td>Joystick deadzone</td><td>0.08–0.30</td><td>Prevents accidental drift.</td></tr>
+      <tr><td>Sprint mode</td><td>burst / toggle / hold fallback</td><td>Default should be burst/toggle; hold is optional only.</td></tr>
+      <tr><td>LOOK sensitivity</td><td>low / normal / high</td><td>Fixes over-turning on small phones and under-turning on tablets.</td></tr>
+      <tr><td>Reduced motion</td><td>on/off</td><td>Turns down screen shake, flash, and heavy visual effects.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Control profile data shape</h3>
+  <pre><code>const DEFAULT_CONTROL_PROFILE = {
+  version: 1,
+  name: "SNC Portrait Default",
+  updatedBy: "human-readable-controls-doc",
+  global: {
+    opacity: 0.62,
+    dockHeight: "normal",
+    leftHanded: false,
+    safeAreaPadding: true,
+    reducedMotion: false
+  },
+  actions: {
+    move:   { type: "joystick", label: "MOVE",   deadzone: 0.16, radius: 64 },
+    look:   { type: "strip",    label: "LOOK",   sensitivity: 1.0, tapZones: true },
+    give:   { type: "button",   label: "GIVE",   repeat: false },
+    sprint: { type: "button",   label: "SPRINT", mode: "burstToggle", burstMs: 650 },
+    menu:   { type: "button",   label: "MENU",   opens: "pause" },
+    map:    { type: "tab",      label: "MAP",    opens: "minimap" }
+  },
+  portrait: {
+    controls: [
+      { id: "move",   action: "move",   anchor: "bottom-left",  x: 0.08, y: 0.12, w: 0.32, h: 0.32 },
+      { id: "look",   action: "look",   anchor: "bottom-right", x: 0.69, y: 0.06, w: 0.26, h: 0.44 },
+      { id: "give",   action: "give",   anchor: "bottom-right", x: 0.42, y: 0.08, w: 0.22, h: 0.24 },
+      { id: "sprint", action: "sprint", anchor: "bottom-right", x: 0.42, y: 0.62, w: 0.22, h: 0.24 },
+      { id: "menu",   action: "menu",   anchor: "bottom-right", x: 0.69, y: 0.62, w: 0.26, h: 0.24 },
+      { id: "map",    action: "map",    anchor: "map-band",     x: 0.26, y: 0.14, w: 0.48, h: 0.70 }
+    ]
+  },
+  landscape: {
+    controls: [
+      { id: "move",   action: "move",   anchor: "bottom-left",  x: 0.05, y: 0.12, w: 0.20, h: 0.34 },
+      { id: "look",   action: "look",   anchor: "bottom-right", x: 0.74, y: 0.12, w: 0.20, h: 0.44 },
+      { id: "give",   action: "give",   anchor: "bottom-right", x: 0.61, y: 0.16, w: 0.11, h: 0.20 },
+      { id: "sprint", action: "sprint", anchor: "bottom-right", x: 0.61, y: 0.62, w: 0.11, h: 0.20 },
+      { id: "menu",   action: "menu",   anchor: "top-right",    x: 0.82, y: 0.04, w: 0.12, h: 0.10 }
+    ]
+  }
+};</code></pre>
+
+  <h2>5. Edit Controls flow</h2>
+  <ol>
+    <li>Player opens <strong>MENU → OPTIONS → EDIT CONTROLS</strong>.</li>
+    <li>Options overlay hides or dims so it does not block the controls being edited.</li>
+    <li>Each control shows its boundary, label, resize handles, and reset button.</li>
+    <li>Player drags controls inside the legal control deck / map band.</li>
+    <li>Player uses <strong>+</strong> and <strong>−</strong> to resize selected control.</li>
+    <li>Player taps <strong>Save</strong>, <strong>Reset Portrait</strong>, <strong>Reset All</strong>, or <strong>Export Profile</strong>.</li>
+  </ol>
+
+  <p class="note">The editor must clamp controls away from browser gesture edges and safe-area cutouts. It should never allow a critical button to sit under Android navigation, iOS home indicator, a notch, or the browser back gesture edge.</p>
+
+  <h2>6. Runtime input rules</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Pointer ownership</h3>
+      <p>Each active pointer gets one owner: move, look, give, sprint, menu, map, or UI. Do not let one pointer trigger two gameplay controls.</p>
+    </div>
+    <div class="card">
+      <h3>Pointer capture</h3>
+      <p>When a pointer starts on MOVE or LOOK, capture it until pointerup or pointercancel. Dragging off the visible circle should still work.</p>
+    </div>
+    <div class="card">
+      <h3>Cancel safety</h3>
+      <p>On pointercancel, blur, orientation change, pause, or scene transition, zero movement and look input immediately.</p>
+    </div>
+    <div class="card">
+      <h3>Action sampling</h3>
+      <p>DOM events update raw pointer/key state only. The game loop samples the action map once per frame.</p>
+    </div>
+  </div>
+
+  <h3>Input pipeline</h3>
+  <pre><code>Pointer/keyboard/gamepad events
+        ↓
+INPUT module stores raw state by pointerId/key
+        ↓
+CONTROL_LAYOUT assigns raw input to control zones
+        ↓
+ACTION_MAP emits move/look/give/sprint/menu/map
+        ↓
+GAME UPDATE consumes actions
+        ↓
+RENDER draws world and UI feedback</code></pre>
+
+  <h2>7. Implementation notes for SNC</h2>
+  <ul>
+    <li><strong>Keep controls declarative.</strong> Do not hardcode button coordinates in five places.</li>
+    <li><strong>Keep MENU as the phone pause path.</strong> A separate tiny PAUSE button is redundant if MENU opens the pause/options overlay.</li>
+    <li><strong>Keep minimap independent.</strong> Minimap should live in its own bottom-center tab/band, not inside MOVE or LOOK zones.</li>
+    <li><strong>Keep sprint forgiving.</strong> Recommended default: tap for a short burst, double-tap for toggle, stamina drains normally.</li>
+    <li><strong>Keep LOOK forgiving.</strong> Treat a broad right strip as the input area; visible arrows can be decoration, not the only hit targets.</li>
+    <li><strong>Keep safe-area math centralized.</strong> Resize/orientation changes should rebuild the layout from the profile.</li>
+    <li><strong>Do not couple visual size to gameplay strength.</strong> Making SPRINT bigger should not change sprint speed.</li>
+  </ul>
+
+  <h2>8. Presets</h2>
+  <table>
+    <thead>
+      <tr><th>Preset</th><th>Changes</th><th>Use case</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Default</strong></td><td>MOVE left, LOOK right, GIVE/SPRINT/MENU right cluster, minimap bottom-center</td><td>Normal portrait phone play.</td></tr>
+      <tr><td><strong>Big Thumb</strong></td><td>Large MOVE, large GIVE/SPRINT, taller dock, lower opacity</td><td>Work phone, gloves, bigger hands, rough conditions.</td></tr>
+      <tr><td><strong>Left-Handed</strong></td><td>Mirror MOVE and action cluster; LOOK can remain on preferred side</td><td>Left-handed play or hand fatigue.</td></tr>
+      <tr><td><strong>Minimal</strong></td><td>Fewer visible labels, map collapsed, lower opacity</td><td>Cleaner screenshots and less UI clutter.</td></tr>
+      <tr><td><strong>Accessibility</strong></td><td>Maximum button size, high contrast, no hold actions, reduced motion</td><td>Lowest precision burden.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>9. Mobile proof checklist</h2>
+  <table>
+    <thead>
+      <tr><th>Check</th><th>Pass condition</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>First load portrait</td><td>Gameplay window, stats/map band, and control deck appear without black dead zone confusion.</td></tr>
+      <tr><td>MOVE joystick</td><td>Dragging inside and outside the visible circle moves player and returns to zero on release.</td></tr>
+      <tr><td>LOOK strip</td><td>Right thumb drag turns reliably in portrait and landscape.</td></tr>
+      <tr><td>MOVE + GIVE multitouch</td><td>Player can move while giving/interacting.</td></tr>
+      <tr><td>MOVE + SPRINT multitouch</td><td>Player can burst/toggle sprint while moving without getting stuck.</td></tr>
+      <tr><td>Pointercancel</td><td>Active pointer count returns to zero and movement stops.</td></tr>
+      <tr><td>Options edit overlay</td><td>Edit Controls does not hide or block the selected controls.</td></tr>
+      <tr><td>Resize controls</td><td>+ / − changes visible control size without moving minimap/stat band incorrectly.</td></tr>
+      <tr><td>Rotation</td><td>Portrait ↔ landscape recalculates controls and keeps LOOK usable.</td></tr>
+      <tr><td>Safe area</td><td>No critical control is under browser/system gesture zones.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>10. Hermes / Codex implementation card</h2>
+  <pre><code>TASK: Implement SNC customizable controls based on docs/snc-customizable-control-scheme.html.
+
+Rules:
+- Do not redesign gameplay.
+- Do not edit minified/release output directly.
+- Keep controls declarative in one profile object.
+- MOVE bottom-left by default.
+- Minimap bottom-center in its own band/tab.
+- LOOK is a right-side strip/zone, not tiny required arrows.
+- GIVE and SPRINT are explicit large buttons.
+- SPRINT default is burst/toggle, not hold-only.
+- MENU opens pause/options on phone.
+- Edit Controls supports drag, +/− resize, reset, save, left-handed mirror.
+- Runtime input uses Pointer Events, pointer capture, pointercancel recovery.
+- Every change must run smoke tests.
+- Every control/layout change must produce portrait and landscape screenshots.
+- Every mobile-control change must be tested on Android Chrome if possible.
+
+Evidence paths:
+- proof/control-default-portrait.png
+- proof/control-edit-portrait.png
+- proof/control-default-landscape.png
+- proof/control-multitouch-report.md</code></pre>
+
+  <h2>11. Final design contract</h2>
+  <p><strong>SNC controls should feel like a fixed phone gamepad attached to a raycaster window.</strong> The playfield remains readable. The control deck remains touchable. The minimap has its own stable home. MOVE, LOOK, GIVE, SPRINT, and MENU are all customizable but still bound by a layout contract that protects the game from regression.</p>
+</main>
+</body>
+</html>
