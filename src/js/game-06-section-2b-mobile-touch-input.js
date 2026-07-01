@@ -6,6 +6,7 @@ const inp = {
   fwd:false, back:false, left:false, right:false,
   turnLeft:false, turnRight:false,
   sprint:false, give:false, map:false, pause:false,
+  lookDeltaRad:0,
   _active:false, // true when any touch is on screen
 };
 const BUILD_ID = 'feel2';
@@ -104,9 +105,16 @@ function crGetLookPadApplyCount(){ return _crLookPadApplyCount; }
 function crApplyLookPadDx(dx){
   if(state!==STATE.PLAY || paused) return false;
   if(Math.abs(dx) <= 0.2) return false;
-  player.angle += dx * mobileLookSens();
+  inp.lookDeltaRad += dx * mobileLookSens();
   _crLookPadApplyCount++;
   return true;
+}
+/** Apply accumulated look delta from input handlers (simulation step). */
+function crApplyPendingInputActions(){
+  if(inp.lookDeltaRad){
+    player.angle += inp.lookDeltaRad;
+    inp.lookDeltaRad = 0;
+  }
 }
 let lookHintUsed = false;
 let lookHintShownAt = 0;
@@ -1127,8 +1135,12 @@ function bindMobileControls(){
     if(!mrPtr || e.pointerId !== mrPtr.id) return;
     if(state!==STATE.PLAY || paused) return;
     const dx = e.clientX - mrPtr.startX;
-    if(Math.abs(dx) > 0.5){ mrPtr.startX = e.clientX; }
-    player.angle += dx * mobileLookSens();
+    if(Math.abs(dx) > 0.5){
+      mrPtr.startX = e.clientX;
+      if(state===STATE.PLAY && !paused){
+        inp.lookDeltaRad += dx * mobileLookSens();
+      }
+    }
     touchDebug({type:'land_look_move', dx, angle:player.angle});
   },{passive:false});
 
@@ -1239,7 +1251,7 @@ function bindMobileControls(){
         tzone.lastX = t.clientX;
         if(state===STATE.PLAY && !paused){
           if(Math.abs(dx) > 2) dismissLookHint();
-          player.angle += dx * mobileLookSens();
+          inp.lookDeltaRad += dx * mobileLookSens();
         }
       }
       if(lookTouch.id !== null && t.identifier === lookTouch.id){

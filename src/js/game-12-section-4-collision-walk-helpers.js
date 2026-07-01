@@ -127,3 +127,31 @@ function movePlayerWithCollision(dx, dy){
   return { steps: n, moved: Math.hypot(player.x - x0, player.y - y0) > 1e-7 };
 }
 
+/** Thin adapter over game.map — preserves existing walk/collision semantics. */
+const World = {
+  inBounds(tx, ty){
+    return ty >= 0 && ty < game.MAP_H && tx >= 0 && tx < game.MAP_W;
+  },
+  rawCell(tx, ty){
+    if(!World.inBounds(tx, ty)) return null;
+    return game.map[ty][tx];
+  },
+  cellSolid(tx, ty){
+    const c = World.rawCell(tx, ty);
+    return c == null || c !== 0;
+  },
+  cellMaterial(tx, ty){
+    const c = World.rawCell(tx, ty);
+    if(c == null) return 'void';
+    if(c === 0) return 'walk';
+    return typeof c === 'number' ? ('mat_' + c) : String(c);
+  },
+  cellSemantic(tx, ty){
+    if(!World.inBounds(tx, ty)) return 'oob';
+    return game.map[ty][tx] === 0 ? 'street' : 'blocked';
+  },
+  cellSolidAt(x, y){
+    return World.cellSolid(Math.floor(x), Math.floor(y));
+  },
+};
+

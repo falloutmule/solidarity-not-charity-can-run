@@ -26,3 +26,10 @@ See **`src/README.md`**, **`reports/guards/SOURCE_SPLIT_BUILD_PIPELINE_REPORT.md
 
 - Selfcheck: https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28372414445
 - Pages: https://github.com/falloutmule/solidarity-not-charity-can-run/actions/runs/28372413468
+
+## Engine hardening (2026-07-01)
+
+- **BUILD_ID:** `feel2` (unchanged)
+- Viewport authority, semantic actions, input guard, `World` adapter, fixed-step baseline, raycast debug proofs in Playwright `corePass`
+- Report: `reports/guards/ENGINE_HARDENING_PHASE_REPORT.md`
+- Fixed-step **simulation rewrite** (card 5) deferred; baseline in `proof-fixed-step-baseline.json`

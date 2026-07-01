@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-30T13:30:49.248Z",
+  "generatedAt": "2026-07-01T23:23:51.629Z",
   "output": "index.html",
-  "outputSha256": "841b40a17a57a8c4af2477f3439f7a28793e8cd7c15ae46ee561f9cdf7eaae9b",
-  "outputBytes": 654284,
+  "outputSha256": "ed08829019ba6a5f2f6c0c7f6d0c37b1665e1f0d0cb2637422d4a5805867688e",
+  "outputBytes": 678496,
   "inputs": [
     {
       "path": "src/template.html",
@@ -51,8 +51,8 @@
     },
     {
       "path": "src/js/game-06-section-2b-mobile-touch-input.js",
-      "sha256": "0d8d2342c6825a261856eb334fb02441024069c9d7499aba148e9cb2b9dd2323",
-      "bytes": 57872
+      "sha256": "d2429d274ad6e13c613c2791b10858797bd3bb148ffe8b5ff88978675fc6e099",
+      "bytes": 58185
     },
     {
       "path": "src/js/game-07-section-2c-responsive-mobile-menu-html-overlay.js",
@@ -81,8 +81,8 @@
     },
     {
       "path": "src/js/game-12-section-4-collision-walk-helpers.js",
-      "sha256": "3979ba89200d75f0124d2d567c1635ee3325c1d885b4ee8ca49162514b84372a",
-      "bytes": 5032
+      "sha256": "2eef21d50a7309f5f3b8067bf28c821739eabbb7f23dfa2b5cffa0114f9bd5d5",
+      "bytes": 5831
     },
     {
       "path": "src/js/game-13-section-5-audio-centralized-audiocontext-unlock-.js",
@@ -101,8 +101,8 @@
     },
     {
       "path": "src/js/game-16-section-7-render.js",
-      "sha256": "4cfc11908a99f4abbf59d3c25093d64746169c5c3b39113a1d460eb4b08a7c68",
-      "bytes": 10046
+      "sha256": "5c31da3c56aa467b2af775b132c9754a237cb4d5021c6c698c9f33ed4576c94e",
+      "bytes": 10255
     },
     {
       "path": "src/js/game-17-section-8-minimap.js",
@@ -121,8 +121,8 @@
     },
     {
       "path": "src/js/game-20-section-11-update-input.js",
-      "sha256": "a4033bf40c9949f3038456654b3e8180a1cf4ca2f739a081f6c1c2a369e461c0",
-      "bytes": 21793
+      "sha256": "7ab5064b9b6e22a12e64315d1bb6d19bdc4f3cbfd6a5170b1792459890d6a6ce",
+      "bytes": 23191
     },
     {
       "path": "src/js/game-21-section-12-overlays.js",
@@ -136,8 +136,8 @@
     },
     {
       "path": "src/js/game-22-section-13-main-loop.js",
-      "sha256": "68c66f9f8b6ec0cb5b12f5f47da0b5bf6391d13e2f98def75fdb10830c3d723d",
-      "bytes": 322211
+      "sha256": "42f9fd263ee3088f290afc8c729cb70b92bb58e728a11be28303adc82a542e22",
+      "bytes": 344485
     }
   ],
   "nodeVersion": "v24.14.0",

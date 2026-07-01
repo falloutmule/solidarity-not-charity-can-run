@@ -578,14 +578,33 @@ function getSafeAreaAudit(){
   };
 }
 
-function getViewportProof(){
+/** Single refresh point for viewport/DPR/safe-area/visualViewport/canvas backing vs CSS layout. */
+function crGetViewportAuthority(opts){
+  const refresh = !opts || opts.refresh !== false;
+  if(refresh){
+    syncVisualViewportShell();
+    resize();
+  }
   const vv = window.visualViewport;
   const root = document.documentElement;
   const cs = getComputedStyle(root);
-  return {
+  const { cw, ch } = layoutCssSize();
+  const sa = readSafeAreaInsets();
+  const dpr = window.devicePixelRatio || 1;
+  const canvasRect = view.getBoundingClientRect();
+  const domRect = id=>{
+    const el = document.getElementById(id);
+    if(!el) return null;
+    const b = el.getBoundingClientRect();
+    return { left: Math.round(b.left), top: Math.round(b.top), width: Math.round(b.width), height: Math.round(b.height) };
+  };
+  const authority = {
     BUILD_ID,
+    dpr,
     inner: { w: innerWidth, h: innerHeight },
     visual: vv ? { w: vv.width, h: vv.height, offsetX: vv.offsetLeft, offsetY: vv.offsetTop, scale: vv.scale } : null,
+    layoutCss: { cw, ch },
+    safeArea: sa,
     cssVars: {
       appVwPx: cs.getPropertyValue('--app-vw-px').trim(),
       appVhPx: cs.getPropertyValue('--app-vh-px').trim(),
@@ -595,9 +614,202 @@ function getViewportProof(){
       safeTop: cs.getPropertyValue('--safe-top').trim(),
       safeBottom: cs.getPropertyValue('--safe-bottom').trim(),
     },
-    safeAreaInsetsPx: readSafeAreaInsets(),
-    canvas: { w: view.width, h: view.height, cssW: view.style.width, cssH: view.style.height },
-    mob: (()=>{ const m=document.getElementById('mob'); return m?{w:m.style.width,h:m.style.height,top:m.style.top,left:m.style.left}:null; })(),
+    internal: { RW, RH },
+    canvas: {
+      backingW: view.width,
+      backingH: view.height,
+      cssW: view.style.width,
+      cssH: view.style.height,
+      rect: {
+        left: Math.round(canvasRect.left),
+        top: Math.round(canvasRect.top),
+        width: Math.round(canvasRect.width),
+        height: Math.round(canvasRect.height),
+      },
+    },
+    portrait: isMobilePortrait(),
+    mobileMode,
+    mob: (()=>{
+      const m = document.getElementById('mob');
+      if(!m) return null;
+      const mcs = getComputedStyle(m);
+      return { display: mcs.display, className: m.className, height: mcs.height };
+    })(),
+    controlsDom: {
+      move: domRect('ml'),
+      look: domRect('mlookpad'),
+      give: domRect('mg'),
+      sprint: domRect('ms'),
+      menu: domRect('mportmenu'),
+    },
+  };
+  if(authority.portrait){
+    const L = portraitLayout();
+    authority.layout = {
+      fpvRect: L.fpvRect,
+      minimapRect: L.minimapRect,
+      statsRect: L.statsRect,
+      controlsRect: L.controlsRect,
+      menuRect: L.menuRect,
+      moveRect: L.moveRect,
+      giveRect: L.giveRect,
+      sprintRect: L.sprintRect,
+      lookRect: L.lookRect,
+      safeAreaInsets: L.safeAreaInsets || sa,
+    };
+  }
+  return authority;
+}
+
+function crDomAgreesWithLayoutRect(dom, layoutRect, tol){
+  if(!dom || !layoutRect) return false;
+  const t = tol === undefined ? 4 : tol;
+  const lr = layoutRect.left !== undefined ? layoutRect : { left: layoutRect.x, top: layoutRect.y, width: layoutRect.w, height: layoutRect.h };
+  return Math.abs(dom.left - lr.left) <= t &&
+    Math.abs(dom.top - lr.top) <= t &&
+    Math.abs(dom.width - lr.width) <= t &&
+    Math.abs(dom.height - lr.height) <= t;
+}
+
+function runViewportAuthoritySelfCheck(){
+  if(_crHarnessDepth > 0) return runViewportAuthoritySelfCheckBody();
+  return crWithTemporaryState('viewportAuthority', () => runViewportAuthoritySelfCheckBody());
+}
+
+function runViewportAuthoritySelfCheckBody(){
+  const errors = [];
+  const warnings = [];
+  const evidence = {};
+  const savedOverride = mobileOverride;
+  const savedState = state;
+  const savedForcePortrait = _selfCheckForcePortrait;
+  const err0 = window.__crRuntimeErrors.length;
+  try {
+    crForceMobileOverlayVisible();
+    syncVisualViewportShell();
+    resize();
+    applyMobileControlSettings();
+
+    const scenarios = [];
+    crPrepareSelfCheckPortrait();
+    applyMobileControlSettings();
+    scenarios.push({ name: 'portrait', auth: crGetViewportAuthority({ refresh: true }) });
+
+    _selfCheckForcePortrait = false;
+    applyMobileControlSettings();
+    resize();
+    scenarios.push({ name: 'landscape', auth: crGetViewportAuthority({ refresh: true }) });
+
+    const checks = {};
+    let allAgree = true;
+    for(const sc of scenarios){
+      const a = sc.auth;
+      const tol = 6;
+      const canvasMatchesLayout = Math.abs(a.canvas.backingW - a.layoutCss.cw) <= tol &&
+        Math.abs(a.canvas.backingH - a.layoutCss.ch) <= tol;
+      if(!canvasMatchesLayout){
+        allAgree = false;
+        errors.push(sc.name + ': canvas backing does not match layoutCssSize');
+      }
+      const cssMatchesBacking = String(a.canvas.cssW) === (a.canvas.backingW + 'px') &&
+        String(a.canvas.cssH) === (a.canvas.backingH + 'px');
+      if(!cssMatchesBacking){
+        allAgree = false;
+        errors.push(sc.name + ': canvas CSS size does not match backing store');
+      }
+      const saMatch = a.safeArea && typeof a.safeArea.top === 'number';
+      if(!saMatch){
+        allAgree = false;
+        errors.push(sc.name + ': safeArea missing from authority');
+      }
+      if(a.portrait && a.layout){
+        const L = a.layout;
+        const dom = a.controlsDom;
+        const moveOk = crDomAgreesWithLayoutRect(dom.move, L.moveRect);
+        const lookOk = crDomAgreesWithLayoutRect(dom.look, L.lookRect);
+        const giveOk = crDomAgreesWithLayoutRect(dom.give, L.giveRect);
+        const sprintOk = crDomAgreesWithLayoutRect(dom.sprint, L.sprintRect);
+        const menuOk = crDomAgreesWithLayoutRect(dom.menu, L.menuRect);
+        if(!moveOk || !lookOk || !giveOk || !sprintOk || !menuOk){
+          allAgree = false;
+          errors.push(sc.name + ': control DOM rects disagree with portraitLayout');
+        }
+        const layoutProof = getLayoutProof();
+        const fpvOk = Math.abs(layoutProof.fpvRect.x - L.fpvRect.x) <= 2 &&
+          Math.abs(layoutProof.fpvRect.y - L.fpvRect.y) <= 2;
+        if(!fpvOk){
+          allAgree = false;
+          errors.push(sc.name + ': getLayoutProof fpv disagrees with authority layout');
+        }
+        const saLayoutOk = !L.safeAreaInsets || (
+          Math.abs((L.safeAreaInsets.top || 0) - a.safeArea.top) <= 2 &&
+          Math.abs((L.safeAreaInsets.bottom || 0) - a.safeArea.bottom) <= 2
+        );
+        if(!saLayoutOk){
+          allAgree = false;
+          errors.push(sc.name + ': layout safeAreaInsets disagree with authority safeArea');
+        }
+      }
+      evidence[sc.name] = {
+        layoutCss: a.layoutCss,
+        canvas: a.canvas,
+        safeArea: a.safeArea,
+        portrait: a.portrait,
+      };
+    }
+
+    syncVisualViewportShell();
+    resize();
+    applyMobileControlSettings();
+    const afterResize = crGetViewportAuthority({ refresh: true });
+    const resizeStable = afterResize.canvas.backingW > 0 && afterResize.layoutCss.cw > 0;
+    if(!resizeStable) errors.push('authority empty after resize');
+
+    checks.scenariosAgree = allAgree;
+    checks.canvasAuthorityMatchesLayout = allAgree;
+    checks.resizeReappliesAuthority = resizeStable;
+    checks.getViewportProofUsesAuthority = (()=>{
+      const p = getViewportProof();
+      return p && p.canvas && p.canvas.w === afterResize.canvas.backingW;
+    })();
+
+    const runtimeClean = window.__crRuntimeErrors.length === err0;
+    const pass = errors.length === 0 && Object.values(checks).every(v => v === true) && runtimeClean;
+    if(!runtimeClean) errors.push('runtime errors during viewport authority check');
+    return {
+      pass,
+      build: BUILD_ID,
+      errors,
+      warnings,
+      checks,
+      evidence,
+      authority: afterResize,
+      timestamp: new Date().toISOString(),
+    };
+  } catch(e){
+    errors.push(String(e && e.message ? e.message : e));
+    return { pass: false, build: BUILD_ID, errors, warnings, checks: {}, evidence: {} };
+  } finally {
+    state = savedState;
+    _selfCheckForcePortrait = savedForcePortrait;
+    mobileOverride = savedOverride;
+    applyMobileControlSettings();
+  }
+}
+
+function getViewportProof(){
+  const a = crGetViewportAuthority({ refresh: true });
+  const m = document.getElementById('mob');
+  return {
+    BUILD_ID: a.BUILD_ID,
+    inner: a.inner,
+    visual: a.visual,
+    cssVars: a.cssVars,
+    safeAreaInsetsPx: a.safeArea,
+    layoutCss: a.layoutCss,
+    dpr: a.dpr,
+    canvas: { w: a.canvas.backingW, h: a.canvas.backingH, cssW: a.canvas.cssW, cssH: a.canvas.cssH },
+    mob: m ? { w: m.style.width, h: m.style.height, top: m.style.top, left: m.style.left } : null,
   };
 }
 
@@ -1331,6 +1543,7 @@ function runMobileControlReliabilitySelfCheckBody(){
     const ly = lbr.top + lbr.height * 0.5;
     crDispatchPointer(lpad, 'pointerdown', lx, ly, 44, 'touch');
     crDispatchPointer(lpad, 'pointermove', lx + 55, ly, 44, 'touch');
+    crApplyPendingInputActions();
     checks.lookChangesAngle = Math.abs(player.angle - angle0) > 0.01;
     crDispatchPointer(lpad, 'pointermove', lx + 200, ly + 50, 44, 'touch');
     crDispatchPointer(lpad, 'pointerup', lx + 200, ly + 50, 44, 'touch');
@@ -4828,6 +5041,7 @@ function runInputSelfCheck(){
     const ly = lbr.top + lbr.height * 0.5;
     crDispatchPointer(lpad, 'pointerdown', lx, ly, 44, 'mouse');
     crDispatchPointer(lpad, 'pointermove', lx + 40, ly, 44, 'mouse');
+    crApplyPendingInputActions();
     checks.lookChangesAngle = Math.abs(player.angle - angle0) > 0.008;
     crDispatchPointer(lpad, 'pointerup', lx + 40, ly, 44, 'mouse');
     if(!checks.lookChangesAngle) errors.push('LOOK drag did not change player.angle');
@@ -5788,6 +6002,208 @@ function runLevelSelfCheckBody(){
     mobileOverride = savedOverride;
     applyMobileControlSettings();
   }
+}
+
+function runSemanticActionMapSelfCheck(){
+  const errors = [];
+  const checks = {};
+  try {
+    startRun(55);
+    state = STATE.PLAY;
+    paused = false;
+    clearMoveInput();
+    for(const k of Object.keys(keys)) delete keys[k];
+    keys['KeyW'] = true;
+    const a1 = crRefreshSemanticActionMap();
+    checks.keyboardFwd = a1.moveFwd === true;
+    delete keys['KeyW'];
+    inp.fwd = true;
+    const a2 = crRefreshSemanticActionMap();
+    checks.touchFwd = a2.moveFwd === true;
+    inp.fwd = false;
+    keys['KeyQ'] = true;
+    const a3 = crRefreshSemanticActionMap();
+    checks.turnLeft = a3.turnLeft === true;
+    keys['ShiftLeft'] = true;
+    const a4 = crRefreshSemanticActionMap();
+    checks.sprintHold = a4.sprintHold === true;
+    for(const k of Object.keys(keys)) delete keys[k];
+    checks.mapObject = typeof getSemanticActionMap === 'function';
+    const pass = errors.length === 0 && Object.values(checks).every(Boolean);
+    return { pass, build: BUILD_ID, errors, checks, sample: a4 };
+  } catch(e){
+    errors.push(String(e && e.message ? e.message : e));
+    return { pass: false, build: BUILD_ID, errors, checks: {} };
+  }
+}
+
+function crInputHandlerForbiddenPatterns(){
+  return [/player\.x\s*=/, /player\.y\s*=/, /player\.angle\s*\+=/, /genCity\s*\(/, /SAVE\.save\s*\(/];
+}
+
+function runInputNoDirectMutationGuardSelfCheck(){
+  const errors = [];
+  const checks = {};
+  const scanned = [];
+  const fns = [
+    ['crApplyLookPadDx', typeof crApplyLookPadDx === 'function' ? crApplyLookPadDx : null],
+    ['applyJoyFromClient', typeof applyJoyFromClient === 'function' ? applyJoyFromClient : null],
+    ['syncInpFromJoy', typeof syncInpFromJoy === 'function' ? syncInpFromJoy : null],
+    ['clearMoveInput', typeof clearMoveInput === 'function' ? clearMoveInput : null],
+    ['beginJoy', null],
+  ];
+  const forbidden = crInputHandlerForbiddenPatterns();
+  for(const [name, fn] of fns){
+    if(!fn) continue;
+    const src = String(fn);
+    scanned.push(name);
+    for(const re of forbidden){
+      if(re.test(src)) errors.push(name + ' contains forbidden mutation: ' + re);
+    }
+  }
+  checks.handlerSourceScan = scanned.length >= 3;
+  try {
+    startRun(66);
+    state = STATE.PLAY;
+    paused = false;
+    const px0 = player.x, py0 = player.y, a0 = player.angle;
+    inp.lookDeltaRad = 0;
+    const ml = document.getElementById('ml');
+    if(ml){
+      const br = ml.getBoundingClientRect();
+      crDispatchPointer(ml, 'pointerdown', br.left + br.width * 0.5, br.top + br.height * 0.5, 77, 'touch');
+      if(player.x !== px0 || player.y !== py0){
+        errors.push('pointerdown on MOVE mutated player position before update');
+      }
+    }
+    crApplyLookPadDx(48);
+    checks.lookDeferred = Math.abs(player.angle - a0) < 0.001 && inp.lookDeltaRad > 0;
+    if(!checks.lookDeferred) errors.push('look handler should defer angle via inp.lookDeltaRad');
+    crApplyPendingInputActions();
+    checks.lookAppliedOnSimStep = Math.abs(player.angle - a0) > 0.01;
+    if(!checks.lookAppliedOnSimStep) errors.push('crApplyPendingInputActions did not apply look');
+    const pass = errors.length === 0 && Object.values(checks).every(Boolean);
+    return { pass, build: BUILD_ID, errors, checks, scanned };
+  } catch(e){
+    errors.push(String(e && e.message ? e.message : e));
+    return { pass: false, build: BUILD_ID, errors, checks };
+  }
+}
+
+function runWorldLayerAdapterSelfCheck(){
+  const errors = [];
+  const checks = {};
+  try {
+    startRun(77);
+    checks.mapExists = !!(game.map && game.map.length);
+    const tx = Math.floor(player.x), ty = Math.floor(player.y);
+    const legacyWalk = isWalkableCell(tx, ty);
+    const adapterWalk = !World.cellSolid(tx, ty);
+    checks.walkMatchesLegacy = legacyWalk === adapterWalk;
+    if(!checks.walkMatchesLegacy) errors.push('World.cellSolid disagrees with isWalkableCell');
+    checks.materialString = typeof World.cellMaterial(tx, ty) === 'string';
+    checks.semanticString = typeof World.cellSemantic(tx, ty) === 'string';
+    checks.oobSolid = World.cellSolid(-1, -1) === true;
+    const pass = errors.length === 0 && Object.values(checks).every(Boolean);
+    return { pass, build: BUILD_ID, errors, checks };
+  } catch(e){
+    errors.push(String(e && e.message ? e.message : e));
+    return { pass: false, build: BUILD_ID, errors, checks: {} };
+  }
+}
+
+function runFixedStepBaselineSelfCheck(){
+  const errors = [];
+  const evidence = {};
+  try {
+    startRun(88);
+    state = STATE.PLAY;
+    paused = false;
+    player.stamina = player.maxStamina;
+    sprintBurstUntil = 0;
+    for(const k of Object.keys(keys)) delete keys[k];
+    clearMoveInput();
+    const angle0 = player.angle;
+    const px0 = player.x, py0 = player.y;
+    keys['KeyE'] = true;
+    for(let i = 0; i < 10; i++) update(0.05);
+    evidence.turnRate10x005 = player.angle - angle0;
+    delete keys['KeyE'];
+    for(const k of Object.keys(keys)) delete keys[k];
+    const px1 = player.x, py1 = player.y;
+    keys['KeyW'] = true;
+    for(let i = 0; i < 20; i++) update(0.05);
+    evidence.moveDist1sFwd = Math.hypot(player.x - px1, player.y - py1);
+    delete keys['KeyW'];
+    crHarnessInstallMicroMap([
+      '###',
+      '#.#',
+      '###',
+    ]);
+    player.x = 1.5;
+    player.y = 1.0;
+    player.angle = 0;
+    const pxWall = player.x;
+    const wallHit = movePlayerWithCollision(4, 0);
+    evidence.collisionStopDist = Math.abs(player.x - pxWall);
+    evidence.collisionMovePlayer = wallHit;
+    evidence.collisionMicroMap = true;
+    keys['ShiftLeft'] = true;
+    keys['KeyW'] = true;
+    const stam0 = player.stamina;
+    for(let i = 0; i < 15; i++) update(0.05);
+    evidence.sprintStaminaDrop = stam0 - player.stamina;
+    delete keys['ShiftLeft'];
+    delete keys['KeyW'];
+    evidence.frameDeltaModel = 'variable_dt_update';
+    const checks = {
+      turnRecorded: Math.abs(evidence.turnRate10x005) > 0.05,
+      moveRecorded: evidence.moveDist1sFwd > 0.05,
+      collisionRecorded: wallHit.moved === false || evidence.collisionStopDist < 0.45,
+      sprintRecorded: evidence.sprintStaminaDrop > 0.01,
+    };
+    const pass = errors.length === 0 && Object.values(checks).every(Boolean);
+    return { pass, build: BUILD_ID, errors, checks, evidence, timestamp: new Date().toISOString() };
+  } catch(e){
+    errors.push(String(e && e.message ? e.message : e));
+    return { pass: false, build: BUILD_ID, errors, checks: {}, evidence };
+  }
+}
+
+function crDebugRaycastFrame(){
+  const sprites = (game.sprites || []).filter(s => s && !s._hidden);
+  let zPos = 0, zInf = 0, zSampleMin = Infinity, zSampleMax = 0;
+  for(let col = 0; col < RW; col += 8){
+    const v = zbuffer[col];
+    if(v > 1e8) zInf++;
+    else if(v > 0){
+      zPos++;
+      zSampleMin = Math.min(zSampleMin, v);
+      zSampleMax = Math.max(zSampleMax, v);
+    }
+  }
+  let nearestWall = null;
+  for(let col = 0; col < RW; col++){
+    const d = zbuffer[col];
+    if(d > 0 && d < 1e8 && (!nearestWall || d < nearestWall.dist)){
+      nearestWall = { column: col, dist: d };
+    }
+  }
+  return {
+    player: { x: player.x, y: player.y, angle: player.angle },
+    rayColumns: RW,
+    internalBuffer: { RW, RH },
+    zbuffer: {
+      positiveColumnsSampled: zPos,
+      infiniteColumnsSampled: zInf,
+      sampleMin: zSampleMin === Infinity ? null : zSampleMin,
+      sampleMax: zSampleMax,
+    },
+    spriteCount: sprites.length,
+    nearestWall,
+    aimedTarget: game.aimNpc ? { x: game.aimNpc.x, y: game.aimNpc.y, kind: game.aimNpc.kind, need: game.aimNpc.need } : null,
+    build: BUILD_ID,
+  };
 }
 
 function runRenderSelfCheck(){
@@ -6780,7 +7196,7 @@ globalThis.CR = window.CR = {
   get mobileMode(){ return mobileMode; },
   crGetSelectedStartDistrict,crCycleSelectedStartDistrict,crSetSelectedStartDistrict,crTitleMenuSelectableRows,titleMenuRowLabel,crMinimapNavCellColor,
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
-  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runDecorativePropsSelfCheck,runOptionsCleanupSelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runStreetBlockLevelSelfCheck,runD1ParkLandmarkSelfCheck,runBuildingModuleFacadeSelfCheck,runFacadePackBridgeSelfCheck,runFacadePackV2SafeModuleSelfCheck,runFpvGroundPlaneAlignmentSelfCheck,runD2D3FacadeReadabilityFinalSelfCheck,runBuildingSmoothStyleSelfCheck,runContinuousFacadeTextureSelfCheck,runSpriteGroundAnchorSelfCheck,crDebugGroundPlaneAlignment,crDebugFacadeReadabilityFinal,crDebugBuildingSmoothStyle,crDebugContinuousFacadeTexture,crDebugPropDensity,crApplySolidwallsFrontProofHarness,CR_SOLIDWALLS_FRONTPROOF_NAME,crBuildFacadeTextureAtlas,crGetFacadeTextureForFace,crProjectedFloorY,crWallProjectionMetrics,crDebugSpriteProjection,runFacadeArtVocabularySelfCheck,runFacadeCompositionReadabilitySelfCheck,crDebugDescribeFacadeHit,runFpvFacadeTargetPolishSelfCheck,runFpvWallLineArtifactFixSelfCheck,runFpvStreetShimmerFixSelfCheck,runStreetReadabilityMinimapSelfCheck,runBuildingScalePolishSelfCheck,runEarlyDistrictProgressionSelfCheck,runLevelSelectorSelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRaycasterInvariantSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
+  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,crGetViewportAuthority,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runViewportAuthoritySelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runDecorativePropsSelfCheck,runOptionsCleanupSelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runStreetBlockLevelSelfCheck,runD1ParkLandmarkSelfCheck,runBuildingModuleFacadeSelfCheck,runFacadePackBridgeSelfCheck,runFacadePackV2SafeModuleSelfCheck,runFpvGroundPlaneAlignmentSelfCheck,runD2D3FacadeReadabilityFinalSelfCheck,runBuildingSmoothStyleSelfCheck,runContinuousFacadeTextureSelfCheck,runSpriteGroundAnchorSelfCheck,crDebugGroundPlaneAlignment,crDebugFacadeReadabilityFinal,crDebugBuildingSmoothStyle,crDebugContinuousFacadeTexture,crDebugPropDensity,crApplySolidwallsFrontProofHarness,CR_SOLIDWALLS_FRONTPROOF_NAME,crBuildFacadeTextureAtlas,crGetFacadeTextureForFace,crProjectedFloorY,crWallProjectionMetrics,crDebugSpriteProjection,runFacadeArtVocabularySelfCheck,runFacadeCompositionReadabilitySelfCheck,crDebugDescribeFacadeHit,runFpvFacadeTargetPolishSelfCheck,runFpvWallLineArtifactFixSelfCheck,runFpvStreetShimmerFixSelfCheck,runStreetReadabilityMinimapSelfCheck,runBuildingScalePolishSelfCheck,runEarlyDistrictProgressionSelfCheck,runLevelSelectorSelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runSemanticActionMapSelfCheck,runInputNoDirectMutationGuardSelfCheck,runWorldLayerAdapterSelfCheck,runFixedStepBaselineSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRaycasterInvariantSelfCheck,crDebugRaycastFrame,World,getSemanticActionMap,crRefreshSemanticActionMap,crApplyPendingInputActions,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
   CR_VISUAL_READABILITY,CR_SOUND_FEEDBACK,DECOR_PROP_REQUIRED,INPUT_CONFIG,CR_CONTROLS_LS_KEY,crTriggerSoundCue,crSoundEnabled,crSoundFeedbackCueIds,crLoadControlOverrides,crPersistControlOverrides,crResetControlLayoutOverrides,crClearControlOverrides,crEnterControlEditMode,crFinishControlEditMode,crControlHitTest,crSnapshotLayoutNorms,crPrepareSelfCheckPortrait,crStepEditControlSize,crSelectEditControl,
   getCrVisualHarnessSnapshot(){ return _crVisualHarnessSnapshot; },
   showOnboardingHelp,dismissOnboardingHelp,crOpenFirstRunHelpIfNeeded,

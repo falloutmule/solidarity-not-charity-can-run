@@ -3,6 +3,38 @@
 // ---------------------------------------------------------------------------
 const keys={};
 
+const semanticActions = {
+  moveFwd:false, moveBack:false, strafeLeft:false, strafeRight:false,
+  turnLeft:false, turnRight:false, sprintHold:false, giveHold:false,
+  mapHold:false, pauseHold:false,
+  sources:{ keyboard:false, touch:false, joy:false },
+};
+
+function crRefreshSemanticActionMap(){
+  semanticActions.moveFwd = !!(keys['KeyW'] || keys['ArrowUp'] || inp.fwd);
+  semanticActions.moveBack = !!(keys['KeyS'] || keys['ArrowDown'] || inp.back);
+  semanticActions.strafeLeft = !!(keys['KeyA'] || keys['ArrowLeft'] || inp.left);
+  semanticActions.strafeRight = !!(keys['KeyD'] || keys['ArrowRight'] || inp.right);
+  semanticActions.turnLeft = !!(keys['KeyQ'] || inp.turnLeft);
+  semanticActions.turnRight = !!(keys['KeyE'] || inp.turnRight);
+  semanticActions.sprintHold = !!(keys['ShiftLeft'] || keys['ShiftRight'] || inp.sprint);
+  semanticActions.giveHold = !!inp.give;
+  semanticActions.mapHold = !!inp.map;
+  semanticActions.pauseHold = !!inp.pause;
+  semanticActions.sources.keyboard = !!(
+    keys['KeyW'] || keys['KeyS'] || keys['KeyA'] || keys['KeyD'] ||
+    keys['KeyQ'] || keys['KeyE'] || keys['ShiftLeft'] || keys['ShiftRight'] ||
+    keys['ArrowUp'] || keys['ArrowDown'] || keys['ArrowLeft'] || keys['ArrowRight']
+  );
+  semanticActions.sources.touch = !!(inp.give || inp.map || inp.pause || inp._active);
+  semanticActions.sources.joy = !!joy.active;
+  return semanticActions;
+}
+
+function getSemanticActionMap(){
+  return crRefreshSemanticActionMap();
+}
+
 // --- MENU STATE ---
 let menuSel = 0;           // selected menu item index
 let selectedStartDistrict = 1; // 1–4 testing start (title menu below NEW RUN)
@@ -368,6 +400,9 @@ function update(dt){
 
   if(state!==STATE.PLAY || paused || onboardingOpen) return;
 
+  crApplyPendingInputActions();
+  const act = crRefreshSemanticActionMap();
+
   game.timeLeft -= dt;
   if(player.giveCD>0) player.giveCD=Math.max(0,player.giveCD-dt);
   if(game.revealT>0) game.revealT-=dt;
@@ -388,20 +423,20 @@ function update(dt){
     if(!paused){ paused=true; SAVE.save(); crTriggerSoundCue('menuHelp'); }
     else { paused=false; }
   }
-  if(inp.give && !inp._lastGive && !paused){ giveCan(); }
-  inp._lastMap = inp.map;
-  inp._lastPause = inp.pause;
-  inp._lastGive = inp.give;
+  if(act.giveHold && !inp._lastGive && !paused){ giveCan(); }
+  inp._lastMap = act.mapHold;
+  inp._lastPause = act.pauseHold;
+  inp._lastGive = act.giveHold;
 
   const turn=2.4*dt;
-  if(keys['KeyQ']||inp.turnLeft)  player.angle-=turn;
-  if(keys['KeyE']||inp.turnRight) player.angle+=turn;
+  if(act.turnLeft)  player.angle-=turn;
+  if(act.turnRight) player.angle+=turn;
 
   // Sprint: desktop Shift (hold/drain) OR mobile burst tap (spend one block up front)
   const nowSec = performance.now()/1000;
   let burstActive = nowSec < sprintBurstUntil;
   if(burstActive && player.stamina <= 0.1){ sprintBurstUntil = 0; burstActive = false; }
-  const shiftHeld = (keys['ShiftLeft']||keys['ShiftRight']);
+  const shiftHeld = act.sprintHold;
   const sprinting = (shiftHeld || burstActive) && player.stamina>0.1;
   // Keep sprint button visual in sync with burst state
   if(ms_element) ms_element.classList.toggle('pr', burstActive);
@@ -419,10 +454,10 @@ function update(dt){
     dx += rx * joy.x * s;
     dy += ry * joy.x * s;
   } else {
-    if(keys['KeyW']||keys['ArrowUp']   ||inp.fwd)  { dx+=fx; dy+=fy; }
-    if(keys['KeyS']||keys['ArrowDown'] ||inp.back) { dx-=fx; dy-=fy; }
-    if(keys['KeyD']||keys['ArrowRight']||inp.right){ dx+=rx; dy+=ry; }
-    if(keys['KeyA']||keys['ArrowLeft'] ||inp.left) { dx-=rx; dy-=ry; }
+    if(act.moveFwd)  { dx+=fx; dy+=fy; }
+    if(act.moveBack) { dx-=fx; dy-=fy; }
+    if(act.strafeRight){ dx+=rx; dy+=ry; }
+    if(act.strafeLeft) { dx-=rx; dy-=ry; }
   }
   const len=Math.hypot(dx,dy)||1; dx=dx/len*mv; dy=dy/len*mv;
   const px0 = player.x, py0 = player.y;

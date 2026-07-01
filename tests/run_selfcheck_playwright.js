@@ -391,6 +391,7 @@ async function pointerTorture(page) {
       bubbles: true, cancelable: true, clientX: lx + 35, clientY: lbr.top + 10,
       pointerId: 2, pointerType: 'mouse', isPrimary: true, buttons: 1,
     }));
+    if (typeof CR.crApplyPendingInputActions === 'function') CR.crApplyPendingInputActions();
     out.checks.lookAngle = Math.abs(CR.player.angle - angle0) > 0.005;
     lpad.dispatchEvent(new PointerEvent('pointerup', {
       bubbles: true, cancelable: true, clientX: lx + 35, clientY: lbr.top + 10,
@@ -2710,6 +2711,45 @@ async function main() {
   });
   writeProof('proof-raycaster-invariant.json', raycastInvariant);
 
+  const viewportAuthority = await page.evaluate(() => {
+    window.__crRuntimeErrors = window.__crRuntimeErrors || [];
+    return CR.runViewportAuthoritySelfCheck();
+  });
+  writeProof('proof-viewport-authority.json', viewportAuthority);
+
+  const semanticAction = await page.evaluate(() => CR.runSemanticActionMapSelfCheck());
+  writeProof('proof-semantic-action-map.json', semanticAction);
+
+  const inputGuard = await page.evaluate(() => CR.runInputNoDirectMutationGuardSelfCheck());
+  writeProof('proof-input-no-direct-mutation.json', inputGuard);
+
+  const worldAdapter = await page.evaluate(() => CR.runWorldLayerAdapterSelfCheck());
+  writeProof('proof-world-layer-adapter.json', worldAdapter);
+
+  const fixedStepBaseline = await page.evaluate(() => CR.runFixedStepBaselineSelfCheck());
+  writeProof('proof-fixed-step-baseline.json', fixedStepBaseline);
+
+  const raycastDebug = await page.evaluate(() => {
+    CR.startRun(42);
+    CR.state = CR.STATE.PLAY;
+    if (typeof drawScene === 'function') drawScene(performance.now());
+    return CR.crDebugRaycastFrame();
+  });
+  writeProof('proof-raycast-debug-frame.json', raycastDebug);
+
+  const spriteOcclusionVisual = await page.evaluate(() => {
+    const occ = CR.getOcclusionZbufferProof();
+    const halo = CR.getSpriteHaloRegressionProof();
+    return {
+      pass: !!(occ && occ.predicateOk && halo && halo.spriteLoopOk),
+      occlusion: occ,
+      halo,
+      build: CR.BUILD_ID,
+      timestamp: new Date().toISOString(),
+    };
+  });
+  writeProof('proof-sprite-occlusion-visual.json', spriteOcclusionVisual);
+
   const dock = await controlDockRegression(page);
   const pointer = await pointerTorture(page);
   const resilience = await viewportResilience(page);
@@ -2778,6 +2818,11 @@ async function main() {
     sourceBuildPipeline.pass &&
     full.pass &&
     raycastInvariant.pass === true &&
+    viewportAuthority.pass === true &&
+    semanticAction.pass === true &&
+    inputGuard.pass === true &&
+    worldAdapter.pass === true &&
+    fixedStepBaseline.pass === true &&
     dock.pass &&
     pointer.pass &&
     resilience.pass &&
