@@ -34,7 +34,7 @@ Add **`CR.runRaycasterInvariantSelfCheck()`** to prove the Canvas 2D raycaster s
 
 - **Branch:** `main`
 - **Commit before card:** `e1451fdd4910be07b6f36fa3ab01228c2942ea05`
-- **Commit after card:** (set on push)
+- **Commit after card:** `42535d5` (pushed to `main`)
 - **Files changed (intended commit):**
   - `src/js/game-22-section-13-main-loop.js`
   - `tests/run_selfcheck_playwright.js`
