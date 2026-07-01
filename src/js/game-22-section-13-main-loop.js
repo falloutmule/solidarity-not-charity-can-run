@@ -5824,6 +5824,150 @@ function runRenderSelfCheck(){
   }
 }
 
+function crRaycastInvariantStateSnap(){
+  return JSON.stringify({
+    state,
+    paused,
+    game: {
+      seed: game.seed,
+      district: game.district,
+      totalScore: game.totalScore,
+      MAP_W: game.MAP_W,
+      MAP_H: game.MAP_H,
+      map: game.map,
+      pickups: game.pickups,
+      npcs: game.npcs,
+      exit: game.exit,
+      props: game.props,
+      quota: game.quota,
+      helped: game.helped,
+      delivered: game.delivered,
+      timeLeft: game.timeLeft,
+      modifier: game.modifier,
+      scoreMult: game.scoreMult,
+      run: game.run,
+    },
+    player,
+  });
+}
+
+function runRaycasterInvariantSelfCheck(){
+  if(_crHarnessDepth > 0) return runRaycasterInvariantSelfCheckBody();
+  return crWithTemporaryState('raycasterInvariant', () => runRaycasterInvariantSelfCheckBody());
+}
+
+function runRaycasterInvariantSelfCheckBody(){
+  const errors = [];
+  const warnings = [];
+  const checks = {};
+  const evidence = {};
+  const err0 = window.__crRuntimeErrors.length;
+  const savedPick = selectedStartDistrict;
+
+  try {
+    const drawSrc = typeof drawScene === 'function' ? String(drawScene) : '';
+    const wallLoopAt = drawSrc.indexOf('for(let col=0; col<RW; col++)');
+    const zWriteAt = drawSrc.indexOf('zbuffer[col]=d');
+    const spriteCollectAt = drawSrc.indexOf('const sprites=[]');
+    const spriteSortAt = drawSrc.indexOf('sprites.sort((p,q)=>q.depth-p.depth)');
+    const spriteLoopAt = drawSrc.indexOf('for(const s of sprites)');
+    const zClipAt = drawSrc.indexOf('if(depth >= zbuffer[col]) continue');
+
+    checks.drawSceneExists = typeof drawScene === 'function';
+    if(!checks.drawSceneExists) errors.push('drawScene missing');
+    checks.wallLoopBeforeSprites = wallLoopAt >= 0 && spriteCollectAt > wallLoopAt;
+    if(!checks.wallLoopBeforeSprites) errors.push('wall column loop missing or not before sprite collection');
+    checks.zbufferWriteBeforeSprites = zWriteAt > wallLoopAt && zWriteAt < spriteCollectAt;
+    if(!checks.zbufferWriteBeforeSprites) errors.push('zbuffer[col] wall write missing or after sprite collection');
+    checks.spriteSortBeforeLoop = spriteSortAt > spriteCollectAt && spriteSortAt < spriteLoopAt;
+    if(!checks.spriteSortBeforeLoop) errors.push('sprite sort missing or out of order');
+    checks.perColumnSpriteClip = zClipAt > spriteLoopAt;
+    if(!checks.perColumnSpriteClip) errors.push('per-column sprite zbuffer clip missing or before sprite loop');
+    checks.haloGuardMarker = drawSrc.indexOf('SPRITE HALO REGRESSION GUARD') >= 0;
+    if(!checks.haloGuardMarker) errors.push('SPRITE HALO REGRESSION GUARD marker missing');
+    checks.noFullRectSpriteFogMarker = drawSrc.indexOf('no full-rect sprite fog') >= 0;
+    if(!checks.noFullRectSpriteFogMarker) errors.push('no full-rect sprite fog marker missing');
+
+    checks.internalResolution = RW === 320 && RH === 200;
+    if(!checks.internalResolution) errors.push('internal resolution not 320x200');
+    checks.bufferCanvasMatchesResolution = !!buf && buf.width === RW && buf.height === RH;
+    if(!checks.bufferCanvasMatchesResolution) errors.push('internal buffer canvas size mismatch');
+    checks.zbufferTyped = !!zbuffer && typeof zbuffer.length === 'number' && typeof zbuffer.BYTES_PER_ELEMENT === 'number';
+    if(!checks.zbufferTyped) errors.push('zbuffer not a typed array');
+    checks.zbufferLengthMatchesRW = zbuffer && zbuffer.length === RW;
+    if(!checks.zbufferLengthMatchesRW) errors.push('zbuffer length does not match RW');
+    checks.renderContextExists = !!bctx && !!ctx && !!view;
+    if(!checks.renderContextExists) errors.push('render contexts or view canvas missing');
+
+    const halo = typeof getSpriteHaloRegressionProof === 'function'
+      ? getSpriteHaloRegressionProof()
+      : { spriteLoopOk: false, missing: true };
+    evidence.halo = halo;
+    checks.spriteHaloPolicy = halo.spriteLoopOk === true;
+    if(!checks.spriteHaloPolicy) errors.push('sprite halo policy check failed');
+
+    const occ = typeof getOcclusionZbufferProof === 'function'
+      ? getOcclusionZbufferProof()
+      : { predicateOk: false, missing: true };
+    evidence.occlusion = occ;
+    checks.occlusionPredicate = occ.predicateOk === true;
+    if(!checks.occlusionPredicate) errors.push('occlusion predicate check failed');
+    checks.occlusionZbufferWidth = occ.zbufferMatchesRenderWidth === true;
+    if(!checks.occlusionZbufferWidth) errors.push('occlusion zbuffer width check failed');
+
+    startRun(42);
+    state = STATE.PLAY;
+    paused = false;
+    drawScene(performance.now());
+
+    let finite = 0;
+    let positive = 0;
+    let sampled = 0;
+    const sample = [];
+    for(let col = 0; col < RW; col += 16){
+      sampled++;
+      const d = zbuffer[col];
+      if(Number.isFinite(d)) finite++;
+      if(Number.isFinite(d) && d > 0) positive++;
+      sample.push({ col, d: Number.isFinite(d) ? +d.toFixed(3) : String(d) });
+    }
+    checks.zbufferSampleFinite = finite === sampled;
+    if(!checks.zbufferSampleFinite) errors.push('zbuffer sample columns not all finite');
+    checks.zbufferSamplePositive = positive >= Math.max(1, Math.floor(sampled * 0.75));
+    if(!checks.zbufferSamplePositive) errors.push('zbuffer sample lacks enough positive wall distances');
+    evidence.zbufferSample = sample;
+
+    const before = crRaycastInvariantStateSnap();
+    drawScene(performance.now() + 16);
+    const after = crRaycastInvariantStateSnap();
+    checks.drawSceneDoesNotMutateGameplay = before === after;
+    if(!checks.drawSceneDoesNotMutateGameplay) errors.push('drawScene mutated gameplay state');
+
+    checks.noExternalRuntimeDeps = document.querySelectorAll('script[src],link[rel="stylesheet"][href],audio[src],source[src]').length === 0;
+    if(!checks.noExternalRuntimeDeps) errors.push('external runtime dependency found');
+  } catch(e) {
+    errors.push(String(e && e.message ? e.message : e));
+  } finally {
+    selectedStartDistrict = savedPick;
+    _selfCheckForcePortrait = false;
+    crForceSafeTitleAfterHarness();
+    if(typeof drawMobileMenu === 'function') drawMobileMenu();
+  }
+
+  checks.noRuntimeErrors = window.__crRuntimeErrors.length === err0;
+  if(!checks.noRuntimeErrors) errors.push('runtime errors during raycaster invariant check');
+
+  return {
+    pass: errors.length === 0,
+    build: BUILD_ID,
+    errors,
+    warnings,
+    checks,
+    evidence,
+    timestamp: new Date().toISOString(),
+  };
+}
+
 function crHallTestPlace(px, py){
   if(!canStand(px, py)) return false;
   player.x = px;
@@ -6636,7 +6780,7 @@ globalThis.CR = window.CR = {
   get mobileMode(){ return mobileMode; },
   crGetSelectedStartDistrict,crCycleSelectedStartDistrict,crSetSelectedStartDistrict,crTitleMenuSelectableRows,titleMenuRowLabel,crMinimapNavCellColor,
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
-  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runDecorativePropsSelfCheck,runOptionsCleanupSelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runStreetBlockLevelSelfCheck,runD1ParkLandmarkSelfCheck,runBuildingModuleFacadeSelfCheck,runFacadePackBridgeSelfCheck,runFacadePackV2SafeModuleSelfCheck,runFpvGroundPlaneAlignmentSelfCheck,runD2D3FacadeReadabilityFinalSelfCheck,runBuildingSmoothStyleSelfCheck,runContinuousFacadeTextureSelfCheck,runSpriteGroundAnchorSelfCheck,crDebugGroundPlaneAlignment,crDebugFacadeReadabilityFinal,crDebugBuildingSmoothStyle,crDebugContinuousFacadeTexture,crDebugPropDensity,crApplySolidwallsFrontProofHarness,CR_SOLIDWALLS_FRONTPROOF_NAME,crBuildFacadeTextureAtlas,crGetFacadeTextureForFace,crProjectedFloorY,crWallProjectionMetrics,crDebugSpriteProjection,runFacadeArtVocabularySelfCheck,runFacadeCompositionReadabilitySelfCheck,crDebugDescribeFacadeHit,runFpvFacadeTargetPolishSelfCheck,runFpvWallLineArtifactFixSelfCheck,runFpvStreetShimmerFixSelfCheck,runStreetReadabilityMinimapSelfCheck,runBuildingScalePolishSelfCheck,runEarlyDistrictProgressionSelfCheck,runLevelSelectorSelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
+  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runDecorativePropsSelfCheck,runOptionsCleanupSelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runStreetBlockLevelSelfCheck,runD1ParkLandmarkSelfCheck,runBuildingModuleFacadeSelfCheck,runFacadePackBridgeSelfCheck,runFacadePackV2SafeModuleSelfCheck,runFpvGroundPlaneAlignmentSelfCheck,runD2D3FacadeReadabilityFinalSelfCheck,runBuildingSmoothStyleSelfCheck,runContinuousFacadeTextureSelfCheck,runSpriteGroundAnchorSelfCheck,crDebugGroundPlaneAlignment,crDebugFacadeReadabilityFinal,crDebugBuildingSmoothStyle,crDebugContinuousFacadeTexture,crDebugPropDensity,crApplySolidwallsFrontProofHarness,CR_SOLIDWALLS_FRONTPROOF_NAME,crBuildFacadeTextureAtlas,crGetFacadeTextureForFace,crProjectedFloorY,crWallProjectionMetrics,crDebugSpriteProjection,runFacadeArtVocabularySelfCheck,runFacadeCompositionReadabilitySelfCheck,crDebugDescribeFacadeHit,runFpvFacadeTargetPolishSelfCheck,runFpvWallLineArtifactFixSelfCheck,runFpvStreetShimmerFixSelfCheck,runStreetReadabilityMinimapSelfCheck,runBuildingScalePolishSelfCheck,runEarlyDistrictProgressionSelfCheck,runLevelSelectorSelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRaycasterInvariantSelfCheck,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
   CR_VISUAL_READABILITY,CR_SOUND_FEEDBACK,DECOR_PROP_REQUIRED,INPUT_CONFIG,CR_CONTROLS_LS_KEY,crTriggerSoundCue,crSoundEnabled,crSoundFeedbackCueIds,crLoadControlOverrides,crPersistControlOverrides,crResetControlLayoutOverrides,crClearControlOverrides,crEnterControlEditMode,crFinishControlEditMode,crControlHitTest,crSnapshotLayoutNorms,crPrepareSelfCheckPortrait,crStepEditControlSize,crSelectEditControl,
   getCrVisualHarnessSnapshot(){ return _crVisualHarnessSnapshot; },
   showOnboardingHelp,dismissOnboardingHelp,crOpenFirstRunHelpIfNeeded,

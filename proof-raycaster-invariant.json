@@ -1,0 +1,163 @@
+{
+  "pass": true,
+  "build": "feel2",
+  "errors": [],
+  "warnings": [],
+  "checks": {
+    "drawSceneExists": true,
+    "wallLoopBeforeSprites": true,
+    "zbufferWriteBeforeSprites": true,
+    "spriteSortBeforeLoop": true,
+    "perColumnSpriteClip": true,
+    "haloGuardMarker": true,
+    "noFullRectSpriteFogMarker": true,
+    "internalResolution": true,
+    "bufferCanvasMatchesResolution": true,
+    "zbufferTyped": true,
+    "zbufferLengthMatchesRW": true,
+    "renderContextExists": true,
+    "spriteHaloPolicy": true,
+    "occlusionPredicate": true,
+    "occlusionZbufferWidth": true,
+    "zbufferSampleFinite": true,
+    "zbufferSamplePositive": true,
+    "drawSceneDoesNotMutateGameplay": true,
+    "noExternalRuntimeDeps": true,
+    "noRuntimeErrors": true
+  },
+  "evidence": {
+    "halo": {
+      "BUILD_ID": "feel2",
+      "policy": "walls own distance fog; billboards drawImage only — no post-loop sprite fog fillRect",
+      "forbiddenPatternsAbsent": true,
+      "forbiddenHits": [],
+      "requiredMarkersPresent": true,
+      "requiredMissing": [],
+      "spriteLoopOk": true,
+      "regressionCommentMarker": "SPRITE HALO REGRESSION GUARD"
+    },
+    "occlusion": {
+      "BUILD_ID": "feel2",
+      "renderWidth": 320,
+      "zbufferLength": 320,
+      "zbufferMatchesRenderWidth": true,
+      "billboardKinds": [
+        "props",
+        "pickups",
+        "npcs",
+        "exit"
+      ],
+      "perColumnGuard": "depth >= zbuffer[col] => skip column",
+      "wallPassFillsZbufferPerColumn": true,
+      "noPostLoopSpriteFog": true,
+      "predicateTests": [
+        {
+          "spriteDepth": 3,
+          "wallDist": 2,
+          "expectSkip": true,
+          "label": "sprite behind wall",
+          "pass": true
+        },
+        {
+          "spriteDepth": 2,
+          "wallDist": 2,
+          "expectSkip": true,
+          "label": "sprite flush with wall (skip)",
+          "pass": true
+        },
+        {
+          "spriteDepth": 1.2,
+          "wallDist": 2,
+          "expectSkip": false,
+          "label": "sprite in front of wall",
+          "pass": true
+        }
+      ],
+      "predicateOk": true,
+      "regressionCommentMarker": "OCCLUSION REGRESSION GUARD"
+    },
+    "zbufferSample": [
+      {
+        "col": 0,
+        "d": 31.096
+      },
+      {
+        "col": 16,
+        "d": 32.383
+      },
+      {
+        "col": 32,
+        "d": 33.782
+      },
+      {
+        "col": 48,
+        "d": 27.601
+      },
+      {
+        "col": 64,
+        "d": 29.268
+      },
+      {
+        "col": 80,
+        "d": 26.385
+      },
+      {
+        "col": 96,
+        "d": 24.019
+      },
+      {
+        "col": 112,
+        "d": 17.117
+      },
+      {
+        "col": 128,
+        "d": 20.366
+      },
+      {
+        "col": 144,
+        "d": 18.927
+      },
+      {
+        "col": 160,
+        "d": 17.678
+      },
+      {
+        "col": 176,
+        "d": 16.583
+      },
+      {
+        "col": 192,
+        "d": 15.616
+      },
+      {
+        "col": 208,
+        "d": 14.756
+      },
+      {
+        "col": 224,
+        "d": 13.985
+      },
+      {
+        "col": 240,
+        "d": 13.291
+      },
+      {
+        "col": 256,
+        "d": 12.663
+      },
+      {
+        "col": 272,
+        "d": 12.091
+      },
+      {
+        "col": 288,
+        "d": 11.569
+      },
+      {
+        "col": 304,
+        "d": 11.09
+      }
+    ]
+  },
+  "timestamp": "2026-07-01T21:59:24.604Z"
+}

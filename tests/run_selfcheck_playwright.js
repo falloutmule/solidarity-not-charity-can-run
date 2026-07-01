@@ -2704,6 +2704,12 @@ async function main() {
   });
   writeProof('proof-full-selfcheck.json', full);
 
+  const raycastInvariant = await page.evaluate(() => {
+    window.__crRuntimeErrors = window.__crRuntimeErrors || [];
+    return CR.runRaycasterInvariantSelfCheck();
+  });
+  writeProof('proof-raycaster-invariant.json', raycastInvariant);
+
   const dock = await controlDockRegression(page);
   const pointer = await pointerTorture(page);
   const resilience = await viewportResilience(page);
@@ -2771,6 +2777,7 @@ async function main() {
     constitution.pass &&
     sourceBuildPipeline.pass &&
     full.pass &&
+    raycastInvariant.pass === true &&
     dock.pass &&
     pointer.pass &&
     resilience.pass &&

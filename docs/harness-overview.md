@@ -6,7 +6,7 @@ SNC Can Run uses **in-browser self-checks** (`window.CR`) plus a **Playwright** 
 
 ## In-browser (`window.CR`)
 
-- Functions like `CR.runLayoutSelfCheck()`, `CR.runFullSelfCheck()`, `CR.runContinuousFacadeTextureSelfCheck()`, `CR.crDebugContinuousFacadeTexture()`, `CR.runBuildingSmoothStyleSelfCheck()`, `CR.crDebugBuildingSmoothStyle()`, `CR.runFpvGroundPlaneAlignmentSelfCheck()`, `CR.crDebugGroundPlaneAlignment()`, `CR.runSpriteGroundAnchorSelfCheck()`, `CR.crDebugSpriteProjection()`, `CR.runFacadeArtVocabularySelfCheck()`, `CR.runFacadeCompositionReadabilitySelfCheck()`, `CR.runFacadePackV2SafeModuleSelfCheck()`, `CR.runFacadePackBridgeSelfCheck()`, `CR.runBuildingModuleFacadeSelfCheck()`, `CR.runStreetReadabilityMinimapSelfCheck()`, `CR.runBuildingScalePolishSelfCheck()`, `CR.runLevelSelectorSelfCheck()`, `CR.runEarlyDistrictProgressionSelfCheck()`, `CR.runStreetBlockLevelSelfCheck()`, `CR.runD1ParkLandmarkSelfCheck()`, `CR.runOnboardingSelfCheck()`, `CR.runSoundFeedbackSelfCheck()`, `CR.runVisualReadabilitySelfCheck()`, `CR.runVisualRectangleRegressionSelfCheck()`, `CR.runDecorativePropsSelfCheck()`, `CR.runOptionsCleanupSelfCheck()`, `CR.runHallSelfCheck()`, etc.
+- Functions like `CR.runLayoutSelfCheck()`, `CR.runFullSelfCheck()`, `CR.runRaycasterInvariantSelfCheck()`, `CR.runContinuousFacadeTextureSelfCheck()`, `CR.crDebugContinuousFacadeTexture()`, `CR.runBuildingSmoothStyleSelfCheck()`, `CR.crDebugBuildingSmoothStyle()`, `CR.runFpvGroundPlaneAlignmentSelfCheck()`, `CR.crDebugGroundPlaneAlignment()`, `CR.runSpriteGroundAnchorSelfCheck()`, `CR.crDebugSpriteProjection()`, `CR.runFacadeArtVocabularySelfCheck()`, `CR.runFacadeCompositionReadabilitySelfCheck()`, `CR.runFacadePackV2SafeModuleSelfCheck()`, `CR.runFacadePackBridgeSelfCheck()`, `CR.runBuildingModuleFacadeSelfCheck()`, `CR.runStreetReadabilityMinimapSelfCheck()`, `CR.runBuildingScalePolishSelfCheck()`, `CR.runLevelSelectorSelfCheck()`, `CR.runEarlyDistrictProgressionSelfCheck()`, `CR.runStreetBlockLevelSelfCheck()`, `CR.runD1ParkLandmarkSelfCheck()`, `CR.runOnboardingSelfCheck()`, `CR.runSoundFeedbackSelfCheck()`, `CR.runVisualReadabilitySelfCheck()`, `CR.runVisualRectangleRegressionSelfCheck()`, `CR.runDecorativePropsSelfCheck()`, `CR.runOptionsCleanupSelfCheck()`, `CR.runHallSelfCheck()`, etc.
 - URL: `?selfcheck=1` runs full check and shows PASS/FAIL overlay.
 - **`crWithTemporaryState`** — snapshots public state + `localStorage`, runs harness, restores so benchmarks do not leak.
 - **`__crRuntimeErrors`** — uncaught errors fail runtime-clean checks.
@@ -22,6 +22,7 @@ SNC Can Run uses **in-browser self-checks** (`window.CR`) plus a **Playwright** 
 | File | Card |
 |------|------|
 | `proof-playwright-summary.json` | Full suite |
+| `proof-raycaster-invariant.json` | Raycaster architecture invariants (z-buffer, render order, halo) |
 | `proof-portrait-usability.json` | Portrait layout |
 | `proof-mobile-control-reliability.json` | Mobile controls |
 | `proof-movement-collision.json` | Collision |
