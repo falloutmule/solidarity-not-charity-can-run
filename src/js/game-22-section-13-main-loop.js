@@ -1896,7 +1896,7 @@ function runDeclarativeControlsSelfCheckBody(){
     checks.menuNotEditable = INPUT_CONFIG.controls.menu && INPUT_CONFIG.controls.menu.editable === false;
     if(!checks.menuNotEditable) errors.push('MENU must stay non-editable');
 
-    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1')));
+    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2')));
         if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
 
     checks.saveFormatUnchanged = !('controlsLayout' in (options.data || options));
@@ -1947,7 +1947,7 @@ function runDecorativePropsSelfCheckBody(){
   const evidence = {};
   const err0 = window.__crRuntimeErrors.length;
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1')));
+    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2')));
     if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
 
     checks.decorArrayExported = Array.isArray(DECOR_PROP_REQUIRED) && DECOR_PROP_REQUIRED.length === 12;
@@ -2057,7 +2057,7 @@ function runOptionsCleanupSelfCheckBody(){
   _controlEditActive = false;
   crShowControlEditChrome(false);
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1')));
+    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2')));
         if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
 
     state = STATE.TITLE;
@@ -2210,7 +2210,7 @@ function runLevelSelectorSelfCheckBody(){
   mobileOverride = 'on';
   setMobileMode(true);
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1')));
+    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2')));
     if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
     checks.saveVersionUnchanged = SAVE_VERSION === 1;
     checks.controlsSchemaUnchanged = CR_CONTROLS_LS_KEY === 'cannedRun.controls.v1';
@@ -2322,7 +2322,7 @@ function runFpvGroundPlaneAlignmentSelfCheckBody(){
   const err0 = window.__crRuntimeErrors.length;
   const savedPick = selectedStartDistrict;
   try{
-    checks.buildId = BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1'));
+    checks.buildId = BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2'));
     checks.splitSourcePipeline = CR_SOURCE_BUILD_PIPELINE_ACTIVE === 1;
     checks.generatedFromSourceContract = typeof crWallProjectionMetrics === 'function' && typeof crProjectedFloorY === 'function';
     checks.wallProjectionHelper = typeof crWallProjectionMetrics === 'function';
@@ -2425,7 +2425,7 @@ function runD2D3FacadeReadabilityFinalSelfCheckBody(){
     const debug = crDebugFacadeReadabilityFinal();
     evidence.debug = debug;
 
-    checks.buildId = (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1'));
+    checks.buildId = (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2'));
     checks.splitSourcePipeline = CR_SOURCE_BUILD_PIPELINE_ACTIVE === 1;
     checks.rootGeneratedFromSourceContract = checks.splitSourcePipeline && typeof crDrawComposedFacadeFaceColumn === 'function';
     checks.groundplaneHelpersStillExist = typeof crProjectedFloorY === 'function' && typeof crWallProjectionMetrics === 'function' && typeof crDebugGroundPlaneAlignment === 'function';
@@ -2530,7 +2530,7 @@ function runBuildingSmoothStyleSelfCheckBody(){
     evidence.groundplane = ground;
     evidence.modules = mods.slice();
 
-    checks.buildId = (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1');
+    checks.buildId = (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2');
     checks.splitSourcePipeline = CR_SOURCE_BUILD_PIPELINE_ACTIVE === 1;
     checks.rootGeneratedFromSourceContract = checks.splitSourcePipeline && typeof crDrawSmoothBuildingFaceColumn === 'function' && drawSrc.indexOf('crDrawComposedFacadeFaceColumn') >= 0;
     checks.buildCheckCoveredByHarness = checks.splitSourcePipeline;
@@ -2628,7 +2628,7 @@ function runContinuousFacadeTextureSelfCheckBody(){
     evidence.groundplane = ground;
     evidence.modules = mods.slice();
 
-    checks.buildId = BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1';
+    checks.buildId = BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2';
     checks.splitSourcePipeline = CR_SOURCE_BUILD_PIPELINE_ACTIVE === 1;
     checks.rootIndexGeneratedFromSource = checks.splitSourcePipeline && typeof crDrawComposedFacadeFaceColumn === 'function' && drawSrc.indexOf('crDrawComposedFacadeFaceColumn') >= 0;
     checks.npmBuildCheckPasses = checks.splitSourcePipeline;
@@ -2638,7 +2638,10 @@ function runContinuousFacadeTextureSelfCheckBody(){
     checks.boardedShopTexture = debug.checks && debug.checks.boardedShopTextureExists === true;
     checks.garageServiceTexture = debug.checks && debug.checks.garageServiceTextureExists === true;
     checks.sideBackTexture = debug.checks && debug.checks.sideBackTextureExists === true;
-    checks.raycasterSamplesFacadeTexturesByContinuousFaceU = composedSrc.indexOf('faceU') >= 0 && composedSrc.indexOf('crDrawContinuousFacadeTextureColumn') >= 0 && (composedSrc.indexOf('crGetFacadeTextureForFace') >= 0 || composedSrc.indexOf('crGetBuildingMaterialTextureForFace') >= 0);
+    const materialWallSrc = typeof crDrawBuildingMaterialWallColumn === 'function' ? String(crDrawBuildingMaterialWallColumn) : '';
+    checks.raycasterSamplesFacadeTexturesByContinuousFaceU =
+      (composedSrc.indexOf('crDrawBuildingMaterialWallColumn') >= 0 && materialWallSrc.indexOf('crBuildingMaterialTileUForCell') >= 0) ||
+      (composedSrc.indexOf('faceU') >= 0 && composedSrc.indexOf('crDrawContinuousFacadeTextureColumn') >= 0 && (composedSrc.indexOf('crGetFacadeTextureForFace') >= 0 || composedSrc.indexOf('crGetBuildingMaterialTextureForFace') >= 0));
     const simpleSrc = typeof crDrawSimpleWallColumn === 'function' ? String(crDrawSimpleWallColumn) : '';
     checks.simpleWallsBaselineFlag = BUILD_ID !== 'simplewalls1' || (typeof CR_SIMPLE_WALLS_BASELINE !== 'undefined' && CR_SIMPLE_WALLS_BASELINE === 1);
     checks.simpleWallRouteFirst = BUILD_ID !== 'simplewalls1' || (composedSrc.indexOf('CR_SIMPLE_WALLS_BASELINE') >= 0 && composedSrc.indexOf('crDrawSimpleWallColumn') >= 0 && composedSrc.indexOf('crDrawSimpleWallColumn') < composedSrc.indexOf('crDrawCalmPropsFirstWallColumn'));
@@ -2719,7 +2722,7 @@ function runSpriteGroundAnchorSelfCheckBody(){
   const evidence = {};
   const tol = 0.75;
   try{
-    checks.buildId = (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1')));
+    checks.buildId = (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2')));
     if(!checks.buildId) errors.push('BUILD_ID must be spriteground1');
 
     const src = typeof drawScene === 'function' ? String(drawScene) : '';
@@ -2820,7 +2823,7 @@ function runFacadeArtVocabularySelfCheckBody(){
   const artSrc = (typeof crDrawSmoothBuildingFaceColumn === 'function' ? String(crDrawSmoothBuildingFaceColumn) : '') + '\n' + String(crDrawComposedFacadeFaceColumn);
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildId = BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1'))) || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1')));
+    checks.buildId = BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2'))) || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2')));
     checks.packExists = typeof CR_FACADE_PACK === 'object' && CR_FACADE_PACK !== null;
     checks.packVersion = checks.packExists && CR_FACADE_PACK.version === 'facadeart1';
     checks.packMarkers = (function(){
@@ -2986,7 +2989,7 @@ function runFacadeCompositionReadabilitySelfCheckBody(){
   const drawSrc = String(drawScene);
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildId = BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1')));
+    checks.buildId = BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2')));
     checks.packExists = typeof CR_FACADE_PACK === 'object' && CR_FACADE_PACK !== null;
     checks.packVersion = checks.packExists && (CR_FACADE_PACK.version === 'facadecompose1' || CR_FACADE_PACK.version === 'facadeart1');
     checks.packMarkers = (function(){
@@ -3162,7 +3165,7 @@ function runFacadePackV2SafeModuleSelfCheckBody(){
   const savedPick = selectedStartDistrict;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildId = BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1')));
+    checks.buildId = BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2')));
     checks.v2SafeFlag = CR_FACADE_PACK_V2_SAFE >= 1;
     checks.packExists = typeof CR_FACADE_PACK === 'object' && CR_FACADE_PACK !== null;
     checks.packMarkers = (function(){
@@ -3297,7 +3300,7 @@ function runFacadePackBridgeSelfCheckBody(){
   crPrepareSelfCheckPortrait();
   try {
     const html = typeof CR_FACADE_PACK !== 'undefined' ? 'ok' : '';
-    checks.buildId = BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1')));
+    checks.buildId = BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2')));
     checks.packExists = typeof CR_FACADE_PACK === 'object' && CR_FACADE_PACK !== null;
     checks.packVersion = checks.packExists && (CR_FACADE_PACK.version === 'facadepack1' || CR_FACADE_PACK.version === 'facadev2safe1' || CR_FACADE_PACK.version === 'facadecompose1' || CR_FACADE_PACK.version === 'facadeart1');
     checks.packMarkers = (function(){
@@ -3424,7 +3427,7 @@ function runBuildingModuleFacadeSelfCheckBody(){
   const savedPick = selectedStartDistrict;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdModules1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1')));
+    checks.buildIdModules1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2')));
     checks.moduleFlag = CR_BUILDING_MODULE_FACADE >= 1;
     checks.moduleDefs = !!(CR_FACADE_PACK && CR_FACADE_PACK.modules && CR_FACADE_PACK.modules.storefront_4x2 && CR_FACADE_PACK.modules.storefront_3x2);
     checks.faceRoles = !!(CR_FACADE_PACK.modules.storefront_4x2.faces && CR_FACADE_PACK.modules.storefront_4x2.faces.south);
@@ -3531,7 +3534,7 @@ function runFpvFacadeTargetPolishSelfCheckBody(){
   const savedPick = selectedStartDistrict;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdFacadeFix1 = BUILD_ID === 'facadefix1' || BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1')));
+    checks.buildIdFacadeFix1 = BUILD_ID === 'facadefix1' || BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2')));
     checks.facadePolishFlag = CR_FPV_FACADE_TARGET_POLISH >= 1;
     checks.fpvMassPreserved = CR_BUILDING_FPV_MASS >= 1.45 && CR_BUILDING_FPV_MASS <= 1.55;
     checks.coarseWallTexBroad = CR_FPV_WALL_TEX_COARSE >= 12;
@@ -3641,7 +3644,7 @@ function runFpvWallLineArtifactFixSelfCheckBody(){
   const savedPick = selectedStartDistrict;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdWallLineStack = BUILD_ID === 'wallfix1' || BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1')));
+    checks.buildIdWallLineStack = BUILD_ID === 'wallfix1' || BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2')));
     checks.fpvMassPreserved = CR_BUILDING_FPV_MASS >= 1.45 && CR_BUILDING_FPV_MASS <= 1.55;
     checks.coarseWallTex = typeof CR_FPV_WALL_TEX_COARSE === 'number' && CR_FPV_WALL_TEX_COARSE >= 6;
     checks.wallLineFixFlag = CR_FPV_WALL_LINE_FIX >= 1;
@@ -3755,7 +3758,7 @@ function runFpvStreetShimmerFixSelfCheckBody(){
   const savedPick = selectedStartDistrict;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdShimmerFix1 = BUILD_ID === 'shimmerfix1' || BUILD_ID === 'wallfix1' || BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1')));
+    checks.buildIdShimmerFix1 = BUILD_ID === 'shimmerfix1' || BUILD_ID === 'wallfix1' || BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2')));
     checks.fpvMassPreserved = CR_BUILDING_FPV_MASS >= 1.45 && CR_BUILDING_FPV_MASS <= 1.55;
     checks.matteStreetMode = CR_FPV_STREET_MATTE === true && CR_FPV_STREET_SHIMMER_FIX >= 1;
     checks.minimapNavPreserved = typeof crMinimapNavCellColor === 'function' && Array.isArray(CR_MINIMAP_NAV_PALETTE);
@@ -3872,7 +3875,7 @@ function runStreetReadabilityMinimapSelfCheckBody(){
   const savedPick = selectedStartDistrict;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdStreetRead1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1')));
+    checks.buildIdStreetRead1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2')));
     if(!checks.buildIdStreetRead1) errors.push('BUILD_ID must be facadefix1 (minimap contract)');
     checks.footprint40x20 = true;
     checks.buildingMassPreserved = CR_BUILDING_FPV_MASS >= 1.45 && CR_BUILDING_FPV_MASS <= 1.55;
@@ -3995,7 +3998,7 @@ function runBuildingScalePolishSelfCheckBody(){
   const savedPick = selectedStartDistrict;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1')));
+    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2')));
     if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
     checks.fpvMassConstant = CR_BUILDING_FPV_MASS >= 1.45 && CR_BUILDING_FPV_MASS <= 1.55;
     checks.footprint40x20 = true;
@@ -4111,7 +4114,7 @@ function runEarlyDistrictProgressionSelfCheckBody(){
   const err0 = window.__crRuntimeErrors.length;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1')));
+    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2')));
     if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
     checks.footprintUnchanged = true;
     checks.saveVersionUnchanged = SAVE_VERSION === 1;
@@ -4210,7 +4213,7 @@ function runD1ParkLandmarkSelfCheckBody(){
   const err0 = window.__crRuntimeErrors.length;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1')));
+    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2')));
     if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
 
     const matrix = [
@@ -4326,7 +4329,7 @@ function runStreetBlockLevelSelfCheckBody(){
   const err0 = window.__crRuntimeErrors.length;
   crPrepareSelfCheckPortrait();
   try {
-    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1')));
+    checks.buildIdBuildScale1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2')));
     if(!checks.buildIdBuildScale1) errors.push('BUILD_ID must be shimmerfix1');
 
     const matrix = [
@@ -4617,7 +4620,7 @@ function runSoundFeedbackSelfCheckBody(){
   try {
     checks.functionExists = typeof runSoundFeedbackSelfCheck === 'function';
     checks.contract = !!(CR_SOUND_FEEDBACK && CR_SOUND_FEEDBACK.style === 'sound1' && CR_SOUND_FEEDBACK.webAudio === true);
-    checks.buildIdOptionsClean1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1')));
+    checks.buildIdOptionsClean1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2')));
     checks.crTriggerExists = typeof crTriggerSoundCue === 'function';
     checks.crSoundEnabledFn = typeof crSoundEnabled === 'function';
     checks.noExternalAudioTags = document.querySelectorAll('audio,source[src]').length === 0;
@@ -4686,7 +4689,7 @@ function runVisualReadabilitySelfCheckBody(){
   mobileOverride = true;
   try {
     checks.functionExists = typeof runVisualReadabilitySelfCheck === 'function';
-    checks.buildIdOptionsClean1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1')));
+    checks.buildIdOptionsClean1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2')));
     checks.visualContract = !!(CR_VISUAL_READABILITY && CR_VISUAL_READABILITY.style === 'visualfix1');
     checks.noScreenPathStripe = CR_VISUAL_READABILITY.floorPathStripe === false;
     checks.pickupTex = !!TEX.can;
@@ -4819,7 +4822,7 @@ function runVisualRectangleRegressionSelfCheckBody(){
   mobileOverride = true;
   try {
     checks.functionExists = typeof runVisualRectangleRegressionSelfCheck === 'function';
-    checks.buildIdOptionsClean1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1')));
+    checks.buildIdOptionsClean1 = BUILD_ID === 'modules1' || BUILD_ID === 'facadepack1' || BUILD_ID === 'facadev2safe1' || BUILD_ID === 'facadecompose1' || BUILD_ID === 'facadeart1' || (BUILD_ID === 'spriteground1' || BUILD_ID === 'groundplane1' || (BUILD_ID === 'facadefinal1' || (BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2')));
     checks.noScreenPathStripe = !!(CR_VISUAL_READABILITY && CR_VISUAL_READABILITY.floorPathStripe === false);
     if(!checks.buildIdOptionsClean1) errors.push('BUILD_ID must be shimmerfix1');
     if(!checks.noScreenPathStripe) errors.push('screen-space path stripe flag must be false');
@@ -6651,13 +6654,15 @@ function runSingleMaterialBuildingTextureSelfCheckBody(){
     const drawSrc = typeof drawScene === 'function' ? String(drawScene) : '';
     checks.liveDrawSceneUsesBuildingMaterialPath =
       drawSrc.indexOf('buildingMaterialWall') >= 0 &&
-      drawSrc.indexOf('crGetBuildingMaterialTextureForFace') >= 0 &&
+      drawSrc.indexOf('crDrawBuildingMaterialWallColumn') >= 0 &&
       drawSrc.indexOf('!useBuildingMaterialTextures') >= 0;
     const composedSrc = typeof crDrawComposedFacadeFaceColumn === 'function' ? String(crDrawComposedFacadeFaceColumn) : '';
+    const calmIdx = composedSrc.indexOf('crDrawCalmPropsFirstWallColumn');
+    const singleIdx = composedSrc.indexOf('CR_SINGLE_MATERIAL_BUILDING_TEXTURES');
     checks.composedFacadePrioritizesSingleMaterial =
-      composedSrc.indexOf('CR_SINGLE_MATERIAL_BUILDING_TEXTURES') >= 0 &&
-      composedSrc.indexOf('crGetBuildingMaterialTextureForFace') >= 0 &&
-      (composedSrc.indexOf('crDrawCalmPropsFirstWallColumn') < 0 || composedSrc.indexOf('CR_SINGLE_MATERIAL_BUILDING_TEXTURES') < composedSrc.indexOf('crDrawCalmPropsFirstWallColumn'));
+      singleIdx >= 0 &&
+      composedSrc.indexOf('crDrawBuildingMaterialWallColumn') >= 0 &&
+      (calmIdx < 0 || singleIdx < calmIdx);
 
     const scenarios = [
       { district: 1, seed: 880101 },
@@ -6717,6 +6722,117 @@ function runSingleMaterialBuildingTextureSelfCheckBody(){
     if(!checks.spriteOcclusionStillPasses) errors.push('sprite occlusion regressed');
     if(!checks.fixedStepStillPasses) errors.push('fixed-step regressed');
     if(!checks.runtimeClean) errors.push('runtime errors during single-material selfcheck');
+  } catch(e) {
+    errors.push(String(e && e.message ? e.message : e));
+  }
+  for(const k of Object.keys(checks)) if(!checks[k]) errors.push('check failed: ' + k);
+  return {
+    pass: errors.length === 0,
+    build: BUILD_ID,
+    checks,
+    evidence,
+    errors,
+    timestamp: new Date().toISOString(),
+  };
+}
+
+function crTextureStats(canvas){
+  if(!canvas || !canvas.getContext) return { min: 0, max: 0, mean: 0, range: 0 };
+  const c = canvas.getContext('2d');
+  const img = c.getImageData(0, 0, canvas.width, canvas.height).data;
+  let min = 999, max = -1, sum = 0, n = 0;
+  for(let i = 0; i < img.length; i += 4){
+    const l = (img[i] * 0.299 + img[i + 1] * 0.587 + img[i + 2] * 0.114);
+    min = Math.min(min, l); max = Math.max(max, l); sum += l; n++;
+  }
+  return { min, max, mean: n ? sum / n : 0, range: max - min };
+}
+
+function crInstallMaterialTextureBenchScene(materialKey){
+  const mat = crNormalizeBuildingTextureMaterial(materialKey);
+  const GW = 11, GH = 9;
+  const map = [];
+  for(let y = 0; y < GH; y++){
+    const row = [];
+    for(let x = 0; x < GW; x++) row.push(0);
+    map.push(row);
+  }
+  for(let x = 3; x <= 7; x++) map[2][x] = WALL.BUILDING;
+  game.map = map;
+  game.MAP_W = GW;
+  game.MAP_H = GH;
+  game.buildingRegistry = { bench_wall: { moduleId: 'bench', x0: 3, y0: 2, front: 'south', mod: {}, materialKey: mat } };
+  game.buildingGrid = [];
+  for(let y = 0; y < GH; y++) game.buildingGrid.push(new Array(GW).fill(null));
+  for(let x = 3; x <= 7; x++) game.buildingGrid[2][x] = { bid: 'bench_wall', lx: x - 3, ly: 0, mid: 'bench' };
+  player.x = 5.5;
+  player.y = 5.5;
+  player.angle = -Math.PI / 2;
+  player.dir = 0;
+  state = STATE.PLAY;
+  paused = false;
+  clearInputState();
+  if(game.run) game.run.harnessOnly = true;
+  return { materialKey: mat, player: { x: player.x, y: player.y, angle: player.angle } };
+}
+
+function runWalltextures2ScaleVariationSelfCheck(){
+  if(_crHarnessDepth > 0) return runWalltextures2ScaleVariationSelfCheckBody();
+  return crWithTemporaryState('walltextures2ScaleVariation', () => runWalltextures2ScaleVariationSelfCheckBody());
+}
+
+function runWalltextures2ScaleVariationSelfCheckBody(){
+  const errors = [];
+  const checks = {};
+  const evidence = {};
+  const err0 = window.__crRuntimeErrors.length;
+  try {
+    checks.oneMaterialPerBuilding = runSingleMaterialBuildingTextureSelfCheck().pass === true;
+
+    const atlas = crBuildFacadeTextureAtlas();
+    checks.materialAtlasHasFour = !!(atlas.material_stucco && atlas.material_red_brick && atlas.material_light_gray_cinderblock && atlas.material_aluminum_siding);
+
+    const renderSrc = typeof drawScene === 'function' ? String(drawScene) : '';
+    const helperSrc = typeof crDrawBuildingMaterialWallColumn === 'function' ? String(crDrawBuildingMaterialWallColumn) : '';
+    checks.liveDrawSceneUsesMaterialTextures =
+      renderSrc.indexOf('buildingMaterialWall') >= 0 &&
+      renderSrc.indexOf('crDrawBuildingMaterialWallColumn') >= 0;
+    checks.baseTextureUsesTiledWorldU =
+      helperSrc.indexOf('crBuildingMaterialTileUForCell') >= 0 &&
+      renderSrc.indexOf('crDrawBuildingMaterialWallColumn') >= 0;
+    checks.overlayUsesFacadeU =
+      helperSrc.indexOf('crDrawFpvFacadePackRoleOverlays') >= 0 &&
+      helperSrc.indexOf('wallX') >= 0 &&
+      helperSrc.indexOf('materialU') >= 0;
+
+    const uA = crBuildingMaterialTileUForCell(3, 2, 'south', 0.15, 'light_gray_cinderblock');
+    const uB = crBuildingMaterialTileUForCell(3, 2, 'south', 0.85, 'light_gray_cinderblock');
+    const uStucco = crBuildingMaterialTileUForCell(5, 2, 'south', 0.3, 'stucco');
+    const uBrick = crBuildingMaterialTileUForCell(5, 2, 'south', 0.3, 'red_brick');
+    checks.tileUVariesAcrossCells = Math.abs(uA - uB) > 0.12;
+    checks.tileURespectsMaterialScale = Math.abs(uStucco - uBrick) > 0.05;
+    evidence.tileSamples = { uA, uB, uStucco, uBrick };
+
+    const cinderSrc = typeof crPaintMaterialLightGrayCinderblock === 'function' ? String(crPaintMaterialLightGrayCinderblock) : '';
+    const stuccoSrc = typeof crPaintMaterialStucco === 'function' ? String(crPaintMaterialStucco) : '';
+    checks.cinderblockSeamsNotDominant = cinderSrc.indexOf('blockW = 24') >= 0 && cinderSrc.indexOf('0.12') >= 0;
+    checks.stuccoHasReadableVariance = stuccoSrc.indexOf('150') >= 0 && stuccoSrc.indexOf('320') >= 0;
+
+    const overlaySrc = typeof crDrawFpvFacadePackRoleOverlays === 'function' ? String(crDrawFpvFacadePackRoleOverlays) : '';
+    checks.noRoleMaterialBaseOverride = overlaySrc.indexOf('crDrawFpvFacadePackMaterialBase') < 0;
+
+    const stStats = crTextureStats(atlas.material_stucco);
+    const cbStats = crTextureStats(atlas.material_light_gray_cinderblock);
+    evidence.stuccoStats = stStats;
+    evidence.cinderStats = cbStats;
+    checks.stuccoTextureHasLumaRange = stStats.range >= 12;
+    checks.cinderTextureHasLumaRange = cbStats.range >= 10;
+
+    checks.noRuntimeErrors = window.__crRuntimeErrors.length === err0;
+    if(!checks.tileUVariesAcrossCells) errors.push('material tile U does not vary along wall');
+    if(!checks.tileURespectsMaterialScale) errors.push('material tile scale not applied per material');
+    if(!checks.stuccoTextureHasLumaRange) errors.push('stucco atlas luma range too flat');
+    if(!checks.cinderTextureHasLumaRange) errors.push('cinderblock atlas luma range too flat');
   } catch(e) {
     errors.push(String(e && e.message ? e.message : e));
   }
@@ -7758,7 +7874,7 @@ globalThis.CR = window.CR = {
   crGetSelectedStartDistrict,crCycleSelectedStartDistrict,crSetSelectedStartDistrict,crTitleMenuSelectableRows,titleMenuRowLabel,crMinimapNavCellColor,
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,update,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
   crResetFixedStepSimulation,crStepSimulationFixed,crGetFixedStepState,crClampFixedFrameDt,
-  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,crGetViewportAuthority,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runViewportAuthoritySelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runDecorativePropsSelfCheck,runOptionsCleanupSelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runStreetBlockLevelSelfCheck,runD1ParkLandmarkSelfCheck,runBuildingModuleFacadeSelfCheck,runFacadePackBridgeSelfCheck,runFacadePackV2SafeModuleSelfCheck,runFpvGroundPlaneAlignmentSelfCheck,runD2D3FacadeReadabilityFinalSelfCheck,runBuildingSmoothStyleSelfCheck,runContinuousFacadeTextureSelfCheck,runSpriteGroundAnchorSelfCheck,crDebugGroundPlaneAlignment,crDebugFacadeReadabilityFinal,crDebugBuildingSmoothStyle,crDebugContinuousFacadeTexture,crDebugPropDensity,crApplySolidwallsFrontProofHarness,CR_SOLIDWALLS_FRONTPROOF_NAME,crBuildFacadeTextureAtlas,crGetFacadeTextureForFace,crProjectedFloorY,crWallProjectionMetrics,crDebugSpriteProjection,runFacadeArtVocabularySelfCheck,runFacadeCompositionReadabilitySelfCheck,crDebugDescribeFacadeHit,runFpvFacadeTargetPolishSelfCheck,runFpvWallLineArtifactFixSelfCheck,runFpvStreetShimmerFixSelfCheck,runStreetReadabilityMinimapSelfCheck,runBuildingScalePolishSelfCheck,runEarlyDistrictProgressionSelfCheck,runLevelSelectorSelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runSemanticActionMapSelfCheck,runInputNoDirectMutationGuardSelfCheck,runWorldLayerAdapterSelfCheck,runWorldAdapterWiringPhase1SelfCheck,runWorldAdapterWiringPhase2SelfCheck,runFixedStepSimulationSelfCheck,runFixedStepBaselineSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRaycasterInvariantSelfCheck,crDebugRaycastFrame,World,getSemanticActionMap,crRefreshSemanticActionMap,crApplyPendingInputActions,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crSpriteOcclusionScreenshotProof,runSingleMaterialBuildingTextureSelfCheck,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
+  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,crGetViewportAuthority,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runViewportAuthoritySelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runDecorativePropsSelfCheck,runOptionsCleanupSelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runStreetBlockLevelSelfCheck,runD1ParkLandmarkSelfCheck,runBuildingModuleFacadeSelfCheck,runFacadePackBridgeSelfCheck,runFacadePackV2SafeModuleSelfCheck,runFpvGroundPlaneAlignmentSelfCheck,runD2D3FacadeReadabilityFinalSelfCheck,runBuildingSmoothStyleSelfCheck,runContinuousFacadeTextureSelfCheck,runSpriteGroundAnchorSelfCheck,crDebugGroundPlaneAlignment,crDebugFacadeReadabilityFinal,crDebugBuildingSmoothStyle,crDebugContinuousFacadeTexture,crDebugPropDensity,crApplySolidwallsFrontProofHarness,CR_SOLIDWALLS_FRONTPROOF_NAME,crBuildFacadeTextureAtlas,crGetFacadeTextureForFace,crProjectedFloorY,crWallProjectionMetrics,crDebugSpriteProjection,runFacadeArtVocabularySelfCheck,runFacadeCompositionReadabilitySelfCheck,crDebugDescribeFacadeHit,runFpvFacadeTargetPolishSelfCheck,runFpvWallLineArtifactFixSelfCheck,runFpvStreetShimmerFixSelfCheck,runStreetReadabilityMinimapSelfCheck,runBuildingScalePolishSelfCheck,runEarlyDistrictProgressionSelfCheck,runLevelSelectorSelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runSemanticActionMapSelfCheck,runInputNoDirectMutationGuardSelfCheck,runWorldLayerAdapterSelfCheck,runWorldAdapterWiringPhase1SelfCheck,runWorldAdapterWiringPhase2SelfCheck,runFixedStepSimulationSelfCheck,runFixedStepBaselineSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRaycasterInvariantSelfCheck,crDebugRaycastFrame,World,getSemanticActionMap,crRefreshSemanticActionMap,crApplyPendingInputActions,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crSpriteOcclusionScreenshotProof,runSingleMaterialBuildingTextureSelfCheck,runWalltextures2ScaleVariationSelfCheck,crInstallMaterialTextureBenchScene,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
   CR_VISUAL_READABILITY,CR_SOUND_FEEDBACK,DECOR_PROP_REQUIRED,INPUT_CONFIG,CR_CONTROLS_LS_KEY,crTriggerSoundCue,crSoundEnabled,crSoundFeedbackCueIds,crLoadControlOverrides,crPersistControlOverrides,crResetControlLayoutOverrides,crClearControlOverrides,crEnterControlEditMode,crFinishControlEditMode,crControlHitTest,crSnapshotLayoutNorms,crPrepareSelfCheckPortrait,crStepEditControlSize,crSelectEditControl,
   getCrVisualHarnessSnapshot(){ return _crVisualHarnessSnapshot; },
   showOnboardingHelp,dismissOnboardingHelp,crOpenFirstRunHelpIfNeeded,

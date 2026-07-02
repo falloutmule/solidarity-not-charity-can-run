@@ -576,21 +576,26 @@ function crPaintMaterialStucco(w, h){
   crFacadeTextureBase(ctx, w, h, { wall:'#b6a385', top:'rgba(84,68,48,0.10)', base:'rgba(48,38,28,0.22)', line:'rgba(80,64,44,0.12)', mottle:'rgba(248,238,212,0.045)' });
   const rng = crFacadeMaterialRng(0xa37c5011);
   // Soft mottle: low-contrast warm patches
-  for(let i = 0; i < 80; i++){
+  for(let i = 0; i < 150; i++){
     const x = Math.floor(rng() * w);
     const y = Math.floor(rng() * h);
-    const r = 4 + Math.floor(rng() * 9);
-    const alpha = 0.025 + rng() * 0.04;
-    const warm = rng() < 0.5;
-    ctx.fillStyle = warm ? 'rgba(190,160,116,'+alpha.toFixed(3)+')' : 'rgba(120,98,72,'+alpha.toFixed(3)+')';
-    ctx.fillRect(x, y, r, r);
+    const rw = 2 + Math.floor(rng() * 7);
+    const rh = 1 + Math.floor(rng() * 5);
+    ctx.fillStyle = rng() < 0.55
+      ? 'rgba(210,190,150,0.055)'
+      : 'rgba(112,92,66,0.050)';
+    ctx.fillRect(x, y, rw, rh);
   }
-  // Small pits (stucco damage)
-  for(let i = 0; i < 220; i++){
-    const x = Math.floor(rng() * w);
-    const y = Math.floor(rng() * h);
-    ctx.fillStyle = 'rgba(96,80,60,'+(0.04 + rng() * 0.06).toFixed(3)+')';
-    ctx.fillRect(x, y, 1, 1);
+  for(let i = 0; i < 320; i++){
+    ctx.fillStyle = 'rgba(86,70,52,'+(0.045 + rng()*0.065).toFixed(3)+')';
+    ctx.fillRect(Math.floor(rng()*w), Math.floor(rng()*h), 1, 1);
+  }
+  // Faint vertical plaster stains
+  for(let i = 0; i < 6; i++){
+    const x = Math.floor(rng() * (w - 8));
+    const yy = Math.floor(rng() * (h - 20));
+    ctx.fillStyle = 'rgba(100,82,58,0.04)';
+    ctx.fillRect(x, yy, 2 + Math.floor(rng() * 4), 12 + Math.floor(rng() * 24));
   }
   // A few faint patch rectangles (repair marks)
   for(let i = 0; i < 5; i++){
@@ -645,9 +650,9 @@ function crPaintMaterialLightGrayCinderblock(w, h){
   // Pale gray base with cool tone
   crFacadeTextureBase(ctx, w, h, { wall:'#b6b5ad', top:'rgba(60,68,72,0.10)', base:'rgba(40,42,46,0.22)', line:'rgba(70,76,82,0.18)', mottle:'rgba(230,232,230,0.045)' });
   const rng = crFacadeMaterialRng(0xc12d9e57);
-  const blockW = 32;
-  const blockH = 16;
-  const seam = 2;
+  const blockW = 24;
+  const blockH = 12;
+  const seam = 1;
   for(let row = -1; row * (blockH + seam) < h + blockH; row++){
     for(let col = -1; col * (blockW + seam) < w + blockW; col++){
       const x = col * (blockW + seam);
@@ -657,21 +662,17 @@ function crPaintMaterialLightGrayCinderblock(w, h){
       const R = Math.floor(186 * v); const G = Math.floor(186 * v); const B = Math.floor(178 * v);
       ctx.fillStyle = 'rgb(' + Math.min(255, R) + ',' + Math.min(255, G) + ',' + Math.min(255, B) + ')';
       ctx.fillRect(x, y, blockW, blockH);
-      // Porous aggregate dots
-      for(let i = 0; i < 8; i++){
+      for(let i = 0; i < 12; i++){
         const dx = x + Math.floor(rng() * blockW);
         const dy = y + Math.floor(rng() * blockH);
-        ctx.fillStyle = 'rgba(90,92,90,'+(0.10 + rng() * 0.20).toFixed(3)+')';
+        ctx.fillStyle = 'rgba(78,82,80,'+(0.08 + rng() * 0.14).toFixed(3)+')';
         ctx.fillRect(dx, dy, 1, 1);
       }
-      // Seam shadow on right + bottom
-      ctx.fillStyle = 'rgba(40,44,48,0.22)';
+      ctx.fillStyle = 'rgba(46,50,54,0.12)';
       ctx.fillRect(x + blockW - seam, y, seam, blockH);
       ctx.fillRect(x, y + blockH - seam, blockW, seam);
-      // Faint top highlight
-      ctx.fillStyle = 'rgba(240,242,240,0.18)';
+      ctx.fillStyle = 'rgba(240,242,240,0.14)';
       ctx.fillRect(x, y, blockW, 1);
-      ctx.fillRect(x, y, 1, blockH);
     }
   }
   return o.canvas;
@@ -791,6 +792,38 @@ function crGetBuildingMaterialTextureForFace(mapX, mapY, faceDir){
     materialKey,
     faceContext: fc,
   };
+}
+
+function crBuildingMaterialTileU(mapX, mapY, faceDir, wallX, scaleCells){
+  const s = Math.max(0.25, Number(scaleCells) || 1);
+  const u = wallX - Math.floor(wallX);
+  let worldAlong = u;
+  if(faceDir === 'south' || faceDir === 'north') worldAlong = mapX + u;
+  else worldAlong = mapY + u;
+  const t = worldAlong / s;
+  return t - Math.floor(t);
+}
+
+function crMaterialTileScaleCells(materialKey){
+  const m = crNormalizeBuildingTextureMaterial(materialKey);
+  if(m === 'red_brick') return 1.0;
+  if(m === 'light_gray_cinderblock') return 1.25;
+  if(m === 'aluminum_siding') return 1.0;
+  return 1.35; // stucco: broader, less repetitive
+}
+
+function crBuildingMaterialTileUForCell(mapX, mapY, faceDir, wallX, materialKey){
+  return crBuildingMaterialTileU(mapX, mapY, faceDir, wallX, crMaterialTileScaleCells(materialKey));
+}
+
+function crDrawBuildingMaterialWallColumn(ctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX, facadeRole){
+  const faceDir = crWallHitFaceDir(side, stepX, stepY);
+  const resolved = crGetBuildingMaterialTextureForFace(mapX, mapY, faceDir);
+  const materialU = crBuildingMaterialTileUForCell(mapX, mapY, faceDir, wallX, resolved.materialKey);
+  crDrawContinuousFacadeTextureColumn(ctx, col, drawStart, sliceH, resolved.texture, materialU);
+  if(facadeRole && typeof crDrawFpvFacadePackRoleOverlays === 'function'){
+    crDrawFpvFacadePackRoleOverlays(ctx, col, drawStart, sliceH, mapX, mapY, faceDir, wallX, facadeRole);
+  }
 }
 
 function crGetBuildingMaterialTextureForCellRaw(mapX, mapY){
@@ -1101,14 +1134,8 @@ function crDrawSmoothBuildingFaceColumn(ctx, col, drawStart, sliceH, mapX, mapY,
 function crDrawComposedFacadeFaceColumn(ctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX, roleId){
   if(typeof CR_SINGLE_MATERIAL_BUILDING_TEXTURES !== 'undefined' && CR_SINGLE_MATERIAL_BUILDING_TEXTURES === 1 &&
      typeof CR_CONTINUOUS_FACADE_TEXTURES !== 'undefined' && CR_CONTINUOUS_FACADE_TEXTURES === 1){
-    const faceDir = crWallHitFaceDir(side, stepX, stepY);
-    const fc = crUpdateFacadeFaceU(mapX, mapY, faceDir, wallX);
-    const resolved = crGetBuildingMaterialTextureForFace(mapX, mapY, faceDir);
-    const faceU = fc ? fc.faceU : (wallX - Math.floor(wallX));
-    crDrawContinuousFacadeTextureColumn(ctx, col, drawStart, sliceH, resolved.texture, faceU);
-    if(fc && typeof crDrawFpvFacadePackRoleOverlays === 'function'){
-      crDrawFpvFacadePackRoleOverlays(ctx, col, drawStart, sliceH, mapX, mapY, faceDir, wallX, fc.roleId || roleId);
-    }
+    const fc = crUpdateFacadeFaceU(mapX, mapY, crWallHitFaceDir(side, stepX, stepY), wallX);
+    crDrawBuildingMaterialWallColumn(ctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX, (fc && fc.roleId) || roleId);
     return;
   }
   if(typeof CR_SIMPLE_WALLS_BASELINE !== 'undefined' && CR_SIMPLE_WALLS_BASELINE === 1){
@@ -1122,15 +1149,8 @@ function crDrawComposedFacadeFaceColumn(ctx, col, drawStart, sliceH, mapX, mapY,
   if(typeof CR_CONTINUOUS_FACADE_TEXTURES !== 'undefined' && CR_CONTINUOUS_FACADE_TEXTURES === 1){
     const faceDir = crWallHitFaceDir(side, stepX, stepY);
     const fc = crUpdateFacadeFaceU(mapX, mapY, faceDir, wallX);
-    // Base texture is the building's single material (walltextures1+).
-    // Doors / windows / signs / boards / vents stay as role overlays via the smooth/FPV fallback path.
-    const resolved = crGetBuildingMaterialTextureForFace(mapX, mapY, faceDir);
-    const faceU = fc ? fc.faceU : (wallX - Math.floor(wallX));
-    crDrawContinuousFacadeTextureColumn(ctx, col, drawStart, sliceH, resolved.texture, faceU);
-    // Re-impose role overlays on top of the building material base.
-    if(fc && CR_SINGLE_MATERIAL_BUILDING_TEXTURES === 1 && typeof crDrawFpvFacadePackRoleOverlays === 'function'){
-      crDrawFpvFacadePackRoleOverlays(ctx, col, drawStart, sliceH, mapX, mapY, faceDir, wallX, fc.roleId || roleId);
-    }
+    // Base texture is the building's single material (walltextures1+), tiled at world scale (walltextures2+).
+    crDrawBuildingMaterialWallColumn(ctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX, (fc && fc.roleId) || roleId);
     return;
   }
   if(CR_BUILDING_SMOOTH_STYLE === 1){
@@ -1321,7 +1341,7 @@ function crDebugBuildingSmoothStyle(){
   const base = crDebugFacadeReadabilityFinal();
   const artSrc = (typeof crDrawSmoothBuildingMaterialBase === 'function' ? String(crDrawSmoothBuildingMaterialBase) : '') + '\\n' + (typeof crDrawSmoothBuildingFaceColumn === 'function' ? String(crDrawSmoothBuildingFaceColumn) : '') + '\\n' + (typeof crDrawComposedFacadeFaceColumn === 'function' ? String(crDrawComposedFacadeFaceColumn) : '');
   const checks = {
-    buildId: BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1',
+    buildId: BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2',
     smoothFlag: typeof CR_BUILDING_SMOOTH_STYLE !== 'undefined' && CR_BUILDING_SMOOTH_STYLE === 1,
     smoothHelper: typeof crDrawSmoothBuildingFaceColumn === 'function' && typeof crDrawSmoothBuildingMaterialBase === 'function',
     facadePackStillExists: !!(CR_FACADE_PACK && CR_FACADE_PACK.modules && CR_FACADE_PACK.roles),
@@ -1365,7 +1385,7 @@ function crDebugContinuousFacadeTexture(){
   }
   const drawSrc = (typeof crDrawComposedFacadeFaceColumn === 'function' ? String(crDrawComposedFacadeFaceColumn) : '') + '\n' + (typeof crDrawContinuousFacadeTextureColumn === 'function' ? String(crDrawContinuousFacadeTextureColumn) : '');
   const checks = {
-    buildId: BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1',
+    buildId: BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2',
     calmWallsPropsFirstMode: BUILD_ID !== 'calmwalls1' || (typeof CR_CALM_WALLS_PROPS_FIRST !== 'undefined' && CR_CALM_WALLS_PROPS_FIRST === 1 && drawSrc.indexOf('crDrawCalmPropsFirstWallColumn') >= 0),
     simpleWallsBaselineMode: BUILD_ID !== 'simplewalls1' || (typeof CR_SIMPLE_WALLS_BASELINE !== 'undefined' && CR_SIMPLE_WALLS_BASELINE === 1 && drawSrc.indexOf('crDrawSimpleWallColumn') >= 0),
     atlasExists: !!atlas && keys.length >= 7,

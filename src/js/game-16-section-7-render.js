@@ -95,14 +95,7 @@ function drawScene(now){
     }
 
     if(buildingMaterialWall){
-      const faceDir = crWallHitFaceDir(side, stepX, stepY);
-      const resolved = crGetBuildingMaterialTextureForFace(mapX, mapY, faceDir);
-      const fc = (typeof crUpdateFacadeFaceU === 'function') ? crUpdateFacadeFaceU(mapX, mapY, faceDir, wallX) : null;
-      const faceU = fc ? fc.faceU : wallX;
-      crDrawContinuousFacadeTextureColumn(bctx, col, drawStart, sliceH, resolved.texture, faceU);
-      if(facadeRole && typeof crDrawFpvFacadePackRoleOverlays === 'function'){
-        crDrawFpvFacadePackRoleOverlays(bctx, col, drawStart, sliceH, mapX, mapY, faceDir, wallX, facadeRole);
-      }
+      crDrawBuildingMaterialWallColumn(bctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX, facadeRole);
     } else if(flatBuildingWall){
       crDrawFlatBuildingWallColumn(bctx, col, drawStart, sliceH, wt);
     } else if(facadeRole){

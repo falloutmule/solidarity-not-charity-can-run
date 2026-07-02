@@ -1686,6 +1686,69 @@ async function d2D3FacadeReadabilityFinalSection(page) {
   return { pass: !!result.pass, errors: result.selfcheck.errors || [], screenshots: shots.map(s => s.file).concat(['proof-facadefinal-minimap-preserved.png']) };
 }
 
+async function walltextures2ScaleVariationSection(page) {
+  const result = await page.evaluate(() => CR.runWalltextures2ScaleVariationSelfCheck());
+  writeProof('proof-walltextures2-scale-variation.json', result);
+
+  const mats = [
+    { key: 'stucco', file: 'proof-walltextures2-stucco.png' },
+    { key: 'red_brick', file: 'proof-walltextures2-red-brick.png' },
+    { key: 'light_gray_cinderblock', file: 'proof-walltextures2-cinderblock.png' },
+    { key: 'aluminum_siding', file: 'proof-walltextures2-aluminum-siding.png' },
+  ];
+  for (const m of mats) {
+    await page.evaluate((materialKey) => {
+      CR.crInstallMaterialTextureBenchScene(materialKey);
+      CR.state = CR.STATE.PLAY;
+      CR.paused = false;
+      if (typeof CR.dismissOnboardingHelp === 'function') CR.dismissOnboardingHelp();
+      if (typeof drawScene === 'function') drawScene(performance.now());
+    }, m.key);
+    await page.waitForTimeout(280);
+    await page.screenshot({ path: path.join(ROOT, m.file) });
+  }
+
+  await page.evaluate(() => {
+    CR.crSetSelectedStartDistrict(2);
+    CR.startRun(880102);
+    CR.state = CR.STATE.PLAY;
+    CR.paused = false;
+    if (typeof CR.dismissOnboardingHelp === 'function') CR.dismissOnboardingHelp();
+    const G = CR.game;
+    let best = { y: Math.floor(G.MAP_H / 2), score: -1 };
+    for (let y = 1; y < G.MAP_H - 1; y++) {
+      let score = 0;
+      for (let x = 2; x < G.MAP_W - 2; x++) {
+        if (x > 1 && y > 1 && x < G.MAP_W - 1 && y < G.MAP_H - 1) score++;
+      }
+      if (score > best.score) best = { y, score };
+    }
+    CR.player.x = 4.5;
+    CR.player.y = best.y + 0.5;
+    CR.player.angle = 0;
+    CR.player.dir = 0;
+    if (typeof drawScene === 'function') drawScene(performance.now());
+  });
+  await page.waitForTimeout(280);
+  await page.screenshot({ path: path.join(ROOT, 'proof-walltextures2-mixed-street.png') });
+
+  await page.evaluate(() => {
+    if (typeof drawMinimap === 'function') drawMinimap();
+    if (typeof drawScene === 'function') drawScene(performance.now());
+  });
+  await page.waitForTimeout(200);
+  await page.screenshot({ path: path.join(ROOT, 'proof-walltextures2-minimap-preserved.png') });
+
+  return {
+    pass: result.pass === true,
+    errors: result.errors || [],
+    screenshots: mats.map((m) => m.file).concat([
+      'proof-walltextures2-mixed-street.png',
+      'proof-walltextures2-minimap-preserved.png',
+    ]),
+  };
+}
+
 async function singleMaterialBuildingTextureSection(page) {
   const result = await page.evaluate(() => CR.runSingleMaterialBuildingTextureSelfCheck());
   writeProof('proof-single-material-building-textures.json', result);
@@ -2703,8 +2766,9 @@ function sourceBuildPipelineSection() {
     indexText.includes("const BUILD_ID = 'feel2'") ||
     indexText.includes("const BUILD_ID = 'feel1'") ||
     indexText.includes("const BUILD_ID = 'solidwalls1'") ||
-    indexText.includes("const BUILD_ID = 'walltextures1'");
-  if (!buildIdOk) errors.push('BUILD_ID must be feel2, feel1, solidwalls1, or walltextures1 for this pass');
+    indexText.includes("const BUILD_ID = 'walltextures1'") ||
+    indexText.includes("const BUILD_ID = 'walltextures2'");
+  if (!buildIdOk) errors.push('BUILD_ID must be feel2, feel1, solidwalls1, walltextures1, or walltextures2 for this pass');
   const pass = errors.length === 0 && proof && proof.check === 'pass';
   const buildIdMatch = indexText.match(/const BUILD_ID = '([^']+)'/);
   const result = { pass, errors, buildId: buildIdMatch ? buildIdMatch[1] : null, proofSummary: proof ? { outputSha256: proof.outputSha256, outputBytes: proof.outputBytes, check: proof.check } : null };
@@ -2818,6 +2882,7 @@ async function main() {
   writeProof('proof-sprite-occlusion-screenshot.json', spriteOcclusionScreenshot);
 
   const singleMaterialBuildingTextures = await singleMaterialBuildingTextureSection(page);
+  const walltextures2ScaleVariation = await walltextures2ScaleVariationSection(page);
 
   const dock = await controlDockRegression(page);
   const pointer = await pointerTorture(page);
@@ -2897,6 +2962,7 @@ async function main() {
     fixedStepSimulation.pass === true &&
     spriteOcclusionScreenshot.pass === true &&
     singleMaterialBuildingTextures.pass === true &&
+    walltextures2ScaleVariation.pass === true &&
     dock.pass &&
     pointer.pass &&
     resilience.pass &&

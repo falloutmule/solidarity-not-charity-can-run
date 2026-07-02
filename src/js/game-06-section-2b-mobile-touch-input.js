@@ -9,7 +9,7 @@ const inp = {
   lookDeltaRad:0,
   _active:false, // true when any touch is on screen
 };
-const BUILD_ID = 'walltextures1';
+const BUILD_ID = 'walltextures2';
 const CR_FPV_STREET_SHIMMER_FIX = 1;
 const CR_FPV_STREET_MATTE = true;
 const CR_FPV_WALL_LINE_FIX = 1;
@@ -629,7 +629,7 @@ function crPortraitLookSensMultiplier(){
   if(!mobileMode) return 1;
   if(isMobilePortrait()){
     let mult = PORTRAIT_LOOK_BOOST;
-    if(BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1') mult *= FEEL2_PORTRAIT_LOOK_SOFTEN;
+    if(BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2') mult *= FEEL2_PORTRAIT_LOOK_SOFTEN;
     return mult;
   }
   return 1.06;
@@ -647,11 +647,11 @@ function crGetFeel2LookTuningProof(){
     BUILD_ID,
     BASE_MOBILE_TURN_SENS,
     PORTRAIT_LOOK_BOOST,
-    FEEL2_PORTRAIT_LOOK_SOFTEN: BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' ? FEEL2_PORTRAIT_LOOK_SOFTEN : null,
+    FEEL2_PORTRAIT_LOOK_SOFTEN: BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2' ? FEEL2_PORTRAIT_LOOK_SOFTEN : null,
     portraitLookMultiplier: mult,
     effectiveMobileLookSens: optSens * mult,
     feel1PortraitMultiplier: feel1Mult,
-    percentReductionVsFeel1Portrait: BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' ? Math.round((1 - FEEL2_PORTRAIT_LOOK_SOFTEN) * 1000) / 10 : 0,
+    percentReductionVsFeel1Portrait: BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2' ? Math.round((1 - FEEL2_PORTRAIT_LOOK_SOFTEN) * 1000) / 10 : 0,
     mobileTurnSens: optSens,
     lookSpeed: options.lookSpeed,
   };
