@@ -7,26 +7,32 @@ Fix walltextures1 stretch/panel bugs: tile each building’s single base materia
 - Added `crBuildingMaterialTileU`, `crMaterialTileScaleCells`, `crBuildingMaterialTileUForCell`, `crDrawBuildingMaterialWallColumn`.
 - Live FPV + composed facade paths use tiled `materialU` for base; overlays still use `wallX` / facade coords.
 - Retuned `crPaintMaterialStucco` and `crPaintMaterialLightGrayCinderblock`.
-- `BUILD_ID` → `walltextures2`; allowlists extended in `game-22`.
+- `BUILD_ID` → `walltextures2`; allowlists + debug helpers extended.
 - `runWalltextures2ScaleVariationSelfCheck`, `crInstallMaterialTextureBenchScene`, Playwright proofs + `corePass` gate.
 
 ## What was verified
-- Pending: `npm run build`, `build:check`, `test:selfcheck` on this workstation.
+- `npm run build` — pass
+- `npm run build:check` — pass
+- `npm run test:selfcheck` — pass (`proof-playwright-summary.json` pass true)
+- `proof-walltextures2-scale-variation.json` — pass true (all checks green)
 
 ## What failed
-- None yet (pre-pipeline).
+- Nothing on final pipeline run.
 
 ## Current exact state
-- Base commit before card: `986f8150a01bba9192c9adcf46da539eb102da21`
-- BUILD_ID: `walltextures2` (local, uncommitted until push)
+- **HEAD:** `50c19432085fe40ab125587bfbd663ac5a63f649`
+- **BUILD_ID:** `walltextures2`
+- Pushed to `main`.
 
 ## Remaining blockers
-- None after green pipeline + push.
+- None.
 
 ## Next actionable step
-- Run full selfcheck; commit `fix(render): tile building wall textures at world scale`; pin Pages `?v=<sha>`.
+- Phone check pinned Pages URL; confirm materials read at walking distance (not giant panels).
 
 ## Evidence
-- `proof-walltextures2-scale-variation.json`
-- `proof-walltextures2-*.png` (four materials + mixed street + minimap)
-- `proof-playwright-summary.json`
+- commit before: `986f8150a01bba9192c9adcf46da539eb102da21`
+- commit after: `50c19432085fe40ab125587bfbd663ac5a63f649`
+- BUILD_ID: `walltextures2`
+- proof-walltextures2-scale-variation.json: **pass true**
+- Pages: `https://falloutmule.github.io/solidarity-not-charity-can-run/?v=50c19432085fe40ab125587bfbd663ac5a63f649&mobile=on&portraitlayout=1`
