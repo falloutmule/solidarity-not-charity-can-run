@@ -2753,6 +2753,23 @@ async function main() {
   });
   writeProof('proof-sprite-occlusion-visual.json', spriteOcclusionVisual);
 
+  // --- Card 6: sprite occlusion screenshot proof ---
+  const spriteOcclusionShots = [
+    ['visible_sprite', 'proof-sprite-visible.png'],
+    ['occluded_sprite', 'proof-sprite-occluded.png'],
+    ['can_near_wall', 'proof-sprite-near-wall.png'],
+  ];
+  for (const [scene, file] of spriteOcclusionShots) {
+    await page.evaluate((s) => {
+      CR.setMobileMode(true);
+      CR.crRenderFailureBenchScene(s);
+    }, scene);
+    await page.waitForTimeout(300);
+    await page.screenshot({ path: path.join(ROOT, file) });
+  }
+  const spriteOcclusionScreenshot = await page.evaluate(() => CR.crSpriteOcclusionScreenshotProof());
+  writeProof('proof-sprite-occlusion-screenshot.json', spriteOcclusionScreenshot);
+
   const dock = await controlDockRegression(page);
   const pointer = await pointerTorture(page);
   const resilience = await viewportResilience(page);
@@ -2827,6 +2844,7 @@ async function main() {
     worldAdapter.pass === true &&
     fixedStepBaseline.pass === true &&
     fixedStepSimulation.pass === true &&
+    spriteOcclusionScreenshot.pass === true &&
     dock.pass &&
     pointer.pass &&
     resilience.pass &&

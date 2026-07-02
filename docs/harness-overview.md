@@ -22,6 +22,8 @@ SNC Can Run uses **in-browser self-checks** (`window.CR`) plus a **Playwright** 
 | File | Card |
 |------|------|
 | `proof-playwright-summary.json` | Full suite |
+| `proof-sprite-occlusion-screenshot.json` | Card 6 — visible vs occluded sprite pixel proof (Playwright `corePass`) |
+| `proof-sprite-visible.png` / `proof-sprite-occluded.png` / `proof-sprite-near-wall.png` | Card 6 screenshot artifacts |
 | `proof-raycaster-invariant.json` | Raycaster architecture invariants (z-buffer, render order, halo) |
 | `proof-fixed-step-baseline.json` | Variable-dt `update()` baseline metrics (harness) |
 | `proof-fixed-step-simulation.json` | Fixed 1/60s accumulator via `crStepSimulationFixed` (Playwright `corePass`) |

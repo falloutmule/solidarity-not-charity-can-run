@@ -7110,6 +7110,103 @@ function crRenderFailureBenchScene(name){
   if(_crHarnessDepth > 0) return crRenderFailureBenchSceneImpl(name);
   return crWithTemporaryState('benchScene:' + name, () => crRenderFailureBenchSceneImpl(name));
 }
+
+/**
+ * Card 6 — SPRITE_OCCLUSION_SCREENSHOT_PROOF
+ * Render visible + occluded bench scenes, capture buffer pixel evidence,
+ * and verify: visible sprite has high-variance content in projected columns,
+ * occluded sprite's column range is wall-dominant (sprite hidden).
+ * No screenshot capture here (Playwright does that); this returns pixel proof.
+ */
+function crSpriteOcclusionScreenshotProof(){
+  return crWithTemporaryState('spriteOcclusion', () => {
+    const errors = [];
+    const evidence = {};
+    const err0 = window.__crRuntimeErrors.length;
+    const checks = {
+      visibleSpriteNonblank: false,
+      visibleSpriteColumnsHaveContent: false,
+      occludedSpriteHidden: false,
+      noHaloBox: false,
+      haloGuardPasses: false,
+      occlusionPredicatePasses: false,
+      raycasterInvariantPasses: false,
+      runtimeClean: true,
+    };
+
+    function captureBench(name){
+      crRenderFailureBenchSceneImpl(name);
+      return bctx.getImageData(0, 0, RW, RH);
+    }
+
+    function spriteColumnVariance(img, obj, tex, hKey){
+      const proj = crProjectBillboard(obj, tex, hKey);
+      if(!proj) return null;
+      const x0 = Math.max(0, proj.startCol);
+      const x1 = Math.min(RW, proj.endCol);
+      const stats = crRegionLumaStats(img, x0, proj.top, x1, proj.bottom);
+      return { proj, stats };
+    }
+
+    try {
+      // --- visible sprite ---
+      const visImg = captureBench('visible_sprite');
+      const visSprite = (game.pickups || [])[0] || null;
+      evidence.visible = { canvasVariance: crRegionLumaStats(visImg, 0, 0, RW, RH) };
+      if(visSprite && TEX.can){
+        const res = spriteColumnVariance(visImg, visSprite, TEX.can, HEIGHT.can);
+        if(res){
+          evidence.visible.spriteStats = res.stats;
+          evidence.visible.proj = { startCol: res.proj.startCol, endCol: res.proj.endCol, depth: res.proj.depth };
+          checks.visibleSpriteColumnsHaveContent = res.stats.variance > 15;
+        }
+      }
+      const visFull = crRegionLumaStats(visImg, 0, 0, RW, RH);
+      checks.visibleSpriteNonblank = visFull.variance > 20;
+
+      // --- occluded sprite ---
+      const occImg = captureBench('occluded_sprite');
+      const occSprite = (game.pickups || [])[0] || null;
+      evidence.occluded = { canvasVariance: crRegionLumaStats(occImg, 0, 0, RW, RH) };
+      if(occSprite && TEX.can){
+        const res = spriteColumnVariance(occImg, occSprite, TEX.can, HEIGHT.can);
+        if(res){
+          evidence.occluded.spriteStats = res.stats;
+          evidence.occluded.proj = { startCol: res.proj.startCol, endCol: res.proj.endCol, depth: res.proj.depth };
+          // Occluded: the zbuffer wall is closer than the sprite at those columns.
+          // The sprite should be mostly hidden behind wall. Low sprite-area variance.
+          checks.occludedSpriteHidden = res.stats.variance < evidence.visible.spriteStats?.variance * 0.6;
+        }
+      }
+
+      // --- halo + occlusion guards ---
+      const halo = getSpriteHaloRegressionProof();
+      const occ = getOcclusionZbufferProof();
+      checks.noHaloBox = halo.spriteLoopOk === true;
+      checks.haloGuardPasses = halo.spriteLoopOk === true;
+      checks.occlusionPredicatePasses = occ.predicateOk === true;
+
+      // --- raycaster invariant still passes ---
+      checks.raycasterInvariantPasses = runRaycasterInvariantSelfCheck().pass === true;
+
+      checks.runtimeClean = window.__crRuntimeErrors.length === err0;
+      if(!checks.runtimeClean) errors.push('runtime errors during occlusion screenshot proof');
+    } catch(e){
+      errors.push(String(e && e.message ? e.message : e));
+    }
+
+    const pass = errors.length === 0 && Object.values(checks).every(Boolean);
+    return {
+      pass,
+      build: BUILD_ID,
+      errors,
+      checks,
+      evidence,
+      timestamp: new Date().toISOString(),
+    };
+  });
+}
+
 function crRenderFailureBenchSceneImpl(name){
   switch(name){
     case 'visible_sprite': crRenderBenchVisibleSprite(); break;
@@ -7419,7 +7516,7 @@ globalThis.CR = window.CR = {
   crGetSelectedStartDistrict,crCycleSelectedStartDistrict,crSetSelectedStartDistrict,crTitleMenuSelectableRows,titleMenuRowLabel,crMinimapNavCellColor,
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,update,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
   crResetFixedStepSimulation,crStepSimulationFixed,crGetFixedStepState,crClampFixedFrameDt,
-  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,crGetViewportAuthority,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runViewportAuthoritySelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runDecorativePropsSelfCheck,runOptionsCleanupSelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runStreetBlockLevelSelfCheck,runD1ParkLandmarkSelfCheck,runBuildingModuleFacadeSelfCheck,runFacadePackBridgeSelfCheck,runFacadePackV2SafeModuleSelfCheck,runFpvGroundPlaneAlignmentSelfCheck,runD2D3FacadeReadabilityFinalSelfCheck,runBuildingSmoothStyleSelfCheck,runContinuousFacadeTextureSelfCheck,runSpriteGroundAnchorSelfCheck,crDebugGroundPlaneAlignment,crDebugFacadeReadabilityFinal,crDebugBuildingSmoothStyle,crDebugContinuousFacadeTexture,crDebugPropDensity,crApplySolidwallsFrontProofHarness,CR_SOLIDWALLS_FRONTPROOF_NAME,crBuildFacadeTextureAtlas,crGetFacadeTextureForFace,crProjectedFloorY,crWallProjectionMetrics,crDebugSpriteProjection,runFacadeArtVocabularySelfCheck,runFacadeCompositionReadabilitySelfCheck,crDebugDescribeFacadeHit,runFpvFacadeTargetPolishSelfCheck,runFpvWallLineArtifactFixSelfCheck,runFpvStreetShimmerFixSelfCheck,runStreetReadabilityMinimapSelfCheck,runBuildingScalePolishSelfCheck,runEarlyDistrictProgressionSelfCheck,runLevelSelectorSelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runSemanticActionMapSelfCheck,runInputNoDirectMutationGuardSelfCheck,runWorldLayerAdapterSelfCheck,runFixedStepSimulationSelfCheck,runFixedStepBaselineSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRaycasterInvariantSelfCheck,crDebugRaycastFrame,World,getSemanticActionMap,crRefreshSemanticActionMap,crApplyPendingInputActions,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
+  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,crGetViewportAuthority,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runViewportAuthoritySelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runDecorativePropsSelfCheck,runOptionsCleanupSelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runStreetBlockLevelSelfCheck,runD1ParkLandmarkSelfCheck,runBuildingModuleFacadeSelfCheck,runFacadePackBridgeSelfCheck,runFacadePackV2SafeModuleSelfCheck,runFpvGroundPlaneAlignmentSelfCheck,runD2D3FacadeReadabilityFinalSelfCheck,runBuildingSmoothStyleSelfCheck,runContinuousFacadeTextureSelfCheck,runSpriteGroundAnchorSelfCheck,crDebugGroundPlaneAlignment,crDebugFacadeReadabilityFinal,crDebugBuildingSmoothStyle,crDebugContinuousFacadeTexture,crDebugPropDensity,crApplySolidwallsFrontProofHarness,CR_SOLIDWALLS_FRONTPROOF_NAME,crBuildFacadeTextureAtlas,crGetFacadeTextureForFace,crProjectedFloorY,crWallProjectionMetrics,crDebugSpriteProjection,runFacadeArtVocabularySelfCheck,runFacadeCompositionReadabilitySelfCheck,crDebugDescribeFacadeHit,runFpvFacadeTargetPolishSelfCheck,runFpvWallLineArtifactFixSelfCheck,runFpvStreetShimmerFixSelfCheck,runStreetReadabilityMinimapSelfCheck,runBuildingScalePolishSelfCheck,runEarlyDistrictProgressionSelfCheck,runLevelSelectorSelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runSemanticActionMapSelfCheck,runInputNoDirectMutationGuardSelfCheck,runWorldLayerAdapterSelfCheck,runFixedStepSimulationSelfCheck,runFixedStepBaselineSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRaycasterInvariantSelfCheck,crDebugRaycastFrame,World,getSemanticActionMap,crRefreshSemanticActionMap,crApplyPendingInputActions,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crSpriteOcclusionScreenshotProof,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
   CR_VISUAL_READABILITY,CR_SOUND_FEEDBACK,DECOR_PROP_REQUIRED,INPUT_CONFIG,CR_CONTROLS_LS_KEY,crTriggerSoundCue,crSoundEnabled,crSoundFeedbackCueIds,crLoadControlOverrides,crPersistControlOverrides,crResetControlLayoutOverrides,crClearControlOverrides,crEnterControlEditMode,crFinishControlEditMode,crControlHitTest,crSnapshotLayoutNorms,crPrepareSelfCheckPortrait,crStepEditControlSize,crSelectEditControl,
   getCrVisualHarnessSnapshot(){ return _crVisualHarnessSnapshot; },
   showOnboardingHelp,dismissOnboardingHelp,crOpenFirstRunHelpIfNeeded,
