@@ -2,15 +2,15 @@
 
 | Field | Value |
 |-------|-------|
-| **Gameplay baseline** | `BUILD_ID` **`walltextures1`** |
-| **Previous gameplay baseline** | `feel2` / engine hardening `3a7b3d1`; `facadetexture1` / `c511936`; `buildingsmooth1` / `0b41159` |
+| **Gameplay baseline** | `BUILD_ID` **`walltextures2`** |
+| **Previous gameplay baseline** | `walltextures1` / `d936677`; `feel2` / engine hardening `3a7b3d1` |
 | **Infrastructure** | Split-source build pipeline (`src/` → `index.html`) |
-| **Gameplay commit** | `d936677` — `feat(art): single-material building wall textures` |
+| **Gameplay commit** | `50c1943` — `fix(render): tile building wall textures at world scale` |
 
 ## Play / self-check
 
-- Play: `https://falloutmule.github.io/solidarity-not-charity-can-run/?v=d93667755214c9bb28191c85ef14a9c572595820&mobile=on&portraitlayout=1`
-- Self-check: `https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=d93667755214c9bb28191c85ef14a9c572595820&mobile=on&portraitlayout=1`
+- Play: `https://falloutmule.github.io/solidarity-not-charity-can-run/?v=50c19432085fe40ab125587bfbd663ac5a63f649&mobile=on&portraitlayout=1`
+- Self-check: `https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=50c19432085fe40ab125587bfbd663ac5a63f649&mobile=on&portraitlayout=1`
 
 ## Build workflow
 
@@ -33,6 +33,12 @@ See **`src/README.md`**, **`reports/guards/SOURCE_SPLIT_BUILD_PIPELINE_REPORT.md
 - Viewport authority, semantic actions, input guard, `World` adapter, fixed-step baseline, raycast debug proofs in Playwright `corePass`
 - Report: `reports/guards/ENGINE_HARDENING_PHASE_REPORT.md`
 - Fixed-step **simulation rewrite** (card 5) deferred; baseline in `proof-fixed-step-baseline.json`
+
+## Walltextures2 scale & variation (`walltextures2`)
+
+- Tiles single building material at world scale (not full-facade stretch); stucco/cinderblock painter retune; overlays still facade U.
+- Selfcheck: `CR.runWalltextures2ScaleVariationSelfCheck()`; proof: `proof-walltextures2-scale-variation.json` (Playwright `corePass`).
+- Report: `reports/guards/WALLTEXTURES2_SCALE_AND_VARIATION_FIX_REPORT.md`
 
 ## Single-material building textures (`walltextures1`)
 
