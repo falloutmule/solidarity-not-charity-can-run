@@ -372,13 +372,24 @@ function crSmoothWallPalette(materialKey, kind){
   if(kind === 'boarded_front'){
     return { wall:'rgba(142,116,92,0.80)', top:'rgba(84,68,52,0.16)', base:'rgba(42,32,26,0.28)', line:'rgba(78,58,42,0.20)', frame:'rgba(52,38,30,0.36)' };
   }
-  if(materialKey === 'concrete'){
+  if(materialKey === 'concrete' || materialKey === 'light_gray_cinderblock'){
     return { wall:'rgba(140,142,136,0.80)', top:'rgba(84,84,78,0.16)', base:'rgba(38,38,36,0.28)', line:'rgba(62,62,58,0.20)', frame:'rgba(40,42,40,0.34)' };
   }
   if(materialKey === 'stucco'){
     return { wall:'rgba(168,158,140,0.80)', top:'rgba(92,82,66,0.14)', base:'rgba(42,34,28,0.26)', line:'rgba(76,64,50,0.18)', frame:'rgba(52,44,36,0.32)' };
   }
+  if(materialKey === 'red_brick'){
+    return { wall:'rgba(146,98,72,0.82)', top:'rgba(86,60,46,0.16)', base:'rgba(40,28,22,0.30)', line:'rgba(80,54,40,0.22)', frame:'rgba(48,32,24,0.36)' };
+  }
+  if(materialKey === 'aluminum_siding'){
+    return { wall:'rgba(150,156,160,0.78)', top:'rgba(220,228,232,0.20)', base:'rgba(34,40,46,0.32)', line:'rgba(54,62,70,0.22)', frame:'rgba(38,46,54,0.36)' };
+  }
   return { wall:'rgba(138,102,78,0.78)', top:'rgba(88,62,46,0.14)', base:'rgba(42,30,24,0.26)', line:'rgba(78,54,40,0.18)', frame:'rgba(54,38,30,0.32)' };
+}
+
+function crSmoothPaletteFromBuildingMaterial(materialKey, kind){
+  const m = crNormalizeBuildingTextureMaterial(materialKey);
+  return crSmoothWallPalette(m, kind);
 }
 let CR_FACADE_TEXTURES = null;
 const CR_FACADE_TEXTURE_MAPPING = {
@@ -389,6 +400,49 @@ const CR_FACADE_TEXTURE_MAPPING = {
   blank_service_block: { south: 'service_back', north: 'service_back', east: 'blank_side', west: 'blank_side' },
   restroom_pavilion: { south: 'pavilion_front', north: 'pavilion_front', east: 'blank_side', west: 'blank_side' }
 };
+
+// ----- Single-material building textures (walltextures1 BUILD_ID) -----
+const CR_SINGLE_MATERIAL_BUILDING_TEXTURES = 1;
+const CR_BUILDING_TEXTURE_MATERIALS = [
+  'stucco',
+  'red_brick',
+  'light_gray_cinderblock',
+  'aluminum_siding',
+];
+const CR_BUILDING_TEXTURE_MATERIAL_SET = Object.fromEntries(
+  CR_BUILDING_TEXTURE_MATERIALS.map(k => [k, true])
+);
+
+function crHashBuildingMaterial(seed, district, moduleId, x0, y0, bid){
+  let h = (typeof seed === 'number' ? seed : 0) >>> 0;
+  h = Math.imul(h ^ 0x9e3779b1, 16777619) >>> 0;
+  const s = String(seed|0) + '|' + String(district|0) + '|' + String(moduleId||'') + '|' + (x0|0) + '|' + (y0|0) + '|' + (bid|0);
+  for(let i = 0; i < s.length; i++){
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619) >>> 0;
+  }
+  return h >>> 0;
+}
+
+function crPickBuildingTextureMaterial(moduleId, x0, y0, bid){
+  const pool = CR_BUILDING_TEXTURE_MATERIALS;
+  const seed = (game && typeof game.seed === 'number') ? game.seed : 0;
+  const district = (game && typeof game.district === 'number') ? game.district : 0;
+  const idx = crHashBuildingMaterial(seed, district, moduleId, x0, y0, bid) % pool.length;
+  return pool[(idx + pool.length) % pool.length];
+}
+
+function crNormalizeBuildingTextureMaterial(materialKey){
+  return CR_BUILDING_TEXTURE_MATERIAL_SET[materialKey] ? materialKey : 'stucco';
+}
+
+function crMaterialTextureKey(materialKey){
+  const m = crNormalizeBuildingTextureMaterial(materialKey);
+  if(m === 'red_brick') return 'material_red_brick';
+  if(m === 'light_gray_cinderblock') return 'material_light_gray_cinderblock';
+  if(m === 'aluminum_siding') return 'material_aluminum_siding';
+  return 'material_stucco';
+}
 
 function crFacadeTextureCanvas(key, w, h){
   const c = document.createElement('canvas');
@@ -502,6 +556,178 @@ function crPaintQuietWallTexture(key, wall, accent){
   }
   return o.canvas;
 }
+
+// Procedural single-material wall textures (256x128 each).
+// Deterministic: all "randomness" comes from seeded crHashBuildingMaterial() below.
+function crFacadeMaterialRng(seed){
+  let s = (seed >>> 0) || 0x9e3779b9;
+  return function(){
+    s = Math.imul(s ^ (s >>> 15), 2246822507) >>> 0;
+    s = Math.imul(s ^ (s >>> 13), 3266489909) >>> 0;
+    s = (s ^ (s >>> 16)) >>> 0;
+    return s / 4294967296;
+  };
+}
+
+function crPaintMaterialStucco(w, h){
+  const o = crFacadeTextureCanvas('material_stucco', w, h);
+  const ctx = o.ctx;
+  // Beige plaster base
+  crFacadeTextureBase(ctx, w, h, { wall:'#b6a385', top:'rgba(84,68,48,0.10)', base:'rgba(48,38,28,0.22)', line:'rgba(80,64,44,0.12)', mottle:'rgba(248,238,212,0.045)' });
+  const rng = crFacadeMaterialRng(0xa37c5011);
+  // Soft mottle: low-contrast warm patches
+  for(let i = 0; i < 80; i++){
+    const x = Math.floor(rng() * w);
+    const y = Math.floor(rng() * h);
+    const r = 4 + Math.floor(rng() * 9);
+    const alpha = 0.025 + rng() * 0.04;
+    const warm = rng() < 0.5;
+    ctx.fillStyle = warm ? 'rgba(190,160,116,'+alpha.toFixed(3)+')' : 'rgba(120,98,72,'+alpha.toFixed(3)+')';
+    ctx.fillRect(x, y, r, r);
+  }
+  // Small pits (stucco damage)
+  for(let i = 0; i < 220; i++){
+    const x = Math.floor(rng() * w);
+    const y = Math.floor(rng() * h);
+    ctx.fillStyle = 'rgba(96,80,60,'+(0.04 + rng() * 0.06).toFixed(3)+')';
+    ctx.fillRect(x, y, 1, 1);
+  }
+  // A few faint patch rectangles (repair marks)
+  for(let i = 0; i < 5; i++){
+    const px = Math.floor(rng() * (w - 24));
+    const py = Math.floor(rng() * (h - 16));
+    ctx.fillStyle = 'rgba(166,142,108,0.10)';
+    ctx.fillRect(px, py, 16 + Math.floor(rng() * 14), 8 + Math.floor(rng() * 6));
+  }
+  return o.canvas;
+}
+
+function crPaintMaterialRedBrick(w, h){
+  const o = crFacadeTextureCanvas('material_red_brick', w, h);
+  const ctx = o.ctx;
+  // Mortar base
+  crFacadeTextureBase(ctx, w, h, { wall:'#a09284', top:'rgba(70,58,44,0.10)', base:'rgba(46,36,30,0.22)', line:'rgba(40,30,22,0.16)', mottle:'rgba(220,200,180,0.04)' });
+  const rng = crFacadeMaterialRng(0xb72e1331);
+  const brickW = 24;
+  const brickH = 8;
+  const mortar = 2;
+  for(let row = -1; row * (brickH + mortar) < h + brickH; row++){
+    const offset = (row % 2 === 0) ? 0 : (brickW / 2);
+    for(let col = -1; col * (brickW + mortar) < w + brickW; col++){
+      const x = col * (brickW + mortar) + offset;
+      const y = row * (brickH + mortar);
+      if(x + brickW <= 0 || y + brickH <= 0 || x >= w || y >= h) continue;
+      const rV = 0.6 + rng() * 0.5;
+      const gV = 0.4 + rng() * 0.4;
+      const bV = 0.32 + rng() * 0.32;
+      const R = Math.floor(150 * rV); const G = Math.floor(74 * gV); const B = Math.floor(58 * bV);
+      ctx.fillStyle = 'rgb(' + Math.min(255, R) + ',' + Math.min(255, G) + ',' + Math.min(255, B) + ')';
+      ctx.fillRect(x, y, brickW, brickH);
+      // Top highlight
+      ctx.fillStyle = 'rgba(220,180,140,0.10)';
+      ctx.fillRect(x, y, brickW, 1);
+      // Bottom shadow
+      ctx.fillStyle = 'rgba(40,20,16,0.18)';
+      ctx.fillRect(x, y + brickH - 1, brickW, 1);
+      // Tiny chip mark
+      if(rng() < 0.18){
+        ctx.fillStyle = 'rgba(60,38,30,0.18)';
+        ctx.fillRect(x + Math.floor(rng() * (brickW - 3)), y + Math.floor(rng() * (brickH - 1)), 2, 1);
+      }
+    }
+  }
+  return o.canvas;
+}
+
+function crPaintMaterialLightGrayCinderblock(w, h){
+  const o = crFacadeTextureCanvas('material_light_gray_cinderblock', w, h);
+  const ctx = o.ctx;
+  // Pale gray base with cool tone
+  crFacadeTextureBase(ctx, w, h, { wall:'#b6b5ad', top:'rgba(60,68,72,0.10)', base:'rgba(40,42,46,0.22)', line:'rgba(70,76,82,0.18)', mottle:'rgba(230,232,230,0.045)' });
+  const rng = crFacadeMaterialRng(0xc12d9e57);
+  const blockW = 32;
+  const blockH = 16;
+  const seam = 2;
+  for(let row = -1; row * (blockH + seam) < h + blockH; row++){
+    for(let col = -1; col * (blockW + seam) < w + blockW; col++){
+      const x = col * (blockW + seam);
+      const y = row * (blockH + seam);
+      if(x + blockW <= 0 || y + blockH <= 0 || x >= w || y >= h) continue;
+      const v = 0.85 + rng() * 0.18;
+      const R = Math.floor(186 * v); const G = Math.floor(186 * v); const B = Math.floor(178 * v);
+      ctx.fillStyle = 'rgb(' + Math.min(255, R) + ',' + Math.min(255, G) + ',' + Math.min(255, B) + ')';
+      ctx.fillRect(x, y, blockW, blockH);
+      // Porous aggregate dots
+      for(let i = 0; i < 8; i++){
+        const dx = x + Math.floor(rng() * blockW);
+        const dy = y + Math.floor(rng() * blockH);
+        ctx.fillStyle = 'rgba(90,92,90,'+(0.10 + rng() * 0.20).toFixed(3)+')';
+        ctx.fillRect(dx, dy, 1, 1);
+      }
+      // Seam shadow on right + bottom
+      ctx.fillStyle = 'rgba(40,44,48,0.22)';
+      ctx.fillRect(x + blockW - seam, y, seam, blockH);
+      ctx.fillRect(x, y + blockH - seam, blockW, seam);
+      // Faint top highlight
+      ctx.fillStyle = 'rgba(240,242,240,0.18)';
+      ctx.fillRect(x, y, blockW, 1);
+      ctx.fillRect(x, y, 1, blockH);
+    }
+  }
+  return o.canvas;
+}
+
+function crPaintMaterialAluminumSiding(w, h){
+  const o = crFacadeTextureCanvas('material_aluminum_siding', w, h);
+  const ctx = o.ctx;
+  // Cool gray base
+  crFacadeTextureBase(ctx, w, h, { wall:'#9aa1a4', top:'rgba(220,224,228,0.18)', base:'rgba(36,42,48,0.28)', line:'rgba(60,68,76,0.18)', mottle:'rgba(180,186,190,0.035)' });
+  const rng = crFacadeMaterialRng(0xd309a72f);
+  const bandH = 7;
+  for(let y = 0; y < h; y += bandH){
+    const v = 0.86 + rng() * 0.18;
+    const R = Math.floor(154 * v); const G = Math.floor(161 * v); const B = Math.floor(166 * v);
+    ctx.fillStyle = 'rgb(' + Math.min(255, R) + ',' + Math.min(255, G) + ',' + Math.min(255, B) + ')';
+    ctx.fillRect(0, y, w, bandH);
+    // Top highlight
+    ctx.fillStyle = 'rgba(232,236,238,0.22)';
+    ctx.fillRect(0, y, w, 1);
+    // Bottom shadow
+    ctx.fillStyle = 'rgba(34,40,46,0.28)';
+    ctx.fillRect(0, y + bandH - 1, w, 1);
+    // Oxidation smudges
+    for(let i = 0; i < 4; i++){
+      const sx = Math.floor(rng() * w);
+      const sw = 4 + Math.floor(rng() * 12);
+      ctx.fillStyle = 'rgba(70,88,96,'+(0.10 + rng() * 0.10).toFixed(3)+')';
+      ctx.fillRect(sx, y + 1, sw, bandH - 2);
+    }
+    // Shallow dents
+    if(rng() < 0.4){
+      const dx = Math.floor(rng() * (w - 10));
+      ctx.fillStyle = 'rgba(40,48,54,0.20)';
+      ctx.fillRect(dx, y + 1, 8, 1);
+      ctx.fillStyle = 'rgba(228,232,236,0.18)';
+      ctx.fillRect(dx + 1, y + bandH - 2, 7, 1);
+    }
+  }
+  // Faint grime streaks
+  for(let i = 0; i < 14; i++){
+    const x = Math.floor(rng() * w);
+    const yy = Math.floor(rng() * h);
+    ctx.fillStyle = 'rgba(70,80,86,0.10)';
+    ctx.fillRect(x, yy, 1, 4 + Math.floor(rng() * 8));
+  }
+  return o.canvas;
+}
+
+function crPaintBuildingWallMaterialTexture(materialKey, w, h){
+  const m = crNormalizeBuildingTextureMaterial(materialKey);
+  if(m === 'red_brick') return crPaintMaterialRedBrick(w, h);
+  if(m === 'light_gray_cinderblock') return crPaintMaterialLightGrayCinderblock(w, h);
+  if(m === 'aluminum_siding') return crPaintMaterialAluminumSiding(w, h);
+  return crPaintMaterialStucco(w, h);
+}
 function crPaintPavilionTexture(){
   const w = 320, h = 128;
   const o = crFacadeTextureCanvas('pavilion_front', w, h);
@@ -524,8 +750,58 @@ function crBuildFacadeTextureAtlas(){
   store.service_back = crPaintQuietWallTexture('service_back', '#928a7a', 'rgba(82,86,82,0.14)');
   store.pavilion_front = crPaintPavilionTexture();
   store.fallback_smooth_wall = crPaintQuietWallTexture('fallback_smooth_wall', '#9b907c', 'rgba(82,86,82,0.10)');
+  // Single-material building wall textures (walltextures1)
+  store.material_stucco = crPaintBuildingWallMaterialTexture('stucco', 256, 128);
+  store.material_red_brick = crPaintBuildingWallMaterialTexture('red_brick', 256, 128);
+  store.material_light_gray_cinderblock = crPaintBuildingWallMaterialTexture('light_gray_cinderblock', 256, 128);
+  store.material_aluminum_siding = crPaintBuildingWallMaterialTexture('aluminum_siding', 256, 128);
   CR_FACADE_TEXTURES = store;
   return CR_FACADE_TEXTURES;
+}
+
+function crBuildingRegistryForCell(mapX, mapY){
+  try {
+    const cell = game && game.buildingGrid && game.buildingGrid[mapY] && game.buildingGrid[mapY][mapX];
+    if(!cell) return null;
+    return (game.buildingRegistry && game.buildingRegistry[cell.bid]) || null;
+  } catch(e){ return null; }
+}
+
+function crBuildingMaterialForCell(mapX, mapY){
+  const reg = crBuildingRegistryForCell(mapX, mapY);
+  return crNormalizeBuildingTextureMaterial(reg && reg.materialKey);
+}
+
+function crFacadeFaceBuildingMaterial(fc, fallback){
+  const reg = fc && fc.reg;
+  const mat = reg && reg.materialKey;
+  return crNormalizeBuildingTextureMaterial(mat || fallback);
+}
+
+function crGetBuildingMaterialTextureForFace(mapX, mapY, faceDir){
+  const atlas = crBuildFacadeTextureAtlas();
+  let fc = null;
+  try { fc = (typeof crUpdateFacadeFaceU === 'function') ? crUpdateFacadeFaceU(mapX, mapY, faceDir, mapX + 0.5) : null; } catch(e){ fc = null; }
+  const fallback = crBuildingMaterialForCell(mapX, mapY);
+  const materialKey = crFacadeFaceBuildingMaterial(fc, fallback);
+  const key = crMaterialTextureKey(materialKey);
+  return {
+    texture: atlas[key] || atlas.material_stucco || atlas.fallback_smooth_wall,
+    key,
+    materialKey,
+    faceContext: fc,
+  };
+}
+
+function crGetBuildingMaterialTextureForCellRaw(mapX, mapY){
+  const atlas = crBuildFacadeTextureAtlas();
+  const materialKey = crBuildingMaterialForCell(mapX, mapY);
+  const key = crMaterialTextureKey(materialKey);
+  return {
+    texture: atlas[key] || atlas.material_stucco || atlas.fallback_smooth_wall,
+    key,
+    materialKey,
+  };
 }
 function crFacadeTextureKeyForFace(moduleId, faceDir, roleId){
   const role = crNormalizeFacadeRoleId(roleId || '');
@@ -671,7 +947,9 @@ function crDrawSmoothBuildingFaceColumn(ctx, col, drawStart, sliceH, mapX, mapY,
   const row = fc.reg.mod.faces[faceDir];
   const norm = (i)=> crNormalizeFacadeRoleId(row[i]);
   const n = row.length;
-  const pal = crDrawSmoothBuildingMaterialBase(ctx, col, drawStart, sliceH, pw, role.material, kind);
+  // Base wall color must come from the building's material (walltextures1+), not the role's color band.
+  const buildingMaterialKey = crNormalizeBuildingTextureMaterial(fc.reg && fc.reg.materialKey);
+  const pal = crDrawSmoothBuildingMaterialBase(ctx, col, drawStart, sliceH, pw, buildingMaterialKey, kind);
   const baseY0 = drawStart + sliceH * 0.905;
   const baseY1 = drawStart + sliceH * 0.955;
 
@@ -832,9 +1110,15 @@ function crDrawComposedFacadeFaceColumn(ctx, col, drawStart, sliceH, mapX, mapY,
   if(typeof CR_CONTINUOUS_FACADE_TEXTURES !== 'undefined' && CR_CONTINUOUS_FACADE_TEXTURES === 1){
     const faceDir = crWallHitFaceDir(side, stepX, stepY);
     const fc = crUpdateFacadeFaceU(mapX, mapY, faceDir, wallX);
-    const texture = fc ? crGetFacadeTextureForFace(fc.moduleId, faceDir, fc.roleId || roleId) : crBuildFacadeTextureAtlas().fallback_smooth_wall;
+    // Base texture is the building's single material (walltextures1+).
+    // Doors / windows / signs / boards / vents stay as role overlays via the smooth/FPV fallback path.
+    const resolved = crGetBuildingMaterialTextureForFace(mapX, mapY, faceDir);
     const faceU = fc ? fc.faceU : (wallX - Math.floor(wallX));
-    crDrawContinuousFacadeTextureColumn(ctx, col, drawStart, sliceH, texture, faceU);
+    crDrawContinuousFacadeTextureColumn(ctx, col, drawStart, sliceH, resolved.texture, faceU);
+    // Re-impose role overlays on top of the building material base.
+    if(fc && CR_SINGLE_MATERIAL_BUILDING_TEXTURES === 1 && typeof crDrawFpvFacadePackRoleOverlays === 'function'){
+      crDrawFpvFacadePackRoleOverlays(ctx, col, drawStart, sliceH, mapX, mapY, faceDir, wallX, fc.roleId || roleId);
+    }
     return;
   }
   if(CR_BUILDING_SMOOTH_STYLE === 1){
@@ -862,6 +1146,79 @@ function crDrawFpvFacadePackColumn(ctx, col, drawStart, sliceH, roleId, wallX){
   crDrawFpvFacadePackColumnLegacy(ctx, col, drawStart, sliceH, roleId);
 }
 
+// Paints ONLY the role-driven overlays (signs / window glass / door / boarded / garage bay / vents / panels / murals / etc.)
+// on top of an already-drawn building-material base. Used as the second half of the continuous-facade draw so that
+// role-specific overlays stay readable without affecting the wall's base material.
+function crDrawFpvFacadePackRoleOverlays(ctx, col, drawStart, sliceH, mapX, mapY, faceDir, wallX, roleId){
+  if(sliceH < 14 || !roleId) return;
+  const faceU = Math.max(0, Math.min(0.999, wallX - Math.floor(wallX)));
+  const fc = (typeof crUpdateFacadeFaceU === 'function') ? (function(){ try { return crUpdateFacadeFaceU(mapX, mapY, faceDir, wallX); } catch(e){ return null; } })() : null;
+  if(!fc) return;
+  const moduleId = fc.moduleId;
+  const kind = crFacadeComposeKind(moduleId, faceDir);
+  if(!fc.reg || !fc.reg.mod || !fc.reg.mod.faces) return;
+  const row = fc.reg.mod.faces[faceDir];
+  if(!row) return;
+  const n = row.length;
+  const Z = crFacadeArtVocabularyZones(drawStart, sliceH);
+  const fu = fc.faceU;
+  const panelAt = (i)=> crFacadeArtPanelInset(i, n, 0.28);
+  const norm = (i)=> crNormalizeFacadeRoleId(row[i]);
+
+  function framedObj(x0, x1, y0, y1, fill, frame){
+    return crFacadeArtColFramedBox(ctx, col, 1, fu, x0, x1, y0, y1, fill, frame || 'rgba(28,26,22,0.46)');
+  }
+
+  if(kind === 'storefront_front'){
+    for(let i = 0; i < n; i++){
+      const P = panelAt(i);
+      const pr = norm(i);
+      if(!crFacadeArtFuIn(fu, P.ox0, P.ox1)) continue;
+      if(pr === 'storefront_door'){
+        const D = crFacadeArtLocalRange(P, 0.24, 0.76);
+        const doorY0 = Z.door0 + sliceH * 0.055;
+        const doorY1 = drawStart + sliceH * 0.875;
+        framedObj(D.x0, D.x1, doorY0, doorY1, 'rgba(54,44,36,0.66)', 'rgba(28,24,22,0.46)');
+      } else if(pr === 'storefront_window'){
+        const W = crFacadeArtLocalRange(P, 0.10, 0.90);
+        const windowY0 = Z.win0 + sliceH * 0.040;
+        const windowY1 = Z.win0 + (Z.win1-Z.win0)*0.72;
+        framedObj(W.x0, W.x1, windowY0, windowY1, 'rgba(60,78,88,0.34)', 'rgba(26,30,30,0.42)');
+      } else if(pr === 'storefront_sign'){
+        const S = crFacadeArtLocalRange(P, 0.16, 0.84);
+        framedObj(S.x0, S.x1, Z.sign0 + 1, Z.sign0 + (Z.sign1-Z.sign0)*0.58, 'rgba(148,120,70,0.18)', 'rgba(70,54,36,0.24)');
+      }
+    }
+    return;
+  }
+  if(kind === 'boarded_front'){
+    for(let i = 0; i < n; i++){
+      const P = panelAt(i);
+      const pr = norm(i);
+      if(!crFacadeArtFuIn(fu, P.ox0, P.ox1)) continue;
+      if(pr === 'boarded_window'){
+        const W = crFacadeArtLocalRange(P, 0.10, 0.90);
+        framedObj(W.x0, W.x1, Z.win0 + sliceH * 0.06, Z.win0 + (Z.win1-Z.win0)*0.72, 'rgba(96,72,52,0.46)', 'rgba(46,32,22,0.48)');
+      }
+    }
+    return;
+  }
+  if(kind === 'garage_front'){
+    for(let i = 0; i < n; i++){
+      const P = panelAt(i);
+      const pr = norm(i);
+      if(!crFacadeArtFuIn(fu, P.ox0, P.ox1)) continue;
+      if(pr === 'garage_bay'){
+        const W = crFacadeArtLocalRange(P, 0.10, 0.90);
+        framedObj(W.x0, W.x1, Z.win0 + sliceH * 0.10, drawStart + sliceH * 0.890, 'rgba(104,106,102,0.42)', 'rgba(36,38,38,0.46)');
+      }
+    }
+    return;
+  }
+  // Other roles (service/utility/mural/side doors/blank_brick/blank_concrete): the building-material
+  // texture already gives identity; small role marker decals stay subtle so material stays the dominant read.
+}
+
 
 function crDebugDescribeFacadeHit(tileX, tileY, hitSide){
   const faceDir = (typeof hitSide === 'string') ? hitSide
@@ -872,7 +1229,10 @@ function crDebugDescribeFacadeHit(tileX, tileY, hitSide){
   const roleRaw = crGetBuildingFaceRole(tx, ty, faceDir);
   const role = roleRaw ? crNormalizeFacadeRoleId(roleRaw) : null;
   const cell = game.buildingGrid && game.buildingGrid[ty] && game.buildingGrid[ty][tx];
+  const reg = cell && game.buildingRegistry && game.buildingRegistry[cell.bid];
   const roleDef = role && CR_FACADE_PACK.roles[role];
+  const roleMaterial = roleDef ? roleDef.material : null;
+  const buildingMaterial = reg ? crNormalizeBuildingTextureMaterial(reg.materialKey) : null;
   return {
     buildingId: cell ? cell.bid : null,
     moduleId: cell ? cell.mid : null,
@@ -880,7 +1240,11 @@ function crDebugDescribeFacadeHit(tileX, tileY, hitSide){
     localY: cell ? cell.ly : null,
     faceDirection: faceDir,
     role: role,
-    material: roleDef ? roleDef.material : null,
+    roleMaterial,
+    material: roleMaterial, // keep old alias for back-compat
+    buildingMaterial,
+    baseMaterial: buildingMaterial,
+    baseTextureKey: reg ? crMaterialTextureKey(reg.materialKey) : null,
     slots: roleDef ? (roleDef.slots || []).slice() : []
   };
 }
@@ -945,7 +1309,7 @@ function crDebugBuildingSmoothStyle(){
   const base = crDebugFacadeReadabilityFinal();
   const artSrc = (typeof crDrawSmoothBuildingMaterialBase === 'function' ? String(crDrawSmoothBuildingMaterialBase) : '') + '\\n' + (typeof crDrawSmoothBuildingFaceColumn === 'function' ? String(crDrawSmoothBuildingFaceColumn) : '') + '\\n' + (typeof crDrawComposedFacadeFaceColumn === 'function' ? String(crDrawComposedFacadeFaceColumn) : '');
   const checks = {
-    buildId: BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2',
+    buildId: BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1',
     smoothFlag: typeof CR_BUILDING_SMOOTH_STYLE !== 'undefined' && CR_BUILDING_SMOOTH_STYLE === 1,
     smoothHelper: typeof crDrawSmoothBuildingFaceColumn === 'function' && typeof crDrawSmoothBuildingMaterialBase === 'function',
     facadePackStillExists: !!(CR_FACADE_PACK && CR_FACADE_PACK.modules && CR_FACADE_PACK.roles),
@@ -989,7 +1353,7 @@ function crDebugContinuousFacadeTexture(){
   }
   const drawSrc = (typeof crDrawComposedFacadeFaceColumn === 'function' ? String(crDrawComposedFacadeFaceColumn) : '') + '\n' + (typeof crDrawContinuousFacadeTextureColumn === 'function' ? String(crDrawContinuousFacadeTextureColumn) : '');
   const checks = {
-    buildId: BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2',
+    buildId: BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1',
     calmWallsPropsFirstMode: BUILD_ID !== 'calmwalls1' || (typeof CR_CALM_WALLS_PROPS_FIRST !== 'undefined' && CR_CALM_WALLS_PROPS_FIRST === 1 && drawSrc.indexOf('crDrawCalmPropsFirstWallColumn') >= 0),
     simpleWallsBaselineMode: BUILD_ID !== 'simplewalls1' || (typeof CR_SIMPLE_WALLS_BASELINE !== 'undefined' && CR_SIMPLE_WALLS_BASELINE === 1 && drawSrc.indexOf('crDrawSimpleWallColumn') >= 0),
     atlasExists: !!atlas && keys.length >= 7,
@@ -1043,7 +1407,8 @@ function crPlaceBuildingModule(map, shade, x0, y0, moduleId, frontFace){
     }
   }
   const bid = game._nextBuildingId++;
-  game.buildingRegistry[bid] = { moduleId, x0, y0, front: frontFace, mod };
+  const materialKey = crPickBuildingTextureMaterial(moduleId, x0, y0, bid);
+  game.buildingRegistry[bid] = { moduleId, x0, y0, front: frontFace, mod, materialKey };
   for(let dy=0;dy<mod.h;dy++){
     for(let dx=0;dx<mod.w;dx++){
       const x = x0+dx, y = y0+dy;
@@ -1096,7 +1461,8 @@ function crRegisterD1PavilionModule(lm, map){
   const mod = crGetFacadeModule('restroom_pavilion');
   const bid = game._nextBuildingId++;
   const front = lm.northSide ? 'south' : 'north';
-  game.buildingRegistry[bid] = { moduleId: 'restroom_pavilion', x0: lm.x0, y0: lm.y0, front, mod };
+  const materialKey = crPickBuildingTextureMaterial('restroom_pavilion', lm.x0, lm.y0, bid);
+  game.buildingRegistry[bid] = { moduleId: 'restroom_pavilion', x0: lm.x0, y0: lm.y0, front, mod, materialKey };
   for(let y=lm.y0;y<=lm.y1;y++){
     for(let x=lm.x0;x<lm.x0+mod.w;x++){
       if(y<0||x<0||y>=game.buildingGrid.length||x>=game.buildingGrid[0].length) continue;

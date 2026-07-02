@@ -1686,6 +1686,46 @@ async function d2D3FacadeReadabilityFinalSection(page) {
   return { pass: !!result.pass, errors: result.selfcheck.errors || [], screenshots: shots.map(s => s.file).concat(['proof-facadefinal-minimap-preserved.png']) };
 }
 
+async function singleMaterialBuildingTextureSection(page) {
+  const result = await page.evaluate(() => CR.runSingleMaterialBuildingTextureSelfCheck());
+  writeProof('proof-single-material-building-textures.json', result);
+
+  const shots = [
+    { d: 1, seed: 880101, file: 'proof-single-material-d1.png' },
+    { d: 2, seed: 880102, file: 'proof-single-material-d2.png' },
+    { d: 3, seed: 903203, file: 'proof-single-material-d3.png' },
+    { d: 4, seed: 934204, file: 'proof-single-material-d4.png' },
+  ];
+  for (const s of shots) {
+    await page.evaluate(({ d, seed }) => {
+      CR.crSetSelectedStartDistrict(d);
+      CR.startRun(seed);
+      CR.state = CR.STATE.PLAY;
+      CR.paused = false;
+      if (typeof CR.dismissOnboardingHelp === 'function') CR.dismissOnboardingHelp();
+      const G = CR.game;
+      function standOk(x, y) {
+        return x > 1 && y > 1 && x < G.MAP_W - 1 && y < G.MAP_H - 1 && (typeof canStand !== 'function' || canStand(x, y));
+      }
+      let best = { y: Math.floor(G.MAP_H / 2), score: -1 };
+      for (let y = 1; y < G.MAP_H - 1; y++) {
+        let score = 0;
+        for (let x = 2; x < G.MAP_W - 2; x++) if (standOk(x + 0.5, y + 0.5)) score++;
+        if (score > best.score) best = { y, score };
+      }
+      CR.player.x = 3.5;
+      CR.player.y = best.y + 0.5;
+      CR.player.angle = 0;
+      CR.player.dir = 0;
+      if (typeof window.updateAim === 'function') window.updateAim();
+      if (typeof drawScene === 'function') drawScene(performance.now());
+    }, s);
+    await page.waitForTimeout(280);
+    await page.screenshot({ path: path.join(ROOT, s.file) });
+  }
+
+  return { pass: result.pass === true, errors: result.errors || [], screenshots: shots.map((s) => s.file) };
+}
 
 async function buildingSmoothStyleSection(page) {
   const baseUrl = `${BASE}/index.html?mobile=on&portraitlayout=1`;
@@ -2662,8 +2702,9 @@ function sourceBuildPipelineSection() {
   const buildIdOk =
     indexText.includes("const BUILD_ID = 'feel2'") ||
     indexText.includes("const BUILD_ID = 'feel1'") ||
-    indexText.includes("const BUILD_ID = 'solidwalls1'");
-  if (!buildIdOk) errors.push('BUILD_ID must be feel2, feel1, or solidwalls1 for this pass');
+    indexText.includes("const BUILD_ID = 'solidwalls1'") ||
+    indexText.includes("const BUILD_ID = 'walltextures1'");
+  if (!buildIdOk) errors.push('BUILD_ID must be feel2, feel1, solidwalls1, or walltextures1 for this pass');
   const pass = errors.length === 0 && proof && proof.check === 'pass';
   const buildIdMatch = indexText.match(/const BUILD_ID = '([^']+)'/);
   const result = { pass, errors, buildId: buildIdMatch ? buildIdMatch[1] : null, proofSummary: proof ? { outputSha256: proof.outputSha256, outputBytes: proof.outputBytes, check: proof.check } : null };
@@ -2776,6 +2817,8 @@ async function main() {
   const spriteOcclusionScreenshot = await page.evaluate(() => CR.crSpriteOcclusionScreenshotProof());
   writeProof('proof-sprite-occlusion-screenshot.json', spriteOcclusionScreenshot);
 
+  const singleMaterialBuildingTextures = await singleMaterialBuildingTextureSection(page);
+
   const dock = await controlDockRegression(page);
   const pointer = await pointerTorture(page);
   const resilience = await viewportResilience(page);
@@ -2853,6 +2896,7 @@ async function main() {
     fixedStepBaseline.pass === true &&
     fixedStepSimulation.pass === true &&
     spriteOcclusionScreenshot.pass === true &&
+    singleMaterialBuildingTextures.pass === true &&
     dock.pass &&
     pointer.pass &&
     resilience.pass &&
@@ -2919,6 +2963,7 @@ async function main() {
     sourceBuildPipeline,
     releaseArtifact,
     fullSelfCheck: { pass: full.pass, build: full.build },
+    singleMaterialBuildingTextures,
     dock,
     pointer,
     resilience,

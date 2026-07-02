@@ -2,11 +2,11 @@
 
 SNC Can Run uses **in-browser self-checks** (`window.CR`) plus a **Playwright** driver that loads root **`index.html`** and collects proofs.
 
-**Gameplay baseline:** `BUILD_ID` `facadetexture1` — see `PROJECT_STATUS.md`. **Build:** `npm run build` / `build:check` (see `src/README.md`).
+**Gameplay baseline:** `BUILD_ID` `walltextures1` — see `PROJECT_STATUS.md`. **Build:** `npm run build` / `build:check` (see `src/README.md`).
 
 ## In-browser (`window.CR`)
 
-- Functions like `CR.runLayoutSelfCheck()`, `CR.runFullSelfCheck()`, `CR.runRaycasterInvariantSelfCheck()`, `CR.runContinuousFacadeTextureSelfCheck()`, `CR.crDebugContinuousFacadeTexture()`, `CR.runBuildingSmoothStyleSelfCheck()`, `CR.crDebugBuildingSmoothStyle()`, `CR.runFpvGroundPlaneAlignmentSelfCheck()`, `CR.crDebugGroundPlaneAlignment()`, `CR.runSpriteGroundAnchorSelfCheck()`, `CR.crDebugSpriteProjection()`, `CR.runFacadeArtVocabularySelfCheck()`, `CR.runFacadeCompositionReadabilitySelfCheck()`, `CR.runFacadePackV2SafeModuleSelfCheck()`, `CR.runFacadePackBridgeSelfCheck()`, `CR.runBuildingModuleFacadeSelfCheck()`, `CR.runStreetReadabilityMinimapSelfCheck()`, `CR.runBuildingScalePolishSelfCheck()`, `CR.runLevelSelectorSelfCheck()`, `CR.runEarlyDistrictProgressionSelfCheck()`, `CR.runStreetBlockLevelSelfCheck()`, `CR.runD1ParkLandmarkSelfCheck()`, `CR.runOnboardingSelfCheck()`, `CR.runSoundFeedbackSelfCheck()`, `CR.runVisualReadabilitySelfCheck()`, `CR.runVisualRectangleRegressionSelfCheck()`, `CR.runDecorativePropsSelfCheck()`, `CR.runOptionsCleanupSelfCheck()`, `CR.runHallSelfCheck()`, etc.
+- Functions like `CR.runLayoutSelfCheck()`, `CR.runFullSelfCheck()`, `CR.runRaycasterInvariantSelfCheck()`, `CR.runSingleMaterialBuildingTextureSelfCheck()`, `CR.runContinuousFacadeTextureSelfCheck()`, `CR.crDebugContinuousFacadeTexture()`, `CR.runBuildingSmoothStyleSelfCheck()`, `CR.crDebugBuildingSmoothStyle()`, `CR.runFpvGroundPlaneAlignmentSelfCheck()`, `CR.crDebugGroundPlaneAlignment()`, `CR.runSpriteGroundAnchorSelfCheck()`, `CR.crDebugSpriteProjection()`, `CR.runFacadeArtVocabularySelfCheck()`, `CR.runFacadeCompositionReadabilitySelfCheck()`, `CR.runFacadePackV2SafeModuleSelfCheck()`, `CR.runFacadePackBridgeSelfCheck()`, `CR.runBuildingModuleFacadeSelfCheck()`, `CR.runStreetReadabilityMinimapSelfCheck()`, `CR.runBuildingScalePolishSelfCheck()`, `CR.runLevelSelectorSelfCheck()`, `CR.runEarlyDistrictProgressionSelfCheck()`, `CR.runStreetBlockLevelSelfCheck()`, `CR.runD1ParkLandmarkSelfCheck()`, `CR.runOnboardingSelfCheck()`, `CR.runSoundFeedbackSelfCheck()`, `CR.runVisualReadabilitySelfCheck()`, `CR.runVisualRectangleRegressionSelfCheck()`, `CR.runDecorativePropsSelfCheck()`, `CR.runOptionsCleanupSelfCheck()`, `CR.runHallSelfCheck()`, etc.
 - URL: `?selfcheck=1` runs full check and shows PASS/FAIL overlay.
 - **`crWithTemporaryState`** — snapshots public state + `localStorage`, runs harness, restores so benchmarks do not leak.
 - **`__crRuntimeErrors`** — uncaught errors fail runtime-clean checks.
@@ -77,6 +77,8 @@ SNC Can Run uses **in-browser self-checks** (`window.CR`) plus a **Playwright** 
 | `proof-buildingsmooth-d2-road-view.png` … `proof-buildingsmooth-minimap-preserved.png` | Smooth D2 road/close wall, D2 storefront/boarded, D3 garage/side, D1, groundplane, and minimap proof shots |
 | `proof-facadetexture-continuous.json` / `proof-facadetexture-debug.json` | Continuous facade texture / no panel gaps |
 | `proof-facadetexture-d2-road-view.png` … `proof-facadetexture-minimap-preserved.png` | D2 road/close wall/storefront/boarded, D3 garage/side, D1, groundplane, and minimap proof shots |
+| `proof-single-material-building-textures.json` | Single-material building wall textures (`walltextures1`, Playwright `corePass`) |
+| `proof-single-material-d1.png` … `proof-single-material-d4.png` | D1–D4 FPV road views with per-building material base |
 | `proof-sprite-ground-anchor.json` | Sprite ground anchor self-check |
 | `proof-facade-art-vocabulary.json` | Facade art vocabulary self-check |
 | `proof-facade-composition-readability.json` | Facade composition self-check |
