@@ -62,7 +62,7 @@
     "errors": [],
     "artifactPath": "C:\\Users\\fallo\\Documents\\HermesProjects\\canned-run\\index.html",
     "policyPath": "C:\\Users\\fallo\\Documents\\HermesProjects\\canned-run\\SOURCE_RELEASE_POLICY.md",
-    "timestamp": "2026-07-01T23:59:39.676Z"
+    "timestamp": "2026-07-02T00:19:46.733Z"
   },
   "aiSafeConstitution": {
     "pass": true,
@@ -73,8 +73,8 @@
     "errors": [],
     "buildId": "feel2",
     "proofSummary": {
-      "outputSha256": "65c4e92be93216045d2a195821fd08bfac453dff71b64d8e9995d5776615dede",
-      "outputBytes": 689587,
+      "outputSha256": "e71c6fdc3aa6a35e350e895b88de70b7f10807277c930d2f6fb032d63fb84f7d",
+      "outputBytes": 692927,
       "check": "pass"
     }
   },
@@ -97,9 +97,9 @@
     },
     "playwrightSummaryPass": true,
     "buildId": "feel2",
-    "commitHash": "b9a9e6b",
+    "commitHash": "0e87740",
     "errors": [],
-    "timestamp": "2026-07-02T00:02:46.887Z"
+    "timestamp": "2026-07-02T00:22:54.507Z"
   },
   "fullSelfCheck": {
     "pass": true,
@@ -648,7 +648,7 @@
               "cw": 412,
               "ch": 915
             },
-            "timestamp": "2026-07-02T00:00:06.727Z"
+            "timestamp": "2026-07-02T00:20:14.007Z"
           },
           "checkAfterResize": {
             "pass": true,
@@ -775,7 +775,7 @@
               "cw": 412,
               "ch": 875
             },
-            "timestamp": "2026-07-02T00:00:06.945Z"
+            "timestamp": "2026-07-02T00:20:14.231Z"
           },
           "fingerprint": {
             "state": "play",
@@ -878,7 +878,7 @@
               "cw": 915,
               "ch": 412
             },
-            "timestamp": "2026-07-02T00:00:07.771Z"
+            "timestamp": "2026-07-02T00:20:15.060Z"
           },
           "checkAfterResize": {
             "pass": true,
@@ -958,7 +958,7 @@
               "cw": 915,
               "ch": 400
             },
-            "timestamp": "2026-07-02T00:00:07.991Z"
+            "timestamp": "2026-07-02T00:20:15.277Z"
           },
           "fingerprint": {
             "state": "play",
@@ -1108,7 +1108,7 @@
               "cw": 360,
               "ch": 800
             },
-            "timestamp": "2026-07-02T00:00:08.816Z"
+            "timestamp": "2026-07-02T00:20:16.103Z"
           },
           "checkAfterResize": {
             "pass": true,
@@ -1235,7 +1235,7 @@
               "cw": 360,
               "ch": 760
             },
-            "timestamp": "2026-07-02T00:00:09.036Z"
+            "timestamp": "2026-07-02T00:20:16.317Z"
           },
           "fingerprint": {
             "state": "play",
@@ -1243,7 +1243,7 @@
             "benchmark": false,
             "mapW": 40,
             "mapH": 20,
-            "timeLeft": 94.4166666666667,
+            "timeLeft": 94.43333333333337,
             "seed": 77,
             "runActive": true,
             "harnessOnly": false,
@@ -1385,7 +1385,7 @@
               "cw": 390,
               "ch": 720
             },
-            "timestamp": "2026-07-02T00:00:10.170Z"
+            "timestamp": "2026-07-02T00:20:17.463Z"
           },
           "checkAfterResize": {
             "pass": true,
@@ -1512,7 +1512,7 @@
               "cw": 390,
               "ch": 680
             },
-            "timestamp": "2026-07-02T00:00:10.390Z"
+            "timestamp": "2026-07-02T00:20:17.681Z"
           },
           "fingerprint": {
             "state": "play",
@@ -1662,7 +1662,7 @@
               "cw": 390,
               "ch": 900
             },
-            "timestamp": "2026-07-02T00:00:11.215Z"
+            "timestamp": "2026-07-02T00:20:18.499Z"
           },
           "checkAfterResize": {
             "pass": true,
@@ -1789,7 +1789,7 @@
               "cw": 390,
               "ch": 860
             },
-            "timestamp": "2026-07-02T00:00:11.434Z"
+            "timestamp": "2026-07-02T00:20:18.715Z"
           },
           "fingerprint": {
             "state": "play",
@@ -1797,7 +1797,7 @@
             "benchmark": false,
             "mapW": 40,
             "mapH": 20,
-            "timeLeft": 94.4166666666667,
+            "timeLeft": 94.43333333333337,
             "seed": 77,
             "runActive": true,
             "harnessOnly": false,
@@ -1939,7 +1939,7 @@
               "cw": 390,
               "ch": 844
             },
-            "timestamp": "2026-07-02T00:00:12.244Z"
+            "timestamp": "2026-07-02T00:20:19.541Z"
           },
           "checkAfterResize": {
             "pass": true,
@@ -2066,7 +2066,7 @@
               "cw": 390,
               "ch": 804
             },
-            "timestamp": "2026-07-02T00:00:12.464Z"
+            "timestamp": "2026-07-02T00:20:19.758Z"
           },
           "fingerprint": {
             "state": "play",
@@ -2085,7 +2085,7 @@
           "shot": null
         }
       ],
-      "timestamp": "2026-07-02T00:00:12.466Z"
+      "timestamp": "2026-07-02T00:20:19.761Z"
     },
     "results": [
       {
@@ -2220,7 +2220,7 @@
             "cw": 412,
             "ch": 915
           },
-          "timestamp": "2026-07-02T00:00:06.727Z"
+          "timestamp": "2026-07-02T00:20:14.007Z"
         },
         "checkAfterResize": {
           "pass": true,
@@ -2347,7 +2347,7 @@
             "cw": 412,
             "ch": 875
           },
-          "timestamp": "2026-07-02T00:00:06.945Z"
+          "timestamp": "2026-07-02T00:20:14.231Z"
         },
         "fingerprint": {
           "state": "play",
@@ -2450,7 +2450,7 @@
             "cw": 915,
             "ch": 412
           },
-          "timestamp": "2026-07-02T00:00:07.771Z"
+          "timestamp": "2026-07-02T00:20:15.060Z"
         },
         "checkAfterResize": {
           "pass": true,
@@ -2530,7 +2530,7 @@
             "cw": 915,
             "ch": 400
           },
-          "timestamp": "2026-07-02T00:00:07.991Z"
+          "timestamp": "2026-07-02T00:20:15.277Z"
         },
         "fingerprint": {
           "state": "play",
@@ -2680,7 +2680,7 @@
             "cw": 360,
             "ch": 800
           },
-          "timestamp": "2026-07-02T00:00:08.816Z"
+          "timestamp": "2026-07-02T00:20:16.103Z"
         },
         "checkAfterResize": {
           "pass": true,
@@ -2807,7 +2807,7 @@
             "cw": 360,
             "ch": 760
           },
-          "timestamp": "2026-07-02T00:00:09.036Z"
+          "timestamp": "2026-07-02T00:20:16.317Z"
         },
         "fingerprint": {
           "state": "play",
@@ -2815,7 +2815,7 @@
           "benchmark": false,
           "mapW": 40,
           "mapH": 20,
-          "timeLeft": 94.4166666666667,
+          "timeLeft": 94.43333333333337,
           "seed": 77,
           "runActive": true,
           "harnessOnly": false,
@@ -2957,7 +2957,7 @@
             "cw": 390,
             "ch": 720
           },
-          "timestamp": "2026-07-02T00:00:10.170Z"
+          "timestamp": "2026-07-02T00:20:17.463Z"
         },
         "checkAfterResize": {
           "pass": true,
@@ -3084,7 +3084,7 @@
             "cw": 390,
             "ch": 680
           },
-          "timestamp": "2026-07-02T00:00:10.390Z"
+          "timestamp": "2026-07-02T00:20:17.681Z"
         },
         "fingerprint": {
           "state": "play",
@@ -3234,7 +3234,7 @@
             "cw": 390,
             "ch": 900
           },
-          "timestamp": "2026-07-02T00:00:11.215Z"
+          "timestamp": "2026-07-02T00:20:18.499Z"
         },
         "checkAfterResize": {
           "pass": true,
@@ -3361,7 +3361,7 @@
             "cw": 390,
             "ch": 860
           },
-          "timestamp": "2026-07-02T00:00:11.434Z"
+          "timestamp": "2026-07-02T00:20:18.715Z"
         },
         "fingerprint": {
           "state": "play",
@@ -3369,7 +3369,7 @@
           "benchmark": false,
           "mapW": 40,
           "mapH": 20,
-          "timeLeft": 94.4166666666667,
+          "timeLeft": 94.43333333333337,
           "seed": 77,
           "runActive": true,
           "harnessOnly": false,
@@ -3511,7 +3511,7 @@
             "cw": 390,
             "ch": 844
           },
-          "timestamp": "2026-07-02T00:00:12.244Z"
+          "timestamp": "2026-07-02T00:20:19.541Z"
         },
         "checkAfterResize": {
           "pass": true,
@@ -3638,7 +3638,7 @@
             "cw": 390,
             "ch": 804
           },
-          "timestamp": "2026-07-02T00:00:12.464Z"
+          "timestamp": "2026-07-02T00:20:19.758Z"
         },
         "fingerprint": {
           "state": "play",
@@ -3824,7 +3824,7 @@
         "proof-usability-very-high.png",
         "proof-resetcontrols-safe.png"
       ],
-      "timestamp": "2026-07-02T00:00:34.211Z"
+      "timestamp": "2026-07-02T00:20:41.596Z"
     },
     "usability": {
       "pass": true,
@@ -4002,7 +4002,7 @@
         "proof-options-cleanup-menu.png",
         "proof-options-cleanup-edit-controls.png"
       ],
-      "timestamp": "2026-07-02T00:00:35.115Z"
+      "timestamp": "2026-07-02T00:20:42.493Z"
     },
     "optionsCleanup": {
       "pass": true,
@@ -4089,7 +4089,7 @@
         "proof-decorative-props-world.png",
         "proof-decorative-props-closeup.png"
       ],
-      "timestamp": "2026-07-02T00:00:35.835Z"
+      "timestamp": "2026-07-02T00:20:43.214Z"
     },
     "decorativeProps": {
       "pass": true,
@@ -4272,7 +4272,7 @@
         "proof-street-block-d3.png",
         "proof-street-block-minimap.png"
       ],
-      "timestamp": "2026-07-02T00:00:37.834Z"
+      "timestamp": "2026-07-02T00:20:45.211Z"
     },
     "streetBlockLevel": {
       "pass": true,
@@ -4588,7 +4588,7 @@
         "proof-d1-park-landmark-fpv.png",
         "proof-d1-park-landmark-minimap.png"
       ],
-      "timestamp": "2026-07-02T00:00:38.984Z"
+      "timestamp": "2026-07-02T00:20:46.428Z"
     },
     "d1ParkLandmark": {
       "pass": true,
@@ -5800,7 +5800,7 @@
         "proof-d3-alley-street.png",
         "proof-d4-service-pockets.png"
       ],
-      "timestamp": "2026-07-02T00:01:09.996Z"
+      "timestamp": "2026-07-02T00:21:17.525Z"
     },
     "earlyDistrictProgression": {
       "pass": true,
@@ -6110,7 +6110,7 @@
         "proof-level-selector-d3.png",
         "proof-level-selector-d4.png"
       ],
-      "timestamp": "2026-07-02T00:01:11.713Z"
+      "timestamp": "2026-07-02T00:21:19.292Z"
     },
     "levelSelector": {
       "pass": true,
@@ -6408,7 +6408,7 @@
             "joyActive": false
           },
           "sprint": {
-            "burstUntil": 1.1067000000476837,
+            "burstUntil": 1.0992999999523163,
             "stamBefore": 60,
             "stamAfter": 40
           },
@@ -6427,7 +6427,7 @@
         "proof-control-look-drag.png",
         "proof-control-menu-open.png"
       ],
-      "timestamp": "2026-07-02T00:01:14.562Z"
+      "timestamp": "2026-07-02T00:21:22.124Z"
     },
     "reliability": {
       "pass": true,
@@ -6453,7 +6453,7 @@
           "joyActive": false
         },
         "sprint": {
-          "burstUntil": 1.1067000000476837,
+          "burstUntil": 1.0992999999523163,
           "stamBefore": 60,
           "stamAfter": 40
         },
@@ -6535,7 +6535,7 @@
       "screenshots": [
         "proof-collision-corridor.png"
       ],
-      "timestamp": "2026-07-02T00:01:16.046Z"
+      "timestamp": "2026-07-02T00:21:23.557Z"
     },
     "movementCollision": {
       "pass": true,
@@ -6637,7 +6637,7 @@
         "proof-reachability-hall.png",
         "proof-reachability-wallblocked.png"
       ],
-      "timestamp": "2026-07-02T00:01:16.762Z"
+      "timestamp": "2026-07-02T00:21:24.290Z"
     },
     "reachability": {
       "pass": true,
@@ -6701,10 +6701,10 @@
           "harnessStateRestored": true
         },
         "cases": 52,
-        "timestamp": "2026-07-02T00:01:24.913Z"
+        "timestamp": "2026-07-02T00:21:32.539Z"
       },
       "harnessStateOk": true,
-      "timestamp": "2026-07-02T00:01:24.917Z"
+      "timestamp": "2026-07-02T00:21:32.542Z"
     },
     "proceduralLevelValidation": {
       "pass": true,
@@ -6734,7 +6734,7 @@
         "harnessStateRestored": true
       },
       "cases": 52,
-      "timestamp": "2026-07-02T00:01:24.913Z"
+      "timestamp": "2026-07-02T00:21:32.539Z"
     }
   },
   "fullRunProgression": {
@@ -6796,10 +6796,10 @@
         },
         "hallPass": true,
         "mobilePass": true,
-        "timestamp": "2026-07-02T00:01:25.602Z"
+        "timestamp": "2026-07-02T00:21:33.224Z"
       },
       "harnessStateOk": true,
-      "timestamp": "2026-07-02T00:01:25.606Z",
+      "timestamp": "2026-07-02T00:21:33.228Z",
       "screenshot": "proof-full-run-complete.png"
     },
     "fullRunProgression": {
@@ -6856,7 +6856,7 @@
       },
       "hallPass": true,
       "mobilePass": true,
-      "timestamp": "2026-07-02T00:01:25.602Z"
+      "timestamp": "2026-07-02T00:21:33.224Z"
     }
   },
   "harnessIsolation": {
@@ -6917,7 +6917,7 @@
         "lsHarness": false,
         "lsSavePresent": true
       },
-      "timestamp": "2026-07-02T00:01:44.569Z"
+      "timestamp": "2026-07-02T00:21:52.029Z"
     },
     "afterSelfcheck": {
       "state": "title",
@@ -7073,7 +7073,7 @@
             "screenW": 15.272727272727273,
             "screenH": 16.8
           },
-          "canvasVariance": 4829.539724656263
+          "canvasVariance": 4847.005495940618
         },
         "occludedSprite": {
           "pass": true,
@@ -7141,9 +7141,9 @@
         "hallStart": {
           "pass": true,
           "stats": {
-            "mean": 80.23177964077648,
-            "brightRatio": 0.02283115671641791,
-            "variance": 2341.574272757357,
+            "mean": 80.46683386185867,
+            "brightRatio": 0.02453358208955224,
+            "variance": 2378.3504849938076,
             "count": 42880
           },
           "customLevel": "hall_of_servants"
@@ -7155,15 +7155,15 @@
             "h": 844
           },
           "stats": {
-            "mean": 115.17713698449684,
-            "brightRatio": 0.143171875,
-            "variance": 4214.725056100872,
+            "mean": 115.33462331262197,
+            "brightRatio": 0.1443125,
+            "variance": 4228.370502156073,
             "count": 64000
           }
         }
       },
       "runtimeErrors": [],
-      "timestamp": "2026-07-02T00:02:08.144Z"
+      "timestamp": "2026-07-02T00:22:15.697Z"
     },
     "imageHashes": {
       "proof-render-visible-sprite.png": 1255030,
@@ -7179,7 +7179,7 @@
       "proof-render-npc-near-wall.png",
       "proof-render-hall-start.png"
     ],
-    "timestamp": "2026-07-02T00:02:08.146Z"
+    "timestamp": "2026-07-02T00:22:15.698Z"
   },
   "hallE2E": {
     "pass": true,
@@ -7222,7 +7222,7 @@
       },
       "runtimeErrors": [],
       "runtimeClean": true,
-      "timestamp": "2026-07-02T00:02:10.842Z"
+      "timestamp": "2026-07-02T00:22:18.388Z"
     },
     "playwright": {
       "helpedSnap": {
@@ -7244,7 +7244,7 @@
       "proof-hall-helped.png",
       "proof-hall-exit.png"
     ],
-    "timestamp": "2026-07-02T00:02:10.843Z"
+    "timestamp": "2026-07-02T00:22:18.388Z"
   },
   "visual": {
     "pass": true,
@@ -7395,9 +7395,9 @@
           "giveReady": false
         },
         "hallStats": {
-          "mean": 114.86723226575559,
-          "brightRatio": 0.142375,
-          "variance": 4225.528122501703,
+          "mean": 114.87738857825558,
+          "brightRatio": 0.142328125,
+          "variance": 4225.461397924173,
           "count": 64000
         },
         "exitReadySnapshot": {
@@ -7431,7 +7431,7 @@
         "giveTargetHighlight": true
       }
     },
-    "timestamp": "2026-07-02T00:02:20.608Z"
+    "timestamp": "2026-07-02T00:22:28.188Z"
   },
   "visualRectangle": {
     "pass": true,
@@ -8592,7 +8592,7 @@
           "cw": 390,
           "ch": 844
         },
-        "timestamp": "2026-07-02T00:02:28.424Z"
+        "timestamp": "2026-07-02T00:22:36.088Z"
       },
       "portraitUsability": {
         "pass": true,
@@ -8837,7 +8837,7 @@
             "joyActive": false
           },
           "sprint": {
-            "burstUntil": 1.6063000000715255,
+            "burstUntil": 1.6107999999523162,
             "stamBefore": 60,
             "stamAfter": 40
           },
@@ -11794,7 +11794,7 @@
           "harnessStateRestored": true
         },
         "cases": 52,
-        "timestamp": "2026-07-02T00:02:46.334Z"
+        "timestamp": "2026-07-02T00:22:53.945Z"
       },
       "fullRunProgression": {
         "pass": true,
@@ -11850,7 +11850,7 @@
         },
         "hallPass": true,
         "mobilePass": true,
-        "timestamp": "2026-07-02T00:02:46.563Z"
+        "timestamp": "2026-07-02T00:22:54.187Z"
       },
       "onboarding": {
         "pass": true,
@@ -12094,9 +12094,9 @@
             "giveReady": false
           },
           "hallStats": {
-            "mean": 114.88416084388038,
-            "brightRatio": 0.142640625,
-            "variance": 4227.517563736206,
+            "mean": 114.76964662513045,
+            "brightRatio": 0.141625,
+            "variance": 4216.7871850754145,
             "count": 64000
           },
           "exitReadySnapshot": {
@@ -12410,7 +12410,7 @@
               "screenW": 15.272727272727273,
               "screenH": 16.8
             },
-            "canvasVariance": 4873.085732784671
+            "canvasVariance": 4863.932513015616
           },
           "occludedSprite": {
             "pass": true,
@@ -12478,9 +12478,9 @@
           "hallStart": {
             "pass": true,
             "stats": {
-              "mean": 79.74336543836519,
-              "brightRatio": 0.020918843283582088,
-              "variance": 2317.868474650857,
+              "mean": 80.01340506056687,
+              "brightRatio": 0.022154850746268658,
+              "variance": 2355.5858921870667,
               "count": 42880
             },
             "customLevel": "hall_of_servants"
@@ -12492,15 +12492,15 @@
               "h": 844
             },
             "stats": {
-              "mean": 114.84989946888025,
-              "brightRatio": 0.141890625,
-              "variance": 4221.76577826839,
+              "mean": 115.03082601575497,
+              "brightRatio": 0.14271875,
+              "variance": 4234.349162987451,
               "count": 64000
             }
           }
         },
         "runtimeErrors": [],
-        "timestamp": "2026-07-02T00:02:46.835Z"
+        "timestamp": "2026-07-02T00:22:54.454Z"
       },
       "render": {
         "pass": true,
@@ -12624,7 +12624,7 @@
               "screenW": 15.272727272727273,
               "screenH": 16.8
             },
-            "canvasVariance": 4873.085732784671
+            "canvasVariance": 4863.932513015616
           },
           "occludedSprite": {
             "pass": true,
@@ -12692,9 +12692,9 @@
           "hallStart": {
             "pass": true,
             "stats": {
-              "mean": 79.74336543836519,
-              "brightRatio": 0.020918843283582088,
-              "variance": 2317.868474650857,
+              "mean": 80.01340506056687,
+              "brightRatio": 0.022154850746268658,
+              "variance": 2355.5858921870667,
               "count": 42880
             },
             "customLevel": "hall_of_servants"
@@ -12706,22 +12706,22 @@
               "h": 844
             },
             "stats": {
-              "mean": 114.84989946888025,
-              "brightRatio": 0.141890625,
-              "variance": 4221.76577826839,
+              "mean": 115.03082601575497,
+              "brightRatio": 0.14271875,
+              "variance": 4234.349162987451,
               "count": 64000
             }
           }
         },
         "runtimeErrors": [],
-        "timestamp": "2026-07-02T00:02:46.835Z"
+        "timestamp": "2026-07-02T00:22:54.454Z"
       },
       "runtimeErrors": [],
       "runtimeClean": true,
-      "timestamp": "2026-07-02T00:02:46.835Z"
+      "timestamp": "2026-07-02T00:22:54.454Z"
     },
     "overlayText": "SELF-CHECK PASS\nbuild feel2",
     "overlayVisible": true
   },
-  "timestamp": "2026-07-02T00:02:46.887Z"
+  "timestamp": "2026-07-02T00:22:54.507Z"
 }

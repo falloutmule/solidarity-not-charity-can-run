@@ -2726,6 +2726,9 @@ async function main() {
   const worldAdapter = await page.evaluate(() => CR.runWorldLayerAdapterSelfCheck());
   writeProof('proof-world-layer-adapter.json', worldAdapter);
 
+  const worldAdapterPhase1 = await page.evaluate(() => CR.runWorldAdapterWiringPhase1SelfCheck());
+  writeProof('proof-world-adapter-collision.json', worldAdapterPhase1);
+
   const fixedStepBaseline = await page.evaluate(() => CR.runFixedStepBaselineSelfCheck());
   writeProof('proof-fixed-step-baseline.json', fixedStepBaseline);
 
@@ -2842,6 +2845,7 @@ async function main() {
     semanticAction.pass === true &&
     inputGuard.pass === true &&
     worldAdapter.pass === true &&
+    worldAdapterPhase1.pass === true &&
     fixedStepBaseline.pass === true &&
     fixedStepSimulation.pass === true &&
     spriteOcclusionScreenshot.pass === true &&

@@ -2,8 +2,7 @@
 // SECTION 4 — COLLISION / WALK HELPERS
 // ---------------------------------------------------------------------------
 function isWalkableCell(tx, ty){
-  if(ty<0||ty>=game.MAP_H||tx<0||tx>=game.MAP_W) return false;
-  return game.map[ty][tx] === 0;
+  return !World.cellSolid(tx, ty);
 }
 function isWalkableAt(x, y){
   return isWalkableCell(Math.floor(x), Math.floor(y));
@@ -38,7 +37,7 @@ function gridTraceClear(x1, y1, x2, y2, options){
         return { clear: false, blocked: true, blockedAt: { x: x1, y: y1, tx, ty, cell: null }, samples, outOfBounds: true };
       }
       const walk = isWalkableCell(tx, ty);
-      return { clear: walk, blocked: !walk, blockedAt: walk ? null : { x: x1, y: y1, tx, ty, cell: game.map[ty][tx] }, samples, outOfBounds: false };
+      return { clear: walk, blocked: !walk, blockedAt: walk ? null : { x: x1, y: y1, tx, ty, cell: World.rawCell(tx, ty) }, samples, outOfBounds: false };
     }
     const n = Math.max(2, Math.ceil(dist / step));
     for(let i = 1; i <= n; i++){
@@ -52,7 +51,7 @@ function gridTraceClear(x1, y1, x2, y2, options){
         return { clear: false, blocked: true, blockedAt: { x, y, tx, ty, cell: null }, samples, outOfBounds: true };
       }
       if(!isWalkableCell(tx, ty)){
-        return { clear: false, blocked: true, blockedAt: { x, y, tx, ty, cell: game.map[ty][tx] }, samples, outOfBounds: false };
+        return { clear: false, blocked: true, blockedAt: { x, y, tx, ty, cell: World.rawCell(tx, ty) }, samples, outOfBounds: false };
       }
     }
     return { clear: true, blocked: false, blockedAt: null, samples, outOfBounds: false };

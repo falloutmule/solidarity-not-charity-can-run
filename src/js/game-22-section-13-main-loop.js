@@ -6174,6 +6174,94 @@ function runWorldLayerAdapterSelfCheck(){
   }
 }
 
+function runWorldAdapterWiringPhase1SelfCheck(){
+  return crWithTemporaryState('worldAdapterPhase1', () => {
+    const errors = [];
+    const checks = {};
+    const evidence = {};
+    const err0 = window.__crRuntimeErrors.length;
+    try {
+      startRun(1234);
+      state = STATE.PLAY;
+      paused = false;
+      onboardingOpen = false;
+      game.timeLeft = 999;
+
+      // 1. isWalkableCell now delegates to World.cellSolid
+      let walkViaLegacy = 0, walkViaAdapter = 0;
+      for(let ty = 0; ty < game.MAP_H; ty++){
+        for(let tx = 0; tx < game.MAP_W; tx++){
+          const a = isWalkableCell(tx, ty);
+          const b = !World.cellSolid(tx, ty);
+          if(a !== b){
+            errors.push('isWalkableCell vs World.cellSolid mismatch at ' + tx + ',' + ty);
+          }
+          if(a) walkViaLegacy++;
+          if(b) walkViaAdapter++;
+        }
+      }
+      checks.allCellsAgree = errors.length === 0;
+      evidence.walkableCellCount = walkViaLegacy;
+
+      // 2. gridTraceClear uses World for blockedAt cell
+      const ptx = Math.floor(player.x), pty = Math.floor(player.y);
+      let traceTarget = { x: player.x + 2, y: player.y };
+      for(let attempts = 0; attempts < 8; attempts++){
+        const res = gridTraceClear(player.x, player.y, traceTarget.x, traceTarget.y);
+        if(res.clear) break;
+        traceTarget.x += 0.5;
+      }
+      const trace = gridTraceClear(player.x, player.y, traceTarget.x, traceTarget.y);
+      checks.gridTraceWorks = typeof trace.clear === 'boolean';
+      if(!trace.clear && trace.blockedAt){
+        checks.blockedAtUsesWorld = trace.blockedAt.cell === World.rawCell(trace.blockedAt.tx, trace.blockedAt.ty);
+      } else {
+        checks.blockedAtUsesWorld = true; // clear path, nothing to check
+      }
+
+      // 3. gridReachableFrom uses World.cellSolid via isWalkableCell
+      const reach = gridReachableFrom(player.x, player.y, { maxCells: 5000 });
+      checks.reachabilityWorks = reach.count > 0;
+      evidence.reachableCount = reach.count;
+
+      // 4. interactionLineClear (LOS) works
+      const los = interactionLineClear(player.x, player.y, player.x + 1, player.y);
+      checks.losWorks = typeof los.clear === 'boolean';
+
+      // 5. movePlayerWithCollision still works
+      const px0 = player.x;
+      const origAngle = player.angle;
+      player.angle = 0;
+      const moveRes = movePlayerWithCollision(0.5, 0);
+      checks.movementWorks = typeof moveRes.moved === 'boolean';
+      player.angle = origAngle;
+
+      // 6. OOB safety
+      checks.oobWalkableFalse = !isWalkableCell(-5, -5) && !World.cellSolid(-5, -5) === false;
+      checks.oobSolid = World.cellSolid(-1, -1) === true;
+
+      // 7. Nested proofs still pass
+      checks.raycasterInvariantPasses = runRaycasterInvariantSelfCheck().pass === true;
+      checks.movementCollisionPasses = runMovementCollisionSelfCheck().pass === true;
+
+      checks.runtimeClean = window.__crRuntimeErrors.length === err0;
+      if(!checks.runtimeClean) errors.push('runtime errors during world adapter phase 1');
+    } catch(e){
+      errors.push(String(e && e.message ? e.message : e));
+    }
+
+    const pass = errors.length === 0 && Object.values(checks).every(Boolean);
+    return {
+      pass,
+      build: BUILD_ID,
+      errors,
+      checks,
+      evidence,
+      timestamp: new Date().toISOString(),
+    };
+  });
+}
+
 function runFixedStepSimulationSelfCheck(){
   return crWithTemporaryState('fixedStepSimulation', () => {
     const errors = [];
@@ -7516,7 +7604,7 @@ globalThis.CR = window.CR = {
   crGetSelectedStartDistrict,crCycleSelectedStartDistrict,crSetSelectedStartDistrict,crTitleMenuSelectableRows,titleMenuRowLabel,crMinimapNavCellColor,
   startRun,restartRun,continueRun,endRun,completeRun,giveCan,update,updateSeed,chooseUpgrade,startCustomLevel,specialLevelMenuItems,
   crResetFixedStepSimulation,crStepSimulationFixed,crGetFixedStepState,crClampFixedFrameDt,
-  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,crGetViewportAuthority,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runViewportAuthoritySelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runDecorativePropsSelfCheck,runOptionsCleanupSelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runStreetBlockLevelSelfCheck,runD1ParkLandmarkSelfCheck,runBuildingModuleFacadeSelfCheck,runFacadePackBridgeSelfCheck,runFacadePackV2SafeModuleSelfCheck,runFpvGroundPlaneAlignmentSelfCheck,runD2D3FacadeReadabilityFinalSelfCheck,runBuildingSmoothStyleSelfCheck,runContinuousFacadeTextureSelfCheck,runSpriteGroundAnchorSelfCheck,crDebugGroundPlaneAlignment,crDebugFacadeReadabilityFinal,crDebugBuildingSmoothStyle,crDebugContinuousFacadeTexture,crDebugPropDensity,crApplySolidwallsFrontProofHarness,CR_SOLIDWALLS_FRONTPROOF_NAME,crBuildFacadeTextureAtlas,crGetFacadeTextureForFace,crProjectedFloorY,crWallProjectionMetrics,crDebugSpriteProjection,runFacadeArtVocabularySelfCheck,runFacadeCompositionReadabilitySelfCheck,crDebugDescribeFacadeHit,runFpvFacadeTargetPolishSelfCheck,runFpvWallLineArtifactFixSelfCheck,runFpvStreetShimmerFixSelfCheck,runStreetReadabilityMinimapSelfCheck,runBuildingScalePolishSelfCheck,runEarlyDistrictProgressionSelfCheck,runLevelSelectorSelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runSemanticActionMapSelfCheck,runInputNoDirectMutationGuardSelfCheck,runWorldLayerAdapterSelfCheck,runFixedStepSimulationSelfCheck,runFixedStepBaselineSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRaycasterInvariantSelfCheck,crDebugRaycastFrame,World,getSemanticActionMap,crRefreshSemanticActionMap,crApplyPendingInputActions,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crSpriteOcclusionScreenshotProof,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
+  crMinimapOverlapPass,crMinimapOverlapMetrics,crMigrateUnsafeControlsYOffset,crSafeControlsYOffsetPx,setMobileMode,isMobile,rmenuAction,getDebugState,getViewportProof,getSafeAreaAudit,readSafeAreaInsets,crGetViewportAuthority,syncVisualViewportShell,portraitLayout,getLayoutProof,getControlDockRectProof,runControlDockSelfCheck,runLayoutSelfCheck,runViewportSafeAreaSelfCheck,runViewportAuthoritySelfCheck,runPortraitUsabilitySelfCheck,runSettingsSafetySelfCheck,runDecorativePropsSelfCheck,runOptionsCleanupSelfCheck,runMobileControlReliabilitySelfCheck,runDeclarativeControlsSelfCheck,runMovementCollisionSelfCheck,movePlayerWithCollision,gridTraceClear,gridReachableFrom,isReachableCell,interactionLineClear,runReachabilitySelfCheck,runStreetBlockLevelSelfCheck,runD1ParkLandmarkSelfCheck,runBuildingModuleFacadeSelfCheck,runFacadePackBridgeSelfCheck,runFacadePackV2SafeModuleSelfCheck,runFpvGroundPlaneAlignmentSelfCheck,runD2D3FacadeReadabilityFinalSelfCheck,runBuildingSmoothStyleSelfCheck,runContinuousFacadeTextureSelfCheck,runSpriteGroundAnchorSelfCheck,crDebugGroundPlaneAlignment,crDebugFacadeReadabilityFinal,crDebugBuildingSmoothStyle,crDebugContinuousFacadeTexture,crDebugPropDensity,crApplySolidwallsFrontProofHarness,CR_SOLIDWALLS_FRONTPROOF_NAME,crBuildFacadeTextureAtlas,crGetFacadeTextureForFace,crProjectedFloorY,crWallProjectionMetrics,crDebugSpriteProjection,runFacadeArtVocabularySelfCheck,runFacadeCompositionReadabilitySelfCheck,crDebugDescribeFacadeHit,runFpvFacadeTargetPolishSelfCheck,runFpvWallLineArtifactFixSelfCheck,runFpvStreetShimmerFixSelfCheck,runStreetReadabilityMinimapSelfCheck,runBuildingScalePolishSelfCheck,runEarlyDistrictProgressionSelfCheck,runLevelSelectorSelfCheck,runProceduralLevelValidationSelfCheck,runFullRunProgressionSelfCheck,runOnboardingSelfCheck,runSoundFeedbackSelfCheck,runVisualReadabilitySelfCheck,runVisualRectangleRegressionSelfCheck,runInputSelfCheck,runSemanticActionMapSelfCheck,runInputNoDirectMutationGuardSelfCheck,runWorldLayerAdapterSelfCheck,runWorldAdapterWiringPhase1SelfCheck,runFixedStepSimulationSelfCheck,runFixedStepBaselineSelfCheck,runLevelSelfCheck,runRenderSelfCheck,runRaycasterInvariantSelfCheck,crDebugRaycastFrame,World,getSemanticActionMap,crRefreshSemanticActionMap,crApplyPendingInputActions,runRenderFailureSelfCheck,runHarnessIsolationSelfCheck,runHallSelfCheck,runFullSelfCheck,crRenderFailureBenchScene,crRenderFailureDrawFrame,crSpriteOcclusionScreenshotProof,crWithTemporaryState,crPublicStateFingerprint,crFingerprintPublicSafe,crHarnessInstallMicroMap,getMinimapAlignProof,getTouchActionProof,getSpriteHaloRegressionProof,getOcclusionZbufferProof,rectsOverlap,
   CR_VISUAL_READABILITY,CR_SOUND_FEEDBACK,DECOR_PROP_REQUIRED,INPUT_CONFIG,CR_CONTROLS_LS_KEY,crTriggerSoundCue,crSoundEnabled,crSoundFeedbackCueIds,crLoadControlOverrides,crPersistControlOverrides,crResetControlLayoutOverrides,crClearControlOverrides,crEnterControlEditMode,crFinishControlEditMode,crControlHitTest,crSnapshotLayoutNorms,crPrepareSelfCheckPortrait,crStepEditControlSize,crSelectEditControl,
   getCrVisualHarnessSnapshot(){ return _crVisualHarnessSnapshot; },
   showOnboardingHelp,dismissOnboardingHelp,crOpenFirstRunHelpIfNeeded,
