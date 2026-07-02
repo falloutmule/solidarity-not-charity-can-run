@@ -644,34 +644,58 @@ function crPaintMaterialRedBrick(w, h){
   return o.canvas;
 }
 
+const CR_MATERIAL_CINDERBLOCK_BLOCK_W = 48;
+const CR_MATERIAL_CINDERBLOCK_BLOCK_H = 12;
+const CR_MATERIAL_CINDERBLOCK_TILE_SCALE = 1.85;
+const CR_MATERIAL_SIDING_BAND_H = 9;
+const CR_MATERIAL_SIDING_TILE_SCALE = 2.0;
+
+function crMaterialTextureDebugSpec(){
+  return {
+    light_gray_cinderblock: {
+      blockW: CR_MATERIAL_CINDERBLOCK_BLOCK_W,
+      blockH: CR_MATERIAL_CINDERBLOCK_BLOCK_H,
+      aspect: CR_MATERIAL_CINDERBLOCK_BLOCK_W / CR_MATERIAL_CINDERBLOCK_BLOCK_H,
+      tileScaleCells: CR_MATERIAL_CINDERBLOCK_TILE_SCALE,
+      staggeredRows: true,
+    },
+    aluminum_siding: {
+      bandH: CR_MATERIAL_SIDING_BAND_H,
+      orientation: 'horizontal',
+      tileScaleCells: CR_MATERIAL_SIDING_TILE_SCALE,
+      highFrequencyNoise: 'low',
+    },
+  };
+}
+
 function crPaintMaterialLightGrayCinderblock(w, h){
   const o = crFacadeTextureCanvas('material_light_gray_cinderblock', w, h);
   const ctx = o.ctx;
-  // Pale gray base with cool tone
-  crFacadeTextureBase(ctx, w, h, { wall:'#b6b5ad', top:'rgba(60,68,72,0.10)', base:'rgba(40,42,46,0.22)', line:'rgba(70,76,82,0.18)', mottle:'rgba(230,232,230,0.045)' });
+  crFacadeTextureBase(ctx, w, h, { wall:'#b6b5ad', top:'rgba(60,68,72,0.08)', base:'rgba(40,42,46,0.14)', line:'rgba(70,76,82,0.10)', mottle:'rgba(230,232,230,0.028)' });
   const rng = crFacadeMaterialRng(0xc12d9e57);
-  const blockW = 24;
-  const blockH = 12;
+  const blockW = CR_MATERIAL_CINDERBLOCK_BLOCK_W;
+  const blockH = CR_MATERIAL_CINDERBLOCK_BLOCK_H;
   const seam = 1;
   for(let row = -1; row * (blockH + seam) < h + blockH; row++){
+    const offset = (row % 2 === 0) ? 0 : Math.floor(blockW / 2);
     for(let col = -1; col * (blockW + seam) < w + blockW; col++){
-      const x = col * (blockW + seam);
+      const x = col * (blockW + seam) + offset;
       const y = row * (blockH + seam);
       if(x + blockW <= 0 || y + blockH <= 0 || x >= w || y >= h) continue;
-      const v = 0.85 + rng() * 0.18;
+      const v = 0.88 + rng() * 0.12;
       const R = Math.floor(186 * v); const G = Math.floor(186 * v); const B = Math.floor(178 * v);
       ctx.fillStyle = 'rgb(' + Math.min(255, R) + ',' + Math.min(255, G) + ',' + Math.min(255, B) + ')';
       ctx.fillRect(x, y, blockW, blockH);
-      for(let i = 0; i < 12; i++){
+      for(let i = 0; i < 4; i++){
         const dx = x + Math.floor(rng() * blockW);
         const dy = y + Math.floor(rng() * blockH);
-        ctx.fillStyle = 'rgba(78,82,80,'+(0.08 + rng() * 0.14).toFixed(3)+')';
+        ctx.fillStyle = 'rgba(78,82,80,'+(0.05 + rng() * 0.06).toFixed(3)+')';
         ctx.fillRect(dx, dy, 1, 1);
       }
-      ctx.fillStyle = 'rgba(46,50,54,0.12)';
+      ctx.fillStyle = 'rgba(46,50,54,0.08)';
       ctx.fillRect(x + blockW - seam, y, seam, blockH);
       ctx.fillRect(x, y + blockH - seam, blockW, seam);
-      ctx.fillStyle = 'rgba(240,242,240,0.14)';
+      ctx.fillStyle = 'rgba(240,242,240,0.10)';
       ctx.fillRect(x, y, blockW, 1);
     }
   }
@@ -681,43 +705,23 @@ function crPaintMaterialLightGrayCinderblock(w, h){
 function crPaintMaterialAluminumSiding(w, h){
   const o = crFacadeTextureCanvas('material_aluminum_siding', w, h);
   const ctx = o.ctx;
-  // Cool gray base
-  crFacadeTextureBase(ctx, w, h, { wall:'#9aa1a4', top:'rgba(220,224,228,0.18)', base:'rgba(36,42,48,0.28)', line:'rgba(60,68,76,0.18)', mottle:'rgba(180,186,190,0.035)' });
+  crFacadeTextureBase(ctx, w, h, { wall:'#9aa1a4', top:'rgba(220,224,228,0.14)', base:'rgba(36,42,48,0.18)', line:'rgba(60,68,76,0.10)', mottle:'rgba(180,186,190,0.02)' });
   const rng = crFacadeMaterialRng(0xd309a72f);
-  const bandH = 7;
+  const bandH = CR_MATERIAL_SIDING_BAND_H;
   for(let y = 0; y < h; y += bandH){
-    const v = 0.86 + rng() * 0.18;
+    const v = 0.90 + rng() * 0.10;
     const R = Math.floor(154 * v); const G = Math.floor(161 * v); const B = Math.floor(166 * v);
     ctx.fillStyle = 'rgb(' + Math.min(255, R) + ',' + Math.min(255, G) + ',' + Math.min(255, B) + ')';
     ctx.fillRect(0, y, w, bandH);
-    // Top highlight
-    ctx.fillStyle = 'rgba(232,236,238,0.22)';
+    ctx.fillStyle = 'rgba(232,236,238,0.20)';
     ctx.fillRect(0, y, w, 1);
-    // Bottom shadow
-    ctx.fillStyle = 'rgba(34,40,46,0.28)';
+    ctx.fillStyle = 'rgba(34,40,46,0.22)';
     ctx.fillRect(0, y + bandH - 1, w, 1);
-    // Oxidation smudges
-    for(let i = 0; i < 4; i++){
-      const sx = Math.floor(rng() * w);
-      const sw = 4 + Math.floor(rng() * 12);
-      ctx.fillStyle = 'rgba(70,88,96,'+(0.10 + rng() * 0.10).toFixed(3)+')';
-      ctx.fillRect(sx, y + 1, sw, bandH - 2);
+    if(rng() < 0.12){
+      const sx = Math.floor(rng() * Math.max(1, w - 24));
+      ctx.fillStyle = 'rgba(70,88,96,0.05)';
+      ctx.fillRect(sx, y + 2, 18, Math.max(1, bandH - 3));
     }
-    // Shallow dents
-    if(rng() < 0.4){
-      const dx = Math.floor(rng() * (w - 10));
-      ctx.fillStyle = 'rgba(40,48,54,0.20)';
-      ctx.fillRect(dx, y + 1, 8, 1);
-      ctx.fillStyle = 'rgba(228,232,236,0.18)';
-      ctx.fillRect(dx + 1, y + bandH - 2, 7, 1);
-    }
-  }
-  // Faint grime streaks
-  for(let i = 0; i < 14; i++){
-    const x = Math.floor(rng() * w);
-    const yy = Math.floor(rng() * h);
-    ctx.fillStyle = 'rgba(70,80,86,0.10)';
-    ctx.fillRect(x, yy, 1, 4 + Math.floor(rng() * 8));
   }
   return o.canvas;
 }
@@ -941,8 +945,8 @@ function crBuildingMaterialTileU(mapX, mapY, faceDir, wallX, scaleCells){
 function crMaterialTileScaleCells(materialKey){
   const m = crNormalizeBuildingTextureMaterial(materialKey);
   if(m === 'red_brick') return 1.0;
-  if(m === 'light_gray_cinderblock') return 1.25;
-  if(m === 'aluminum_siding') return 1.0;
+  if(m === 'light_gray_cinderblock') return CR_MATERIAL_CINDERBLOCK_TILE_SCALE;
+  if(m === 'aluminum_siding') return CR_MATERIAL_SIDING_TILE_SCALE;
   return 1.35; // stucco: broader, less repetitive
 }
 
@@ -1475,7 +1479,7 @@ function crDebugBuildingSmoothStyle(){
   const base = crDebugFacadeReadabilityFinal();
   const artSrc = (typeof crDrawSmoothBuildingMaterialBase === 'function' ? String(crDrawSmoothBuildingMaterialBase) : '') + '\\n' + (typeof crDrawSmoothBuildingFaceColumn === 'function' ? String(crDrawSmoothBuildingFaceColumn) : '') + '\\n' + (typeof crDrawComposedFacadeFaceColumn === 'function' ? String(crDrawComposedFacadeFaceColumn) : '');
   const checks = {
-    buildId: BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2' || BUILD_ID === 'walltextures3',
+    buildId: BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2' || BUILD_ID === 'walltextures3' || BUILD_ID === 'walltextures4',
     smoothFlag: typeof CR_BUILDING_SMOOTH_STYLE !== 'undefined' && CR_BUILDING_SMOOTH_STYLE === 1,
     smoothHelper: typeof crDrawSmoothBuildingFaceColumn === 'function' && typeof crDrawSmoothBuildingMaterialBase === 'function',
     facadePackStillExists: !!(CR_FACADE_PACK && CR_FACADE_PACK.modules && CR_FACADE_PACK.roles),
@@ -1519,7 +1523,7 @@ function crDebugContinuousFacadeTexture(){
   }
   const drawSrc = (typeof crDrawComposedFacadeFaceColumn === 'function' ? String(crDrawComposedFacadeFaceColumn) : '') + '\n' + (typeof crDrawContinuousFacadeTextureColumn === 'function' ? String(crDrawContinuousFacadeTextureColumn) : '');
   const checks = {
-    buildId: BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2' || BUILD_ID === 'walltextures3',
+    buildId: BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2' || BUILD_ID === 'walltextures3' || BUILD_ID === 'walltextures4',
     calmWallsPropsFirstMode: BUILD_ID !== 'calmwalls1' || (typeof CR_CALM_WALLS_PROPS_FIRST !== 'undefined' && CR_CALM_WALLS_PROPS_FIRST === 1 && drawSrc.indexOf('crDrawCalmPropsFirstWallColumn') >= 0),
     simpleWallsBaselineMode: BUILD_ID !== 'simplewalls1' || (typeof CR_SIMPLE_WALLS_BASELINE !== 'undefined' && CR_SIMPLE_WALLS_BASELINE === 1 && drawSrc.indexOf('crDrawSimpleWallColumn') >= 0),
     atlasExists: !!atlas && keys.length >= 7,

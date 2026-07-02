@@ -1813,6 +1813,75 @@ async function walltextures3WholeBuildingTextureOwnershipSection(page) {
   };
 }
 
+async function walltextures4MaterialShapeReadabilitySection(page) {
+  await page.setViewportSize({ width: 412, height: 915 });
+  const result = await page.evaluate(() => CR.runWalltextures4MaterialShapeReadabilitySelfCheck());
+  writeProof('proof-walltextures4-material-shape-readability.json', result);
+
+  async function benchShot(materialKey, file) {
+    await page.evaluate((materialKey) => {
+      CR.crInstallMaterialTextureBenchScene(materialKey);
+      CR.state = CR.STATE.PLAY;
+      CR.paused = false;
+      if (typeof CR.dismissOnboardingHelp === 'function') CR.dismissOnboardingHelp();
+      if (typeof drawScene === 'function') drawScene(performance.now());
+    }, materialKey);
+    await page.waitForTimeout(280);
+    await page.screenshot({ path: path.join(ROOT, file) });
+  }
+
+  await benchShot('light_gray_cinderblock', 'proof-walltextures4-cinderblock-phone-proxy.png');
+  await benchShot('aluminum_siding', 'proof-walltextures4-siding-phone-proxy.png');
+
+  async function frameDistrict(d, seed, mode) {
+    await page.evaluate(({ d, seed, mode }) => {
+      CR.crSetSelectedStartDistrict(d);
+      CR.startRun(seed);
+      CR.state = CR.STATE.PLAY;
+      CR.paused = false;
+      if (typeof CR.dismissOnboardingHelp === 'function') CR.dismissOnboardingHelp();
+      const G = CR.game;
+      const map = G.map || [];
+      let bestRow = Math.floor(G.MAP_H / 2);
+      let bestScore = -1;
+      for (let y = 1; y < G.MAP_H - 1; y++) {
+        let score = 0;
+        for (let x = 2; x < G.MAP_W - 2; x++) {
+          const wt = map[y] && map[y][x];
+          if (wt > 0) score++;
+        }
+        if (score > bestScore) {
+          bestScore = score;
+          bestRow = y;
+        }
+      }
+      CR.player.x = mode === 'corner' ? 6.5 : 4.5;
+      CR.player.y = bestRow + 0.5;
+      CR.player.angle = mode === 'corner' ? Math.PI / 2 : 0;
+      CR.player.dir = CR.player.angle;
+      if (typeof window.updateAim === 'function') window.updateAim();
+      if (typeof drawScene === 'function') drawScene(performance.now());
+    }, { d, seed, mode });
+    await page.waitForTimeout(280);
+  }
+
+  await frameDistrict(2, 290144176, 'long');
+  await page.screenshot({ path: path.join(ROOT, 'proof-walltextures4-d2-long-wall.png') });
+  await frameDistrict(2, 290144176, 'corner');
+  await page.screenshot({ path: path.join(ROOT, 'proof-walltextures4-corner-material-continuity.png') });
+
+  return {
+    pass: result.pass === true,
+    errors: result.errors || [],
+    screenshots: [
+      'proof-walltextures4-cinderblock-phone-proxy.png',
+      'proof-walltextures4-siding-phone-proxy.png',
+      'proof-walltextures4-d2-long-wall.png',
+      'proof-walltextures4-corner-material-continuity.png',
+    ],
+  };
+}
+
 async function singleMaterialBuildingTextureSection(page) {
   const result = await page.evaluate(() => CR.runSingleMaterialBuildingTextureSelfCheck());
   writeProof('proof-single-material-building-textures.json', result);
@@ -2832,8 +2901,9 @@ function sourceBuildPipelineSection() {
     indexText.includes("const BUILD_ID = 'solidwalls1'") ||
     indexText.includes("const BUILD_ID = 'walltextures1'") ||
     indexText.includes("const BUILD_ID = 'walltextures2'") ||
-    indexText.includes("const BUILD_ID = 'walltextures3'");
-  if (!buildIdOk) errors.push('BUILD_ID must be feel2, feel1, solidwalls1, walltextures1, walltextures2, or walltextures3 for this pass');
+    indexText.includes("const BUILD_ID = 'walltextures3'") ||
+    indexText.includes("const BUILD_ID = 'walltextures4'");
+  if (!buildIdOk) errors.push('BUILD_ID must be feel2, feel1, solidwalls1, walltextures1, walltextures2, walltextures3, or walltextures4 for this pass');
   const pass = errors.length === 0 && proof && proof.check === 'pass';
   const buildIdMatch = indexText.match(/const BUILD_ID = '([^']+)'/);
   const result = { pass, errors, buildId: buildIdMatch ? buildIdMatch[1] : null, proofSummary: proof ? { outputSha256: proof.outputSha256, outputBytes: proof.outputBytes, check: proof.check } : null };
@@ -2949,6 +3019,7 @@ async function main() {
   const singleMaterialBuildingTextures = await singleMaterialBuildingTextureSection(page);
   const walltextures2ScaleVariation = await walltextures2ScaleVariationSection(page);
   const walltextures3Ownership = await walltextures3WholeBuildingTextureOwnershipSection(page);
+  const walltextures4Shape = await walltextures4MaterialShapeReadabilitySection(page);
 
   const dock = await controlDockRegression(page);
   const pointer = await pointerTorture(page);
@@ -3030,6 +3101,7 @@ async function main() {
     singleMaterialBuildingTextures.pass === true &&
     walltextures2ScaleVariation.pass === true &&
     walltextures3Ownership.pass === true &&
+    walltextures4Shape.pass === true &&
     dock.pass &&
     pointer.pass &&
     resilience.pass &&

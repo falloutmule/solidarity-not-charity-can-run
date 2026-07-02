@@ -1,9 +1,9 @@
 {
   "pass": true,
-  "build": "walltextures3",
+  "build": "walltextures4",
   "layout": {
     "pass": true,
-    "build": "walltextures3",
+    "build": "walltextures4",
     "errors": [],
     "warnings": [
       "intentional SPRINT/LOOK overlap"
@@ -125,7 +125,7 @@
   },
   "viewportSafeArea": {
     "pass": true,
-    "build": "walltextures3",
+    "build": "walltextures4",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -199,7 +199,7 @@
       "left": 0
     },
     "viewport": {
-      "BUILD_ID": "walltextures3",
+      "BUILD_ID": "walltextures4",
       "inner": {
         "w": 390,
         "h": 844
@@ -248,11 +248,11 @@
       "cw": 390,
       "ch": 844
     },
-    "timestamp": "2026-07-02T10:38:58.487Z"
+    "timestamp": "2026-07-02T11:11:50.637Z"
   },
   "portraitUsability": {
     "pass": true,
-    "build": "walltextures3",
+    "build": "walltextures4",
     "errors": [],
     "warnings": [],
     "thresholds": {
@@ -376,7 +376,7 @@
   },
   "settingsSafety": {
     "pass": true,
-    "build": "walltextures3",
+    "build": "walltextures4",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -397,7 +397,7 @@
   },
   "decorativeProps": {
     "pass": true,
-    "build": "walltextures3",
+    "build": "walltextures4",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -438,7 +438,7 @@
   },
   "optionsCleanup": {
     "pass": true,
-    "build": "walltextures3",
+    "build": "walltextures4",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -466,12 +466,12 @@
       "lsKeyUnchanged": true
     },
     "evidence": {
-      "htmlSample": "\n      <div class=\"options-scroll-body\">\n      <div class=\"rpantit\">OPTIONS</div>\n      <div class=\"rdesc\" style=\"margin-bottom:8px;color:#6a5a4a;\">build walltextures3</div>\n      <div class=\"options-section-hdr\">CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-edit-controls\">EDIT CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-reset-controls\">RESET CONTROLS</div>\n      <div cla"
+      "htmlSample": "\n      <div class=\"options-scroll-body\">\n      <div class=\"rpantit\">OPTIONS</div>\n      <div class=\"rdesc\" style=\"margin-bottom:8px;color:#6a5a4a;\">build walltextures4</div>\n      <div class=\"options-section-hdr\">CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-edit-controls\">EDIT CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-reset-controls\">RESET CONTROLS</div>\n      <div cla"
     }
   },
   "mobileControlReliability": {
     "pass": true,
-    "build": "walltextures3",
+    "build": "walltextures4",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -493,7 +493,7 @@
         "joyActive": false
       },
       "sprint": {
-        "burstUntil": 1.5635,
+        "burstUntil": 1.5737000000476837,
         "stamBefore": 60,
         "stamAfter": 40
       },
@@ -506,7 +506,7 @@
   },
   "movementCollision": {
     "pass": true,
-    "build": "walltextures3",
+    "build": "walltextures4",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -567,7 +567,7 @@
   },
   "reachability": {
     "pass": true,
-    "build": "walltextures3",
+    "build": "walltextures4",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -595,7 +595,7 @@
   },
   "streetBlockLevel": {
     "pass": true,
-    "build": "walltextures3",
+    "build": "walltextures4",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -722,7 +722,7 @@
   },
   "d1ParkLandmark": {
     "pass": true,
-    "build": "walltextures3",
+    "build": "walltextures4",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -1178,11 +1178,11 @@
     },
     "errors": [],
     "warnings": [],
-    "build": "walltextures3"
+    "build": "walltextures4"
   },
   "fpvGroundPlaneAlignment": {
     "pass": true,
-    "build": "walltextures3",
+    "build": "walltextures4",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -1227,7 +1227,7 @@
     },
     "evidence": {
       "groundPlaneDebug": {
-        "BUILD_ID": "walltextures3",
+        "BUILD_ID": "walltextures4",
         "pass": true,
         "records": [
           {
@@ -1296,7 +1296,7 @@
         ]
       },
       "spriteHalo": {
-        "BUILD_ID": "walltextures3",
+        "BUILD_ID": "walltextures4",
         "policy": "walls own distance fog; billboards drawImage only — no post-loop sprite fog fillRect",
         "forbiddenPatternsAbsent": true,
         "forbiddenHits": [],
@@ -1306,7 +1306,7 @@
         "regressionCommentMarker": "SPRITE HALO REGRESSION GUARD"
       },
       "zbuffer": {
-        "BUILD_ID": "walltextures3",
+        "BUILD_ID": "walltextures4",
         "renderWidth": 320,
         "zbufferLength": 320,
         "zbufferMatchesRenderWidth": true,
@@ -1349,7 +1349,7 @@
   },
   "d2D3FacadeReadabilityFinal": {
     "pass": true,
-    "build": "walltextures3",
+    "build": "walltextures4",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -1393,7 +1393,7 @@
     },
     "evidence": {
       "debug": {
-        "BUILD_ID": "walltextures3",
+        "BUILD_ID": "walltextures4",
         "facadePackVersion": "facadeart1",
         "currentModuleList": [
           "storefront_4x2",
@@ -1500,7 +1500,7 @@
         "pass": true
       },
       "groundplane": {
-        "BUILD_ID": "walltextures3",
+        "BUILD_ID": "walltextures4",
         "pass": true,
         "records": [
           {
@@ -1594,7 +1594,7 @@
   },
   "buildingSmoothStyle": {
     "pass": true,
-    "build": "walltextures3",
+    "build": "walltextures4",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -1638,7 +1638,7 @@
     },
     "evidence": {
       "debug": {
-        "BUILD_ID": "walltextures3",
+        "BUILD_ID": "walltextures4",
         "facadePackVersion": "facadeart1",
         "currentModuleList": [
           "storefront_4x2",
@@ -1743,7 +1743,7 @@
         "spritegroundHelpersActive": true,
         "noLabOnlyModules": true,
         "pass": true,
-        "smoothStyle": "walltextures3",
+        "smoothStyle": "walltextures4",
         "checks": {
           "buildId": true,
           "smoothFlag": true,
@@ -1760,7 +1760,7 @@
         }
       },
       "groundplane": {
-        "BUILD_ID": "walltextures3",
+        "BUILD_ID": "walltextures4",
         "pass": true,
         "records": [
           {
@@ -1840,7 +1840,7 @@
   },
   "continuousFacadeTexture": {
     "pass": true,
-    "build": "walltextures3",
+    "build": "walltextures4",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -1889,7 +1889,7 @@
     },
     "evidence": {
       "debug": {
-        "BUILD_ID": "walltextures3",
+        "BUILD_ID": "walltextures4",
         "pass": true,
         "textureAtlasKeys": [
           "storefront_4x2_south",
@@ -2235,7 +2235,7 @@
         }
       },
       "groundplane": {
-        "BUILD_ID": "walltextures3",
+        "BUILD_ID": "walltextures4",
         "pass": true,
         "records": [
           {
@@ -2584,7 +2584,7 @@
         }
       ]
     },
-    "build": "walltextures3"
+    "build": "walltextures4"
   },
   "facadeArtVocabulary": {
     "pass": true,
@@ -2825,11 +2825,11 @@
     },
     "errors": [],
     "warnings": [],
-    "build": "walltextures3"
+    "build": "walltextures4"
   },
   "fpvFacadeTargetPolish": {
     "pass": true,
-    "build": "walltextures3",
+    "build": "walltextures4",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -2877,7 +2877,7 @@
   },
   "fpvWallLineArtifactFix": {
     "pass": true,
-    "build": "walltextures3",
+    "build": "walltextures4",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -2934,7 +2934,7 @@
   },
   "fpvStreetShimmerFix": {
     "pass": true,
-    "build": "walltextures3",
+    "build": "walltextures4",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -2996,7 +2996,7 @@
   },
   "streetReadabilityMinimap": {
     "pass": true,
-    "build": "walltextures3",
+    "build": "walltextures4",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -3133,7 +3133,7 @@
   },
   "buildingScalePolish": {
     "pass": true,
-    "build": "walltextures3",
+    "build": "walltextures4",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -3255,7 +3255,7 @@
   },
   "earlyDistrictProgression": {
     "pass": true,
-    "build": "walltextures3",
+    "build": "walltextures4",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -3404,7 +3404,7 @@
   },
   "levelSelector": {
     "pass": true,
-    "build": "walltextures3",
+    "build": "walltextures4",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -3536,7 +3536,7 @@
   },
   "proceduralLevelValidation": {
     "pass": true,
-    "build": "walltextures3",
+    "build": "walltextures4",
     "seedCount": 52,
     "districtCount": 3,
     "errors": [],
@@ -3562,11 +3562,11 @@
       "harnessStateRestored": true
     },
     "cases": 52,
-    "timestamp": "2026-07-02T10:39:15.478Z"
+    "timestamp": "2026-07-02T11:12:07.640Z"
   },
   "fullRunProgression": {
     "pass": true,
-    "build": "walltextures3",
+    "build": "walltextures4",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -3618,11 +3618,11 @@
     },
     "hallPass": true,
     "mobilePass": true,
-    "timestamp": "2026-07-02T10:39:15.691Z"
+    "timestamp": "2026-07-02T11:12:07.853Z"
   },
   "onboarding": {
     "pass": true,
-    "build": "walltextures3",
+    "build": "walltextures4",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -3652,7 +3652,7 @@
   },
   "soundFeedback": {
     "pass": true,
-    "build": "walltextures3",
+    "build": "walltextures4",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -3729,7 +3729,7 @@
         }
       },
       "audioProof": {
-        "BUILD_ID": "walltextures3",
+        "BUILD_ID": "walltextures4",
         "gateBound": true,
         "unlockAttempted": false,
         "hasContext": true,
@@ -3747,7 +3747,7 @@
   },
   "declarativeControls": {
     "pass": true,
-    "build": "walltextures3",
+    "build": "walltextures4",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -3829,7 +3829,7 @@
   },
   "visualReadability": {
     "pass": true,
-    "build": "walltextures3",
+    "build": "walltextures4",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -3862,9 +3862,9 @@
         "giveReady": false
       },
       "hallStats": {
-        "mean": 120.1068307969905,
-        "brightRatio": 0.1420625,
-        "variance": 4530.195075041221,
+        "mean": 120.21378525011501,
+        "brightRatio": 0.142625,
+        "variance": 4534.3675850336385,
         "count": 64000
       },
       "exitReadySnapshot": {
@@ -3900,7 +3900,7 @@
   },
   "visualRectangleRegression": {
     "pass": true,
-    "build": "walltextures3",
+    "build": "walltextures4",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -3948,21 +3948,21 @@
         },
         "probe1": {
           "center": {
-            "mean": 104.30973849239732,
+            "mean": 105.60007369087671,
             "brightRatio": 0,
-            "variance": 3779.094022387739,
+            "variance": 3908.7194649405706,
             "count": 9472
           },
           "sideL": {
-            "mean": 80.6909716216272,
+            "mean": 81.92005506757312,
             "brightRatio": 0,
-            "variance": 3037.573039228269,
+            "variance": 3235.3477391791116,
             "count": 2960
           },
           "sideR": {
-            "mean": 127.09362229729432,
+            "mean": 134.9820195945939,
             "brightRatio": 0,
-            "variance": 3125.2211700641024,
+            "variance": 3669.197319003012,
             "count": 2960
           },
           "roi": {
@@ -3975,21 +3975,21 @@
         },
         "probe2": {
           "center": {
-            "mean": 104.46010853040362,
+            "mean": 106.77079370776609,
             "brightRatio": 0,
-            "variance": 3762.0118224081093,
+            "variance": 4013.701883535003,
             "count": 9472
           },
           "sideL": {
-            "mean": 127.3386027027014,
+            "mean": 131.64942533783957,
             "brightRatio": 0,
-            "variance": 3127.673362103581,
+            "variance": 3396.579254091721,
             "count": 2960
           },
           "sideR": {
-            "mean": 80.95428175676237,
+            "mean": 82.40025979730306,
             "brightRatio": 0,
-            "variance": 3045.205488628223,
+            "variance": 3280.093447358482,
             "count": 2960
           },
           "roi": {
@@ -4000,8 +4000,8 @@
           },
           "angle": 3.9269908169872414
         },
-        "meanSpread": 55.501967060803366,
-        "pairDiff01": 55.351597022797066,
+        "meanSpread": 57.81265223816584,
+        "pairDiff01": 56.64193222127646,
         "stuckBrightBlock": false
       }
     }
@@ -4058,7 +4058,7 @@
   },
   "renderFailure": {
     "pass": true,
-    "build": "walltextures3",
+    "build": "walltextures4",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -4077,7 +4077,7 @@
     },
     "evidence": {
       "haloSource": {
-        "BUILD_ID": "walltextures3",
+        "BUILD_ID": "walltextures4",
         "policy": "walls own distance fog; billboards drawImage only — no post-loop sprite fog fillRect",
         "forbiddenPatternsAbsent": true,
         "forbiddenHits": [],
@@ -4087,7 +4087,7 @@
         "regressionCommentMarker": "SPRITE HALO REGRESSION GUARD"
       },
       "occlusionSource": {
-        "BUILD_ID": "walltextures3",
+        "BUILD_ID": "walltextures4",
         "renderWidth": 320,
         "zbufferLength": 320,
         "zbufferMatchesRenderWidth": true,
@@ -4178,7 +4178,7 @@
           "screenW": 15.272727272727273,
           "screenH": 16.8
         },
-        "canvasVariance": 4497.666158517598
+        "canvasVariance": 4486.465495329153
       },
       "occludedSprite": {
         "pass": true,
@@ -4246,9 +4246,9 @@
       "hallStart": {
         "pass": true,
         "stats": {
-          "mean": 87.0897281715751,
-          "brightRatio": 0.02234141791044776,
-          "variance": 3257.3928779384614,
+          "mean": 86.91132693556663,
+          "brightRatio": 0.020359141791044776,
+          "variance": 3227.4954374464855,
           "count": 42880
         },
         "customLevel": "hall_of_servants"
@@ -4260,19 +4260,19 @@
           "h": 844
         },
         "stats": {
-          "mean": 120.20342378136556,
-          "brightRatio": 0.14284375,
-          "variance": 4538.138511924141,
+          "mean": 120.06243210949003,
+          "brightRatio": 0.141515625,
+          "variance": 4523.250920651814,
           "count": 64000
         }
       }
     },
     "runtimeErrors": [],
-    "timestamp": "2026-07-02T10:39:15.976Z"
+    "timestamp": "2026-07-02T11:12:08.144Z"
   },
   "render": {
     "pass": true,
-    "build": "walltextures3",
+    "build": "walltextures4",
     "errors": [],
     "warnings": [],
     "checks": {
@@ -4291,7 +4291,7 @@
     },
     "evidence": {
       "haloSource": {
-        "BUILD_ID": "walltextures3",
+        "BUILD_ID": "walltextures4",
         "policy": "walls own distance fog; billboards drawImage only — no post-loop sprite fog fillRect",
         "forbiddenPatternsAbsent": true,
         "forbiddenHits": [],
@@ -4301,7 +4301,7 @@
         "regressionCommentMarker": "SPRITE HALO REGRESSION GUARD"
       },
       "occlusionSource": {
-        "BUILD_ID": "walltextures3",
+        "BUILD_ID": "walltextures4",
         "renderWidth": 320,
         "zbufferLength": 320,
         "zbufferMatchesRenderWidth": true,
@@ -4392,7 +4392,7 @@
           "screenW": 15.272727272727273,
           "screenH": 16.8
         },
-        "canvasVariance": 4497.666158517598
+        "canvasVariance": 4486.465495329153
       },
       "occludedSprite": {
         "pass": true,
@@ -4460,9 +4460,9 @@
       "hallStart": {
         "pass": true,
         "stats": {
-          "mean": 87.0897281715751,
-          "brightRatio": 0.02234141791044776,
-          "variance": 3257.3928779384614,
+          "mean": 86.91132693556663,
+          "brightRatio": 0.020359141791044776,
+          "variance": 3227.4954374464855,
           "count": 42880
         },
         "customLevel": "hall_of_servants"
@@ -4474,17 +4474,17 @@
           "h": 844
         },
         "stats": {
-          "mean": 120.20342378136556,
-          "brightRatio": 0.14284375,
-          "variance": 4538.138511924141,
+          "mean": 120.06243210949003,
+          "brightRatio": 0.141515625,
+          "variance": 4523.250920651814,
           "count": 64000
         }
       }
     },
     "runtimeErrors": [],
-    "timestamp": "2026-07-02T10:39:15.976Z"
+    "timestamp": "2026-07-02T11:12:08.144Z"
   },
   "runtimeErrors": [],
   "runtimeClean": true,
-  "timestamp": "2026-07-02T10:39:15.976Z"
+  "timestamp": "2026-07-02T11:12:08.144Z"
 }
