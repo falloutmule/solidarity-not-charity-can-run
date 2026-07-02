@@ -5,12 +5,12 @@
 | **Gameplay baseline** | `BUILD_ID` **`walltextures1`** |
 | **Previous gameplay baseline** | `feel2` / engine hardening `3a7b3d1`; `facadetexture1` / `c511936`; `buildingsmooth1` / `0b41159` |
 | **Infrastructure** | Split-source build pipeline (`src/` → `index.html`) |
-| **Gameplay commit** | `c511936` — `fix(render): use continuous facade textures` |
+| **Gameplay commit** | `d936677` — `feat(art): single-material building wall textures` |
 
 ## Play / self-check
 
-- Play: `https://falloutmule.github.io/solidarity-not-charity-can-run/?v=c511936&mobile=on&portraitlayout=1`
-- Self-check: `https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=c511936&mobile=on&portraitlayout=1`
+- Play: `https://falloutmule.github.io/solidarity-not-charity-can-run/?v=d93667755214c9bb28191c85ef14a9c572595820&mobile=on&portraitlayout=1`
+- Self-check: `https://falloutmule.github.io/solidarity-not-charity-can-run/?selfcheck=1&v=d93667755214c9bb28191c85ef14a9c572595820&mobile=on&portraitlayout=1`
 
 ## Build workflow
 
