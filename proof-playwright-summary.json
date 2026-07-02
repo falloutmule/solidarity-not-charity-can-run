@@ -60,9 +60,9 @@
       "noTravisHarnessBugs": true
     },
     "errors": [],
-    "artifactPath": "C:\\Users\\fallo\\Documents\\HermesProjects\\canned-run\\index.html",
-    "policyPath": "C:\\Users\\fallo\\Documents\\HermesProjects\\canned-run\\SOURCE_RELEASE_POLICY.md",
-    "timestamp": "2026-07-02T00:25:04.014Z"
+    "artifactPath": "C:\\Users\\fallo\\solidarity-not-charity-can-run\\index.html",
+    "policyPath": "C:\\Users\\fallo\\solidarity-not-charity-can-run\\SOURCE_RELEASE_POLICY.md",
+    "timestamp": "2026-07-02T10:38:55.545Z"
   },
   "aiSafeConstitution": {
     "pass": true,
@@ -71,17 +71,17 @@
   "sourceBuildPipeline": {
     "pass": true,
     "errors": [],
-    "buildId": "feel2",
+    "buildId": "walltextures3",
     "proofSummary": {
-      "outputSha256": "95799bf997708f6278a6c6359414d29fe58aafcf8a0d0ec8357b1e4ac25a9316",
-      "outputBytes": 694850,
+      "outputSha256": "69acae598ad59f0bbc30361baa8a856ce6ad134edc016ae90965c0f114cc2e09",
+      "outputBytes": 737132,
       "check": "pass"
     }
   },
   "releaseArtifact": {
     "pass": true,
     "artifactPath": "index.html",
-    "artifactAbsolute": "C:\\Users\\fallo\\Documents\\HermesProjects\\canned-run\\index.html",
+    "artifactAbsolute": "C:\\Users\\fallo\\solidarity-not-charity-can-run\\index.html",
     "githubPagesServes": "root index.html",
     "singleFile": true,
     "runtimeDependencyCheck": {
@@ -93,17 +93,27 @@
     "pageErrorCount": 0,
     "fullSelfCheck": {
       "pass": true,
-      "build": "feel2"
+      "build": "walltextures3"
     },
     "playwrightSummaryPass": true,
-    "buildId": "feel2",
-    "commitHash": "d4d74ea",
+    "buildId": "walltextures3",
+    "commitHash": "a0ce3fd",
     "errors": [],
-    "timestamp": "2026-07-02T00:28:12.577Z"
+    "timestamp": "2026-07-02T10:42:02.496Z"
   },
   "fullSelfCheck": {
     "pass": true,
-    "build": "feel2"
+    "build": "walltextures3"
+  },
+  "singleMaterialBuildingTextures": {
+    "pass": true,
+    "errors": [],
+    "screenshots": [
+      "proof-single-material-d1.png",
+      "proof-single-material-d2.png",
+      "proof-single-material-d3.png",
+      "proof-single-material-d4.png"
+    ]
   },
   "dock": {
     "pass": true,
@@ -116,27 +126,27 @@
       "ml": {
         "top": 557,
         "left": 10,
-        "menuText": "MENUfeel2"
+        "menuText": "MENUwalltextures3"
       },
       "mg": {
         "top": 484,
         "left": 35,
-        "menuText": "MENUfeel2"
+        "menuText": "MENUwalltextures3"
       },
       "ms": {
         "top": 533,
         "left": 313,
-        "menuText": "MENUfeel2"
+        "menuText": "MENUwalltextures3"
       },
       "mlookpad": {
         "top": 557,
         "left": 268,
-        "menuText": "MENUfeel2"
+        "menuText": "MENUwalltextures3"
       },
       "mportmenu": {
         "top": 463,
         "left": 115,
-        "menuText": "MENUfeel2"
+        "menuText": "MENUwalltextures3"
       },
       "canvas": {
         "top": 0,
@@ -223,27 +233,27 @@
       "ml": {
         "top": 437,
         "left": 10,
-        "menuText": "MENUfeel2"
+        "menuText": "MENUwalltextures3"
       },
       "mg": {
         "top": 364,
         "left": 35,
-        "menuText": "MENUfeel2"
+        "menuText": "MENUwalltextures3"
       },
       "ms": {
         "top": 413,
         "left": 313,
-        "menuText": "MENUfeel2"
+        "menuText": "MENUwalltextures3"
       },
       "mlookpad": {
         "top": 437,
         "left": 268,
-        "menuText": "MENUfeel2"
+        "menuText": "MENUwalltextures3"
       },
       "mportmenu": {
         "top": 463,
         "left": 115,
-        "menuText": "MENUfeel2"
+        "menuText": "MENUwalltextures3"
       },
       "canvas": {
         "top": 0,
@@ -330,27 +340,27 @@
       "ml": {
         "top": 534,
         "left": 10,
-        "menuText": "MENUfeel2"
+        "menuText": "MENUwalltextures3"
       },
       "mg": {
         "top": 461,
         "left": 35,
-        "menuText": "MENUfeel2"
+        "menuText": "MENUwalltextures3"
       },
       "ms": {
         "top": 510,
         "left": 313,
-        "menuText": "MENUfeel2"
+        "menuText": "MENUwalltextures3"
       },
       "mlookpad": {
         "top": 534,
         "left": 268,
-        "menuText": "MENUfeel2"
+        "menuText": "MENUwalltextures3"
       },
       "mportmenu": {
         "top": 463,
         "left": 115,
-        "menuText": "MENUfeel2"
+        "menuText": "MENUwalltextures3"
       },
       "canvas": {
         "top": 0,
@@ -479,7 +489,7 @@
   "audio": {
     "pass": true,
     "before": {
-      "BUILD_ID": "feel2",
+      "BUILD_ID": "walltextures3",
       "gateBound": true,
       "unlockAttempted": false,
       "hasContext": false,
@@ -494,7 +504,7 @@
       "harnessMuted": false
     },
     "after": {
-      "BUILD_ID": "feel2",
+      "BUILD_ID": "walltextures3",
       "gateBound": true,
       "unlockAttempted": false,
       "hasContext": true,
@@ -514,7 +524,7 @@
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "scenarios": [
         {
           "label": "pixel7-portrait",
@@ -525,7 +535,7 @@
           "pass": true,
           "checkInitial": {
             "pass": true,
-            "build": "feel2",
+            "build": "walltextures3",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -599,7 +609,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "feel2",
+              "BUILD_ID": "walltextures3",
               "inner": {
                 "w": 412,
                 "h": 915
@@ -648,11 +658,11 @@
               "cw": 412,
               "ch": 915
             },
-            "timestamp": "2026-07-02T00:25:31.801Z"
+            "timestamp": "2026-07-02T10:39:26.229Z"
           },
           "checkAfterResize": {
             "pass": true,
-            "build": "feel2",
+            "build": "walltextures3",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -726,7 +736,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "feel2",
+              "BUILD_ID": "walltextures3",
               "inner": {
                 "w": 412,
                 "h": 875
@@ -775,7 +785,7 @@
               "cw": 412,
               "ch": 875
             },
-            "timestamp": "2026-07-02T00:25:32.016Z"
+            "timestamp": "2026-07-02T10:39:26.448Z"
           },
           "fingerprint": {
             "state": "play",
@@ -783,7 +793,7 @@
             "benchmark": false,
             "mapW": 40,
             "mapH": 20,
-            "timeLeft": 94.4166666666667,
+            "timeLeft": 94.43333333333337,
             "seed": 77,
             "runActive": true,
             "harnessOnly": false,
@@ -802,7 +812,7 @@
           "pass": true,
           "checkInitial": {
             "pass": true,
-            "build": "feel2",
+            "build": "walltextures3",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -829,7 +839,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "feel2",
+              "BUILD_ID": "walltextures3",
               "inner": {
                 "w": 915,
                 "h": 412
@@ -878,11 +888,11 @@
               "cw": 915,
               "ch": 412
             },
-            "timestamp": "2026-07-02T00:25:32.856Z"
+            "timestamp": "2026-07-02T10:39:27.292Z"
           },
           "checkAfterResize": {
             "pass": true,
-            "build": "feel2",
+            "build": "walltextures3",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -909,7 +919,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "feel2",
+              "BUILD_ID": "walltextures3",
               "inner": {
                 "w": 915,
                 "h": 400
@@ -958,7 +968,7 @@
               "cw": 915,
               "ch": 400
             },
-            "timestamp": "2026-07-02T00:25:33.073Z"
+            "timestamp": "2026-07-02T10:39:27.511Z"
           },
           "fingerprint": {
             "state": "play",
@@ -966,7 +976,7 @@
             "benchmark": false,
             "mapW": 40,
             "mapH": 20,
-            "timeLeft": 94.40000000000003,
+            "timeLeft": 94.4166666666667,
             "seed": 77,
             "runActive": true,
             "harnessOnly": false,
@@ -985,7 +995,7 @@
           "pass": true,
           "checkInitial": {
             "pass": true,
-            "build": "feel2",
+            "build": "walltextures3",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -1059,7 +1069,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "feel2",
+              "BUILD_ID": "walltextures3",
               "inner": {
                 "w": 360,
                 "h": 800
@@ -1108,11 +1118,11 @@
               "cw": 360,
               "ch": 800
             },
-            "timestamp": "2026-07-02T00:25:33.893Z"
+            "timestamp": "2026-07-02T10:39:28.334Z"
           },
           "checkAfterResize": {
             "pass": true,
-            "build": "feel2",
+            "build": "walltextures3",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -1186,7 +1196,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "feel2",
+              "BUILD_ID": "walltextures3",
               "inner": {
                 "w": 360,
                 "h": 760
@@ -1235,7 +1245,7 @@
               "cw": 360,
               "ch": 760
             },
-            "timestamp": "2026-07-02T00:25:34.107Z"
+            "timestamp": "2026-07-02T10:39:28.554Z"
           },
           "fingerprint": {
             "state": "play",
@@ -1243,7 +1253,7 @@
             "benchmark": false,
             "mapW": 40,
             "mapH": 20,
-            "timeLeft": 94.43333333333337,
+            "timeLeft": 94.40000000000003,
             "seed": 77,
             "runActive": true,
             "harnessOnly": false,
@@ -1262,7 +1272,7 @@
           "pass": true,
           "checkInitial": {
             "pass": true,
-            "build": "feel2",
+            "build": "walltextures3",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -1336,7 +1346,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "feel2",
+              "BUILD_ID": "walltextures3",
               "inner": {
                 "w": 390,
                 "h": 720
@@ -1385,11 +1395,11 @@
               "cw": 390,
               "ch": 720
             },
-            "timestamp": "2026-07-02T00:25:35.237Z"
+            "timestamp": "2026-07-02T10:39:29.690Z"
           },
           "checkAfterResize": {
             "pass": true,
-            "build": "feel2",
+            "build": "walltextures3",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -1463,7 +1473,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "feel2",
+              "BUILD_ID": "walltextures3",
               "inner": {
                 "w": 390,
                 "h": 680
@@ -1512,7 +1522,7 @@
               "cw": 390,
               "ch": 680
             },
-            "timestamp": "2026-07-02T00:25:35.458Z"
+            "timestamp": "2026-07-02T10:39:29.911Z"
           },
           "fingerprint": {
             "state": "play",
@@ -1539,7 +1549,7 @@
           "pass": true,
           "checkInitial": {
             "pass": true,
-            "build": "feel2",
+            "build": "walltextures3",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -1613,7 +1623,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "feel2",
+              "BUILD_ID": "walltextures3",
               "inner": {
                 "w": 390,
                 "h": 900
@@ -1662,11 +1672,11 @@
               "cw": 390,
               "ch": 900
             },
-            "timestamp": "2026-07-02T00:25:36.277Z"
+            "timestamp": "2026-07-02T10:39:30.745Z"
           },
           "checkAfterResize": {
             "pass": true,
-            "build": "feel2",
+            "build": "walltextures3",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -1740,7 +1750,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "feel2",
+              "BUILD_ID": "walltextures3",
               "inner": {
                 "w": 390,
                 "h": 860
@@ -1789,7 +1799,7 @@
               "cw": 390,
               "ch": 860
             },
-            "timestamp": "2026-07-02T00:25:36.496Z"
+            "timestamp": "2026-07-02T10:39:30.963Z"
           },
           "fingerprint": {
             "state": "play",
@@ -1797,7 +1807,7 @@
             "benchmark": false,
             "mapW": 40,
             "mapH": 20,
-            "timeLeft": 94.43333333333337,
+            "timeLeft": 94.4166666666667,
             "seed": 77,
             "runActive": true,
             "harnessOnly": false,
@@ -1816,7 +1826,7 @@
           "pass": true,
           "checkInitial": {
             "pass": true,
-            "build": "feel2",
+            "build": "walltextures3",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -1890,7 +1900,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "feel2",
+              "BUILD_ID": "walltextures3",
               "inner": {
                 "w": 390,
                 "h": 844
@@ -1939,11 +1949,11 @@
               "cw": 390,
               "ch": 844
             },
-            "timestamp": "2026-07-02T00:25:37.318Z"
+            "timestamp": "2026-07-02T10:39:31.789Z"
           },
           "checkAfterResize": {
             "pass": true,
-            "build": "feel2",
+            "build": "walltextures3",
             "errors": [],
             "warnings": [],
             "checks": {
@@ -2017,7 +2027,7 @@
               "left": 0
             },
             "viewport": {
-              "BUILD_ID": "feel2",
+              "BUILD_ID": "walltextures3",
               "inner": {
                 "w": 390,
                 "h": 804
@@ -2066,7 +2076,7 @@
               "cw": 390,
               "ch": 804
             },
-            "timestamp": "2026-07-02T00:25:37.537Z"
+            "timestamp": "2026-07-02T10:39:32.006Z"
           },
           "fingerprint": {
             "state": "play",
@@ -2085,7 +2095,7 @@
           "shot": null
         }
       ],
-      "timestamp": "2026-07-02T00:25:37.538Z"
+      "timestamp": "2026-07-02T10:39:32.009Z"
     },
     "results": [
       {
@@ -2097,7 +2107,7 @@
         "pass": true,
         "checkInitial": {
           "pass": true,
-          "build": "feel2",
+          "build": "walltextures3",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -2171,7 +2181,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "feel2",
+            "BUILD_ID": "walltextures3",
             "inner": {
               "w": 412,
               "h": 915
@@ -2220,11 +2230,11 @@
             "cw": 412,
             "ch": 915
           },
-          "timestamp": "2026-07-02T00:25:31.801Z"
+          "timestamp": "2026-07-02T10:39:26.229Z"
         },
         "checkAfterResize": {
           "pass": true,
-          "build": "feel2",
+          "build": "walltextures3",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -2298,7 +2308,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "feel2",
+            "BUILD_ID": "walltextures3",
             "inner": {
               "w": 412,
               "h": 875
@@ -2347,7 +2357,7 @@
             "cw": 412,
             "ch": 875
           },
-          "timestamp": "2026-07-02T00:25:32.016Z"
+          "timestamp": "2026-07-02T10:39:26.448Z"
         },
         "fingerprint": {
           "state": "play",
@@ -2355,7 +2365,7 @@
           "benchmark": false,
           "mapW": 40,
           "mapH": 20,
-          "timeLeft": 94.4166666666667,
+          "timeLeft": 94.43333333333337,
           "seed": 77,
           "runActive": true,
           "harnessOnly": false,
@@ -2374,7 +2384,7 @@
         "pass": true,
         "checkInitial": {
           "pass": true,
-          "build": "feel2",
+          "build": "walltextures3",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -2401,7 +2411,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "feel2",
+            "BUILD_ID": "walltextures3",
             "inner": {
               "w": 915,
               "h": 412
@@ -2450,11 +2460,11 @@
             "cw": 915,
             "ch": 412
           },
-          "timestamp": "2026-07-02T00:25:32.856Z"
+          "timestamp": "2026-07-02T10:39:27.292Z"
         },
         "checkAfterResize": {
           "pass": true,
-          "build": "feel2",
+          "build": "walltextures3",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -2481,7 +2491,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "feel2",
+            "BUILD_ID": "walltextures3",
             "inner": {
               "w": 915,
               "h": 400
@@ -2530,7 +2540,7 @@
             "cw": 915,
             "ch": 400
           },
-          "timestamp": "2026-07-02T00:25:33.073Z"
+          "timestamp": "2026-07-02T10:39:27.511Z"
         },
         "fingerprint": {
           "state": "play",
@@ -2538,7 +2548,7 @@
           "benchmark": false,
           "mapW": 40,
           "mapH": 20,
-          "timeLeft": 94.40000000000003,
+          "timeLeft": 94.4166666666667,
           "seed": 77,
           "runActive": true,
           "harnessOnly": false,
@@ -2557,7 +2567,7 @@
         "pass": true,
         "checkInitial": {
           "pass": true,
-          "build": "feel2",
+          "build": "walltextures3",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -2631,7 +2641,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "feel2",
+            "BUILD_ID": "walltextures3",
             "inner": {
               "w": 360,
               "h": 800
@@ -2680,11 +2690,11 @@
             "cw": 360,
             "ch": 800
           },
-          "timestamp": "2026-07-02T00:25:33.893Z"
+          "timestamp": "2026-07-02T10:39:28.334Z"
         },
         "checkAfterResize": {
           "pass": true,
-          "build": "feel2",
+          "build": "walltextures3",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -2758,7 +2768,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "feel2",
+            "BUILD_ID": "walltextures3",
             "inner": {
               "w": 360,
               "h": 760
@@ -2807,7 +2817,7 @@
             "cw": 360,
             "ch": 760
           },
-          "timestamp": "2026-07-02T00:25:34.107Z"
+          "timestamp": "2026-07-02T10:39:28.554Z"
         },
         "fingerprint": {
           "state": "play",
@@ -2815,7 +2825,7 @@
           "benchmark": false,
           "mapW": 40,
           "mapH": 20,
-          "timeLeft": 94.43333333333337,
+          "timeLeft": 94.40000000000003,
           "seed": 77,
           "runActive": true,
           "harnessOnly": false,
@@ -2834,7 +2844,7 @@
         "pass": true,
         "checkInitial": {
           "pass": true,
-          "build": "feel2",
+          "build": "walltextures3",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -2908,7 +2918,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "feel2",
+            "BUILD_ID": "walltextures3",
             "inner": {
               "w": 390,
               "h": 720
@@ -2957,11 +2967,11 @@
             "cw": 390,
             "ch": 720
           },
-          "timestamp": "2026-07-02T00:25:35.237Z"
+          "timestamp": "2026-07-02T10:39:29.690Z"
         },
         "checkAfterResize": {
           "pass": true,
-          "build": "feel2",
+          "build": "walltextures3",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -3035,7 +3045,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "feel2",
+            "BUILD_ID": "walltextures3",
             "inner": {
               "w": 390,
               "h": 680
@@ -3084,7 +3094,7 @@
             "cw": 390,
             "ch": 680
           },
-          "timestamp": "2026-07-02T00:25:35.458Z"
+          "timestamp": "2026-07-02T10:39:29.911Z"
         },
         "fingerprint": {
           "state": "play",
@@ -3111,7 +3121,7 @@
         "pass": true,
         "checkInitial": {
           "pass": true,
-          "build": "feel2",
+          "build": "walltextures3",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -3185,7 +3195,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "feel2",
+            "BUILD_ID": "walltextures3",
             "inner": {
               "w": 390,
               "h": 900
@@ -3234,11 +3244,11 @@
             "cw": 390,
             "ch": 900
           },
-          "timestamp": "2026-07-02T00:25:36.277Z"
+          "timestamp": "2026-07-02T10:39:30.745Z"
         },
         "checkAfterResize": {
           "pass": true,
-          "build": "feel2",
+          "build": "walltextures3",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -3312,7 +3322,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "feel2",
+            "BUILD_ID": "walltextures3",
             "inner": {
               "w": 390,
               "h": 860
@@ -3361,7 +3371,7 @@
             "cw": 390,
             "ch": 860
           },
-          "timestamp": "2026-07-02T00:25:36.496Z"
+          "timestamp": "2026-07-02T10:39:30.963Z"
         },
         "fingerprint": {
           "state": "play",
@@ -3369,7 +3379,7 @@
           "benchmark": false,
           "mapW": 40,
           "mapH": 20,
-          "timeLeft": 94.43333333333337,
+          "timeLeft": 94.4166666666667,
           "seed": 77,
           "runActive": true,
           "harnessOnly": false,
@@ -3388,7 +3398,7 @@
         "pass": true,
         "checkInitial": {
           "pass": true,
-          "build": "feel2",
+          "build": "walltextures3",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -3462,7 +3472,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "feel2",
+            "BUILD_ID": "walltextures3",
             "inner": {
               "w": 390,
               "h": 844
@@ -3511,11 +3521,11 @@
             "cw": 390,
             "ch": 844
           },
-          "timestamp": "2026-07-02T00:25:37.318Z"
+          "timestamp": "2026-07-02T10:39:31.789Z"
         },
         "checkAfterResize": {
           "pass": true,
-          "build": "feel2",
+          "build": "walltextures3",
           "errors": [],
           "warnings": [],
           "checks": {
@@ -3589,7 +3599,7 @@
             "left": 0
           },
           "viewport": {
-            "BUILD_ID": "feel2",
+            "BUILD_ID": "walltextures3",
             "inner": {
               "w": 390,
               "h": 804
@@ -3638,7 +3648,7 @@
             "cw": 390,
             "ch": 804
           },
-          "timestamp": "2026-07-02T00:25:37.537Z"
+          "timestamp": "2026-07-02T10:39:32.006Z"
         },
         "fingerprint": {
           "state": "play",
@@ -3662,10 +3672,10 @@
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "usability": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "thresholds": {
@@ -3789,7 +3799,7 @@
       },
       "settingsSafety": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -3824,11 +3834,11 @@
         "proof-usability-very-high.png",
         "proof-resetcontrols-safe.png"
       ],
-      "timestamp": "2026-07-02T00:25:59.532Z"
+      "timestamp": "2026-07-02T10:39:53.007Z"
     },
     "usability": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "errors": [],
       "warnings": [],
       "thresholds": {
@@ -3964,10 +3974,10 @@
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "optionsCleanup": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -3995,18 +4005,18 @@
           "lsKeyUnchanged": true
         },
         "evidence": {
-          "htmlSample": "\n      <div class=\"options-scroll-body\">\n      <div class=\"rpantit\">OPTIONS</div>\n      <div class=\"rdesc\" style=\"margin-bottom:8px;color:#6a5a4a;\">build feel2</div>\n      <div class=\"options-section-hdr\">CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-edit-controls\">EDIT CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-reset-controls\">RESET CONTROLS</div>\n      <div class=\"rit\""
+          "htmlSample": "\n      <div class=\"options-scroll-body\">\n      <div class=\"rpantit\">OPTIONS</div>\n      <div class=\"rdesc\" style=\"margin-bottom:8px;color:#6a5a4a;\">build walltextures3</div>\n      <div class=\"options-section-hdr\">CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-edit-controls\">EDIT CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-reset-controls\">RESET CONTROLS</div>\n      <div cla"
         }
       },
       "screenshots": [
         "proof-options-cleanup-menu.png",
         "proof-options-cleanup-edit-controls.png"
       ],
-      "timestamp": "2026-07-02T00:26:00.471Z"
+      "timestamp": "2026-07-02T10:39:53.910Z"
     },
     "optionsCleanup": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -4034,7 +4044,7 @@
         "lsKeyUnchanged": true
       },
       "evidence": {
-        "htmlSample": "\n      <div class=\"options-scroll-body\">\n      <div class=\"rpantit\">OPTIONS</div>\n      <div class=\"rdesc\" style=\"margin-bottom:8px;color:#6a5a4a;\">build feel2</div>\n      <div class=\"options-section-hdr\">CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-edit-controls\">EDIT CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-reset-controls\">RESET CONTROLS</div>\n      <div class=\"rit\""
+        "htmlSample": "\n      <div class=\"options-scroll-body\">\n      <div class=\"rpantit\">OPTIONS</div>\n      <div class=\"rdesc\" style=\"margin-bottom:8px;color:#6a5a4a;\">build walltextures3</div>\n      <div class=\"options-section-hdr\">CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-edit-controls\">EDIT CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-reset-controls\">RESET CONTROLS</div>\n      <div cla"
       }
     }
   },
@@ -4042,10 +4052,10 @@
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "decorativeProps": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -4089,11 +4099,11 @@
         "proof-decorative-props-world.png",
         "proof-decorative-props-closeup.png"
       ],
-      "timestamp": "2026-07-02T00:26:01.176Z"
+      "timestamp": "2026-07-02T10:39:54.631Z"
     },
     "decorativeProps": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -4137,10 +4147,10 @@
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "streetBlockLevel": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -4272,11 +4282,11 @@
         "proof-street-block-d3.png",
         "proof-street-block-minimap.png"
       ],
-      "timestamp": "2026-07-02T00:26:03.173Z"
+      "timestamp": "2026-07-02T10:39:56.615Z"
     },
     "streetBlockLevel": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -4406,10 +4416,10 @@
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "d1ParkLandmark": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -4588,11 +4598,11 @@
         "proof-d1-park-landmark-fpv.png",
         "proof-d1-park-landmark-minimap.png"
       ],
-      "timestamp": "2026-07-02T00:26:04.338Z"
+      "timestamp": "2026-07-02T10:39:57.780Z"
     },
     "d1ParkLandmark": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -4911,7 +4921,11 @@
           "localY": 0,
           "faceDirection": "south",
           "role": "storefront_window",
+          "roleMaterial": "brick",
           "material": "brick",
+          "buildingMaterial": "light_gray_cinderblock",
+          "baseMaterial": "light_gray_cinderblock",
+          "baseTextureKey": "material_light_gray_cinderblock",
           "slots": [
             "sign_band",
             "glass_window",
@@ -4925,7 +4939,11 @@
           "localY": 0,
           "faceDirection": "north",
           "role": "service_wall",
+          "roleMaterial": "stucco",
           "material": "stucco",
+          "buildingMaterial": "red_brick",
+          "baseMaterial": "red_brick",
+          "baseTextureKey": "material_red_brick",
           "slots": [
             "service_panel",
             "vent",
@@ -5017,7 +5035,11 @@
           "localY": 0,
           "faceDirection": "south",
           "role": "boarded_window",
+          "roleMaterial": "brick",
           "material": "brick",
+          "buildingMaterial": "light_gray_cinderblock",
+          "baseMaterial": "light_gray_cinderblock",
+          "baseTextureKey": "material_light_gray_cinderblock",
           "slots": [
             "sign_band",
             "boarded_window",
@@ -5031,7 +5053,11 @@
           "localY": 0,
           "faceDirection": "south",
           "role": "garage_bay",
+          "roleMaterial": "concrete",
           "material": "concrete",
+          "buildingMaterial": "stucco",
+          "baseMaterial": "stucco",
+          "baseTextureKey": "material_stucco",
           "slots": [
             "garage_door",
             "dark_base"
@@ -5041,7 +5067,7 @@
       },
       "errors": [],
       "warnings": [],
-      "build": "feel2"
+      "build": "walltextures3"
     }
   },
   "fpvGroundPlaneAlignment": {
@@ -5149,7 +5175,11 @@
           "localY": 0,
           "faceDirection": "south",
           "role": "storefront_sign",
+          "roleMaterial": "brick",
           "material": "brick",
+          "buildingMaterial": "stucco",
+          "baseMaterial": "stucco",
+          "baseTextureKey": "material_stucco",
           "slots": [
             "large_sign",
             "poster_window",
@@ -5163,7 +5193,11 @@
           "localY": 0,
           "faceDirection": "south",
           "role": "boarded_window",
+          "roleMaterial": "brick",
           "material": "brick",
+          "buildingMaterial": "stucco",
+          "baseMaterial": "stucco",
+          "baseTextureKey": "material_stucco",
           "slots": [
             "sign_band",
             "boarded_window",
@@ -5177,7 +5211,11 @@
           "localY": 0,
           "faceDirection": "south",
           "role": "garage_bay",
+          "roleMaterial": "concrete",
           "material": "concrete",
+          "buildingMaterial": "light_gray_cinderblock",
+          "baseMaterial": "light_gray_cinderblock",
+          "baseTextureKey": "material_light_gray_cinderblock",
           "slots": [
             "garage_door",
             "dark_base"
@@ -5190,7 +5228,11 @@
           "localY": 0,
           "faceDirection": "east",
           "role": "blank_brick",
+          "roleMaterial": "brick",
           "material": "brick",
+          "buildingMaterial": "red_brick",
+          "baseMaterial": "red_brick",
+          "baseTextureKey": "material_red_brick",
           "slots": [
             "soft_brick_bands"
           ]
@@ -5260,7 +5302,11 @@
           "localY": 0,
           "faceDirection": "south",
           "role": "storefront_window",
+          "roleMaterial": "brick",
           "material": "brick",
+          "buildingMaterial": "red_brick",
+          "baseMaterial": "red_brick",
+          "baseTextureKey": "material_red_brick",
           "slots": [
             "sign_band",
             "glass_window",
@@ -5288,7 +5334,11 @@
           "localY": 0,
           "faceDirection": "south",
           "role": "garage_bay",
+          "roleMaterial": "concrete",
           "material": "concrete",
+          "buildingMaterial": "red_brick",
+          "baseMaterial": "red_brick",
+          "baseTextureKey": "material_red_brick",
           "slots": [
             "garage_door",
             "dark_base"
@@ -5301,7 +5351,11 @@
           "localY": 0,
           "faceDirection": "east",
           "role": "blank_brick",
+          "roleMaterial": "brick",
           "material": "brick",
+          "buildingMaterial": "stucco",
+          "baseMaterial": "stucco",
+          "baseTextureKey": "material_stucco",
           "slots": [
             "soft_brick_bands"
           ]
@@ -5320,14 +5374,14 @@
       },
       "errors": [],
       "warnings": [],
-      "build": "feel2"
+      "build": "walltextures3"
     }
   },
   "fpvFacadeTargetPolish": {
     "pass": true,
     "fpvFacadeTargetPolish": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -5378,7 +5432,7 @@
     "pass": true,
     "fpvWallLineArtifactFix": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -5438,7 +5492,7 @@
     "pass": true,
     "fpvStreetShimmerFix": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -5503,7 +5557,7 @@
     "pass": true,
     "streetReadabilityMinimap": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -5643,10 +5697,10 @@
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "earlyDistrictProgression": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -5800,11 +5854,11 @@
         "proof-d3-alley-street.png",
         "proof-d4-service-pockets.png"
       ],
-      "timestamp": "2026-07-02T00:26:35.520Z"
+      "timestamp": "2026-07-02T10:40:28.596Z"
     },
     "earlyDistrictProgression": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -5956,10 +6010,10 @@
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "levelSelector": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -6101,7 +6155,7 @@
           "OPTIONS / HELP"
         ],
         "cycle": "D2→D3→D4→D1→D2",
-        "rmenuHtml": "\n      <div class=\"rpantit\" style=\"font-size:16px;margin-bottom:14px;line-height:1.25;\">Solidarity Not Charity Can Run</div>\n      <div class=\"rdesc\" style=\"margin-bottom:14px;\">A desert-city food run</div>\n      \n      <div class=\"rit sel\" data-action=\"title-start\" style=\"margin-top:10px;\">NEW RUN</div><div class=\"rit \" data-action=\"title-cycle-district\" style=\"margin-top:4px;\">START DISTRICT: D1</div><div class=\"rit \" data-action=\"title-continue\" style=\"margin-top:4px;\">CONTINUE SAVED RUN</div><div class=\"rit \" data-action=\"title-seeded\" style=\"margin-top:4px;\">SEEDED RUN</div><div class=\"rdesc\" style=\"margin-top:10px;color:#8a7a5a;letter-spacing:2px;font-size:11px;\">SPECIAL LEVELS</div><div class=\"rit \" data-action=\"custom-level-hall_of_servants\" style=\"margin-top:4px;\">SNC HALL OF SERVANTS</div><div class=\"rit \" data-action=\"title-stats\" style=\"margin-top:4px;\">STATS</div><div class=\"rit \" data-action=\"title-lb\" style=\"margin-top:4px;\">LEADERBOARDS</div><div class=\"rit \" data-action=\"title-options\" style=\"margin-top:4px;\">OPTIONS / HELP</div><div class=\"rit \" data-action=\"toggle-fs\" style=\"margin-top:4px;\">FULLSCREEN</div>\n      <div class=\"rclose\" style=\"margin-top:16px;\">↑↓ navigate · tap to activate</div>\n      <div class=\"rclose\" style=\"margin-top:6px;color:#5a4a3a;\">build feel2</div>\n    "
+        "rmenuHtml": "\n      <div class=\"rpantit\" style=\"font-size:16px;margin-bottom:14px;line-height:1.25;\">Solidarity Not Charity Can Run</div>\n      <div class=\"rdesc\" style=\"margin-bottom:14px;\">A desert-city food run</div>\n      \n      <div class=\"rit sel\" data-action=\"title-start\" style=\"margin-top:10px;\">NEW RUN</div><div class=\"rit \" data-action=\"title-cycle-district\" style=\"margin-top:4px;\">START DISTRICT: D1</div><div class=\"rit \" data-action=\"title-continue\" style=\"margin-top:4px;\">CONTINUE SAVED RUN</div><div class=\"rit \" data-action=\"title-seeded\" style=\"margin-top:4px;\">SEEDED RUN</div><div class=\"rdesc\" style=\"margin-top:10px;color:#8a7a5a;letter-spacing:2px;font-size:11px;\">SPECIAL LEVELS</div><div class=\"rit \" data-action=\"custom-level-hall_of_servants\" style=\"margin-top:4px;\">SNC HALL OF SERVANTS</div><div class=\"rit \" data-action=\"title-stats\" style=\"margin-top:4px;\">STATS</div><div class=\"rit \" data-action=\"title-lb\" style=\"margin-top:4px;\">LEADERBOARDS</div><div class=\"rit \" data-action=\"title-options\" style=\"margin-top:4px;\">OPTIONS / HELP</div><div class=\"rit \" data-action=\"toggle-fs\" style=\"margin-top:4px;\">FULLSCREEN</div>\n      <div class=\"rclose\" style=\"margin-top:16px;\">↑↓ navigate · tap to activate</div>\n      <div class=\"rclose\" style=\"margin-top:6px;color:#5a4a3a;\">build walltextures3</div>\n    "
       },
       "screenshots": [
         "proof-level-selector-menu.png",
@@ -6110,11 +6164,11 @@
         "proof-level-selector-d3.png",
         "proof-level-selector-d4.png"
       ],
-      "timestamp": "2026-07-02T00:26:37.269Z"
+      "timestamp": "2026-07-02T10:40:30.311Z"
     },
     "levelSelector": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -6249,7 +6303,7 @@
     "pass": true,
     "buildingScalePolish": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -6383,10 +6437,10 @@
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "reliability": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -6408,7 +6462,7 @@
             "joyActive": false
           },
           "sprint": {
-            "burstUntil": 1.1083999999761582,
+            "burstUntil": 1.103600000023842,
             "stamBefore": 60,
             "stamAfter": 40
           },
@@ -6427,11 +6481,11 @@
         "proof-control-look-drag.png",
         "proof-control-menu-open.png"
       ],
-      "timestamp": "2026-07-02T00:26:40.055Z"
+      "timestamp": "2026-07-02T10:40:33.110Z"
     },
     "reliability": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -6453,7 +6507,7 @@
           "joyActive": false
         },
         "sprint": {
-          "burstUntil": 1.1083999999761582,
+          "burstUntil": 1.103600000023842,
           "stamBefore": 60,
           "stamAfter": 40
         },
@@ -6469,10 +6523,10 @@
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "movementCollision": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -6535,11 +6589,11 @@
       "screenshots": [
         "proof-collision-corridor.png"
       ],
-      "timestamp": "2026-07-02T00:26:41.555Z"
+      "timestamp": "2026-07-02T10:40:34.580Z"
     },
     "movementCollision": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -6603,10 +6657,10 @@
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "reachability": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -6637,11 +6691,11 @@
         "proof-reachability-hall.png",
         "proof-reachability-wallblocked.png"
       ],
-      "timestamp": "2026-07-02T00:26:42.286Z"
+      "timestamp": "2026-07-02T10:40:35.312Z"
     },
     "reachability": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -6672,10 +6726,10 @@
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "proceduralLevelValidation": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "seedCount": 52,
         "districtCount": 3,
         "errors": [],
@@ -6701,14 +6755,14 @@
           "harnessStateRestored": true
         },
         "cases": 52,
-        "timestamp": "2026-07-02T00:26:50.370Z"
+        "timestamp": "2026-07-02T10:40:43.016Z"
       },
       "harnessStateOk": true,
-      "timestamp": "2026-07-02T00:26:50.374Z"
+      "timestamp": "2026-07-02T10:40:43.019Z"
     },
     "proceduralLevelValidation": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "seedCount": 52,
       "districtCount": 3,
       "errors": [],
@@ -6734,17 +6788,17 @@
         "harnessStateRestored": true
       },
       "cases": 52,
-      "timestamp": "2026-07-02T00:26:50.370Z"
+      "timestamp": "2026-07-02T10:40:43.016Z"
     }
   },
   "fullRunProgression": {
     "pass": true,
     "proof": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "fullRunProgression": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -6796,15 +6850,15 @@
         },
         "hallPass": true,
         "mobilePass": true,
-        "timestamp": "2026-07-02T00:26:51.087Z"
+        "timestamp": "2026-07-02T10:40:43.692Z"
       },
       "harnessStateOk": true,
-      "timestamp": "2026-07-02T00:26:51.092Z",
+      "timestamp": "2026-07-02T10:40:43.695Z",
       "screenshot": "proof-full-run-complete.png"
     },
     "fullRunProgression": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -6856,7 +6910,7 @@
       },
       "hallPass": true,
       "mobilePass": true,
-      "timestamp": "2026-07-02T00:26:51.087Z"
+      "timestamp": "2026-07-02T10:40:43.692Z"
     }
   },
   "harnessIsolation": {
@@ -6878,7 +6932,7 @@
     },
     "iso": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "errors": [],
       "checks": {
         "renderCheckRestoresState": true,
@@ -6917,7 +6971,7 @@
         "lsHarness": false,
         "lsSavePresent": true
       },
-      "timestamp": "2026-07-02T00:27:10.017Z"
+      "timestamp": "2026-07-02T10:41:01.773Z"
     },
     "afterSelfcheck": {
       "state": "title",
@@ -6950,10 +7004,10 @@
   },
   "renderFailure": {
     "pass": true,
-    "build": "feel2",
+    "build": "walltextures3",
     "crRenderFailureSelfCheck": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -6972,7 +7026,7 @@
       },
       "evidence": {
         "haloSource": {
-          "BUILD_ID": "feel2",
+          "BUILD_ID": "walltextures3",
           "policy": "walls own distance fog; billboards drawImage only — no post-loop sprite fog fillRect",
           "forbiddenPatternsAbsent": true,
           "forbiddenHits": [],
@@ -6982,7 +7036,7 @@
           "regressionCommentMarker": "SPRITE HALO REGRESSION GUARD"
         },
         "occlusionSource": {
-          "BUILD_ID": "feel2",
+          "BUILD_ID": "walltextures3",
           "renderWidth": 320,
           "zbufferLength": 320,
           "zbufferMatchesRenderWidth": true,
@@ -7059,9 +7113,9 @@
           "pass": true,
           "haloPass": true,
           "borderStats": {
-            "mean": 148.68112450592866,
-            "brightRatio": 0.2134387351778656,
-            "variance": 3825.030640089229,
+            "mean": 123.04643083003964,
+            "brightRatio": 0.20948616600790515,
+            "variance": 3670.4732688222844,
             "count": 506
           },
           "proj": {
@@ -7073,12 +7127,12 @@
             "screenW": 15.272727272727273,
             "screenH": 16.8
           },
-          "canvasVariance": 4848.538197807723
+          "canvasVariance": 4469.790949704637
         },
         "occludedSprite": {
           "pass": true,
           "occDiff": 0,
-          "visDiff": 145.46949602122015,
+          "visDiff": 143.0106100795756,
           "zPass": true,
           "proj": {
             "depth": 8,
@@ -7141,9 +7195,9 @@
         "hallStart": {
           "pass": true,
           "stats": {
-            "mean": 79.87051014450759,
-            "brightRatio": 0.02068563432835821,
-            "variance": 2288.2049170908745,
+            "mean": 87.50041473872506,
+            "brightRatio": 0.024463619402985075,
+            "variance": 3264.9816883517938,
             "count": 42880
           },
           "customLevel": "hall_of_servants"
@@ -7155,15 +7209,15 @@
             "h": 844
           },
           "stats": {
-            "mean": 114.93508642199694,
-            "brightRatio": 0.141734375,
-            "variance": 4195.913531619272,
+            "mean": 120.47858378135686,
+            "brightRatio": 0.144265625,
+            "variance": 4525.0371774231335,
             "count": 64000
           }
         }
       },
       "runtimeErrors": [],
-      "timestamp": "2026-07-02T00:27:33.542Z"
+      "timestamp": "2026-07-02T10:41:24.471Z"
     },
     "imageHashes": {
       "proof-render-visible-sprite.png": 1255030,
@@ -7179,14 +7233,14 @@
       "proof-render-npc-near-wall.png",
       "proof-render-hall-start.png"
     ],
-    "timestamp": "2026-07-02T00:27:33.544Z"
+    "timestamp": "2026-07-02T10:41:24.473Z"
   },
   "hallE2E": {
     "pass": true,
-    "build": "feel2",
+    "build": "walltextures3",
     "crHallSelfCheck": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "errors": [],
       "warnings": [],
       "hall": {
@@ -7222,7 +7276,7 @@
       },
       "runtimeErrors": [],
       "runtimeClean": true,
-      "timestamp": "2026-07-02T00:27:36.252Z"
+      "timestamp": "2026-07-02T10:41:27.183Z"
     },
     "playwright": {
       "helpedSnap": {
@@ -7244,7 +7298,7 @@
       "proof-hall-helped.png",
       "proof-hall-exit.png"
     ],
-    "timestamp": "2026-07-02T00:27:36.253Z"
+    "timestamp": "2026-07-02T10:41:27.184Z"
   },
   "visual": {
     "pass": true,
@@ -7362,7 +7416,7 @@
     ],
     "visualReadabilitySelfCheck": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -7395,9 +7449,9 @@
           "giveReady": false
         },
         "hallStats": {
-          "mean": 114.89743676575544,
-          "brightRatio": 0.142421875,
-          "variance": 4226.777688923981,
+          "mean": 120.21747600011584,
+          "brightRatio": 0.14290625,
+          "variance": 4538.980556542735,
           "count": 64000
         },
         "exitReadySnapshot": {
@@ -7431,7 +7485,7 @@
         "giveTargetHighlight": true
       }
     },
-    "timestamp": "2026-07-02T00:27:46.067Z"
+    "timestamp": "2026-07-02T10:41:37.002Z"
   },
   "visualRectangle": {
     "pass": true,
@@ -7451,7 +7505,7 @@
     ],
     "crVisualRectangleRegression": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -7499,21 +7553,21 @@
           },
           "probe1": {
             "center": {
-              "mean": 95.29825190033087,
+              "mean": 104.30973849239732,
               "brightRatio": 0,
-              "variance": 2728.178104161586,
+              "variance": 3779.094022387739,
               "count": 9472
             },
             "sideL": {
-              "mean": 75.70844628378889,
+              "mean": 80.6909716216272,
               "brightRatio": 0,
-              "variance": 2234.0315841504616,
+              "variance": 3037.573039228269,
               "count": 2960
             },
             "sideR": {
-              "mean": 115.77897297297362,
+              "mean": 127.09362229729432,
               "brightRatio": 0,
-              "variance": 2340.4787558938337,
+              "variance": 3125.2211700641024,
               "count": 2960
             },
             "roi": {
@@ -7526,21 +7580,21 @@
           },
           "probe2": {
             "center": {
-              "mean": 95.54864252533075,
+              "mean": 104.46010853040362,
               "brightRatio": 0,
-              "variance": 2728.880052313035,
+              "variance": 3762.0118224081093,
               "count": 9472
             },
             "sideL": {
-              "mean": 116.05525067567623,
+              "mean": 127.3386027027014,
               "brightRatio": 0,
-              "variance": 2328.742344423687,
+              "variance": 3127.673362103581,
               "count": 2960
             },
             "sideR": {
-              "mean": 75.95599425676194,
+              "mean": 80.95428175676237,
               "brightRatio": 0,
-              "variance": 2245.5256428408775,
+              "variance": 3045.205488628223,
               "count": 2960
             },
             "roi": {
@@ -7551,8 +7605,8 @@
             },
             "angle": 3.9269908169872414
           },
-          "meanSpread": 46.5905010557305,
-          "pairDiff01": 46.34011043073062,
+          "meanSpread": 55.501967060803366,
+          "pairDiff01": 55.351597022797066,
           "stuckBrightBlock": false
         }
       }
@@ -7580,7 +7634,7 @@
     ],
     "crSoundFeedback": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "errors": [],
       "warnings": [],
       "checks": {
@@ -7657,7 +7711,7 @@
           }
         },
         "audioProof": {
-          "BUILD_ID": "feel2",
+          "BUILD_ID": "walltextures3",
           "gateBound": true,
           "unlockAttempted": false,
           "hasContext": true,
@@ -7707,7 +7761,7 @@
       "layoutPass": true,
       "layout": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "rects": {
@@ -7868,7 +7922,7 @@
       "layoutPass": true,
       "layout": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "rects": {
@@ -8029,7 +8083,7 @@
       "layoutPass": true,
       "layout": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "rects": {
@@ -8190,7 +8244,7 @@
       "layoutPass": true,
       "layout": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "rects": {
@@ -8346,10 +8400,10 @@
   "selfcheckUrl": {
     "result": {
       "pass": true,
-      "build": "feel2",
+      "build": "walltextures3",
       "layout": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "rects": {
@@ -8469,7 +8523,7 @@
       },
       "viewportSafeArea": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -8543,7 +8597,7 @@
           "left": 0
         },
         "viewport": {
-          "BUILD_ID": "feel2",
+          "BUILD_ID": "walltextures3",
           "inner": {
             "w": 390,
             "h": 844
@@ -8592,11 +8646,11 @@
           "cw": 390,
           "ch": 844
         },
-        "timestamp": "2026-07-02T00:27:54.000Z"
+        "timestamp": "2026-07-02T10:41:44.950Z"
       },
       "portraitUsability": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "thresholds": {
@@ -8720,7 +8774,7 @@
       },
       "settingsSafety": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -8741,7 +8795,7 @@
       },
       "decorativeProps": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -8782,7 +8836,7 @@
       },
       "optionsCleanup": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -8810,12 +8864,12 @@
           "lsKeyUnchanged": true
         },
         "evidence": {
-          "htmlSample": "\n      <div class=\"options-scroll-body\">\n      <div class=\"rpantit\">OPTIONS</div>\n      <div class=\"rdesc\" style=\"margin-bottom:8px;color:#6a5a4a;\">build feel2</div>\n      <div class=\"options-section-hdr\">CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-edit-controls\">EDIT CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-reset-controls\">RESET CONTROLS</div>\n      <div class=\"rit\""
+          "htmlSample": "\n      <div class=\"options-scroll-body\">\n      <div class=\"rpantit\">OPTIONS</div>\n      <div class=\"rdesc\" style=\"margin-bottom:8px;color:#6a5a4a;\">build walltextures3</div>\n      <div class=\"options-section-hdr\">CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-edit-controls\">EDIT CONTROLS</div>\n      <div class=\"rit\" data-action=\"option-reset-controls\">RESET CONTROLS</div>\n      <div cla"
         }
       },
       "mobileControlReliability": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -8837,7 +8891,7 @@
             "joyActive": false
           },
           "sprint": {
-            "burstUntil": 1.6096000000238417,
+            "burstUntil": 1.6227999999523162,
             "stamBefore": 60,
             "stamAfter": 40
           },
@@ -8850,7 +8904,7 @@
       },
       "movementCollision": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -8911,7 +8965,7 @@
       },
       "reachability": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -8939,7 +8993,7 @@
       },
       "streetBlockLevel": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -9066,7 +9120,7 @@
       },
       "d1ParkLandmark": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -9379,7 +9433,11 @@
             "localY": 0,
             "faceDirection": "south",
             "role": "storefront_window",
+            "roleMaterial": "brick",
             "material": "brick",
+            "buildingMaterial": "light_gray_cinderblock",
+            "baseMaterial": "light_gray_cinderblock",
+            "baseTextureKey": "material_light_gray_cinderblock",
             "slots": [
               "sign_band",
               "glass_window",
@@ -9393,7 +9451,11 @@
             "localY": 0,
             "faceDirection": "north",
             "role": "service_wall",
+            "roleMaterial": "stucco",
             "material": "stucco",
+            "buildingMaterial": "red_brick",
+            "baseMaterial": "red_brick",
+            "baseTextureKey": "material_red_brick",
             "slots": [
               "service_panel",
               "vent",
@@ -9482,7 +9544,11 @@
             "localY": 0,
             "faceDirection": "south",
             "role": "boarded_window",
+            "roleMaterial": "brick",
             "material": "brick",
+            "buildingMaterial": "light_gray_cinderblock",
+            "baseMaterial": "light_gray_cinderblock",
+            "baseTextureKey": "material_light_gray_cinderblock",
             "slots": [
               "sign_band",
               "boarded_window",
@@ -9496,7 +9562,11 @@
             "localY": 0,
             "faceDirection": "south",
             "role": "garage_bay",
+            "roleMaterial": "concrete",
             "material": "concrete",
+            "buildingMaterial": "stucco",
+            "baseMaterial": "stucco",
+            "baseTextureKey": "material_stucco",
             "slots": [
               "garage_door",
               "dark_base"
@@ -9506,11 +9576,11 @@
         },
         "errors": [],
         "warnings": [],
-        "build": "feel2"
+        "build": "walltextures3"
       },
       "fpvGroundPlaneAlignment": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -9555,7 +9625,7 @@
         },
         "evidence": {
           "groundPlaneDebug": {
-            "BUILD_ID": "feel2",
+            "BUILD_ID": "walltextures3",
             "pass": true,
             "records": [
               {
@@ -9624,7 +9694,7 @@
             ]
           },
           "spriteHalo": {
-            "BUILD_ID": "feel2",
+            "BUILD_ID": "walltextures3",
             "policy": "walls own distance fog; billboards drawImage only — no post-loop sprite fog fillRect",
             "forbiddenPatternsAbsent": true,
             "forbiddenHits": [],
@@ -9634,7 +9704,7 @@
             "regressionCommentMarker": "SPRITE HALO REGRESSION GUARD"
           },
           "zbuffer": {
-            "BUILD_ID": "feel2",
+            "BUILD_ID": "walltextures3",
             "renderWidth": 320,
             "zbufferLength": 320,
             "zbufferMatchesRenderWidth": true,
@@ -9677,7 +9747,7 @@
       },
       "d2D3FacadeReadabilityFinal": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -9721,7 +9791,7 @@
         },
         "evidence": {
           "debug": {
-            "BUILD_ID": "feel2",
+            "BUILD_ID": "walltextures3",
             "facadePackVersion": "facadeart1",
             "currentModuleList": [
               "storefront_4x2",
@@ -9754,7 +9824,11 @@
               "localY": 0,
               "faceDirection": "south",
               "role": "storefront_window",
+              "roleMaterial": "brick",
               "material": "brick",
+              "buildingMaterial": "aluminum_siding",
+              "baseMaterial": "aluminum_siding",
+              "baseTextureKey": "material_aluminum_siding",
               "slots": [
                 "sign_band",
                 "glass_window",
@@ -9770,7 +9844,11 @@
               "localY": 0,
               "faceDirection": "south",
               "role": "boarded_window",
+              "roleMaterial": "brick",
               "material": "brick",
+              "buildingMaterial": "stucco",
+              "baseMaterial": "stucco",
+              "baseTextureKey": "material_stucco",
               "slots": [
                 "sign_band",
                 "boarded_window",
@@ -9786,7 +9864,11 @@
               "localY": 0,
               "faceDirection": "south",
               "role": "garage_bay",
+              "roleMaterial": "concrete",
               "material": "concrete",
+              "buildingMaterial": "red_brick",
+              "baseMaterial": "red_brick",
+              "baseTextureKey": "material_red_brick",
               "slots": [
                 "garage_door",
                 "dark_base"
@@ -9801,7 +9883,11 @@
               "localY": 0,
               "faceDirection": "east",
               "role": "blank_brick",
+              "roleMaterial": "brick",
               "material": "brick",
+              "buildingMaterial": "light_gray_cinderblock",
+              "baseMaterial": "light_gray_cinderblock",
+              "baseTextureKey": "material_light_gray_cinderblock",
               "slots": [
                 "soft_brick_bands"
               ]
@@ -9812,7 +9898,7 @@
             "pass": true
           },
           "groundplane": {
-            "BUILD_ID": "feel2",
+            "BUILD_ID": "walltextures3",
             "pass": true,
             "records": [
               {
@@ -9906,7 +9992,7 @@
       },
       "buildingSmoothStyle": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -9950,7 +10036,7 @@
         },
         "evidence": {
           "debug": {
-            "BUILD_ID": "feel2",
+            "BUILD_ID": "walltextures3",
             "facadePackVersion": "facadeart1",
             "currentModuleList": [
               "storefront_4x2",
@@ -9983,7 +10069,11 @@
               "localY": 0,
               "faceDirection": "south",
               "role": "storefront_window",
+              "roleMaterial": "brick",
               "material": "brick",
+              "buildingMaterial": "aluminum_siding",
+              "baseMaterial": "aluminum_siding",
+              "baseTextureKey": "material_aluminum_siding",
               "slots": [
                 "sign_band",
                 "glass_window",
@@ -9999,7 +10089,11 @@
               "localY": 0,
               "faceDirection": "south",
               "role": "boarded_window",
+              "roleMaterial": "brick",
               "material": "brick",
+              "buildingMaterial": "stucco",
+              "baseMaterial": "stucco",
+              "baseTextureKey": "material_stucco",
               "slots": [
                 "sign_band",
                 "boarded_window",
@@ -10015,7 +10109,11 @@
               "localY": 0,
               "faceDirection": "south",
               "role": "garage_bay",
+              "roleMaterial": "concrete",
               "material": "concrete",
+              "buildingMaterial": "red_brick",
+              "baseMaterial": "red_brick",
+              "baseTextureKey": "material_red_brick",
               "slots": [
                 "garage_door",
                 "dark_base"
@@ -10030,7 +10128,11 @@
               "localY": 0,
               "faceDirection": "east",
               "role": "blank_brick",
+              "roleMaterial": "brick",
               "material": "brick",
+              "buildingMaterial": "light_gray_cinderblock",
+              "baseMaterial": "light_gray_cinderblock",
+              "baseTextureKey": "material_light_gray_cinderblock",
               "slots": [
                 "soft_brick_bands"
               ]
@@ -10039,7 +10141,7 @@
             "spritegroundHelpersActive": true,
             "noLabOnlyModules": true,
             "pass": true,
-            "smoothStyle": "feel2",
+            "smoothStyle": "walltextures3",
             "checks": {
               "buildId": true,
               "smoothFlag": true,
@@ -10056,7 +10158,7 @@
             }
           },
           "groundplane": {
-            "BUILD_ID": "feel2",
+            "BUILD_ID": "walltextures3",
             "pass": true,
             "records": [
               {
@@ -10136,7 +10238,7 @@
       },
       "continuousFacadeTexture": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -10185,7 +10287,7 @@
         },
         "evidence": {
           "debug": {
-            "BUILD_ID": "feel2",
+            "BUILD_ID": "walltextures3",
             "pass": true,
             "textureAtlasKeys": [
               "storefront_4x2_south",
@@ -10195,7 +10297,11 @@
               "blank_side",
               "service_back",
               "pavilion_front",
-              "fallback_smooth_wall"
+              "fallback_smooth_wall",
+              "material_stucco",
+              "material_red_brick",
+              "material_light_gray_cinderblock",
+              "material_aluminum_siding"
             ],
             "textureSizes": {
               "storefront_4x2_south": {
@@ -10228,6 +10334,22 @@
               },
               "fallback_smooth_wall": {
                 "width": 128,
+                "height": 128
+              },
+              "material_stucco": {
+                "width": 256,
+                "height": 128
+              },
+              "material_red_brick": {
+                "width": 256,
+                "height": 128
+              },
+              "material_light_gray_cinderblock": {
+                "width": 256,
+                "height": 128
+              },
+              "material_aluminum_siding": {
+                "width": 256,
                 "height": 128
               }
             },
@@ -10398,7 +10520,11 @@
               "localY": 0,
               "faceDirection": "south",
               "role": "storefront_window",
+              "roleMaterial": "brick",
               "material": "brick",
+              "buildingMaterial": "aluminum_siding",
+              "baseMaterial": "aluminum_siding",
+              "baseTextureKey": "material_aluminum_siding",
               "slots": [
                 "sign_band",
                 "glass_window",
@@ -10419,7 +10545,11 @@
               "localY": 0,
               "faceDirection": "south",
               "role": "boarded_window",
+              "roleMaterial": "brick",
               "material": "brick",
+              "buildingMaterial": "stucco",
+              "baseMaterial": "stucco",
+              "baseTextureKey": "material_stucco",
               "slots": [
                 "sign_band",
                 "boarded_window",
@@ -10440,7 +10570,11 @@
               "localY": 0,
               "faceDirection": "south",
               "role": "garage_bay",
+              "roleMaterial": "concrete",
               "material": "concrete",
+              "buildingMaterial": "red_brick",
+              "baseMaterial": "red_brick",
+              "baseTextureKey": "material_red_brick",
               "slots": [
                 "garage_door",
                 "dark_base"
@@ -10460,7 +10594,11 @@
               "localY": 0,
               "faceDirection": "east",
               "role": "blank_brick",
+              "roleMaterial": "brick",
               "material": "brick",
+              "buildingMaterial": "light_gray_cinderblock",
+              "baseMaterial": "light_gray_cinderblock",
+              "baseTextureKey": "material_light_gray_cinderblock",
               "slots": [
                 "soft_brick_bands"
               ],
@@ -10495,7 +10633,7 @@
             }
           },
           "groundplane": {
-            "BUILD_ID": "feel2",
+            "BUILD_ID": "walltextures3",
             "pass": true,
             "records": [
               {
@@ -10600,7 +10738,7 @@
           "d2NpcGrounded": true,
           "d2CanGrounded": true,
           "d3SpriteGrounded": true,
-          "reachD1D4": false,
+          "reachD1D4": true,
           "levelSelector": true
         },
         "evidence": {
@@ -10844,7 +10982,7 @@
             }
           ]
         },
-        "build": "feel2"
+        "build": "walltextures3"
       },
       "facadeArtVocabulary": {
         "pass": true,
@@ -10889,7 +11027,11 @@
             "localY": 0,
             "faceDirection": "south",
             "role": "storefront_sign",
+            "roleMaterial": "brick",
             "material": "brick",
+            "buildingMaterial": "stucco",
+            "baseMaterial": "stucco",
+            "baseTextureKey": "material_stucco",
             "slots": [
               "large_sign",
               "poster_window",
@@ -10903,7 +11045,11 @@
             "localY": 0,
             "faceDirection": "south",
             "role": "boarded_window",
+            "roleMaterial": "brick",
             "material": "brick",
+            "buildingMaterial": "stucco",
+            "baseMaterial": "stucco",
+            "baseTextureKey": "material_stucco",
             "slots": [
               "sign_band",
               "boarded_window",
@@ -10917,7 +11063,11 @@
             "localY": 0,
             "faceDirection": "south",
             "role": "garage_bay",
+            "roleMaterial": "concrete",
             "material": "concrete",
+            "buildingMaterial": "light_gray_cinderblock",
+            "baseMaterial": "light_gray_cinderblock",
+            "baseTextureKey": "material_light_gray_cinderblock",
             "slots": [
               "garage_door",
               "dark_base"
@@ -10930,7 +11080,11 @@
             "localY": 0,
             "faceDirection": "east",
             "role": "blank_brick",
+            "roleMaterial": "brick",
             "material": "brick",
+            "buildingMaterial": "red_brick",
+            "baseMaterial": "red_brick",
+            "baseTextureKey": "material_red_brick",
             "slots": [
               "soft_brick_bands"
             ]
@@ -10997,7 +11151,11 @@
             "localY": 0,
             "faceDirection": "south",
             "role": "storefront_window",
+            "roleMaterial": "brick",
             "material": "brick",
+            "buildingMaterial": "red_brick",
+            "baseMaterial": "red_brick",
+            "baseTextureKey": "material_red_brick",
             "slots": [
               "sign_band",
               "glass_window",
@@ -11025,7 +11183,11 @@
             "localY": 0,
             "faceDirection": "south",
             "role": "garage_bay",
+            "roleMaterial": "concrete",
             "material": "concrete",
+            "buildingMaterial": "red_brick",
+            "baseMaterial": "red_brick",
+            "baseTextureKey": "material_red_brick",
             "slots": [
               "garage_door",
               "dark_base"
@@ -11038,7 +11200,11 @@
             "localY": 0,
             "faceDirection": "east",
             "role": "blank_brick",
+            "roleMaterial": "brick",
             "material": "brick",
+            "buildingMaterial": "stucco",
+            "baseMaterial": "stucco",
+            "baseTextureKey": "material_stucco",
             "slots": [
               "soft_brick_bands"
             ]
@@ -11057,11 +11223,11 @@
         },
         "errors": [],
         "warnings": [],
-        "build": "feel2"
+        "build": "walltextures3"
       },
       "fpvFacadeTargetPolish": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -11109,7 +11275,7 @@
       },
       "fpvWallLineArtifactFix": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -11166,7 +11332,7 @@
       },
       "fpvStreetShimmerFix": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -11228,7 +11394,7 @@
       },
       "streetReadabilityMinimap": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -11365,7 +11531,7 @@
       },
       "buildingScalePolish": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -11487,7 +11653,7 @@
       },
       "earlyDistrictProgression": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -11636,7 +11802,7 @@
       },
       "levelSelector": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -11768,7 +11934,7 @@
       },
       "proceduralLevelValidation": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "seedCount": 52,
         "districtCount": 3,
         "errors": [],
@@ -11794,11 +11960,11 @@
           "harnessStateRestored": true
         },
         "cases": 52,
-        "timestamp": "2026-07-02T00:28:11.997Z"
+        "timestamp": "2026-07-02T10:42:01.938Z"
       },
       "fullRunProgression": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -11850,11 +12016,11 @@
         },
         "hallPass": true,
         "mobilePass": true,
-        "timestamp": "2026-07-02T00:28:12.216Z"
+        "timestamp": "2026-07-02T10:42:02.150Z"
       },
       "onboarding": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -11884,7 +12050,7 @@
       },
       "soundFeedback": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -11961,7 +12127,7 @@
             }
           },
           "audioProof": {
-            "BUILD_ID": "feel2",
+            "BUILD_ID": "walltextures3",
             "gateBound": true,
             "unlockAttempted": true,
             "hasContext": true,
@@ -11979,7 +12145,7 @@
       },
       "declarativeControls": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -12061,7 +12227,7 @@
       },
       "visualReadability": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -12094,9 +12260,9 @@
             "giveReady": false
           },
           "hallStats": {
-            "mean": 114.98237995325522,
-            "brightRatio": 0.1428125,
-            "variance": 4232.695197172308,
+            "mean": 120.08452154699052,
+            "brightRatio": 0.14196875,
+            "variance": 4528.662713561576,
             "count": 64000
           },
           "exitReadySnapshot": {
@@ -12132,7 +12298,7 @@
       },
       "visualRectangleRegression": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -12180,21 +12346,21 @@
             },
             "probe1": {
               "center": {
-                "mean": 95.29825190033087,
+                "mean": 104.30973849239732,
                 "brightRatio": 0,
-                "variance": 2728.178104161586,
+                "variance": 3779.094022387739,
                 "count": 9472
               },
               "sideL": {
-                "mean": 75.70844628378889,
+                "mean": 80.6909716216272,
                 "brightRatio": 0,
-                "variance": 2234.0315841504616,
+                "variance": 3037.573039228269,
                 "count": 2960
               },
               "sideR": {
-                "mean": 115.77897297297362,
+                "mean": 127.09362229729432,
                 "brightRatio": 0,
-                "variance": 2340.4787558938337,
+                "variance": 3125.2211700641024,
                 "count": 2960
               },
               "roi": {
@@ -12207,21 +12373,21 @@
             },
             "probe2": {
               "center": {
-                "mean": 95.54864252533075,
+                "mean": 104.46010853040362,
                 "brightRatio": 0,
-                "variance": 2728.880052313035,
+                "variance": 3762.0118224081093,
                 "count": 9472
               },
               "sideL": {
-                "mean": 116.05525067567623,
+                "mean": 127.3386027027014,
                 "brightRatio": 0,
-                "variance": 2328.742344423687,
+                "variance": 3127.673362103581,
                 "count": 2960
               },
               "sideR": {
-                "mean": 75.95599425676194,
+                "mean": 80.95428175676237,
                 "brightRatio": 0,
-                "variance": 2245.5256428408775,
+                "variance": 3045.205488628223,
                 "count": 2960
               },
               "roi": {
@@ -12232,8 +12398,8 @@
               },
               "angle": 3.9269908169872414
             },
-            "meanSpread": 46.5905010557305,
-            "pairDiff01": 46.34011043073062,
+            "meanSpread": 55.501967060803366,
+            "pairDiff01": 55.351597022797066,
             "stuckBrightBlock": false
           }
         }
@@ -12290,7 +12456,7 @@
       },
       "renderFailure": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -12309,7 +12475,7 @@
         },
         "evidence": {
           "haloSource": {
-            "BUILD_ID": "feel2",
+            "BUILD_ID": "walltextures3",
             "policy": "walls own distance fog; billboards drawImage only — no post-loop sprite fog fillRect",
             "forbiddenPatternsAbsent": true,
             "forbiddenHits": [],
@@ -12319,7 +12485,7 @@
             "regressionCommentMarker": "SPRITE HALO REGRESSION GUARD"
           },
           "occlusionSource": {
-            "BUILD_ID": "feel2",
+            "BUILD_ID": "walltextures3",
             "renderWidth": 320,
             "zbufferLength": 320,
             "zbufferMatchesRenderWidth": true,
@@ -12396,9 +12562,9 @@
             "pass": true,
             "haloPass": true,
             "borderStats": {
-              "mean": 148.68112450592866,
-              "brightRatio": 0.2134387351778656,
-              "variance": 3825.030640089229,
+              "mean": 123.04643083003964,
+              "brightRatio": 0.20948616600790515,
+              "variance": 3670.4732688222844,
               "count": 506
             },
             "proj": {
@@ -12410,12 +12576,12 @@
               "screenW": 15.272727272727273,
               "screenH": 16.8
             },
-            "canvasVariance": 4859.016002183802
+            "canvasVariance": 4509.34821511907
           },
           "occludedSprite": {
             "pass": true,
             "occDiff": 0,
-            "visDiff": 145.46949602122015,
+            "visDiff": 143.0106100795756,
             "zPass": true,
             "proj": {
               "depth": 8,
@@ -12478,9 +12644,9 @@
           "hallStart": {
             "pass": true,
             "stats": {
-              "mean": 80.05271291970867,
-              "brightRatio": 0.022434701492537314,
-              "variance": 2361.122279321858,
+              "mean": 86.79548285907511,
+              "brightRatio": 0.020359141791044776,
+              "variance": 3217.102462475221,
               "count": 42880
             },
             "customLevel": "hall_of_servants"
@@ -12492,19 +12658,19 @@
               "h": 844
             },
             "stats": {
-              "mean": 115.0571622813804,
-              "brightRatio": 0.14290625,
-              "variance": 4236.2144277935195,
+              "mean": 120.00627942199075,
+              "brightRatio": 0.141515625,
+              "variance": 4524.219433085143,
               "count": 64000
             }
           }
         },
         "runtimeErrors": [],
-        "timestamp": "2026-07-02T00:28:12.512Z"
+        "timestamp": "2026-07-02T10:42:02.441Z"
       },
       "render": {
         "pass": true,
-        "build": "feel2",
+        "build": "walltextures3",
         "errors": [],
         "warnings": [],
         "checks": {
@@ -12523,7 +12689,7 @@
         },
         "evidence": {
           "haloSource": {
-            "BUILD_ID": "feel2",
+            "BUILD_ID": "walltextures3",
             "policy": "walls own distance fog; billboards drawImage only — no post-loop sprite fog fillRect",
             "forbiddenPatternsAbsent": true,
             "forbiddenHits": [],
@@ -12533,7 +12699,7 @@
             "regressionCommentMarker": "SPRITE HALO REGRESSION GUARD"
           },
           "occlusionSource": {
-            "BUILD_ID": "feel2",
+            "BUILD_ID": "walltextures3",
             "renderWidth": 320,
             "zbufferLength": 320,
             "zbufferMatchesRenderWidth": true,
@@ -12610,9 +12776,9 @@
             "pass": true,
             "haloPass": true,
             "borderStats": {
-              "mean": 148.68112450592866,
-              "brightRatio": 0.2134387351778656,
-              "variance": 3825.030640089229,
+              "mean": 123.04643083003964,
+              "brightRatio": 0.20948616600790515,
+              "variance": 3670.4732688222844,
               "count": 506
             },
             "proj": {
@@ -12624,12 +12790,12 @@
               "screenW": 15.272727272727273,
               "screenH": 16.8
             },
-            "canvasVariance": 4859.016002183802
+            "canvasVariance": 4509.34821511907
           },
           "occludedSprite": {
             "pass": true,
             "occDiff": 0,
-            "visDiff": 145.46949602122015,
+            "visDiff": 143.0106100795756,
             "zPass": true,
             "proj": {
               "depth": 8,
@@ -12692,9 +12858,9 @@
           "hallStart": {
             "pass": true,
             "stats": {
-              "mean": 80.05271291970867,
-              "brightRatio": 0.022434701492537314,
-              "variance": 2361.122279321858,
+              "mean": 86.79548285907511,
+              "brightRatio": 0.020359141791044776,
+              "variance": 3217.102462475221,
               "count": 42880
             },
             "customLevel": "hall_of_servants"
@@ -12706,22 +12872,22 @@
               "h": 844
             },
             "stats": {
-              "mean": 115.0571622813804,
-              "brightRatio": 0.14290625,
-              "variance": 4236.2144277935195,
+              "mean": 120.00627942199075,
+              "brightRatio": 0.141515625,
+              "variance": 4524.219433085143,
               "count": 64000
             }
           }
         },
         "runtimeErrors": [],
-        "timestamp": "2026-07-02T00:28:12.512Z"
+        "timestamp": "2026-07-02T10:42:02.441Z"
       },
       "runtimeErrors": [],
       "runtimeClean": true,
-      "timestamp": "2026-07-02T00:28:12.512Z"
+      "timestamp": "2026-07-02T10:42:02.441Z"
     },
-    "overlayText": "SELF-CHECK PASS\nbuild feel2",
+    "overlayText": "SELF-CHECK PASS\nbuild walltextures3",
     "overlayVisible": true
   },
-  "timestamp": "2026-07-02T00:28:12.577Z"
+  "timestamp": "2026-07-02T10:42:02.496Z"
 }

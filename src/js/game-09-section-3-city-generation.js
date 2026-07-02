@@ -768,9 +768,144 @@ function crBuildingRegistryForCell(mapX, mapY){
   } catch(e){ return null; }
 }
 
+function crIsBuildingMaterialWallType(wt){
+  return wt === WALL.BUILDING ||
+         wt === WALL.BRICK ||
+         wt === WALL.GLASS ||
+         wt === WALL.GARAGE ||
+         wt === WALL.CONCRETE ||
+         wt === WALL.SIGNAGE ||
+         wt === WALL.MURAL;
+}
+
+function crPickComponentBuildingMaterial(cells, componentId){
+  let minX = 9999, minY = 9999, maxX = -1, maxY = -1;
+  const registryMaterials = [];
+  for(const [x, y] of cells){
+    minX = Math.min(minX, x); minY = Math.min(minY, y);
+    maxX = Math.max(maxX, x); maxY = Math.max(maxY, y);
+    const reg = crBuildingRegistryForCell(x, y);
+    if(reg && reg.materialKey){
+      registryMaterials.push(crNormalizeBuildingTextureMaterial(reg.materialKey));
+    }
+  }
+  if(registryMaterials.length){
+    const uniq = [...new Set(registryMaterials)];
+    if(uniq.length === 1) return uniq[0];
+    const seed = (game && typeof game.seed === 'number') ? game.seed : 0;
+    const district = (game && typeof game.district === 'number') ? game.district : 0;
+    const hash = crHashBuildingMaterial(seed, district, 'component-merge', minX, minY, componentId ^ (uniq.join('|').length << 4));
+    return uniq[hash % uniq.length];
+  }
+  const seed = (game && typeof game.seed === 'number') ? game.seed : 0;
+  const district = (game && typeof game.district === 'number') ? game.district : 0;
+  const hash = crHashBuildingMaterial(seed, district, 'component', minX, minY, componentId ^ (maxX << 8) ^ (maxY << 16));
+  return CR_BUILDING_TEXTURE_MATERIALS[hash % CR_BUILDING_TEXTURE_MATERIALS.length];
+}
+
+function crSyncRegistryMaterialsToComponents(){
+  if(!game.buildingRegistry || !game.buildingMaterialGrid || !game.buildingMaterialComponents) return;
+  for(const cid in game.buildingMaterialComponents){
+    const comp = game.buildingMaterialComponents[cid];
+    if(!comp || !comp.materialKey) continue;
+    const mat = crNormalizeBuildingTextureMaterial(comp.materialKey);
+    for(let y = 0; y < game.buildingMaterialGrid.length; y++){
+      for(let x = 0; x < game.buildingMaterialGrid[y].length; x++){
+        const own = game.buildingMaterialGrid[y][x];
+        if(!own || String(own.componentId) !== String(cid)) continue;
+        const cell = game.buildingGrid && game.buildingGrid[y] && game.buildingGrid[y][x];
+        if(!cell) continue;
+        const reg = game.buildingRegistry[cell.bid];
+        if(reg) reg.materialKey = mat;
+      }
+    }
+  }
+}
+
+function crBuildBuildingMaterialComponents(map){
+  const H = map.length;
+  const W = H ? map[0].length : 0;
+  game.buildingMaterialGrid = Array.from({ length: H }, () => new Array(W).fill(null));
+  game.buildingMaterialComponents = {};
+  let nextComponentId = 1;
+
+  function isWallCell(x, y){
+    if(x < 0 || y < 0 || y >= H || x >= W) return false;
+    return crIsBuildingMaterialWallType(map[y][x]);
+  }
+
+  for(let y = 0; y < H; y++){
+    for(let x = 0; x < W; x++){
+      if(!isWallCell(x, y) || game.buildingMaterialGrid[y][x]) continue;
+
+      const cells = [];
+      const stack = [[x, y]];
+      game.buildingMaterialGrid[y][x] = { componentId: nextComponentId, materialKey: null };
+
+      while(stack.length){
+        const [cx, cy] = stack.pop();
+        cells.push([cx, cy]);
+        for(const [nx, ny] of [[cx+1,cy],[cx-1,cy],[cx,cy+1],[cx,cy-1]]){
+          if(!isWallCell(nx, ny)) continue;
+          if(game.buildingMaterialGrid[ny][nx]) continue;
+          game.buildingMaterialGrid[ny][nx] = { componentId: nextComponentId, materialKey: null };
+          stack.push([nx, ny]);
+        }
+      }
+
+      const materialKey = crPickComponentBuildingMaterial(cells, nextComponentId);
+      for(const [cx, cy] of cells){
+        game.buildingMaterialGrid[cy][cx].materialKey = materialKey;
+      }
+      game.buildingMaterialComponents[nextComponentId] = {
+        componentId: nextComponentId,
+        materialKey,
+        cells: cells.length,
+        hasRegistryCell: cells.some(([cx, cy]) => !!crBuildingRegistryForCell(cx, cy)),
+      };
+      nextComponentId++;
+    }
+  }
+  crSyncRegistryMaterialsToComponents();
+}
+
+function crEnsureBuildingMaterialComponentsBuilt(){
+  if(!game || !game.map) return;
+  const H = game.MAP_H || game.map.length;
+  if(game.buildingMaterialGrid && game.buildingMaterialGrid.length === H) return;
+  crBuildBuildingMaterialComponents(game.map);
+  crSyncRegistryMaterialsToComponents();
+}
+
 function crBuildingMaterialForCell(mapX, mapY){
+  crEnsureBuildingMaterialComponentsBuilt();
+  const own = game && game.buildingMaterialGrid && game.buildingMaterialGrid[mapY] && game.buildingMaterialGrid[mapY][mapX];
+  if(own && own.materialKey) return crNormalizeBuildingTextureMaterial(own.materialKey);
   const reg = crBuildingRegistryForCell(mapX, mapY);
-  return crNormalizeBuildingTextureMaterial(reg && reg.materialKey);
+  if(reg && reg.materialKey) return crNormalizeBuildingTextureMaterial(reg.materialKey);
+  return 'stucco';
+}
+
+function crDebugBuildingMaterialComponents(){
+  crEnsureBuildingMaterialComponentsBuilt();
+  const map = game.map || [];
+  let wallCells = 0;
+  let coveredNonRegisteredWallCells = 0;
+  const comps = game.buildingMaterialComponents || {};
+  for(let y = 0; y < game.MAP_H; y++){
+    for(let x = 0; x < game.MAP_W; x++){
+      if(!crIsBuildingMaterialWallType(map[y] && map[y][x])) continue;
+      wallCells++;
+      const bg = game.buildingGrid && game.buildingGrid[y] && game.buildingGrid[y][x];
+      const own = game.buildingMaterialGrid[y] && game.buildingMaterialGrid[y][x];
+      if(!bg && own && own.materialKey) coveredNonRegisteredWallCells++;
+    }
+  }
+  return {
+    componentCount: Object.keys(comps).length,
+    wallCells,
+    coveredNonRegisteredWallCells,
+  };
 }
 
 function crFacadeFaceBuildingMaterial(fc, fallback){
@@ -783,8 +918,7 @@ function crGetBuildingMaterialTextureForFace(mapX, mapY, faceDir){
   const atlas = crBuildFacadeTextureAtlas();
   let fc = null;
   try { fc = (typeof crUpdateFacadeFaceU === 'function') ? crUpdateFacadeFaceU(mapX, mapY, faceDir, mapX + 0.5) : null; } catch(e){ fc = null; }
-  const fallback = crBuildingMaterialForCell(mapX, mapY);
-  const materialKey = crFacadeFaceBuildingMaterial(fc, fallback);
+  const materialKey = crBuildingMaterialForCell(mapX, mapY);
   const key = crMaterialTextureKey(materialKey);
   return {
     texture: atlas[key] || atlas.material_stucco || atlas.fallback_smooth_wall,
@@ -1341,7 +1475,7 @@ function crDebugBuildingSmoothStyle(){
   const base = crDebugFacadeReadabilityFinal();
   const artSrc = (typeof crDrawSmoothBuildingMaterialBase === 'function' ? String(crDrawSmoothBuildingMaterialBase) : '') + '\\n' + (typeof crDrawSmoothBuildingFaceColumn === 'function' ? String(crDrawSmoothBuildingFaceColumn) : '') + '\\n' + (typeof crDrawComposedFacadeFaceColumn === 'function' ? String(crDrawComposedFacadeFaceColumn) : '');
   const checks = {
-    buildId: BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2',
+    buildId: BUILD_ID === 'buildingsmooth1' || BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2' || BUILD_ID === 'walltextures3',
     smoothFlag: typeof CR_BUILDING_SMOOTH_STYLE !== 'undefined' && CR_BUILDING_SMOOTH_STYLE === 1,
     smoothHelper: typeof crDrawSmoothBuildingFaceColumn === 'function' && typeof crDrawSmoothBuildingMaterialBase === 'function',
     facadePackStillExists: !!(CR_FACADE_PACK && CR_FACADE_PACK.modules && CR_FACADE_PACK.roles),
@@ -1385,7 +1519,7 @@ function crDebugContinuousFacadeTexture(){
   }
   const drawSrc = (typeof crDrawComposedFacadeFaceColumn === 'function' ? String(crDrawComposedFacadeFaceColumn) : '') + '\n' + (typeof crDrawContinuousFacadeTextureColumn === 'function' ? String(crDrawContinuousFacadeTextureColumn) : '');
   const checks = {
-    buildId: BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2',
+    buildId: BUILD_ID === 'facadetexture1' || BUILD_ID === 'calmwalls1' || BUILD_ID === 'simplewalls1' || BUILD_ID === 'flatwalls1' || BUILD_ID === 'props1restore1' || BUILD_ID === 'solidwalls1' || BUILD_ID === 'feel1' || BUILD_ID === 'feel2' || BUILD_ID === 'walltextures1' || BUILD_ID === 'walltextures2' || BUILD_ID === 'walltextures3',
     calmWallsPropsFirstMode: BUILD_ID !== 'calmwalls1' || (typeof CR_CALM_WALLS_PROPS_FIRST !== 'undefined' && CR_CALM_WALLS_PROPS_FIRST === 1 && drawSrc.indexOf('crDrawCalmPropsFirstWallColumn') >= 0),
     simpleWallsBaselineMode: BUILD_ID !== 'simplewalls1' || (typeof CR_SIMPLE_WALLS_BASELINE !== 'undefined' && CR_SIMPLE_WALLS_BASELINE === 1 && drawSrc.indexOf('crDrawSimpleWallColumn') >= 0),
     atlasExists: !!atlas && keys.length >= 7,
@@ -1425,6 +1559,8 @@ function crDebugContinuousFacadeTexture(){
 function crClearBuildingModules(GW, GH){
   game.buildingRegistry = {};
   game.buildingGrid = [];
+  game.buildingMaterialGrid = [];
+  game.buildingMaterialComponents = {};
   game._nextBuildingId = 1;
   for(let y=0;y<GH;y++) game.buildingGrid.push(new Array(GW).fill(null));
 }
@@ -2178,6 +2314,9 @@ function crApplySolidwallsFrontProofHarness(opts){
 function genCity(seed, district, modifier){
   RNG = mulberry32((seed ^ 0x9e3779b9) + district*2654435761);
   const r = RNG;
+  game.seed = seed;
+  game.district = district;
+  game.modifier = modifier || '';
 
   let canMult = 1.0, peoMult = 1.0;
   game.scoreMult = 1;
@@ -2193,6 +2332,8 @@ function genCity(seed, district, modifier){
   game.streetLayoutMeta = streetMeta;
 
   game.map = map; game.MAP_W = GW; game.MAP_H = GH; game.wallShade = shade;
+  crBuildBuildingMaterialComponents(map);
+  crSyncRegistryMaterialsToComponents();
 
   const roadMidY = (streetMeta.roadY0 + streetMeta.roadY1) / 2;
   let sx = 3.5, sy = roadMidY + 0.5, found = false;
