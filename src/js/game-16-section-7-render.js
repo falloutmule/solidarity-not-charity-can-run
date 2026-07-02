@@ -58,8 +58,9 @@ function drawScene(now){
     let hit=0, side=0, wt=1, steps=0;
     while(hit===0 && steps<80){
       if(sdx<sdy){ sdx+=ddx; mapX+=stepX; side=0; } else { sdy+=ddy; mapY+=stepY; side=1; }
-      if(mapX<0||mapY<0||mapX>=game.MAP_W||mapY>=game.MAP_H){ wt=1; hit=1; break; }
-      if(game.map[mapY][mapX]!==0){ wt=game.map[mapY][mapX]; hit=1; }
+      if(!World.inBounds(mapX, mapY)){ wt=1; hit=1; break; }
+      const cell = World.rawCell(mapX, mapY);
+      if(cell !== 0){ wt=cell; hit=1; }
       steps++;
     }
     const perp = (side===0)? (sdx-ddx) : (sdy-ddy);

@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-07-02T00:19:46.812Z",
+  "generatedAt": "2026-07-02T00:25:04.060Z",
   "output": "index.html",
-  "outputSha256": "e71c6fdc3aa6a35e350e895b88de70b7f10807277c930d2f6fb032d63fb84f7d",
-  "outputBytes": 692927,
+  "outputSha256": "95799bf997708f6278a6c6359414d29fe58aafcf8a0d0ec8357b1e4ac25a9316",
+  "outputBytes": 694850,
   "inputs": [
     {
       "path": "src/template.html",
@@ -101,8 +101,8 @@
     },
     {
       "path": "src/js/game-16-section-7-render.js",
-      "sha256": "5c31da3c56aa467b2af775b132c9754a237cb4d5021c6c698c9f33ed4576c94e",
-      "bytes": 10255
+      "sha256": "6d3d988d56d17878f6e2038604194e00a92815a27e1ce723ce435479a882b72f",
+      "bytes": 10249
     },
     {
       "path": "src/js/game-17-section-8-minimap.js",
@@ -136,8 +136,8 @@
     },
     {
       "path": "src/js/game-22-section-13-main-loop.js",
-      "sha256": "ce5eb51505b1d663c91b1e0e40fa160e3c6ad7d45be8142a656acac7aed423f8",
-      "bytes": 359407
+      "sha256": "db28f37d092dfba0e7c741f0f38992edaf190f83981c0f3a2ed53cd122732e61",
+      "bytes": 361391
     }
   ],
   "nodeVersion": "v24.14.0",
