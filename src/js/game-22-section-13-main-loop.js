@@ -6648,6 +6648,17 @@ function runSingleMaterialBuildingTextureSelfCheckBody(){
     checks.atlasHasCinderblock = !!atlas.material_light_gray_cinderblock;
     checks.atlasHasAluminumSiding = !!atlas.material_aluminum_siding;
 
+    const drawSrc = typeof drawScene === 'function' ? String(drawScene) : '';
+    checks.liveDrawSceneUsesBuildingMaterialPath =
+      drawSrc.indexOf('buildingMaterialWall') >= 0 &&
+      drawSrc.indexOf('crGetBuildingMaterialTextureForFace') >= 0 &&
+      drawSrc.indexOf('!useBuildingMaterialTextures') >= 0;
+    const composedSrc = typeof crDrawComposedFacadeFaceColumn === 'function' ? String(crDrawComposedFacadeFaceColumn) : '';
+    checks.composedFacadePrioritizesSingleMaterial =
+      composedSrc.indexOf('CR_SINGLE_MATERIAL_BUILDING_TEXTURES') >= 0 &&
+      composedSrc.indexOf('crGetBuildingMaterialTextureForFace') >= 0 &&
+      (composedSrc.indexOf('crDrawCalmPropsFirstWallColumn') < 0 || composedSrc.indexOf('CR_SINGLE_MATERIAL_BUILDING_TEXTURES') < composedSrc.indexOf('crDrawCalmPropsFirstWallColumn'));
+
     const scenarios = [
       { district: 1, seed: 880101 },
       { district: 2, seed: 880102 },

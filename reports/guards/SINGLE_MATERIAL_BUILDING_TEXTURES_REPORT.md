@@ -25,7 +25,7 @@ npm run test:selfcheck # PASS (proof-playwright-summary.json pass: true)
 
 ## Failed
 
-- None.
+- **Runtime (pre-fix):** `drawScene` still routed building walls through `crDrawFlatBuildingWallColumn` (`CR_PROPS1_RESTORE_SIMPLE_MATERIALS`), so atlas/registry changes never reached the live FPV path. Fixed in `game-16-section-7-render.js` + composed-facade priority in `game-09`.
 
 ## Current state
 

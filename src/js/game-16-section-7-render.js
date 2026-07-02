@@ -78,10 +78,13 @@ function drawScene(now){
     wallX -= Math.floor(wallX);
     const texX = crCoarseWallTexX(wallX, side, rdx, rdy, wt);
     const facadeRole = crResolveBuildingFaceRole(mapX, mapY, side, stepX, stepY);
+    const useBuildingMaterialTextures = typeof CR_SINGLE_MATERIAL_BUILDING_TEXTURES !== 'undefined' && CR_SINGLE_MATERIAL_BUILDING_TEXTURES === 1;
     const flatBuildingWall =
+      !useBuildingMaterialTextures &&
       ((typeof CR_PROPS1_RESTORE_SIMPLE_MATERIALS !== 'undefined' && CR_PROPS1_RESTORE_SIMPLE_MATERIALS === 1) ||
        (typeof CR_FLAT_BUILDING_WALLS_BASELINE !== 'undefined' && CR_FLAT_BUILDING_WALLS_BASELINE === 1)) &&
       crIsFlatBuildingWallType(wt);
+    const buildingMaterialWall = useBuildingMaterialTextures && crIsFlatBuildingWallType(wt);
     const tex = WALL_TEX[facadeRole ? WALL.BUILDING : wt] || WALL_TEX[WALL.BUILDING];
     const texSampleW = (wt === WALL.FENCE) ? 2 : CR_FPV_WALL_TEX_COARSE;
 
@@ -91,7 +94,16 @@ function drawScene(now){
       if(side===1) sh*=0.72;
     }
 
-    if(flatBuildingWall){
+    if(buildingMaterialWall){
+      const faceDir = crWallHitFaceDir(side, stepX, stepY);
+      const resolved = crGetBuildingMaterialTextureForFace(mapX, mapY, faceDir);
+      const fc = (typeof crUpdateFacadeFaceU === 'function') ? crUpdateFacadeFaceU(mapX, mapY, faceDir, wallX) : null;
+      const faceU = fc ? fc.faceU : wallX;
+      crDrawContinuousFacadeTextureColumn(bctx, col, drawStart, sliceH, resolved.texture, faceU);
+      if(facadeRole && typeof crDrawFpvFacadePackRoleOverlays === 'function'){
+        crDrawFpvFacadePackRoleOverlays(bctx, col, drawStart, sliceH, mapX, mapY, faceDir, wallX, facadeRole);
+      }
+    } else if(flatBuildingWall){
       crDrawFlatBuildingWallColumn(bctx, col, drawStart, sliceH, wt);
     } else if(facadeRole){
       crDrawComposedFacadeFaceColumn(bctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX, facadeRole);

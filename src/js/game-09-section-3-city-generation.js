@@ -1099,6 +1099,18 @@ function crDrawSmoothBuildingFaceColumn(ctx, col, drawStart, sliceH, mapX, mapY,
 }
 
 function crDrawComposedFacadeFaceColumn(ctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX, roleId){
+  if(typeof CR_SINGLE_MATERIAL_BUILDING_TEXTURES !== 'undefined' && CR_SINGLE_MATERIAL_BUILDING_TEXTURES === 1 &&
+     typeof CR_CONTINUOUS_FACADE_TEXTURES !== 'undefined' && CR_CONTINUOUS_FACADE_TEXTURES === 1){
+    const faceDir = crWallHitFaceDir(side, stepX, stepY);
+    const fc = crUpdateFacadeFaceU(mapX, mapY, faceDir, wallX);
+    const resolved = crGetBuildingMaterialTextureForFace(mapX, mapY, faceDir);
+    const faceU = fc ? fc.faceU : (wallX - Math.floor(wallX));
+    crDrawContinuousFacadeTextureColumn(ctx, col, drawStart, sliceH, resolved.texture, faceU);
+    if(fc && typeof crDrawFpvFacadePackRoleOverlays === 'function'){
+      crDrawFpvFacadePackRoleOverlays(ctx, col, drawStart, sliceH, mapX, mapY, faceDir, wallX, fc.roleId || roleId);
+    }
+    return;
+  }
   if(typeof CR_SIMPLE_WALLS_BASELINE !== 'undefined' && CR_SIMPLE_WALLS_BASELINE === 1){
     crDrawSimpleWallColumn(ctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX, roleId);
     return;
