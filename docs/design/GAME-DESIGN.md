@@ -59,7 +59,7 @@ This document uses four evidence labels:
 |---|---|
 | Repository | `falloutmule/solidarity-not-charity-can-run` |
 | Canonical branch | `main` |
-| Current shipped build ID | `farfieldsmooth1` |
+| Current shipped build ID | `perfcorrelate1` |
 | Production URL | `https://falloutmule.github.io/solidarity-not-charity-can-run/` |
 | Release artifact | root `index.html` |
 | Editable source | `src/` plus `src/build-manifest.json` |
@@ -1632,7 +1632,7 @@ The authoritative repository currently identifies:
 Internal render profile: 400 × 250
 Angle handling: interpolated
 Projection: subpixel
-Build ID: farfieldsmooth1
+Build ID: perfcorrelate1
 ```
 
 Alternate 320 and 480 profiles may exist for diagnostics. The selected baseline remains 400×250 unless new physical-device evidence justifies a change.
@@ -2331,7 +2331,7 @@ They become release blockers only when their corresponding content phase begins.
 
 ## Verified runtime baseline
 
-- build ID `farfieldsmooth1`;
+- build ID `perfcorrelate1`;
 - default 400×250 render profile;
 - interpolated angle;
 - subpixel projection;

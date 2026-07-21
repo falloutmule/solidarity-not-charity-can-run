@@ -135,6 +135,25 @@ assert.strictEqual(report.mobileLayoutFlushes, 1, 'legacy apply call is a layout
 assert.strictEqual(report.mobileStableEarlyOuts, 0, 'early-outs must not be inferred');
 assert.strictEqual(JSON.stringify(c.game), gameplayBefore, 'enabled probe must not mutate gameplay state');
 
+// A long delivery gap is correlated with timings from the immediately preceding frame.
+const correlation = makeContext('?perfprobe=1');
+correlation.crPerfProbeEnsureInstalled();
+correlation.crPerfProbeFrameStart(100);
+correlation.crStepSimulationFixed(0.016);
+correlation.drawScene(100);
+correlation.drawMinap();
+correlation.drawPortraitDashboardChrome();
+correlation.drawHUD();
+correlation.drawMobileMenu();
+correlation.crPerfProbeFrameStart(145);
+const correlationReport = correlation.CR.crPerfProbeGetReport();
+assert.strictEqual(correlationReport.longFrame.thresholdMs, 33);
+assert.strictEqual(correlationReport.longFrame.samples, 1);
+assert.strictEqual(correlationReport.longFrame.gapMs.worst, 45);
+assert(correlationReport.longFrame.precedingPhaseMs.simulation.p95 > 0);
+assert(correlationReport.longFrame.precedingPhaseMs.scene.p95 > 0);
+assert(correlationReport.longFrame.precedingPhaseMs.ui.p95 > 0);
+
 // Lane C counters remain truthful and distinct when its API is available.
 let mobileStats = {
   drawCalls: 10, stableEarlyOuts: 3, uiFlushes: 2, layoutFlushes: 1,
@@ -199,7 +218,7 @@ const parsed = JSON.parse(json);
 // Overlay must fit the 320x180 internal FPV buffer.
 const rects = [];
 const overlayCtx = {
-  save() {}, restore() {}, setTransform() {}, fillText() {},
+  lines: [], save() {}, restore() {}, setTransform() {}, fillText(text) { this.lines.push(text); },
   fillRect(x, y, w, h) { rects.push({ x, y, w, h }); },
   set fillStyle(v) {}, set font(v) {}, set textBaseline(v) {}
 };
@@ -207,6 +226,16 @@ interp.crPerfProbeDrawOverlay(overlayCtx, 1000);
 assert(rects.length > 0);
 assert(rects.every(r => r.x >= 0 && r.y >= 0 && r.x + r.w <= 320 && r.y + r.h <= 180),
   'overlay must remain within internal FPV bounds');
+assert(overlayCtx.lines.some(line => line.startsWith('lf n/g ')), 'compact overlay must expose long-frame gaps');
+assert(!overlayCtx.lines.some(line => line.startsWith('lf p/w ')), 'compact overlay omits detail when there is no room');
+
+interp.view.height = 250;
+const detailedOverlayCtx = {
+  lines: [], save() {}, restore() {}, setTransform() {}, fillText(text) { this.lines.push(text); },
+  fillRect() {}, set fillStyle(v) {}, set font(v) {}, set textBaseline(v) {}
+};
+interp.crPerfProbeDrawOverlay(detailedOverlayCtx, 1600);
+assert(detailedOverlayCtx.lines.some(line => line.startsWith('lf p/w ')), 'roomy overlay exposes correlated phase p95/worst');
 
 interp.crPerfProbeReset();
 const reset = interp.CR.crPerfProbeGetReport();
@@ -216,6 +245,7 @@ for (const field of ['stepFrames0', 'stepFrames1', 'stepFrames2', 'stepFrames3Pl
   'repeatedRenderPoseFrames', 'renderDeltaAvg', 'renderDeltaWorst', 'bitmapColumns']) {
   assert.strictEqual(reset[field], 0, `reset must clear ${field}`);
 }
+assert.strictEqual(reset.longFrame.samples, 0, 'reset must clear long-frame correlation samples');
 assert.deepStrictEqual(JSON.parse(JSON.stringify(reset.frameBuckets)), {
   under9_5: 0, from9_5To13_5: 0, from13_5To20: 0,
   from20To33: 0, from33To50: 0, over50: 0

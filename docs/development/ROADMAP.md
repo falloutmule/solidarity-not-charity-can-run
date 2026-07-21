@@ -8,11 +8,12 @@ This roadmap follows the approved [Game Design Document](../design/GAME-DESIGN.m
 - Preserve the existing production artifact without gameplay or renderer changes.
 - Keep generated proof and historical reports out of public history.
 
-## Device-performance gate — next
+## Device-performance gate — current
 
-- Compare the unchanged 400×250 production build in the phone's high-refresh and temporary 60 Hz modes.
-- If 60 Hz is clearly smoother, authorize one query-gated render-pacing candidate.
-- If it is the same or worse, extend only the existing profiler to correlate long frames with measured phases.
+- The target Samsung device did not expose a usable 60 Hz control, so the display-refresh comparison is unavailable.
+- The query-gated `perfcorrelate1` build correlates every delivery gap above 33 ms with timing from its immediately preceding frame.
+- Capture one moving sample near a building and one in an open area; use the `lf n/g` and `lf p/w S/R/U` overlay lines to select the next single hypothesis.
+- Do not add a frame cap unless separately testable physical evidence supports it.
 - Do not revive 320×200, adaptive resolution, or the rejected `presentpose1` path.
 
 ## Rules and vertical slice — after explicit card approval
@@ -31,4 +32,3 @@ This roadmap follows the approved [Game Design Document](../design/GAME-DESIGN.m
 ## Phase 5 — hard user gate
 
 Phase 5 is not authorized by this roadmap. Do not complete it, start broad gameplay expansion, or reinterpret the approved design without direct user input.
-

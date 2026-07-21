@@ -30,9 +30,9 @@ The playable pre-alpha uses a custom raycaster and ships as one self-contained H
 
 ## Current state
 
-The current public build is `farfieldsmooth1` at a 400×250 internal render resolution with interpolated angles and subpixel projection.
+The current public build is `perfcorrelate1` at a 400×250 internal render resolution with interpolated angles and subpixel projection.
 
-The foundation, authored District 1 content, controls, saving, minimap, and single-file build pipeline are playable. The approved campaign and progression design are not yet fully implemented. Game building is paused while one Samsung high-refresh frame-pacing question is isolated; the rejected 320×200 mode will not return as a default.
+The foundation, authored District 1 content, controls, saving, minimap, and single-file build pipeline are playable. The approved campaign and progression design are not yet fully implemented. Gameplay content remains paused while the Samsung frame-pacing investigation captures phase correlation; the rejected 320×200 mode will not return as a default.
 
 See [PROJECT_STATUS.md](PROJECT_STATUS.md) for the exact boundary between implemented, partial, and planned work.
 
@@ -76,4 +76,3 @@ Edit canonical inputs under `src/`, then rebuild the root `index.html`. Do not h
 ## Rights
 
 The repository is public for viewing and collaboration, but it is **not open source**. No reuse license is granted. See [RIGHTS.md](RIGHTS.md).
-

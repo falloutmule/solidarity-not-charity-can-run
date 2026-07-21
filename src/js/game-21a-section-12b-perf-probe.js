@@ -57,6 +57,30 @@ function _crPerfEmptyBuckets() {
   };
 }
 
+const CR_PERF_LONG_FRAME_THRESHOLD_MS = 33;
+const CR_PERF_PHASE_KEYS = [
+  'simulation', 'scene', 'minimap', 'chrome', 'hud', 'mobileMenu', 'mobileLayout', 'bitmap'
+];
+
+function _crPerfEmptyFramePhases() {
+  const phases = {};
+  for (const key of CR_PERF_PHASE_KEYS) phases[key] = 0;
+  return phases;
+}
+
+function _crPerfRecordFramePhase(key, elapsed) {
+  if (!_crPerf || !_crPerf.framePhases || !Object.prototype.hasOwnProperty.call(_crPerf.framePhases, key)) return;
+  _crPerf.framePhases[key] += Math.max(0, _crPerfFinite(elapsed));
+}
+
+function _crPerfRecordLongFrameCorrelation(gap) {
+  if (!_crPerf || !_crPerf.framePhases || gap <= CR_PERF_LONG_FRAME_THRESHOLD_MS) return;
+  _crPerfCap(_crPerf.longFrameGaps, gap, 720);
+  for (const key of CR_PERF_PHASE_KEYS) {
+    _crPerfCap(_crPerf.longFramePhases[key], _crPerf.framePhases[key], 720);
+  }
+}
+
 function _crPerfReadMobileStats() {
   if (typeof crGetMobileUiSyncStats !== 'function') return null;
   try {
@@ -182,6 +206,9 @@ function crPerfProbeReset() {
     bitmapCalls: 0,
     bitmapHandled: 0,
     bitmapFailureColumns: null,
+    framePhases: _crPerfEmptyFramePhases(),
+    longFrameGaps: [],
+    longFramePhases: Object.fromEntries(CR_PERF_PHASE_KEYS.map((key) => [key, []])),
     spriteCount: 0,
     framesSampled: 0,
   };
@@ -313,16 +340,43 @@ function _crPerfBuildMotionReport(current) {
   };
 }
 
-function _crPerfTimeCall(original, receiver, args, sampleArray, totalKey, countKey) {
+function _crPerfTimeCall(original, receiver, args, sampleArray, totalKey, countKey, phaseKey) {
   const started = performance.now();
   try {
     return original.apply(receiver, args);
   } finally {
     const elapsed = Math.max(0, _crPerfFinite(performance.now() - started));
     _crPerfCap(sampleArray, elapsed, 720);
+    if (phaseKey) _crPerfRecordFramePhase(phaseKey, elapsed);
     if (totalKey) _crPerf[totalKey] += elapsed;
     if (countKey) _crPerf[countKey]++;
   }
+}
+
+function _crPerfBuildLongFrameCorrelation() {
+  const gaps = _crPerfSummarize(_crPerf.longFrameGaps);
+  const summarizePhase = (keys) => {
+    const values = [];
+    for (let i = 0; i < _crPerf.longFrameGaps.length; i++) {
+      let total = 0;
+      for (const key of keys) total += _crPerfFinite(_crPerf.longFramePhases[key][i]);
+      values.push(total);
+    }
+    const summary = _crPerfSummarize(values);
+    return { p95: _crPerfRound(summary.p95), worst: _crPerfRound(summary.worst) };
+  };
+  return {
+    thresholdMs: CR_PERF_LONG_FRAME_THRESHOLD_MS,
+    samples: gaps.n,
+    gapMs: { p95: _crPerfRound(gaps.p95), worst: _crPerfRound(gaps.worst) },
+    precedingPhaseMs: {
+      simulation: summarizePhase(['simulation']),
+      scene: summarizePhase(['scene']),
+      ui: summarizePhase(['minimap', 'chrome', 'hud', 'mobileMenu']),
+      bitmap: summarizePhase(['bitmap']),
+      mobileLayout: summarizePhase(['mobileLayout']),
+    },
+  };
 }
 
 function _crPerfRecordInterpolation() {
@@ -392,7 +446,7 @@ function crPerfProbeEnsureInstalled() {
   if (typeof drawScene === 'function') {
     const original = drawScene;
     drawScene = function () {
-      const result = _crPerfTimeCall(original, this, arguments, _crPerf.drawSceneMs);
+      const result = _crPerfTimeCall(original, this, arguments, _crPerf.drawSceneMs, null, null, 'scene');
       try {
         const props = (game.props && game.props.length) || 0;
         const npcs = (game.npcs && game.npcs.filter((n) => !n.helped).length) || 0;
@@ -406,19 +460,19 @@ function crPerfProbeEnsureInstalled() {
   if (typeof drawMinap === 'function') {
     const original = drawMinap;
     drawMinap = function () {
-      return _crPerfTimeCall(original, this, arguments, _crPerf.minimapMs);
+      return _crPerfTimeCall(original, this, arguments, _crPerf.minimapMs, null, null, 'minimap');
     };
   }
   if (typeof drawPortraitDashboardChrome === 'function') {
     const original = drawPortraitDashboardChrome;
     drawPortraitDashboardChrome = function () {
-      return _crPerfTimeCall(original, this, arguments, _crPerf.chromeMs);
+      return _crPerfTimeCall(original, this, arguments, _crPerf.chromeMs, null, null, 'chrome');
     };
   }
   if (typeof drawHUD === 'function') {
     const original = drawHUD;
     drawHUD = function () {
-      return _crPerfTimeCall(original, this, arguments, _crPerf.hudMs);
+      return _crPerfTimeCall(original, this, arguments, _crPerf.hudMs, null, null, 'hud');
     };
   }
   if (typeof crStepSimulationFixed === 'function') {
@@ -441,6 +495,7 @@ function crPerfProbeEnsureInstalled() {
       } finally {
         const elapsed = Math.max(0, _crPerfFinite(performance.now() - started));
         _crPerfCap(_crPerf.simulationMs, elapsed, 720);
+        _crPerfRecordFramePhase('simulation', elapsed);
         _crPerf.simulationTotal += elapsed;
         _crPerf.simulationCalls++;
         _crPerf.simulationWorst = Math.max(_crPerf.simulationWorst, elapsed);
@@ -470,7 +525,7 @@ function crPerfProbeEnsureInstalled() {
     const original = drawMobileMenu;
     drawMobileMenu = function () {
       return _crPerfTimeCall(
-        original, this, arguments, _crPerf.mobileMenuMs, 'mobileMenuTotal', 'mobileMenuCalls'
+        original, this, arguments, _crPerf.mobileMenuMs, 'mobileMenuTotal', 'mobileMenuCalls', 'mobileMenu'
       );
     };
   }
@@ -478,7 +533,7 @@ function crPerfProbeEnsureInstalled() {
     const original = applyMobileControlSettings;
     applyMobileControlSettings = function () {
       return _crPerfTimeCall(
-        original, this, arguments, _crPerf.mobileLayoutMs, 'mobileLayoutTotal', 'mobileLayoutCalls'
+        original, this, arguments, _crPerf.mobileLayoutMs, 'mobileLayoutTotal', 'mobileLayoutCalls', 'mobileLayout'
       );
     };
   }
@@ -493,6 +548,7 @@ function crPerfProbeEnsureInstalled() {
       } finally {
         const elapsed = Math.max(0, _crPerfFinite(performance.now() - started));
         _crPerfCap(_crPerf.bitmapMs, elapsed, 1440);
+        _crPerfRecordFramePhase('bitmap', elapsed);
         _crPerf.bitmapTotal += elapsed;
         _crPerf.bitmapCalls++;
         if (result === true) _crPerf.bitmapHandled++;
@@ -526,6 +582,7 @@ function crPerfProbeFrameStart(now) {
       _crPerf.framesSampled++;
       if (gap > 33) _crPerf.over33++;
       if (gap > 50) _crPerf.over50++;
+      _crPerfRecordLongFrameCorrelation(gap);
       if (gap < 9.5) _crPerf.frameBuckets.under9_5++;
       else if (gap < 13.5) _crPerf.frameBuckets.from9_5To13_5++;
       else if (gap < 20) _crPerf.frameBuckets.from13_5To20++;
@@ -535,6 +592,7 @@ function crPerfProbeFrameStart(now) {
     }
   }
   _crPerfLastFrameNow = now;
+  _crPerf.framePhases = _crPerfEmptyFramePhases();
 }
 
 function _crPerfRound(value, digits) {
@@ -556,6 +614,7 @@ function crPerfProbeRefreshSnap(now, force) {
   const mobileMenu = _crPerfSummarize(_crPerf.mobileMenuMs);
   const mobileLayout = _crPerfSummarize(_crPerf.mobileLayoutMs);
   const bitmap = _crPerfSummarize(_crPerf.bitmapMs);
+  const longFrame = _crPerfBuildLongFrameCorrelation();
   const mobileStats = _crPerfReadMobileStats();
   const farFieldIdentity = _crPerfReadFarFieldIdentity();
   const angleReport = _crPerfBuildAngleReport(_crPerfReadAngleStats());
@@ -652,6 +711,7 @@ function crPerfProbeRefreshSnap(now, force) {
     bitmapCalls: _crPerf.bitmapCalls,
     bitmapHandledCalls: _crPerf.bitmapHandled,
     bitmapFailureColumns: _crPerf.bitmapFailureColumns,
+    longFrame,
     frameBuckets: Object.assign({}, _crPerf.frameBuckets),
     sprites: _crPerf.spriteCount,
     district,
@@ -683,14 +743,23 @@ function crPerfProbeDrawOverlay(ctx, now) {
     'scene/map ' + s.drawScene + '/' + s.minimap + ' hud ' + s.hud,
     'mobile ' + s.mobileMenuAvg + '/' + s.mobileLayoutAvg + ' f/e ' + s.mobileLayoutFlushes + '/' + s.mobileStableEarlyOuts,
     'bitmap ' + s.bitmapAvg + '/' + s.bitmapP95 + ' n ' + s.bitmapColumns,
+    'lf n/g ' + s.longFrame.samples + ' ' + s.longFrame.gapMs.p95 + '/' + s.longFrame.gapMs.worst + ' (CR report p/w)',
     'bkt ' + buckets.under9_5 + '/' + buckets.from9_5To13_5 + '/' + buckets.from13_5To20 + '/' + buckets.from20To33 + '/' + buckets.from33To50 + '/' + buckets.over50,
     'spr ' + s.sprites + ' D' + s.district + ' seed ' + s.seed,
     s.canvas + ' css ' + s.css + ' dpr ' + s.dpr,
     s.layout + ' tap TL reset',
   ];
+  const roomForLongFrameDetail = typeof view !== 'undefined' && view && Number(view.height) >= 190;
+  if (roomForLongFrameDetail) {
+    lines.splice(13, 0,
+      'lf p/w S' + s.longFrame.precedingPhaseMs.simulation.p95 + '/' + s.longFrame.precedingPhaseMs.simulation.worst +
+      ' R' + s.longFrame.precedingPhaseMs.scene.p95 + '/' + s.longFrame.precedingPhaseMs.scene.worst +
+      ' U' + s.longFrame.precedingPhaseMs.ui.p95 + '/' + s.longFrame.precedingPhaseMs.ui.worst
+    );
+  }
   const pad = 4;
   const lineHeight = 10;
-  const width = 168;
+  const width = roomForLongFrameDetail ? 202 : 168;
   const height = pad * 2 + lines.length * lineHeight;
   ctx.save();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
