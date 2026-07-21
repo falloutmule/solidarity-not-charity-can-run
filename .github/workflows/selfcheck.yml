@@ -1,0 +1,155 @@
+name: SNC Release Gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      input_layout: ${{ steps.filter.outputs.input_layout }}
+      renderer_camera: ${{ steps.filter.outputs.renderer_camera }}
+      authored_content: ${{ steps.filter.outputs.authored_content }}
+      persistence: ${{ steps.filter.outputs.persistence }}
+    steps:
+      - uses: actions/checkout@v5
+      - id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            input_layout:
+              - 'src/styles/**'
+              - 'src/html/**'
+              - 'src/js/game-06-**'
+              - 'src/js/game-07-**'
+              - 'src/js/game-08-**'
+              - 'src/js/game-20-section-11-update-input.js'
+              - 'tests/mobile_ui_cache_verify.js'
+            renderer_camera:
+              - 'src/js/game-01**'
+              - 'src/js/game-16**'
+              - 'src/js/game-17**'
+              - 'src/js/game-20a-**'
+              - 'src/js/game-21a-**'
+              - 'src/js/game-22-**'
+              - 'tests/far_field_**'
+              - 'tests/render_interpolation_verify.js'
+            authored_content:
+              - 'src/imported-handoff-assets/**'
+              - 'src/levels/**'
+              - 'src/js/game-09**'
+              - 'src/js/game-14-section-5b-local-persistence.js'
+              - 'src/js/game-16a-**'
+              - 'tests/authored_d1_**'
+              - 'tests/custom_next_001_face_reuse_runtime_verify.js'
+            persistence:
+              - 'src/js/game-05-**'
+              - 'src/js/game-14-**'
+              - 'src/js/game-19-**'
+              - 'tests/authored_d1_save_load_verify.js'
+              - 'tests/far_field_final_candidate_smoke.js'
+
+  minimal-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Create ignored proof directories
+        run: mkdir -p test-results/selfcheck-runs/minimal-release test-results/minimal-release
+      - name: Verify release metadata truth
+        run: npm run test:metadata-truth
+      - name: Verify generated artifact
+        env:
+          CR_SELFCHECK_RUN_DIR: test-results/selfcheck-runs/minimal-release
+        run: npm run build:check
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run ordinary release smoke
+        run: npm run test:farfield-final-smoke -- --output=test-results/minimal-release/farfield-final-smoke.json
+      - name: Upload release evidence
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: snc-release-evidence
+          path: test-results/minimal-release/**
+          if-no-files-found: error
+
+  input-layout:
+    needs: changes
+    if: needs.changes.outputs.input_layout == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run test:mobile-ui-cache
+
+  renderer-camera:
+    needs: changes
+    if: needs.changes.outputs.renderer_camera == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run test:farfield-resolution
+      - run: npm run test:render-interpolation
+      - run: npm run test:farfield-angle
+      - run: npm run test:farfield-projection
+      - run: npm run test:farfield-profiler
+
+  authored-content:
+    needs: changes
+    if: needs.changes.outputs.authored_content == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run test:custom-next
+      - run: npm run test:authored-d1
+      - run: npm run test:authored-d1-save
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:authored-d1-smoke
+
+  persistence:
+    needs: changes
+    if: needs.changes.outputs.persistence == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run test:authored-d1-save
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:farfield-final-smoke -- --output=test-results/persistence/farfield-final-smoke.json
+

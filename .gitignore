@@ -1,0 +1,27 @@
+# Local dependencies and machine state
+node_modules/
+.env
+.env.*
+.DS_Store
+*.log
+*.tmp
+*.bak
+.cache/
+__pycache__/
+*.pyc
+
+# Generated build and browser output
+/dist/
+/playwright-report/
+/test-results/
+/proof-source-build-manifest.json
+proof-*.json
+proof-*.png
+index.before-*.html
+
+# Private archives and report dumps
+*.bundle
+*_REPORT.md
+/reports/
+.snc-archives/
+

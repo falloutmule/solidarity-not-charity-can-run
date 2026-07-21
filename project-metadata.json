@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 3,
+  "project": {
+    "id": "solidarity-not-charity-can-run",
+    "name": "Solidarity Not Charity Can Run"
+  },
+  "runtime": {
+    "buildId": "farfieldsmooth1",
+    "sourcePolicy": "build-manifest",
+    "releaseArtifact": "index.html"
+  },
+  "artifact": {
+    "path": "index.html",
+    "byteLength": 1302797,
+    "sha256": "316fca1b500e4077a3619ee2b1be5e04309fc08c9e14cfe9377bc4be8ebffb82"
+  },
+  "distribution": {
+    "provider": "github-pages",
+    "url": "https://falloutmule.github.io/solidarity-not-charity-can-run/",
+    "source": {
+      "branch": "main",
+      "path": "/"
+    }
+  },
+  "authoredLevels": {
+    "district1": {
+      "levelId": "district-1-authored-v1",
+      "schema": "snc-authored-level-static-v1",
+      "staticByteLength": 3516,
+      "staticSha256": "98168c6d1b5c72bbf802ad69caf2badfa2228d878a9b712f72f4a4cae00bdd82"
+    }
+  },
+  "selection": {
+    "farField": {
+      "candidate": "far-field-smoothing-option2-final",
+      "status": "selected",
+      "basis": "Physical Samsung resolution A/B retained 400x250 with interpolation and subpixel projection.",
+      "evidence": "docs/development/PERFORMANCE.md#current-decision",
+      "modes": {
+        "ffres": "400",
+        "ffangle": "interp",
+        "ffproj": "subpixel"
+      }
+    }
+  },
+  "acceptance": {
+    "samsungSmoothness": {
+      "target": "Samsung Internet",
+      "status": "failed",
+      "scope": "Production root index.html at 400/interp/subpixel during simultaneous MOVE plus LOOK.",
+      "evidence": "docs/development/PERFORMANCE.md#samsung-evidence"
+    },
+    "userVisual": {
+      "status": "pending",
+      "scope": "No general visual acceptance is inferred from publication or automated checks."
+    }
+  },
+  "art": {
+    "custom_next_001": {
+      "version": "001",
+      "approvalStatus": "pending_art_review",
+      "renderMode": "exact_asset",
+      "footprintCells": {
+        "w": 6,
+        "h": 3
+      },
+      "atlas": {
+        "width": 1280,
+        "height": 160,
+        "byteLength": 185412,
+        "sha256": "bffb437c0c6772669233bd58124cded53fe8e32faa9b0e3c96736c4f87ec140c"
+      }
+    }
+  }
+}
+

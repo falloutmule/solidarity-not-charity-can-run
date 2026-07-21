@@ -1,0 +1,39 @@
+{
+  "name": "solidarity-not-charity-can-run",
+  "version": "0.1.0-alpha.1",
+  "description": "Portrait-first single-file browser game about community distribution routes.",
+  "private": true,
+  "license": "UNLICENSED",
+  "homepage": "https://falloutmule.github.io/solidarity-not-charity-can-run/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/falloutmule/solidarity-not-charity-can-run.git"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node tools/build-single-file.js",
+    "build:check": "node tools/build-single-file.js --check",
+    "build:min": "node tools/build-single-file.js --min",
+    "docs:capture": "node tools/capture-docs-images.js",
+    "test:metadata-truth": "node tests/project_metadata_truth_verify.js",
+    "test:selfcheck": "node tests/run_selfcheck_playwright.js",
+    "test:custom-next": "node tests/custom_next_001_face_reuse_runtime_verify.js",
+    "test:authored-d1": "node tests/authored_d1_level_verify.js",
+    "test:authored-d1-save": "node tests/authored_d1_save_load_verify.js",
+    "test:authored-d1-smoke": "node tests/authored_d1_ordinary_game_smoke.js",
+    "test:perf-probe-v2": "node tests/perf_probe_v2_verify.js",
+    "test:render-interpolation": "node tests/render_interpolation_verify.js",
+    "test:mobile-ui-cache": "node tests/mobile_ui_cache_verify.js",
+    "test:farfield-resolution": "node tests/far_field_resolution_verify.js",
+    "test:farfield-angle": "node tests/far_field_angle_verify.js",
+    "test:farfield-projection": "node tests/far_field_projection_verify.js",
+    "test:farfield-profiler": "node tests/far_field_profiler_verify.js",
+    "test:farfield-default-equivalence": "node tests/far_field_default_equivalence_verify.js",
+    "test:farfield-final-smoke": "node tests/far_field_final_candidate_smoke.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.52.0"
+  }
+}

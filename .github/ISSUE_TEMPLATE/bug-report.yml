@@ -1,0 +1,40 @@
+name: Bug report
+description: Report a reproducible SNC Can Run problem
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Describe the observed behavior and what you expected instead.
+    validations:
+      required: true
+  - type: input
+    id: build
+    attributes:
+      label: Build ID
+      placeholder: farfieldsmooth1
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction steps
+      placeholder: "1. Open...\n2. Tap...\n3. Observe..."
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Device and browser
+      placeholder: Samsung model, Android version, browser and version
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Add screenshots, recordings, console errors, or exact URLs when useful.
+
