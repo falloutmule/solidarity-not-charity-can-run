@@ -1,10 +1,10 @@
 # Project Status
 
 **Stage:** Playable pre-alpha  
-**Build:** `rawlook1`
+**Build:** `inputfallback1`
 **Release artifact:** root `index.html`  
 **Production:** <https://falloutmule.github.io/solidarity-not-charity-can-run/>  
-**Game-building state:** Gameplay content paused; one isolated mobile LOOK input-delivery candidate is awaiting Samsung acceptance
+**Game-building state:** Gameplay content paused; a no-code fullscreen compositor A/B is awaiting Samsung acceptance
 
 ## Implemented and verified
 
@@ -26,7 +26,7 @@
 
 Simultaneous MOVE + LOOK still stutters on the target Samsung device. Lowering internal resolution to 320×200 was the same or worse and looked worse, so production remains at 400×250.
 
-The phone did not expose a usable refresh-rate control, so the 60 Hz comparison is unavailable. Measured simulation, renderer, HUD, mobile UI, and bitmap work have not saturated the frame budget, including on the supplied stuttering samples. Repaired `inputcadence2` readings showed sparse LOOK events (about 82 ms p95 gaps), matching the visible angle jumps. `rawlook1` is the next isolated candidate: the dedicated LOOK pad uses browser raw pointer samples when they are available, while the prior `pointermove` path remains its fallback. Rendering, resolution, HUD work, and frame pacing are unchanged. See [docs/development/PERFORMANCE.md](docs/development/PERFORMANCE.md).
+The phone did not expose a usable refresh-rate control, so the 60 Hz comparison is unavailable. Measured simulation, renderer, HUD, mobile UI, and bitmap work have not saturated the frame budget, including on the supplied stuttering samples. Repaired `inputcadence2` readings showed sparse LOOK events (about 82 ms p95 gaps), matching the visible angle jumps. `rawlook1` did not change the reported feel and its moving capture still showed sparse delivery, so it is rejected. `inputfallback1` restores the proven normal `pointermove` route; the next test is fullscreen versus browser chrome with the same runtime bytes. See [docs/development/PERFORMANCE.md](docs/development/PERFORMANCE.md).
 
 ## Authorization boundary
 

@@ -30,9 +30,9 @@ The playable pre-alpha uses a custom raycaster and ships as one self-contained H
 
 ## Current state
 
-The current public build is `rawlook1` at a 400×250 internal render resolution with interpolated angles and subpixel projection.
+The current public build is `inputfallback1` at a 400×250 internal render resolution with interpolated angles and subpixel projection.
 
-The foundation, authored District 1 content, controls, saving, minimap, and single-file build pipeline are playable. The approved campaign and progression design are not yet fully implemented. Gameplay content remains paused while an isolated Samsung LOOK-input delivery candidate awaits physical acceptance; the rejected 320×200 mode will not return as a default.
+The foundation, authored District 1 content, controls, saving, minimap, and single-file build pipeline are playable. The approved campaign and progression design are not yet fully implemented. Gameplay content remains paused while a no-code Samsung fullscreen compositor comparison awaits physical acceptance; the rejected 320×200 mode will not return as a default.
 
 See [PROJECT_STATUS.md](PROJECT_STATUS.md) for the exact boundary between implemented, partial, and planned work.
 
