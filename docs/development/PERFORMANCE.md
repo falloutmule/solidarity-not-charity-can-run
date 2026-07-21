@@ -30,11 +30,20 @@ The query-gated `?perfprobe=1` overlay records each delivery gap above 33 ms wit
 
 `inputcadence1` exposed a missing adapter as `look … ?` values, so its supplied samples are not cadence evidence. `inputcadence2` provides the missing read-only adapter and shows `look n/g <events>/<gap-p95-ms> d <angle-delta-p95>/<largest-jump-rad> r <repeated-frames>` on roomy overlays. It derives values from existing query-gated touch-event and rendered-angle histories; it does not alter input handling, camera motion, rendering, or pacing.
 
-Capture one moving sample near a building and one in an open area. Interpret the result as follows:
+The repaired Samsung captures returned LOOK gap p95 values of about 82 ms, with largest rendered-angle jumps of about 0.05-0.066 rad and 77-112 repeated rendered-angle frames. That cadence matches the reported stutter. The same captures kept the measured game phases below budget; one rare preceding renderer sample reached 29.2 ms, but it did not explain the pervasive LOOK cadence.
+
+## Current input-delivery candidate
+
+`rawlook1` changes only the dedicated `#mlookpad` touch/pen path. When the browser emits `pointerrawupdate`, it consumes that event's chronological coalesced sample sequence and marks raw input as authoritative for that drag. The corresponding `pointermove` is then ignored, preventing duplicate camera deltas. If a browser does not provide raw updates, the existing `pointermove` handling remains unchanged.
+
+This candidate does not change render resolution, renderer work, HUD work, fixed-step simulation, touch layout, save state, or render pacing. The focused verifier covers both exact-once raw-plus-normal event handling and normal-event fallback. It remains physically unaccepted until the Samsung verdict.
+
+For `rawlook1`, capture one moving sample near a building and one in an open area. Interpret the result as follows:
 
 - **Preceding scene or simulation p95/worst rises with long gaps:** isolate that phase in the next single hypothesis card.
-- **LOOK event-gap p95 has visible spikes at the same time as stutter:** treat touch/browser input-event cadence as the leading hypothesis.
+- **The LOOK gap p95 drops materially from about 82 ms and the phone is clearly smoother:** accept raw input delivery and keep this isolated change.
+- **The LOOK gap p95 remains near 82 ms or the phone still clearly stutters:** reject this candidate; do not combine it with a renderer or frame-pacing change.
 - **LOOK gaps stay normal but rendered-angle delta/jump or repeat counts rise:** test rendered-angle cadence next.
 - **Preceding phases and LOOK metrics remain calm while stutter persists:** treat browser/display frame delivery as the leading hypothesis; do not add a cap without a separately testable candidate.
 
-No renderer, input, resolution, HUD, or pacing behavior changes are included in this diagnostic build.
+No renderer, resolution, HUD, or pacing behavior changes are included in this candidate.
