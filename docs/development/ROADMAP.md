@@ -12,9 +12,9 @@ This roadmap follows the approved [Game Design Document](../design/GAME-DESIGN.m
 
 - The target Samsung device did not expose a usable 60 Hz control, so the display-refresh comparison is unavailable.
 - Repaired `inputcadence2` captures showed about 82 ms LOOK event-gap p95 values, matching the phone's visible angle jumps while measured game phases remained below budget.
-- The active `rawlook1` candidate uses raw pointer samples for the dedicated LOOK drag when the browser supplies them; normal `pointermove` remains the fallback and cannot double-apply the same motion.
-- Capture one moving sample near a building and one in an open area while holding MOVE and continuously dragging LOOK. Record the `lf n/g`, `lf p/w S/R/U`, and `look n/g … d … r …` overlay lines.
-- A material drop from the previous ~82 ms `look g` value plus clearly smoother feel accepts the candidate. The same cadence or same stutter rejects it; do not make another source change until that physical-device result selects one hypothesis.
+- `rawlook1` was physically rejected: it did not change the reported feel and a moving capture still showed sparse LOOK delivery. `inputfallback1` restores the preceding normal pointer route.
+- The next test has no game-code mutation: compare the ordinary browser view with the game's FULLSCREEN action, using the same MOVE + LOOK route near a building and in the open.
+- Fullscreen clearly smoother selects Android browser-chrome/compositor delivery. The same or worse result selects one final no-code Chrome versus Samsung Internet A/B before another source card.
 - Do not add a frame cap unless separately testable physical evidence supports it.
 - Do not revive 320×200, adaptive resolution, or the rejected `presentpose1` path.
 

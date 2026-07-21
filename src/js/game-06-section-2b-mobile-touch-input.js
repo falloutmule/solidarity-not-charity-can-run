@@ -9,7 +9,7 @@ const inp = {
   lookDeltaRad:0,
   _active:false, // true when any touch is on screen
 };
-var BUILD_ID = 'rawlook1'; window.BUILD_ID = BUILD_ID;
+var BUILD_ID = 'inputfallback1'; window.BUILD_ID = BUILD_ID;
 const CR_FPV_STREET_SHIMMER_FIX = 1;
 const CR_FPV_STREET_MATTE = true;
 const CR_FPV_WALL_LINE_FIX = 1;
@@ -1285,7 +1285,7 @@ function bindMobileControls(){
     e.preventDefault(); e.stopPropagation();
     if(e.pointerType === 'touch' || e.pointerType === 'pen'){
       try{ lpad.setPointerCapture(e.pointerId); }catch(_e){}
-      lpadTouchPtr = { id: e.pointerId, lastX: e.clientX, rawInput: false };
+      lpadTouchPtr = { id: e.pointerId, lastX: e.clientX };
       lookTouch.id = e.pointerId;
       lookTouch.lastX = e.clientX;
       lpad.classList.add('pr');
@@ -1299,44 +1299,12 @@ function bindMobileControls(){
     }
   },{passive:false});
 
-  const applyLpadTouchSamples = e=>{
-    if(!lpadTouchPtr || e.pointerId !== lpadTouchPtr.id) return false;
-    let samples = null;
-    try{
-      samples = typeof e.getCoalescedEvents === 'function' ? e.getCoalescedEvents() : null;
-    }catch(_e){}
-    if(!samples || !samples.length) samples = [e];
-    let applied = false;
-    for(const sample of samples){
-      const clientX = Number(sample.clientX);
-      if(!Number.isFinite(clientX)) continue;
-      const dx = clientX - lpadTouchPtr.lastX;
-      if(crApplyLookPadDx(dx, sample.timeStamp)){
-        lpadTouchPtr.lastX = clientX;
-        lookTouch.lastX = clientX;
-        applied = true;
-      }
-    }
-    return applied;
-  };
-
-  // On secure-context browsers that provide it, raw updates arrive before their
-  // corresponding pointermove and are not display-rate coalesced.  Once one
-  // arrives, it owns this drag; pointermove remains the compatibility fallback.
-  lpad.addEventListener('pointerrawupdate', e=>{
-    if(state!==STATE.PLAY || paused) return;
-    if(!lpadTouchPtr || e.pointerId !== lpadTouchPtr.id) return;
-    e.stopPropagation();
-    lpadTouchPtr.rawInput = true;
-    applyLpadTouchSamples(e);
-  },{passive:false});
-
   lpad.addEventListener('pointermove', e=>{
     if(state!==STATE.PLAY || paused) return;
     if(lpadTouchPtr && e.pointerId === lpadTouchPtr.id){
       e.preventDefault(); e.stopPropagation();
-      if(lpadTouchPtr.rawInput) return;
-      applyLpadTouchSamples(e);
+      const dx = e.clientX - lpadTouchPtr.lastX;
+      if(crApplyLookPadDx(dx, e.timeStamp)){ lpadTouchPtr.lastX = e.clientX; lookTouch.lastX = e.clientX; }
       return;
     }
     if(e.pointerType === 'touch') return;

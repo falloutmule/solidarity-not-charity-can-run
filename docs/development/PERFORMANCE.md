@@ -32,18 +32,16 @@ The query-gated `?perfprobe=1` overlay records each delivery gap above 33 ms wit
 
 The repaired Samsung captures returned LOOK gap p95 values of about 82 ms, with largest rendered-angle jumps of about 0.05-0.066 rad and 77-112 repeated rendered-angle frames. That cadence matches the reported stutter. The same captures kept the measured game phases below budget; one rare preceding renderer sample reached 29.2 ms, but it did not explain the pervasive LOOK cadence.
 
-## Current input-delivery candidate
+## Rejected raw-input candidate
 
-`rawlook1` changes only the dedicated `#mlookpad` touch/pen path. When the browser emits `pointerrawupdate`, it consumes that event's chronological coalesced sample sequence and marks raw input as authoritative for that drag. The corresponding `pointermove` is then ignored, preventing duplicate camera deltas. If a browser does not provide raw updates, the existing `pointermove` handling remains unchanged.
+`rawlook1` changed only the dedicated `#mlookpad` touch/pen path to consume browser raw pointer samples. The user reported no physical improvement. Its moving capture still showed sparse LOOK delivery, including an event-gap p95 of about 165.8 ms. The candidate is rejected.
 
-This candidate does not change render resolution, renderer work, HUD work, fixed-step simulation, touch layout, save state, or render pacing. The focused verifier covers both exact-once raw-plus-normal event handling and normal-event fallback. It remains physically unaccepted until the Samsung verdict.
+`inputfallback1` restores the exact preceding `pointermove` route while preserving all cadence and long-frame diagnostics. The rollback changes no renderer, resolution, HUD, fixed-step, save, layout, or frame-pacing behavior.
 
-For `rawlook1`, capture one moving sample near a building and one in an open area. Interpret the result as follows:
+## Current no-code experiment
 
-- **Preceding scene or simulation p95/worst rises with long gaps:** isolate that phase in the next single hypothesis card.
-- **The LOOK gap p95 drops materially from about 82 ms and the phone is clearly smoother:** accept raw input delivery and keep this isolated change.
-- **The LOOK gap p95 remains near 82 ms or the phone still clearly stutters:** reject this candidate; do not combine it with a renderer or frame-pacing change.
-- **LOOK gaps stay normal but rendered-angle delta/jump or repeat counts rise:** test rendered-angle cadence next.
-- **Preceding phases and LOOK metrics remain calm while stutter persists:** treat browser/display frame delivery as the leading hypothesis; do not add a cap without a separately testable candidate.
+The supplied captures retained Chrome browser chrome above the game. Test the same `inputfallback1` production artifact first in its current browser view and then after using the game's FULLSCREEN action. In each state, perform simultaneous MOVE + LOOK near a building and in open space for about 15 seconds.
 
-No renderer, resolution, HUD, or pacing behavior changes are included in this candidate.
+- **Fullscreen clearly smoother:** the next hypothesis is Android browser-chrome/compositor delivery, not renderer or input simulation work.
+- **Fullscreen the same or worse:** test the exact same production build in Samsung Internet before another source card.
+- **Do not add a frame cap, revive 320x200, or make another input or renderer change from this result alone.**
