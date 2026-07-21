@@ -184,6 +184,18 @@ for (const name of ['crStepSimulationFixed', 'drawMobileMenu',
 
 // Interpolation sampling uses the locked API without touching player/game state.
 const interp = makeContext('?perfprobe=1');
+let interpAngleStats = {
+  rawLookEvents: 0,
+  lookEventGaps: [],
+  renderAngleDeltas: [],
+  repeatedRenderAngleFramesDuringActiveLook: 0
+};
+interp.crGetRenderAngleCadenceStats = () => Object.assign({}, interpAngleStats, {
+  lookEventGaps: interpAngleStats.lookEventGaps.slice(),
+  renderAngleDeltas: interpAngleStats.renderAngleDeltas.slice()
+});
+let interpCadenceResets = 0;
+interp.crResetRenderAngleCadenceStats = () => { interpCadenceResets++; };
 let poseIndex = 0;
 const poses = [
   { x: 0, y: 0, alpha: 0.2, interpolatedPosition: true, authoritativeX: 1, authoritativeY: 0, previousX: 0, previousY: 0 },
@@ -194,6 +206,13 @@ interp.crGetInterpolatedRenderPose = () => poses[Math.min(poseIndex++, poses.len
 interp.crGetRenderInterpolationAlpha = () => poses[Math.max(0, poseIndex - 1)].alpha;
 interp.crStepSimulationFixed = dt => ({ dt, steps: 0, accumulator: dt, droppedFrames: 0 });
 interp.crPerfProbeEnsureInstalled();
+assert.strictEqual(interpCadenceResets, 1, 'probe initialization clears cadence telemetry before taking its baseline');
+interpAngleStats = {
+  rawLookEvents: 3,
+  lookEventGaps: [10, 20],
+  renderAngleDeltas: [0.01, 0, 0.04],
+  repeatedRenderAngleFramesDuringActiveLook: 2
+};
 for (let i = 0; i < 3; i++) { interp.crStepSimulationFixed(0.01); interp.drawScene(10 + i); }
 const interpReport = interp.CR.crPerfProbeGetReport();
 assert.strictEqual(interpReport.interpolationActive, true);
@@ -237,10 +256,11 @@ const detailedOverlayCtx = {
 };
 interp.crPerfProbeDrawOverlay(detailedOverlayCtx, 1600);
 assert(detailedOverlayCtx.lines.some(line => line.startsWith('lf p/w ')), 'roomy overlay exposes correlated phase p95/worst');
-assert(detailedOverlayCtx.lines.some(line => line === 'look n/g ?/? d ?/? r ?'),
-  'roomy overlay exposes unavailable LOOK cadence explicitly');
+assert(detailedOverlayCtx.lines.some(line => line === 'look n/g 3/20 d 0.04/0.04 r 2'),
+  'roomy overlay exposes populated LOOK cadence from its peer adapter');
 
 interp.crPerfProbeReset();
+assert.strictEqual(interpCadenceResets, 2, 'probe reset clears cadence telemetry before taking its next baseline');
 const reset = interp.CR.crPerfProbeGetReport();
 for (const field of ['stepFrames0', 'stepFrames1', 'stepFrames2', 'stepFrames3Plus',
   'fixedStepDrops', 'accumulatorAlphaAvg', 'accumulatorAlphaMin', 'accumulatorAlphaMax',

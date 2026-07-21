@@ -11,7 +11,7 @@ This roadmap follows the approved [Game Design Document](../design/GAME-DESIGN.m
 ## Device-performance gate — current
 
 - The target Samsung device did not expose a usable 60 Hz control, so the display-refresh comparison is unavailable.
-- The query-gated `inputcadence1` build retains long-frame correlation and adds a phone-visible LOOK-cadence line.
+- The query-gated `inputcadence2` build retains long-frame correlation and adds a phone-visible LOOK-cadence line backed by the actual touch-event and rendered-angle histories.
 - Capture one moving sample near a building and one in an open area while holding MOVE and continuously dragging LOOK. Record the `lf n/g`, `lf p/w S/R/U`, and `look n/g … d … r …` overlay lines.
 - Interpret `look` as `n/g` = LOOK events / event-gap p95 in ms, `d` = rendered-angle delta p95 / largest jump in radians, and `r` = repeated rendered-angle frames while LOOK is active. Large event-gap spikes implicate touch/browser event cadence; normal gaps with large angle jumps or repeats implicate rendered-angle cadence; calm LOOK metrics while stutter persists leaves browser/display delivery as the leading hypothesis.
 - Do not make another source change until this physical-device result selects one hypothesis.

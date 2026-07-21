@@ -212,6 +212,9 @@ function crPerfProbeReset() {
     spriteCount: 0,
     framesSampled: 0,
   };
+  try {
+    if(typeof crResetRenderAngleCadenceStats === 'function') crResetRenderAngleCadenceStats();
+  } catch(_e){}
   _crPerfMobileBaseline = _crPerfReadMobileStats();
   _crPerfAngleBaseline = _crPerfReadAngleStats();
   _crPerfProjectionBaseline = _crPerfReadProjectionStats();
