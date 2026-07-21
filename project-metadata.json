@@ -5,14 +5,14 @@
     "name": "Solidarity Not Charity Can Run"
   },
   "runtime": {
-    "buildId": "farfieldsmooth1",
+    "buildId": "perfcorrelate1",
     "sourcePolicy": "build-manifest",
     "releaseArtifact": "index.html"
   },
   "artifact": {
     "path": "index.html",
-    "byteLength": 1302797,
-    "sha256": "316fca1b500e4077a3619ee2b1be5e04309fc08c9e14cfe9377bc4be8ebffb82"
+    "byteLength": 1305848,
+    "sha256": "da5714e1b1b1e69d1b0bcaf45c2aae189b5b9787afd45d09beb549be09e4b368"
   },
   "distribution": {
     "provider": "github-pages",
@@ -73,4 +73,3 @@
     }
   }
 }
-

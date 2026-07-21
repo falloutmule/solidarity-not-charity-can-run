@@ -172,7 +172,8 @@ assert(ratio480 <= 2.5, `480 synthetic cost ratio ${ratio480} <= 2.5`);
 assert(!/localStorage\s*\.|\bSAVE\b|ffres\s*[:=]\s*['\"]/.test(source), 'profile module has no persistence/save path');
 const game06 = fs.readFileSync(path.join(root, 'src/js/game-06-section-2b-mobile-touch-input.js'), 'utf8').replace(/\r\n/g, '\n');
 const game22 = fs.readFileSync(path.join(root, 'src/js/game-22-section-13-main-loop.js'), 'utf8').replace(/\r\n/g, '\n');
-assert(game06.includes("var BUILD_ID = 'farfieldsmooth1'"), 'current mobile-input coordinator BUILD_ID retained');
+const metadata = JSON.parse(fs.readFileSync(path.join(root, 'project-metadata.json'), 'utf8'));
+assert(game06.includes(`var BUILD_ID = '${metadata.runtime.buildId}'`), 'current mobile-input coordinator BUILD_ID must match metadata');
 assert(game06.includes('function crResetPauseRenderHistory(reason)'), 'current mobile-input pause reset helper retained');
 assert(/const CR_FIXED_STEP_DT\s*=\s*1\s*\/\s*60\s*;/.test(game22), 'fixed-step cadence remains exactly 1/60');
 assert(game22.includes("crApplyRenderProfile(typeof crGetRenderProfile === 'function' ? crGetRenderProfile() : null)"), 'selected render profile initializes through the current runtime hook');
@@ -191,5 +192,4 @@ assert.strictEqual(bitmapBytes.length, 185412, 'canonical bitmap byte length');
 assert.strictEqual(crypto.createHash('sha256').update(bitmapBytes).digest('hex'), 'bffb437c0c6772669233bd58124cded53fe8e32faa9b0e3c96736c4f87ec140c', 'canonical bitmap SHA-256');
 
 console.log(`far_field_resolution_verify: PASS profiles=320,400,480 costRatios=400:${ratio400.toFixed(6)},480:${ratio480.toFixed(6)} selfContained=true`);
-
 

@@ -8,6 +8,7 @@ const { chromium } = require('playwright');
 
 const ROOT = path.resolve(__dirname, '..');
 const OUTPUT = path.join(ROOT, 'docs', 'assets');
+const EXPECTED_BUILD_ID = JSON.parse(fs.readFileSync(path.join(ROOT, 'project-metadata.json'), 'utf8')).runtime.buildId;
 
 function startServer() {
   const server = http.createServer((request, response) => {
@@ -43,7 +44,7 @@ async function dismissIfVisible(page, selector, action) {
 
 async function reachPlay(page, url) {
   await page.goto(url, { waitUntil: 'load', timeout: 15000 });
-  await page.waitForFunction(() => window.CR && window.BUILD_ID === 'farfieldsmooth1' && typeof CR.startRun === 'function', null, { timeout: 10000 });
+  await page.waitForFunction((buildId) => window.CR && window.BUILD_ID === buildId && typeof CR.startRun === 'function', EXPECTED_BUILD_ID, { timeout: 10000 });
   await dismissIfVisible(page, '#porthint', '#portplay');
   await page.evaluate(() => CR.startRun(42));
   await page.waitForFunction(() => window.CR && CR.state === CR.STATE.PLAY, null, { timeout: 10000 });
@@ -60,7 +61,7 @@ async function main() {
     const socialContext = await browser.newContext({ viewport: { width: 1280, height: 640 }, deviceScaleFactor: 1 });
     const socialPage = await socialContext.newPage();
     await socialPage.goto(local.url, { waitUntil: 'load', timeout: 15000 });
-    await socialPage.waitForFunction(() => window.CR && window.BUILD_ID === 'farfieldsmooth1', null, { timeout: 10000 });
+    await socialPage.waitForFunction((buildId) => window.CR && window.BUILD_ID === buildId, EXPECTED_BUILD_ID, { timeout: 10000 });
     await socialPage.waitForTimeout(750);
     await socialPage.screenshot({ path: path.join(OUTPUT, 'social-preview.png') });
     await socialContext.close();

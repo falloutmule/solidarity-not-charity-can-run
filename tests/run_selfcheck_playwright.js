@@ -768,7 +768,7 @@ async function runCanonicalMetadataMetaTest() {
   try {
     const canonical = buildTool.loadProjectMetadata(ROOT);
     const canonicalIdentity = buildTool.validateProjectMetadata(canonical, ROOT);
-    results.actualCanonical = canonical.schemaVersion === 3 && canonical.runtime.buildId === 'farfieldsmooth1';
+    results.actualCanonical = canonical.schemaVersion === 3 && canonical.runtime.buildId === canonicalIdentity.diagnostics.source;
     results.pendingReviewPreserved = canonical.art.custom_next_001.approvalStatus === 'pending_art_review'
       && canonical.acceptance.samsungSmoothness.status === 'failed' && canonical.acceptance.userVisual.status === 'pending';
     for (const declaration of ['const', 'let', 'var']) {
@@ -801,8 +801,8 @@ async function runCanonicalMetadataMetaTest() {
     results.footprintRejected = rejects(() => {
       const m = canonicalMetadata(); m.art.custom_next_001.footprintCells = { w: 6 }; writeFixture(m);
     }, ['footprintCells', 'metadata=', 'source=', 'artifact=']);
-    results.diagnosticsIncludeObservedIdentity = canonicalIdentity.diagnostics.metadata === 'farfieldsmooth1'
-      && canonicalIdentity.diagnostics.source === 'farfieldsmooth1' && canonicalIdentity.diagnostics.artifact === 'farfieldsmooth1';
+    results.diagnosticsIncludeObservedIdentity = canonicalIdentity.diagnostics.metadata === canonical.runtime.buildId
+      && canonicalIdentity.diagnostics.source === canonical.runtime.buildId && canonicalIdentity.diagnostics.artifact === canonical.runtime.buildId;
     writeFixture(canonicalMetadata('not-a-historical-id'), 'const');
     results.historicalIdsNotRequired = buildTool.validateProjectMetadata(buildTool.loadProjectMetadata(tmp), tmp).diagnostics.metadata === 'not-a-historical-id';
   } finally {

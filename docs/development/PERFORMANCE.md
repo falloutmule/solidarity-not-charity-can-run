@@ -20,19 +20,17 @@ During simultaneous MOVE + LOOK, the target Samsung device still showed visible 
 
 The frame distribution was strongly bimodal while measured simulation, HUD, mobile UI, and bitmap work stayed below budget. This supports uneven high-refresh/browser cadence as the next hypothesis, not continuous 400×250 overload. The sample was mixed and ended stationary, so it is not motion-isolated proof.
 
-## Next experiment
+## Display-refresh result
 
-Use the unchanged production URL and compare:
+The target Samsung device did not expose a usable refresh-rate control, so a locked-60-Hz comparison could not be performed. The user repeated the same simultaneous MOVE + LOOK observation and the stutter remained. That is not evidence that 60 Hz would be the same or worse, so it does not authorize a frame cap.
 
-1. the phone's current high-refresh mode;
-2. the phone temporarily locked to 60 Hz;
-3. approximately 15 seconds of simultaneous MOVE + LOOK near a building in each mode.
+## Current diagnostic experiment
 
-The physical verdict is authoritative:
+The query-gated `?perfprobe=1` overlay now records each delivery gap above 33 ms with the measured work from the **immediately preceding frame**. The structured `CR.crPerfProbeGetReport().longFrame` data contains the long-gap p95/worst plus preceding-frame p95/worst timing for simulation, scene rendering, UI, bitmap work, and mobile layout. The phone overlay shows the long-frame sample/gap line and, where the canvas has room, a compact `S` (simulation), `R` (renderer), and `U` (UI) phase p95/worst line; the report contains every phase.
 
-- **60 Hz clearly smoother:** authorize one query-gated 60 fps render-pacing candidate.
-- **Ambiguous:** repeat once under comparable conditions.
-- **Same or worse:** do not add a cap; extend only the existing profiler with phase p95/worst and long-frame correlation.
+Capture one moving sample near a building and one in an open area. Interpret the result as follows:
 
-No renderer, input, resolution, HUD, or pacing changes are combined in one candidate.
+- **Preceding scene or simulation p95/worst rises with long gaps:** isolate that phase in the next single hypothesis card.
+- **Preceding phases remain small while gaps persist:** treat browser/display frame delivery as the leading hypothesis; do not add a cap without a separately testable candidate.
 
+No renderer, input, resolution, HUD, or pacing behavior changes are included in this diagnostic build.

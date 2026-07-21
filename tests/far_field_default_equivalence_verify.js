@@ -14,11 +14,12 @@ function loadChromium() {
 
 const ROOT = path.resolve(__dirname, '..');
 const DEFAULT_ARTIFACT = path.join(ROOT, 'index.html');
+const METADATA = JSON.parse(fs.readFileSync(path.join(ROOT, 'project-metadata.json'), 'utf8'));
 function defaultOutput(name) {
   return path.join(ROOT, 'test-results', 'farfield-runs', `${name}-${process.pid}-${Date.now()}.json`);
 }
 const DEFAULT_OUTPUT = defaultOutput('default-equivalence');
-const EXPECTED = Object.freeze({ buildId: 'farfieldsmooth1', levelId: 'district-1-authored-v1', staticSha256: '98168c6d1b5c72bbf802ad69caf2badfa2228d878a9b712f72f4a4cae00bdd82', bitmapSha256: 'bffb437c0c6772669233bd58124cded53fe8e32faa9b0e3c96736c4f87ec140c' });
+const EXPECTED = Object.freeze({ buildId: METADATA.runtime.buildId, levelId: 'district-1-authored-v1', staticSha256: '98168c6d1b5c72bbf802ad69caf2badfa2228d878a9b712f72f4a4cae00bdd82', bitmapSha256: 'bffb437c0c6772669233bd58124cded53fe8e32faa9b0e3c96736c4f87ec140c' });
 const VIEWPORT = Object.freeze({ width: 960, height: 640 });
 const DPR = 1;
 const SEED = 0x51c0ffee;

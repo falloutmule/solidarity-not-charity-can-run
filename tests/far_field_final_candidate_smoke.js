@@ -21,7 +21,8 @@ const DEFAULT_OUTPUT = defaultOutput('final-candidate-smoke');
 const SAVE_KEY = 'cannedRun.save.v1';
 const STORAGE_INIT_SENTINEL = 'snc.finalSmoke.storageInitialized';
 const SCHEMA = 'snc-far-field-final-candidate-smoke-v1';
-const EXPECTED = Object.freeze({ buildId: 'farfieldsmooth1', levelId: 'district-1-authored-v1', levelSchema: 'snc-authored-level-static-v1', staticSha256: '98168c6d1b5c72bbf802ad69caf2badfa2228d878a9b712f72f4a4cae00bdd82', bitmapSha256: 'bffb437c0c6772669233bd58124cded53fe8e32faa9b0e3c96736c4f87ec140c' });
+const METADATA = JSON.parse(fs.readFileSync(path.join(ROOT, 'project-metadata.json'), 'utf8'));
+const EXPECTED = Object.freeze({ buildId: METADATA.runtime.buildId, levelId: 'district-1-authored-v1', levelSchema: 'snc-authored-level-static-v1', staticSha256: '98168c6d1b5c72bbf802ad69caf2badfa2228d878a9b712f72f4a4cae00bdd82', bitmapSha256: 'bffb437c0c6772669233bd58124cded53fe8e32faa9b0e3c96736c4f87ec140c' });
 function browserContextOptions() { return { viewport: { width: 960, height: 640 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true }; }
 const ROUTE_DT = 1 / 60;
 const TURN_QUANTUM = 2.4 * ROUTE_DT;

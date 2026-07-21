@@ -1,10 +1,10 @@
 # Project Status
 
 **Stage:** Playable pre-alpha  
-**Build:** `farfieldsmooth1`  
+**Build:** `perfcorrelate1`
 **Release artifact:** root `index.html`  
 **Production:** <https://falloutmule.github.io/solidarity-not-charity-can-run/>  
-**Game-building state:** Paused while the current device-performance gate is resolved
+**Game-building state:** Gameplay content paused; a query-gated device-performance diagnostic is active
 
 ## Implemented and verified
 
@@ -26,9 +26,8 @@
 
 Simultaneous MOVE + LOOK still stutters on the target Samsung device. Lowering internal resolution to 320×200 was the same or worse and looked worse, so production remains at 400×250.
 
-The next action is a no-code comparison between the phone's high-refresh mode and a temporary 60 Hz setting using the unchanged production artifact. See [docs/development/PERFORMANCE.md](docs/development/PERFORMANCE.md).
+The phone did not expose a usable refresh-rate control, so the 60 Hz comparison is unavailable. The active diagnostic build adds only query-gated long-frame correlation to `?perfprobe=1`; it records preceding-frame phase timing when a delivery gap exceeds 33 ms. See [docs/development/PERFORMANCE.md](docs/development/PERFORMANCE.md).
 
 ## Authorization boundary
 
 Repository foundation work is authorized. Gameplay, renderer, controls, map content, saves, art, and generated runtime behavior remain paused unless the user explicitly authorizes a bounded card. Phase 5 in the roadmap is a hard user gate.
-

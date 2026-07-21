@@ -112,6 +112,10 @@ function validateProjectMetadata(metadata, root = ROOT, options = {}) {
   if (manifest.output !== runtime.releaseArtifact) fail(`releaseArtifact mismatch: metadata=${runtime.releaseArtifact}, manifest=${manifest.output}`);
   const source = sourceBuildIdentity(manifest, root, diagnostics);
   diagnostics.source = source.id;
+  if (diagnostics.metadata !== diagnostics.source) fail('BUILD_ID parity failed');
+  if (options.skipArtifactValidation === true) {
+    return { metadata, manifest, sourcePath: source.path, sourceBuildId: source.id, artifactBuildId: null, diagnostics };
+  }
   const artifactPath = path.join(root, runtime.releaseArtifact);
   const requireArtifact = options.requireArtifact !== false;
   if (!fs.existsSync(artifactPath)) {
@@ -120,7 +124,7 @@ function validateProjectMetadata(metadata, root = ROOT, options = {}) {
   }
   const artifactText = fs.readFileSync(artifactPath, 'utf8').replace(/\r\n/g, '\n');
   diagnostics.artifact = extractBuildId(artifactText, runtime.releaseArtifact, diagnostics);
-  if (diagnostics.metadata !== diagnostics.source || diagnostics.source !== diagnostics.artifact) fail('BUILD_ID parity failed');
+  if (diagnostics.source !== diagnostics.artifact) fail('BUILD_ID parity failed');
   const artifactBytes = Buffer.from(artifactText, 'utf8');
   if (artifactBytes.length !== artifact.byteLength || sha256(artifactBytes) !== artifact.sha256) fail('artifact byte length or SHA-256 does not match project metadata');
   return { metadata, manifest, sourcePath: source.path, sourceBuildId: source.id, artifactBuildId: diagnostics.artifact, diagnostics };
@@ -151,6 +155,16 @@ function combine(manifest) {
   script = script.replace(/\n+$/, '\n');
   const html = template.replace('{{STYLES}}', styles).replace('{{BODY}}', body).replace('{{SCRIPT}}', script).replace(/\r\n/g, '\n');
   return html.endsWith('\n') ? html : `${html}\n`;
+}
+
+function synchronizeArtifactMetadata(metadata, html) {
+  const bytes = Buffer.from(html, 'utf8');
+  metadata.artifact.byteLength = bytes.length;
+  metadata.artifact.sha256 = sha256(bytes);
+}
+
+function writeProjectMetadata(metadata) {
+  fs.writeFileSync(path.join(ROOT, METADATA_FILE), JSON.stringify(metadata, null, 2) + '\n', 'utf8');
 }
 
 function resolveSelfcheckRunDir() {
@@ -199,7 +213,7 @@ function main() {
   const selfcheckRunDir = resolveSelfcheckRunDir();
   const metadata = loadProjectMetadata();
   const manifest = loadManifest();
-  const preflight = validateProjectMetadata(metadata, ROOT, { requireArtifact: checkOnly });
+  const preflight = validateProjectMetadata(metadata, ROOT, { skipArtifactValidation: !checkOnly });
   const html = combine(manifest);
   const outPath = path.join(ROOT, manifest.output || 'index.html');
 
@@ -219,6 +233,8 @@ function main() {
   }
 
   fs.writeFileSync(outPath, html, 'utf8');
+  synchronizeArtifactMetadata(metadata, html);
+  writeProjectMetadata(metadata);
   const identity = validateProjectMetadata(metadata);
   const proof = writeProof(manifest, html, { mode: doMin ? 'build+min' : 'build', metadata: proofIdentity(identity) }, selfcheckRunDir);
   console.log('Wrote', manifest.output, proof.outputBytes, 'bytes', `${proof.outputSha256.slice(0, 12)}…`);
@@ -234,4 +250,4 @@ function main() {
 
 if (require.main === module) main();
 
-module.exports = { extractBuildId, loadProjectMetadata, validateProjectMetadata };
+module.exports = { extractBuildId, loadProjectMetadata, validateProjectMetadata, synchronizeArtifactMetadata };
