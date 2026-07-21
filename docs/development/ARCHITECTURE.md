@@ -35,4 +35,4 @@ Rendering must not mutate gameplay or save state. Debug and verification entry p
 
 ## Release identity
 
-`BUILD_ID` identifies behaviorally distinct builds. The current build is `perfcorrelate1`. Documentation-only, test-only, and repository-only work does not change it. A runtime behavior change requires a new ID and focused proof.
+`BUILD_ID` identifies behaviorally distinct builds. The current build is `inputcadence1`. Documentation-only, test-only, and repository-only work does not change it. A runtime behavior change requires a new ID and focused proof.

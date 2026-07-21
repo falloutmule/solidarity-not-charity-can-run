@@ -228,6 +228,7 @@ assert(rects.every(r => r.x >= 0 && r.y >= 0 && r.x + r.w <= 320 && r.y + r.h <=
   'overlay must remain within internal FPV bounds');
 assert(overlayCtx.lines.some(line => line.startsWith('lf n/g ')), 'compact overlay must expose long-frame gaps');
 assert(!overlayCtx.lines.some(line => line.startsWith('lf p/w ')), 'compact overlay omits detail when there is no room');
+assert(!overlayCtx.lines.some(line => line.startsWith('look n/g ')), 'compact overlay omits LOOK cadence when there is no room');
 
 interp.view.height = 250;
 const detailedOverlayCtx = {
@@ -236,6 +237,8 @@ const detailedOverlayCtx = {
 };
 interp.crPerfProbeDrawOverlay(detailedOverlayCtx, 1600);
 assert(detailedOverlayCtx.lines.some(line => line.startsWith('lf p/w ')), 'roomy overlay exposes correlated phase p95/worst');
+assert(detailedOverlayCtx.lines.some(line => line === 'look n/g ?/? d ?/? r ?'),
+  'roomy overlay exposes unavailable LOOK cadence explicitly');
 
 interp.crPerfProbeReset();
 const reset = interp.CR.crPerfProbeGetReport();

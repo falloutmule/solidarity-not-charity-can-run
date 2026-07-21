@@ -11,8 +11,10 @@ This roadmap follows the approved [Game Design Document](../design/GAME-DESIGN.m
 ## Device-performance gate — current
 
 - The target Samsung device did not expose a usable 60 Hz control, so the display-refresh comparison is unavailable.
-- The query-gated `perfcorrelate1` build correlates every delivery gap above 33 ms with timing from its immediately preceding frame.
-- Capture one moving sample near a building and one in an open area; use the `lf n/g` and `lf p/w S/R/U` overlay lines to select the next single hypothesis.
+- The query-gated `inputcadence1` build retains long-frame correlation and adds a phone-visible LOOK-cadence line.
+- Capture one moving sample near a building and one in an open area while holding MOVE and continuously dragging LOOK. Record the `lf n/g`, `lf p/w S/R/U`, and `look n/g … d … r …` overlay lines.
+- Interpret `look` as `n/g` = LOOK events / event-gap p95 in ms, `d` = rendered-angle delta p95 / largest jump in radians, and `r` = repeated rendered-angle frames while LOOK is active. Large event-gap spikes implicate touch/browser event cadence; normal gaps with large angle jumps or repeats implicate rendered-angle cadence; calm LOOK metrics while stutter persists leaves browser/display delivery as the leading hypothesis.
+- Do not make another source change until this physical-device result selects one hypothesis.
 - Do not add a frame cap unless separately testable physical evidence supports it.
 - Do not revive 320×200, adaptive resolution, or the rejected `presentpose1` path.
 

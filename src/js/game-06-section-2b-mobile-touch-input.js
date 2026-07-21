@@ -9,7 +9,7 @@ const inp = {
   lookDeltaRad:0,
   _active:false, // true when any touch is on screen
 };
-var BUILD_ID = 'perfcorrelate1'; window.BUILD_ID = BUILD_ID;
+var BUILD_ID = 'inputcadence1'; window.BUILD_ID = BUILD_ID;
 const CR_FPV_STREET_SHIMMER_FIX = 1;
 const CR_FPV_STREET_MATTE = true;
 const CR_FPV_WALL_LINE_FIX = 1;
@@ -1602,4 +1602,3 @@ function syncInpFromJoy(){
   inp.left = joy.x < -0.25;
   inp.right = joy.x > 0.25;
 }
-

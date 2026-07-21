@@ -59,7 +59,7 @@ This document uses four evidence labels:
 |---|---|
 | Repository | `falloutmule/solidarity-not-charity-can-run` |
 | Canonical branch | `main` |
-| Current shipped build ID | `perfcorrelate1` |
+| Current shipped build ID | `inputcadence1` |
 | Production URL | `https://falloutmule.github.io/solidarity-not-charity-can-run/` |
 | Release artifact | root `index.html` |
 | Editable source | `src/` plus `src/build-manifest.json` |
@@ -1632,7 +1632,7 @@ The authoritative repository currently identifies:
 Internal render profile: 400 × 250
 Angle handling: interpolated
 Projection: subpixel
-Build ID: perfcorrelate1
+Build ID: inputcadence1
 ```
 
 Alternate 320 and 480 profiles may exist for diagnostics. The selected baseline remains 400×250 unless new physical-device evidence justifies a change.
@@ -1643,8 +1643,8 @@ Supplied device result:
 
 - MOVE + LOOK still stutters on the Samsung device.
 - 320×200 was rejected as visually worse and not smoother.
-- The next performance action, if resumed, is a physical high-refresh versus 60 Hz A/B.
-- That A/B occurs before a source change.
+- The unavailable high-refresh versus 60 Hz A/B does not authorize a frame cap.
+- The active `inputcadence1` diagnostic now needs a physical MOVE + LOOK sample that distinguishes event gaps from rendered-angle jumps before any further source change.
 
 This GDD does not claim the stutter is fixed.
 
@@ -2211,7 +2211,7 @@ Each task remains one bounded change with focused verification.
 
 1. **SNC-GDD-001A — repository gap audit:** complete; its lasting conclusions live in public status, roadmap, testing, and performance documents.
 2. **SNC-GDD-001B — rules and save contract:** define versioned game data and migration behavior without changing rendering; requires explicit authorization.
-3. **SNC-GDD-002 — portrait layout:** deferred until the Samsung display-refresh gate is resolved and the user explicitly authorizes a layout card.
+3. **SNC-GDD-002 — portrait layout:** deferred until the Samsung input-cadence diagnostic is resolved and the user explicitly authorizes a layout card.
 4. **SNC-GDD-003 through 006 — core run rules:** reconcile no-fail timing, collection and delivery, deterministic anchors and upgrades, then sprint blocks.
 5. **SNC-GDD-007 through 010 — campaign worlds:** build World 1, fixed-loop World 2, the volunteer event, and avoidance-based World 3 in order.
 6. **SNC-GDD-011 and 012 — progression:** implement Hall data and character selection before leaderboard envelopes.
@@ -2232,8 +2232,8 @@ Do not combine broad gameplay work into one branch or one model run. Every task 
 ## 32.2 Current execution gate
 
 - The repository gap audit is complete.
-- The immediate next action is the no-code Samsung high-refresh versus 60 Hz comparison.
-- The existing portrait layout and control editor remain frozen through that comparison.
+- The immediate next action is a physical Samsung MOVE + LOOK capture with the query-gated `inputcadence1` overlay.
+- The existing portrait layout and control editor remain frozen through that diagnostic.
 - `SNC-GDD-001B` is proposed after the device gate but still requires explicit authorization.
 - The vertical-slice gate accumulates from bounded cards; it is never one broad rewrite.
 - Phase 5 remains a hard user gate and cannot be completed without direct user input.
@@ -2331,7 +2331,7 @@ They become release blockers only when their corresponding content phase begins.
 
 ## Verified runtime baseline
 
-- build ID `perfcorrelate1`;
+- build ID `inputcadence1`;
 - default 400×250 render profile;
 - interpolated angle;
 - subpixel projection;
@@ -2343,7 +2343,7 @@ They become release blockers only when their corresponding content phase begins.
 
 - simultaneous MOVE + LOOK stutter remains on the supplied Samsung result;
 - 320×200 was rejected;
-- physical high-refresh versus 60 Hz A/B is the next performance investigation before source changes.
+- the active query-gated LOOK-cadence capture is the next performance investigation before source changes.
 
 ## Not yet implemented or verified by this document
 
@@ -2364,7 +2364,7 @@ This document changes no game source.
 
 The repository gap audit is complete, and its lasting conclusions are incorporated into `PROJECT_STATUS.md` and the public development documents.
 
-The immediate next action remains the no-code Samsung high-refresh versus 60 Hz A/B on the unchanged production artifact.
+The immediate next action is the physical Samsung MOVE + LOOK capture with `?perfprobe=1` on the unchanged `inputcadence1` artifact.
 
 After that device gate, the next proposed GDD card is `SNC-GDD-001B`: define the ruleset and save-migration contract without changing rendering. It still requires explicit authorization.
 
