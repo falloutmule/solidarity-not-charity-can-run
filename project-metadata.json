@@ -5,14 +5,14 @@
     "name": "Solidarity Not Charity Can Run"
   },
   "runtime": {
-    "buildId": "perfcorrelate1",
+    "buildId": "inputcadence1",
     "sourcePolicy": "build-manifest",
     "releaseArtifact": "index.html"
   },
   "artifact": {
     "path": "index.html",
-    "byteLength": 1305848,
-    "sha256": "da5714e1b1b1e69d1b0bcaf45c2aae189b5b9787afd45d09beb549be09e4b368"
+    "byteLength": 1306404,
+    "sha256": "d39de881fe0ac197c59eed0240c81adbf7a14be946701da9147f438f05558ad7"
   },
   "distribution": {
     "provider": "github-pages",

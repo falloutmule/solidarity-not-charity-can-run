@@ -749,9 +749,16 @@ function crPerfProbeDrawOverlay(ctx, now) {
     s.canvas + ' css ' + s.css + ' dpr ' + s.dpr,
     s.layout + ' tap TL reset',
   ];
-  const roomForLongFrameDetail = typeof view !== 'undefined' && view && Number(view.height) >= 190;
+  // The additional LOOK line needs 188px of internal height including padding.
+  // Keep the compact 320x180 overlay unchanged.
+  const roomForLongFrameDetail = typeof view !== 'undefined' && view && Number(view.height) >= 200;
   if (roomForLongFrameDetail) {
     lines.splice(13, 0,
+      'look n/g ' + (s.rawLookEvents == null ? '?' : s.rawLookEvents) + '/' +
+        (s.lookEventGapP95 == null ? '?' : s.lookEventGapP95) + ' d ' +
+        (s.renderAngleDeltaP95 == null ? '?' : s.renderAngleDeltaP95) + '/' +
+        (s.largestRenderAngleJump == null ? '?' : s.largestRenderAngleJump) + ' r ' +
+        (s.repeatedRenderAngleFramesDuringActiveLook == null ? '?' : s.repeatedRenderAngleFramesDuringActiveLook),
       'lf p/w S' + s.longFrame.precedingPhaseMs.simulation.p95 + '/' + s.longFrame.precedingPhaseMs.simulation.worst +
       ' R' + s.longFrame.precedingPhaseMs.scene.p95 + '/' + s.longFrame.precedingPhaseMs.scene.worst +
       ' U' + s.longFrame.precedingPhaseMs.ui.p95 + '/' + s.longFrame.precedingPhaseMs.ui.worst

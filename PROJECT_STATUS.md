@@ -1,7 +1,7 @@
 # Project Status
 
 **Stage:** Playable pre-alpha  
-**Build:** `perfcorrelate1`
+**Build:** `inputcadence1`
 **Release artifact:** root `index.html`  
 **Production:** <https://falloutmule.github.io/solidarity-not-charity-can-run/>  
 **Game-building state:** Gameplay content paused; a query-gated device-performance diagnostic is active
@@ -26,7 +26,7 @@
 
 Simultaneous MOVE + LOOK still stutters on the target Samsung device. Lowering internal resolution to 320×200 was the same or worse and looked worse, so production remains at 400×250.
 
-The phone did not expose a usable refresh-rate control, so the 60 Hz comparison is unavailable. The active diagnostic build adds only query-gated long-frame correlation to `?perfprobe=1`; it records preceding-frame phase timing when a delivery gap exceeds 33 ms. See [docs/development/PERFORMANCE.md](docs/development/PERFORMANCE.md).
+The phone did not expose a usable refresh-rate control, so the 60 Hz comparison is unavailable. Measured simulation, renderer, HUD, mobile UI, and bitmap work have not saturated the frame budget, including on the supplied stuttering samples. The active diagnostic build adds only a query-gated LOOK-cadence readout to `?perfprobe=1`; it distinguishes delayed touch events from delayed rendered-angle updates. See [docs/development/PERFORMANCE.md](docs/development/PERFORMANCE.md).
 
 ## Authorization boundary
 
