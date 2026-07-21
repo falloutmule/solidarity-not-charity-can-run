@@ -350,6 +350,49 @@ assertActualPauseTransition('portrait menu pause entry', r => {
 }, true, 'pause-entry');
 assertActualPauseTransition('pause menu resume', r => { r.paused = true; r.pauseApi.rmenuAction('pause-resume'); }, false, 'pause-resume');
 
+// SNC-PERF-016: raw LOOK samples must own a touch drag when available. The
+// required raw-before-pointermove order then lets the normal pointer event be
+// ignored, so coordinates are never applied twice. Without raw samples the
+// existing pointermove behavior remains the fallback.
+{
+  const event = (pointerId, clientX, timeStamp, samples) => ({
+    pointerId, pointerType: 'touch', clientX, timeStamp,
+    preventDefault(){ this.prevented = true; }, stopPropagation(){ this.stopped = true; },
+    getCoalescedEvents: samples ? () => samples : undefined,
+  });
+  const bindLookRuntime = () => {
+    const r = pauseTransitionRuntime();
+    r.dismissLookHint = () => {};
+    r.touchDebug = () => {};
+    r.crApplyLookPadDx = (dx, at) => {
+      r.__lookSamples.push({ dx, at });
+      return Math.abs(dx) > 0.2;
+    };
+    r.__lookSamples = [];
+    r.pauseApi.bindMobileControls();
+    return r;
+  };
+
+  const raw = bindLookRuntime();
+  const rawPad = raw.element('mlookpad');
+  rawPad.listeners.pointerdown[0](event(9, 100, 0));
+  rawPad.listeners.pointerrawupdate[0](event(9, 108, 8, [
+    { clientX: 103, timeStamp: 3 }, { clientX: 108, timeStamp: 8 },
+  ]));
+  rawPad.listeners.pointermove[0](event(9, 108, 8));
+  assert.deepStrictEqual(raw.__lookSamples, [
+    { dx: 3, at: 3 }, { dx: 5, at: 8 },
+  ], 'raw coalesced samples apply once and suppress their matching pointermove');
+
+  const fallback = bindLookRuntime();
+  const fallbackPad = fallback.element('mlookpad');
+  fallbackPad.listeners.pointerdown[0](event(10, 200, 0));
+  fallbackPad.listeners.pointermove[0](event(10, 206, 11));
+  assert.deepStrictEqual(fallback.__lookSamples, [
+    { dx: 6, at: 11 },
+  ], 'pointermove remains the exact fallback when raw input is unavailable');
+}
+
 {
   const sandbox = { Math, Number, Object, String };
   sandbox.globalThis = sandbox;
