@@ -52,7 +52,7 @@ function runtime(search = '', overrides = {}) {
   sandbox.globalThis = sandbox;
   sandbox.window = sandbox;
   vm.createContext(sandbox);
-  vm.runInContext(`${angleSource}\n;globalThis.__angleApi={crGetRawRenderAngle,crGetInterpolatedRenderAngle,crGetSmoothedRenderAngle,crGetSelectedRenderAngleMode,crResetRenderAngleHistory,crGetRenderAngleStats,crRecordAuthoritativeAngleChange};`, sandbox, { filename: anglePath });
+  vm.runInContext(`${angleSource}\n;globalThis.__angleApi={crGetRawRenderAngle,crGetInterpolatedRenderAngle,crGetSmoothedRenderAngle,crGetSelectedRenderAngleMode,crResetRenderAngleHistory,crGetRenderAngleStats,crGetRenderAngleCadenceStats,crResetRenderAngleCadenceStats,crRecordAuthoritativeAngleChange};`, sandbox, { filename: anglePath });
   sandbox.api = sandbox.__angleApi;
   sandbox.setNow = value => { now = value; };
   return sandbox;
@@ -74,6 +74,54 @@ for (const [search, expected] of [
   assert.strictEqual(JSON.stringify(r.player), before, 'raw getter does not mutate authority');
   r.player.angle = Infinity;
   assert(Number.isFinite(r.api.crGetRawRenderAngle()), 'raw fallback is finite when authority is non-finite');
+}
+
+// SNC-PERF-015: cadence adapter is a read-only bridge from the real touch
+// sample shape and render-angle history, not a perf-probe-only mock.
+{
+  const sectionEnd = touchSource.indexOf('let lookHintUsed = false;');
+  assert(sectionEnd > 0, 'touch LOOK core is extractable for cadence integration');
+  const touchCore = touchSource.slice(0, sectionEnd);
+  let now = 0;
+  const sandbox = {
+    Math, Number, Object, String, URLSearchParams,
+    location: { search: '?perfprobe=1', protocol: 'https:' },
+    CR_PERF_PROBE: true,
+    STATE: { PLAY: 'play' }, state: 'play', paused: false,
+    player: { angle: 0 },
+    performance: { now: () => now },
+    mobileLookSens: () => 1,
+  };
+  sandbox.globalThis = sandbox;
+  sandbox.window = sandbox;
+  vm.createContext(sandbox);
+  vm.runInContext(`${touchCore}\n${angleSource}\n;globalThis.__cadenceApi={crApplyRawTouchLookDelta,crApplyPendingInputActions,crGetRenderAngleCadenceStats,crResetRenderAngleCadenceStats,crGetRawRenderAngle};`, sandbox, { filename: 'actual-cadence-sources.js' });
+  const api = sandbox.__cadenceApi;
+  api.crGetRawRenderAngle();
+  for(const [eventAt, renderAt] of [[10, 16], [30, 33], [50, 50]]){
+    now = eventAt;
+    api.crApplyRawTouchLookDelta(0.1, eventAt);
+    api.crApplyPendingInputActions();
+    now = renderAt;
+    api.crGetRawRenderAngle();
+  }
+  now = 60;
+  api.crGetRawRenderAngle();
+  const before = JSON.stringify(sandbox.player);
+  const cadence = api.crGetRenderAngleCadenceStats();
+  assert(Object.isFrozen(cadence), 'cadence adapter snapshot is frozen');
+  assert.strictEqual(cadence.rawLookEvents, 3, 'cadence adapter reads real raw LOOK count');
+  assert.deepStrictEqual(Array.from(cadence.lookEventGaps), [20, 20], 'cadence adapter preserves real touch-event gaps');
+  assert.strictEqual(cadence.renderAngleDeltas.length, 4, 'cadence adapter derives every rendered-angle transition');
+  assert(Math.abs(cadence.renderAngleDeltas[0] - 0.1) < 1e-12, 'cadence adapter derives rendered angle deltas');
+  assert.strictEqual(cadence.renderAngleDeltas[3], 0, 'cadence adapter retains repeated rendered-angle frames');
+  assert.strictEqual(cadence.repeatedRenderAngleFramesDuringActiveLook, 1, 'cadence adapter counts a repeated frame during active LOOK');
+  assert.strictEqual(JSON.stringify(sandbox.player), before, 'cadence reads never mutate gameplay authority');
+  api.crResetRenderAngleCadenceStats();
+  const cleared = api.crGetRenderAngleCadenceStats();
+  assert.strictEqual(cleared.rawLookEvents, 0, 'cadence reset clears raw LOOK history');
+  assert.deepStrictEqual(Array.from(cleared.renderAngleDeltas), [], 'cadence reset clears rendered-angle history');
+  assert.strictEqual(JSON.stringify(sandbox.player), before, 'cadence reset never changes gameplay authority');
 }
 
 {

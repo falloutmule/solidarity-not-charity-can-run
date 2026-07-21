@@ -59,7 +59,7 @@ This document uses four evidence labels:
 |---|---|
 | Repository | `falloutmule/solidarity-not-charity-can-run` |
 | Canonical branch | `main` |
-| Current shipped build ID | `inputcadence1` |
+| Current shipped build ID | `inputcadence2` |
 | Production URL | `https://falloutmule.github.io/solidarity-not-charity-can-run/` |
 | Release artifact | root `index.html` |
 | Editable source | `src/` plus `src/build-manifest.json` |
@@ -1632,7 +1632,7 @@ The authoritative repository currently identifies:
 Internal render profile: 400 × 250
 Angle handling: interpolated
 Projection: subpixel
-Build ID: inputcadence1
+Build ID: inputcadence2
 ```
 
 Alternate 320 and 480 profiles may exist for diagnostics. The selected baseline remains 400×250 unless new physical-device evidence justifies a change.
@@ -1644,7 +1644,7 @@ Supplied device result:
 - MOVE + LOOK still stutters on the Samsung device.
 - 320×200 was rejected as visually worse and not smoother.
 - The unavailable high-refresh versus 60 Hz A/B does not authorize a frame cap.
-- The active `inputcadence1` diagnostic now needs a physical MOVE + LOOK sample that distinguishes event gaps from rendered-angle jumps before any further source change.
+- The first `inputcadence1` diagnostic exposed its missing adapter as `?` values; `inputcadence2` now needs a physical MOVE + LOOK sample that distinguishes event gaps from rendered-angle jumps before any further source change.
 
 This GDD does not claim the stutter is fixed.
 
@@ -2232,7 +2232,7 @@ Do not combine broad gameplay work into one branch or one model run. Every task 
 ## 32.2 Current execution gate
 
 - The repository gap audit is complete.
-- The immediate next action is a physical Samsung MOVE + LOOK capture with the query-gated `inputcadence1` overlay.
+- The immediate next action is a physical Samsung MOVE + LOOK capture with the query-gated `inputcadence2` overlay.
 - The existing portrait layout and control editor remain frozen through that diagnostic.
 - `SNC-GDD-001B` is proposed after the device gate but still requires explicit authorization.
 - The vertical-slice gate accumulates from bounded cards; it is never one broad rewrite.
@@ -2331,7 +2331,7 @@ They become release blockers only when their corresponding content phase begins.
 
 ## Verified runtime baseline
 
-- build ID `inputcadence1`;
+- build ID `inputcadence2`;
 - default 400×250 render profile;
 - interpolated angle;
 - subpixel projection;
@@ -2364,7 +2364,7 @@ This document changes no game source.
 
 The repository gap audit is complete, and its lasting conclusions are incorporated into `PROJECT_STATUS.md` and the public development documents.
 
-The immediate next action is the physical Samsung MOVE + LOOK capture with `?perfprobe=1` on the unchanged `inputcadence1` artifact.
+The immediate next action is the physical Samsung MOVE + LOOK capture with `?perfprobe=1` on the unchanged `inputcadence2` artifact.
 
 After that device gate, the next proposed GDD card is `SNC-GDD-001B`: define the ruleset and save-migration contract without changing rendering. It still requires explicit authorization.
 

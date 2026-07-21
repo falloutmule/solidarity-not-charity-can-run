@@ -6,6 +6,7 @@
 const CR_RENDER_ANGLE_SMOOTH_TAU_SECONDS = 0.045;
 const CR_RENDER_ANGLE_MAX_DT_SECONDS = 0.1;
 const CR_RENDER_ANGLE_SAMPLE_CAP = 512;
+const CR_RENDER_ANGLE_ACTIVE_LOOK_WINDOW_MS = 120;
 const CR_RENDER_ANGLE_MODES = Object.freeze(['raw', 'interp', 'smooth']);
 
 function crNormalizeRenderAngle(value){
@@ -141,6 +142,69 @@ function crGetRenderAngleStats(){
     renderedAngles: Object.freeze((stats.renderedAngles || []).slice()),
     renderTimestamps: Object.freeze((stats.renderTimestamps || []).slice()),
   });
+}
+
+/**
+ * Query-gated PERF data adapter. It derives cadence-only values from the
+ * existing touch and rendered-angle histories; it never changes input,
+ * simulation, or rendering state.
+ */
+function crGetRenderAngleCadenceStats(){
+  if(typeof crGetRawTouchLookStats !== 'function') return null;
+  let touch;
+  let render;
+  try {
+    touch = crGetRawTouchLookStats();
+    render = crGetRenderAngleStats();
+  } catch(_e){
+    return null;
+  }
+  if(!touch || !render || !Array.isArray(touch.eventTimestamps) ||
+      !Array.isArray(render.renderedAngles) || !Array.isArray(render.renderTimestamps)) return null;
+  const rawLookEvents = Number(touch.rawLookEvents);
+  if(!Number.isFinite(rawLookEvents) || rawLookEvents < 0) return null;
+  const eventTimestamps = touch.eventTimestamps.map(Number);
+  const renderedAngles = render.renderedAngles.map(Number);
+  const renderTimestamps = render.renderTimestamps.map(Number);
+  if(eventTimestamps.some((value) => !Number.isFinite(value) || value < 0) ||
+      renderedAngles.some((value) => !Number.isFinite(value)) ||
+      renderTimestamps.some((value) => !Number.isFinite(value) || value < 0) ||
+      renderedAngles.length !== renderTimestamps.length) return null;
+
+  const lookEventGaps = [];
+  for(let i = 1; i < eventTimestamps.length; i++){
+    lookEventGaps.push(Math.max(0, eventTimestamps[i] - eventTimestamps[i - 1]));
+  }
+  const renderAngleDeltas = [];
+  let repeatedRenderAngleFramesDuringActiveLook = 0;
+  let latestLookEventAt = null;
+  let lookIndex = 0;
+  for(let i = 1; i < renderedAngles.length; i++){
+    const renderAt = renderTimestamps[i];
+    while(lookIndex < eventTimestamps.length && eventTimestamps[lookIndex] <= renderAt){
+      latestLookEventAt = eventTimestamps[lookIndex++];
+    }
+    const delta = Math.abs(crShortestAngleDelta(renderedAngles[i - 1], renderedAngles[i]));
+    renderAngleDeltas.push(delta);
+    if(latestLookEventAt !== null && renderAt - latestLookEventAt <= CR_RENDER_ANGLE_ACTIVE_LOOK_WINDOW_MS && delta <= 1e-12){
+      repeatedRenderAngleFramesDuringActiveLook++;
+    }
+  }
+  return Object.freeze({
+    rawLookEvents,
+    lookEventGaps: Object.freeze(lookEventGaps),
+    renderAngleDeltas: Object.freeze(renderAngleDeltas),
+    repeatedRenderAngleFramesDuringActiveLook,
+  });
+}
+
+/** Clears PERF-only cadence histories without changing the rendered camera state. */
+function crResetRenderAngleCadenceStats(){
+  crClearRenderAngleStats();
+  try {
+    if(typeof crResetRawTouchLookStats === 'function') crResetRawTouchLookStats();
+  } catch(_e){}
+  return Object.freeze({ cleared: true });
 }
 
 function crReadAuthoritativeAngle(){

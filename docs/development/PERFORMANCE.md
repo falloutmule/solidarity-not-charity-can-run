@@ -28,7 +28,7 @@ The target Samsung device did not expose a usable refresh-rate control, so a loc
 
 The query-gated `?perfprobe=1` overlay records each delivery gap above 33 ms with the measured work from the **immediately preceding frame**. The structured `CR.crPerfProbeGetReport().longFrame` data contains the long-gap p95/worst plus preceding-frame p95/worst timing for simulation, scene rendering, UI, bitmap work, and mobile layout. The phone overlay shows the long-frame sample/gap line and, where the canvas has room, a compact `S` (simulation), `R` (renderer), and `U` (UI) phase p95/worst line; the report contains every phase.
 
-`inputcadence1` also shows `look n/g <events>/<gap-p95-ms> d <angle-delta-p95>/<largest-jump-rad> r <repeated-frames>` on roomy overlays. It reports existing query-gated input and render-angle measurements only; it does not alter input handling, camera motion, rendering, or pacing.
+`inputcadence1` exposed a missing adapter as `look … ?` values, so its supplied samples are not cadence evidence. `inputcadence2` provides the missing read-only adapter and shows `look n/g <events>/<gap-p95-ms> d <angle-delta-p95>/<largest-jump-rad> r <repeated-frames>` on roomy overlays. It derives values from existing query-gated touch-event and rendered-angle histories; it does not alter input handling, camera motion, rendering, or pacing.
 
 Capture one moving sample near a building and one in an open area. Interpret the result as follows:
 
