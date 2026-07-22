@@ -36,9 +36,11 @@ function bindAudioUnlockGate(){
   _audioUnlockBound = true;
   const unlockFromGesture = ()=>{ resumeAudioContext(); };
   const opts = { capture:true, passive:true };
-  document.addEventListener('pointerdown', unlockFromGesture, opts);
   document.addEventListener('keydown', unlockFromGesture, opts);
-  document.addEventListener('touchstart', unlockFromGesture, opts);
+  // Pointer Events already cover touch-capable modern browsers.  Keep the
+  // legacy event only for engines that do not implement Pointer Events.
+  if(typeof window.PointerEvent === 'function') document.addEventListener('pointerdown', unlockFromGesture, opts);
+  else document.addEventListener('touchstart', unlockFromGesture, opts);
 }
 
 function _beepNow(ctx, freq, dur, type, gain){

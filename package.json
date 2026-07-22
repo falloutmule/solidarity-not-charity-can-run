@@ -24,6 +24,7 @@
     "test:authored-d1-save": "node tests/authored_d1_save_load_verify.js",
     "test:authored-d1-smoke": "node tests/authored_d1_ordinary_game_smoke.js",
     "test:perf-probe-v2": "node tests/perf_probe_v2_verify.js",
+    "test:chrome-pointer-path": "node tests/chrome_pointer_path_verify.js",
     "test:render-interpolation": "node tests/render_interpolation_verify.js",
     "test:mobile-ui-cache": "node tests/mobile_ui_cache_verify.js",
     "test:farfield-resolution": "node tests/far_field_resolution_verify.js",
