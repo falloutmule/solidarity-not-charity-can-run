@@ -23,4 +23,5 @@ Root `index.html` is the shipped GitHub Pages game. It is generated; do not hand
 4. Run the ordinary browser smoke before a runtime release.
 5. Commit canonical source and regenerated `index.html` together.
 
-Ordinary `build` and `build:check` do not write a proof file. Use `npm.cmd run build:proof` for an ignored local build proof, or set `CR_SELFCHECK_RUN_DIR` to an existing descendant of `test-results/selfcheck-runs/` when running the historical self-check.
+Set `CR_SELFCHECK_RUN_DIR` to an existing descendant of `test-results/selfcheck-runs/` so generated build proof stays ignored and run-local.
+
