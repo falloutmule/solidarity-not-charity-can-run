@@ -44,11 +44,11 @@
     }
   },
   "acceptance": {
-    "samsungSmoothness": {
-      "target": "Samsung Internet",
-      "status": "failed",
-      "scope": "Production root index.html at 400/interp/subpixel during simultaneous MOVE plus LOOK.",
-      "evidence": "docs/development/PERFORMANCE.md#samsung-evidence"
+    "androidChrome": {
+      "target": "Android Chrome",
+      "status": "passed",
+      "scope": "chromeinput2 on the production root index.html during simultaneous MOVE plus LOOK near buildings and in the open.",
+      "evidence": "docs/development/PERFORMANCE.md#chrome-pointer-path-acceptance"
     },
     "userVisual": {
       "status": "pending",

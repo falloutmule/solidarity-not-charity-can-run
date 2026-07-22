@@ -8,7 +8,6 @@ The public documentation is intentionally small and living. Raw audits, proof ou
 | [Architecture](development/ARCHITECTURE.md) | Runtime structure and source/release boundaries |
 | [Roadmap](development/ROADMAP.md) | Ordered work, blockers, and user gates |
 | [Testing](development/TESTING.md) | Release checks and characterization policy |
-| [Performance](development/PERFORMANCE.md) | Current Samsung evidence and decision rules |
+| [Performance](development/PERFORMANCE.md) | Accepted Android Chrome input path and retained guardrails |
 
 For the shortest current-state summary, read [PROJECT_STATUS.md](../PROJECT_STATUS.md).
-

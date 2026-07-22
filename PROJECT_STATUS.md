@@ -1,19 +1,25 @@
 # Project Status
 
-**Stage:** Playable pre-alpha  
-**Build:** `inputfallback1`
-**Release artifact:** root `index.html`  
-**Production:** <https://falloutmule.github.io/solidarity-not-charity-can-run/>  
-**Game-building state:** Gameplay content paused; a no-code fullscreen compositor A/B is awaiting Samsung acceptance
+**Stage:** Playable pre-alpha
+**Build:** `chromeinput2`
+**Production:** <https://falloutmule.github.io/solidarity-not-charity-can-run/>
+**Game-building state:** Gameplay content remains paused while the repository foundation is cleaned up.
+
+## Current production truth
+
+- Production `main` is commit `f12603b5cc92a840cdbb76873c84838a007fcc58`.
+- Root `index.html` is the generated, self-contained release artifact: 1,314,349 bytes, SHA-256 `83d676c607ab4788a33d11150f630f69c8231ada72c5e3706891d2c576e0238b`.
+- The selected render profile remains 400x250, interpolated angles, and subpixel projection. The 320x200 path is closed because it was not smoother and looked worse.
+- Android Chrome is the required platform. The physical `chromeinput2` comparison was clearly better than `inputfallback1`, with no thumb drops, page scroll, pull-to-refresh, text selection, zoom, or material sensitivity change.
 
 ## Implemented and verified
 
 - Custom single-file raycaster runtime with no external runtime dependencies.
 - Manifest-driven source build with source/artifact parity checks.
 - Portrait mobile controls, desktop support, minimap, HUD, audio, and local saving.
+- Pointer Events are authoritative on PointerEvent-capable browsers; legacy Touch input is fallback-only. Chrome LOOK consumes coalesced samples when available.
 - Authored District 1 data and the embedded `custom_next_001` landmark asset.
 - Canned-good collection, delivery vocabulary, timer, sprint, and current progression scaffolding.
-- Selected 400×250 render profile with interpolated angles and subpixel projection.
 
 ## Partial or not yet aligned with the approved design
 
@@ -22,12 +28,8 @@
 - Existing menus and progression scaffolding do not yet represent the complete approved flow.
 - The broad historical self-check includes obsolete expectations and remains characterization-only.
 
-## Current blocker
+## Current authorized work
 
-Simultaneous MOVE + LOOK still stutters on the target Samsung device. Lowering internal resolution to 320×200 was the same or worse and looked worse, so production remains at 400×250.
+The accepted Chrome input behavior is the cleanup baseline. The active repository card is truth and build hygiene: release records, build-proof routing, documentation, and test ownership.
 
-The phone did not expose a usable refresh-rate control, so the 60 Hz comparison is unavailable. Measured simulation, renderer, HUD, mobile UI, and bitmap work have not saturated the frame budget, including on the supplied stuttering samples. Repaired `inputcadence2` readings showed sparse LOOK events (about 82 ms p95 gaps), matching the visible angle jumps. `rawlook1` did not change the reported feel and its moving capture still showed sparse delivery, so it is rejected. `inputfallback1` restores the proven normal `pointermove` route; the next test is fullscreen versus browser chrome with the same runtime bytes. See [docs/development/PERFORMANCE.md](docs/development/PERFORMANCE.md).
-
-## Authorization boundary
-
-Repository foundation work is authorized. Gameplay, renderer, controls, map content, saves, art, and generated runtime behavior remain paused unless the user explicitly authorizes a bounded card. Phase 5 in the roadmap is a hard user gate.
+Gameplay, renderer, controls, map content, saves, art, and generated runtime behavior remain paused unless the user explicitly authorizes a bounded card. Phase 5 in the roadmap remains a hard user gate.

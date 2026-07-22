@@ -716,8 +716,8 @@ async function runCanonicalMetadataMetaTest() {
       },
     },
     acceptance: {
-      samsungSmoothness: {
-        target: 'Samsung Internet', status: 'failed', scope: 'MOVE plus LOOK fixture',
+      androidChrome: {
+        target: 'Android Chrome', status: 'passed', scope: 'MOVE plus LOOK fixture',
         evidence: 'docs/development/PERFORMANCE.md',
       },
       userVisual: { status: 'pending', scope: 'No general visual acceptance in fixture.' },
@@ -770,7 +770,7 @@ async function runCanonicalMetadataMetaTest() {
     const canonicalIdentity = buildTool.validateProjectMetadata(canonical, ROOT);
     results.actualCanonical = canonical.schemaVersion === 3 && canonical.runtime.buildId === canonicalIdentity.diagnostics.source;
     results.pendingReviewPreserved = canonical.art.custom_next_001.approvalStatus === 'pending_art_review'
-      && canonical.acceptance.samsungSmoothness.status === 'failed' && canonical.acceptance.userVisual.status === 'pending';
+      && canonical.acceptance.androidChrome.status === 'passed' && canonical.acceptance.userVisual.status === 'pending';
     for (const declaration of ['const', 'let', 'var']) {
       writeFixture(canonicalMetadata(), declaration);
       buildTool.validateProjectMetadata(buildTool.loadProjectMetadata(tmp), tmp);

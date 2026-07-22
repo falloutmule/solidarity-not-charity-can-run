@@ -30,9 +30,9 @@ The playable pre-alpha uses a custom raycaster and ships as one self-contained H
 
 ## Current state
 
-The current public build is `inputfallback1` at a 400×250 internal render resolution with interpolated angles and subpixel projection.
+The current public build is `chromeinput2` at a 400x250 internal render resolution with interpolated angles and subpixel projection.
 
-The foundation, authored District 1 content, controls, saving, minimap, and single-file build pipeline are playable. The approved campaign and progression design are not yet fully implemented. Gameplay content remains paused while a no-code Samsung fullscreen compositor comparison awaits physical acceptance; the rejected 320×200 mode will not return as a default.
+The foundation, authored District 1 content, controls, saving, minimap, and single-file build pipeline are playable. Android Chrome MOVE + LOOK acceptance is complete: `chromeinput2` was clearly better with no thumb drops or browser-gesture regressions. The approved campaign and progression design are not yet fully implemented; gameplay content remains paused while the repository foundation is cleaned up. The rejected 320x200 mode will not return as a default.
 
 See [PROJECT_STATUS.md](PROJECT_STATUS.md) for the exact boundary between implemented, partial, and planned work.
 
@@ -53,9 +53,8 @@ See [PROJECT_STATUS.md](PROJECT_STATUS.md) for the exact boundary between implem
 
 ```powershell
 npm.cmd ci
-New-Item -ItemType Directory -Force test-results/selfcheck-runs/local-release | Out-Null
-$env:CR_SELFCHECK_RUN_DIR = 'test-results/selfcheck-runs/local-release'
 npm.cmd run test:metadata-truth
+npm.cmd run test:build-proof-routing
 npm.cmd run build:check
 npm.cmd run test:farfield-final-smoke -- --output=test-results/local-release/farfield-final-smoke.json
 ```
@@ -70,7 +69,7 @@ Edit canonical inputs under `src/`, then rebuild the root `index.html`. Do not h
 | [Architecture](docs/development/ARCHITECTURE.md) | Runtime, source, and build boundaries |
 | [Roadmap](docs/development/ROADMAP.md) | Ordered work and explicit user gates |
 | [Testing](docs/development/TESTING.md) | Release checks and characterization policy |
-| [Performance](docs/development/PERFORMANCE.md) | Current Samsung evidence and next experiment |
+| [Performance](docs/development/PERFORMANCE.md) | Accepted Android Chrome input path and retained performance guardrails |
 | [Contributing](CONTRIBUTING.md) | Branch, change, and verification expectations |
 
 ## Rights
