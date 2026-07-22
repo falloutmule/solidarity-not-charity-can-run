@@ -73,6 +73,8 @@ jobs:
         run: mkdir -p test-results/selfcheck-runs/minimal-release test-results/minimal-release
       - name: Verify release metadata truth
         run: npm run test:metadata-truth
+      - name: Verify build proof routing
+        run: npm run test:build-proof-routing
       - name: Verify generated artifact
         env:
           CR_SELFCHECK_RUN_DIR: test-results/selfcheck-runs/minimal-release
@@ -152,4 +154,3 @@ jobs:
       - run: npm run test:authored-d1-save
       - run: npx playwright install --with-deps chromium
       - run: npm run test:farfield-final-smoke -- --output=test-results/persistence/farfield-final-smoke.json
-

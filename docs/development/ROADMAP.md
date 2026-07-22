@@ -2,21 +2,21 @@
 
 This roadmap follows the approved [Game Design Document](../design/GAME-DESIGN.md). Work remains bounded to one card and one hypothesis at a time.
 
-## Foundation — current
+## Foundation cleanup — active
 
-- Establish the clean canonical repository, living documentation, truthful metadata, and focused CI.
-- Preserve the existing production artifact without gameplay or renderer changes.
-- Keep generated proof and historical reports out of public history.
+1. Keep `chromeinput2` as the accepted Android Chrome baseline.
+2. Reconcile release truth, build-proof routing, documentation, and the focused test ownership map.
+3. Inventory runtime ownership before removing any self-check, renderer, diagnostic, or fallback code.
+4. Separate production and test-only harness behavior only after that ownership proof.
 
-## Device-performance gate — current
+No gameplay behavior is part of this cleanup phase.
 
-- The target Samsung device did not expose a usable 60 Hz control, so the display-refresh comparison is unavailable.
-- Repaired `inputcadence2` captures showed about 82 ms LOOK event-gap p95 values, matching the phone's visible angle jumps while measured game phases remained below budget.
-- `rawlook1` was physically rejected: it did not change the reported feel and a moving capture still showed sparse LOOK delivery. `inputfallback1` restores the preceding normal pointer route.
-- The next test has no game-code mutation: compare the ordinary browser view with the game's FULLSCREEN action, using the same MOVE + LOOK route near a building and in the open.
-- Fullscreen clearly smoother selects Android browser-chrome/compositor delivery. The same or worse result selects one final no-code Chrome versus Samsung Internet A/B before another source card.
-- Do not add a frame cap unless separately testable physical evidence supports it.
-- Do not revive 320×200, adaptive resolution, or the rejected `presentpose1` path.
+## Device-performance decision — complete
+
+- The selected 400x250/interpolated/subpixel profile remains unchanged. The 320x200 path is closed.
+- `rawlook1` was physically rejected.
+- `chromeinput2` was physically accepted in Android Chrome: simultaneous MOVE + LOOK was clearly better with no thumb drops or browser-gesture regressions.
+- Preserve the Pointer-only Chrome path, coalesced-sample handling, and static no-scroll CSS. Do not revisit renderer, resolution, raw-pointer, or frame-cap work without new evidence.
 
 ## Rules and vertical slice — after explicit card approval
 

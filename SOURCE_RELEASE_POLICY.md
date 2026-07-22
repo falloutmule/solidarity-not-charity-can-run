@@ -22,13 +22,12 @@ Before a runtime release:
 2. Run `build:check` and prove source/artifact parity.
 3. Run the smallest focused subsystem test.
 4. Run the ordinary release smoke against root `index.html`.
-5. Require physical Samsung evidence for touch, pacing, mobile-layout, or visible-performance changes.
+5. Require physical Android Chrome evidence for touch, pacing, mobile-layout, or visible-performance changes.
 
-Proof output belongs under ignored `test-results/`; it is not release source and is never committed.
+Proof output is opt-in and belongs under ignored `test-results/`; it is not release source and is never committed. Use `npm.cmd run build:proof` for a local build proof, or set `CR_SELFCHECK_RUN_DIR` only for an isolated self-check run.
 
 ## Public history
 
 - `main` is protected from force-push and deletion.
 - Work uses short-lived branches and squash merge.
 - Raw reports, handoffs, backups, and proof archives stay outside the public repository.
-

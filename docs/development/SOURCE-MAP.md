@@ -1,12 +1,14 @@
-# Target module map ↔ index.html SECTION markers
+# Source map
 
-| Target module | SECTION in index.html |
-|---------------|---------------------|
+This is development documentation, not a runtime build input. It maps current responsibilities to the generated artifact's section markers.
+
+| Target module | SECTION in `index.html` |
+|---|---|
 | CONFIG | 2 GAME STATE + cfg, 0c DEBUG |
 | DOM / VIEWPORT | 0 CANVAS, 0b FULLSCREEN, visualViewport shell |
 | OPTIONS / STORAGE | 5b LOCAL PERSISTENCE, options object |
 | INPUT | 11 UPDATE + INPUT, keyboard |
-| MOBILE LAYOUT | 2b MOBILE / TOUCH, portraitLayout, #mob |
+| MOBILE LAYOUT | 2b MOBILE / TOUCH, portraitLayout, `#mob` |
 | LEVEL GENERATION | 3 CITY GENERATION |
 | CUSTOM LEVELS | 3b CUSTOM LEVELS |
 | COLLISION | 4 COLLISION |
@@ -18,7 +20,7 @@
 | GAMEPLAY ACTIONS | 10 GAMEPLAY ACTIONS |
 | UPDATE LOOP | 11 UPDATE + INPUT, 13 MAIN LOOP |
 | MENUS | 2c RESPONSIVE MOBILE MENU, overlays |
-| DEBUG / CR SELF-CHECKS | CR.run*SelfCheck, harness hooks in script tail |
-| TEST HARNESS HOOKS | crWithTemporaryState, benchmark scenes, __crRuntimeErrors |
+| DEBUG / CR SELF-CHECKS | `CR.run*SelfCheck`, harness hooks in script tail |
+| TEST HARNESS HOOKS | `crWithTemporaryState`, benchmark scenes, `__crRuntimeErrors` |
 
-Search pattern in `index.html`: `// SECTION` or `// ---------------------------------------------------------------------------`
+Search `index.html` for `// SECTION` or `// ---------------------------------------------------------------------------`.

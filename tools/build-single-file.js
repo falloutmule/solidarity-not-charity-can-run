@@ -101,8 +101,8 @@ function validateProjectMetadata(metadata, root = ROOT, options = {}) {
   if (!farField.modes || farField.modes.ffres !== '400' || farField.modes.ffangle !== 'interp' || farField.modes.ffproj !== 'subpixel') fail('selection.farField.modes must record the selected 400/interp/subpixel modes');
   validateEvidenceReference(farField.evidence, root, 'selection.farField.evidence', fail);
   const acceptance = metadata.acceptance || {};
-  if (!acceptance.samsungSmoothness || !acceptance.samsungSmoothness.target || !isAcceptanceStatus(acceptance.samsungSmoothness.status) || typeof acceptance.samsungSmoothness.scope !== 'string' || !acceptance.samsungSmoothness.scope || typeof acceptance.samsungSmoothness.evidence !== 'string' || !acceptance.samsungSmoothness.evidence) fail('acceptance.samsungSmoothness must be scoped, evidence-linked, and have a supported status');
-  validateEvidenceReference(acceptance.samsungSmoothness.evidence, root, 'acceptance.samsungSmoothness.evidence', fail);
+  if (!acceptance.androidChrome || acceptance.androidChrome.target !== 'Android Chrome' || !isAcceptanceStatus(acceptance.androidChrome.status) || typeof acceptance.androidChrome.scope !== 'string' || !acceptance.androidChrome.scope || typeof acceptance.androidChrome.evidence !== 'string' || !acceptance.androidChrome.evidence) fail('acceptance.androidChrome must be scoped, evidence-linked, and have a supported status');
+  validateEvidenceReference(acceptance.androidChrome.evidence, root, 'acceptance.androidChrome.evidence', fail);
   if (!acceptance.userVisual || !isAcceptanceStatus(acceptance.userVisual.status) || typeof acceptance.userVisual.scope !== 'string' || !acceptance.userVisual.scope) fail('acceptance.userVisual must be scoped and have a supported status');
   const art = metadata.art && metadata.art.custom_next_001;
   if (!art || !art.version || !art.renderMode || art.approvalStatus !== 'pending_art_review') fail('art.custom_next_001 approvalStatus must remain pending_art_review');
@@ -183,18 +183,39 @@ function resolveSelfcheckRunDir() {
   return resolvedRunDir;
 }
 
-function proofOutputPath(name, resolvedRunDir = resolveSelfcheckRunDir()) {
-  return resolvedRunDir ? path.join(resolvedRunDir, path.basename(name)) : path.join(ROOT, name);
+function resolveBuildProofDir(args) {
+  const requested = [...args].find((arg) => arg.startsWith('--proof-dir='));
+  if (!requested) return null;
+  const value = requested.slice('--proof-dir='.length);
+  const proofRoot = path.resolve(ROOT, 'test-results', 'build-proofs');
+  const resolved = path.resolve(ROOT, value);
+  const relative = path.relative(proofRoot, resolved);
+  const isStrictDescendant = relative !== '' && !relative.startsWith(`..${path.sep}`) && relative !== '..' && !path.isAbsolute(relative);
+  if (!isStrictDescendant) {
+    throw new Error(`--proof-dir must be a strict descendant of test-results/build-proofs: ${value}`);
+  }
+  fs.mkdirSync(resolved, { recursive: true });
+  return resolved;
 }
 
-function writeProof(manifest, html, extra = {}, resolvedRunDir) {
+function resolveProofDir(args) {
+  return resolveSelfcheckRunDir() || resolveBuildProofDir(args);
+}
+
+function proofOutputPath(name, resolvedProofDir) {
+  return resolvedProofDir ? path.join(resolvedProofDir, path.basename(name)) : null;
+}
+
+function writeProof(manifest, html, extra = {}, resolvedProofDir) {
+  const outputPath = proofOutputPath('proof-source-build-manifest.json', resolvedProofDir);
+  if (!outputPath) return null;
   const inputs = [fileEntry(manifest.template), ...manifest.styles.map(fileEntry), fileEntry(manifest.body), ...manifest.scripts.map(fileEntry)];
   const proof = {
     generatedAt: new Date().toISOString(), output: manifest.output,
     outputSha256: sha256(Buffer.from(html, 'utf8')), outputBytes: Buffer.byteLength(html, 'utf8'),
     inputs, nodeVersion: process.version, ...extra,
   };
-  fs.writeFileSync(proofOutputPath('proof-source-build-manifest.json', resolvedRunDir), JSON.stringify(proof, null, 2) + '\n', 'utf8');
+  fs.writeFileSync(outputPath, JSON.stringify(proof, null, 2) + '\n', 'utf8');
   return proof;
 }
 
@@ -210,7 +231,7 @@ function main() {
   const args = new Set(process.argv.slice(2));
   const checkOnly = args.has('--check');
   const doMin = args.has('--min');
-  const selfcheckRunDir = resolveSelfcheckRunDir();
+  const proofDir = resolveProofDir(args);
   const metadata = loadProjectMetadata();
   const manifest = loadManifest();
   const preflight = validateProjectMetadata(metadata, ROOT, { skipArtifactValidation: !checkOnly });
@@ -220,14 +241,14 @@ function main() {
   if (checkOnly) {
     const existing = fs.readFileSync(outPath, 'utf8').replace(/\r\n/g, '\n');
     if (existing !== html) {
-      writeProof(manifest, html, { check: 'fail', reason: 'index.html out of sync with src/' }, selfcheckRunDir);
+      writeProof(manifest, html, { check: 'fail', reason: 'index.html out of sync with src/' }, proofDir);
       console.error('build:check failed — index.html out of sync with src/');
       console.error('output sha existing', sha256(Buffer.from(existing, 'utf8')));
       console.error('output sha rebuilt ', sha256(Buffer.from(html, 'utf8')));
       process.exit(1);
     }
     const identity = validateProjectMetadata(metadata);
-    writeProof(manifest, html, { check: 'pass', metadata: proofIdentity(identity) }, selfcheckRunDir);
+    writeProof(manifest, html, { check: 'pass', metadata: proofIdentity(identity) }, proofDir);
     console.log(JSON.stringify({ pass: true, check: 'pass', output: manifest.output, bytes: html.length }));
     return;
   }
@@ -236,8 +257,8 @@ function main() {
   synchronizeArtifactMetadata(metadata, html);
   writeProjectMetadata(metadata);
   const identity = validateProjectMetadata(metadata);
-  const proof = writeProof(manifest, html, { mode: doMin ? 'build+min' : 'build', metadata: proofIdentity(identity) }, selfcheckRunDir);
-  console.log('Wrote', manifest.output, proof.outputBytes, 'bytes', `${proof.outputSha256.slice(0, 12)}…`);
+  writeProof(manifest, html, { mode: doMin ? 'build+min' : 'build', metadata: proofIdentity(identity) }, proofDir);
+  console.log('Wrote', manifest.output, Buffer.byteLength(html, 'utf8'), 'bytes', `${sha256(Buffer.from(html, 'utf8')).slice(0, 12)}…`);
   if (doMin) {
     const distDir = path.join(ROOT, 'dist');
     fs.mkdirSync(distDir, { recursive: true });

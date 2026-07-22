@@ -120,8 +120,8 @@ function preflight(run) {
   }, 'authored District 1 metadata mismatch');
   assert.deepStrictEqual(metadata.artifact, {
     path: 'index.html',
-    byteLength: 1302797,
-    sha256: '316fca1b500e4077a3619ee2b1be5e04309fc08c9e14cfe9377bc4be8ebffb82',
+    byteLength: 1314349,
+    sha256: '83d676c607ab4788a33d11150f630f69c8231ada72c5e3706891d2c576e0238b',
   }, 'canonical artifact metadata mismatch');
   assert.deepStrictEqual(metadata.distribution, {
     provider: 'github-pages',
@@ -132,7 +132,7 @@ function preflight(run) {
     ffres: '400', ffangle: 'interp', ffproj: 'subpixel',
   }, 'selected far-field mode metadata mismatch');
   assert.strictEqual(metadata.selection && metadata.selection.farField && metadata.selection.farField.status, 'selected', 'far-field selection must remain selected');
-  assert.strictEqual(metadata.acceptance && metadata.acceptance.samsungSmoothness && metadata.acceptance.samsungSmoothness.status, 'failed', 'Samsung smoothness must remain recorded as failed');
+  assert.strictEqual(metadata.acceptance && metadata.acceptance.androidChrome && metadata.acceptance.androidChrome.status, 'passed', 'Android Chrome input acceptance must remain recorded as passed');
   assert.strictEqual(metadata.acceptance && metadata.acceptance.userVisual && metadata.acceptance.userVisual.status, 'pending', 'user visual acceptance must remain pending');
   assert.strictEqual(metadata.art.custom_next_001.approvalStatus, 'pending_art_review', 'asset approval must remain pending');
   assert.deepStrictEqual(metadata.art.custom_next_001.atlas, {

@@ -59,7 +59,7 @@ This document uses four evidence labels:
 |---|---|
 | Repository | `falloutmule/solidarity-not-charity-can-run` |
 | Canonical branch | `main` |
-| Current shipped build ID | `inputfallback1` |
+| Current shipped build ID | `chromeinput2` |
 | Production URL | `https://falloutmule.github.io/solidarity-not-charity-can-run/` |
 | Release artifact | root `index.html` |
 | Editable source | `src/` plus `src/build-manifest.json` |
@@ -1632,7 +1632,7 @@ The authoritative repository currently identifies:
 Internal render profile: 400 × 250
 Angle handling: interpolated
 Projection: subpixel
-Build ID: inputfallback1
+Build ID: chromeinput2
 ```
 
 Alternate 320 and 480 profiles may exist for diagnostics. The selected baseline remains 400×250 unless new physical-device evidence justifies a change.
@@ -1644,9 +1644,9 @@ Supplied device result:
 - MOVE + LOOK still stutters on the Samsung device.
 - 320×200 was rejected as visually worse and not smoother.
 - The unavailable high-refresh versus 60 Hz A/B does not authorize a frame cap.
-- The first `inputcadence1` diagnostic exposed its missing adapter as `?` values. Repaired `inputcadence2` readings then showed about 82 ms LOOK event-gap p95 values. `rawlook1` was physically rejected because it did not change the reported feel; `inputfallback1` restores the preceding pointer route for the no-code fullscreen comparison.
+- The first `inputcadence1` diagnostic exposed its missing adapter as `?` values. Repaired `inputcadence2` readings showed sparse LOOK delivery. `rawlook1` was physically rejected. `chromeinput2` then isolated the Pointer Event path and was physically accepted in Android Chrome as clearly better, with no thumb drops or browser-gesture regressions.
 
-This GDD does not claim the stutter is fixed.
+The accepted result is scoped to Android Chrome's Pointer Event route. It does not authorize unrelated renderer, resolution, or frame-pacing changes.
 
 ## 21.4 Render guardrails
 
@@ -2227,12 +2227,12 @@ Do not combine broad gameplay work into one branch or one model run. Every task 
 - acceptance tests and screenshot requirements;
 - whether generated `index.html` changes;
 - whether saved-data meaning changes;
-- whether physical Samsung acceptance is required.
+- whether physical Android Chrome acceptance is required.
 
 ## 32.2 Current execution gate
 
 - The repository gap audit is complete.
-- The immediate next action is a physical Samsung ordinary-browser versus FULLSCREEN MOVE + LOOK comparison on `inputfallback1`; the query-gated `?perfprobe=1` overlay is useful when readable.
+- The Android Chrome MOVE + LOOK acceptance is complete on `chromeinput2`; preserve its Pointer-only path and static no-scroll CSS through future work.
 - The existing portrait layout and control editor remain frozen through that diagnostic.
 - `SNC-GDD-001B` is proposed after the device gate but still requires explicit authorization.
 - The vertical-slice gate accumulates from bounded cards; it is never one broad rewrite.
@@ -2331,7 +2331,7 @@ They become release blockers only when their corresponding content phase begins.
 
 ## Verified runtime baseline
 
-- build ID `inputfallback1`;
+- build ID `chromeinput2`;
 - default 400×250 render profile;
 - interpolated angle;
 - subpixel projection;
@@ -2343,7 +2343,7 @@ They become release blockers only when their corresponding content phase begins.
 
 - simultaneous MOVE + LOOK stutter remains on the supplied Samsung result;
 - 320×200 was rejected;
-- raw pointer delivery was rejected; the active fullscreen compositor A/B requires a physical Samsung verdict before another source change.
+- raw pointer delivery was rejected; Android Chrome Pointer Event isolation is accepted and future changes must preserve that input contract.
 
 ## Not yet implemented or verified by this document
 
@@ -2364,7 +2364,7 @@ This document changes no game source.
 
 The repository gap audit is complete, and its lasting conclusions are incorporated into `PROJECT_STATUS.md` and the public development documents.
 
-The immediate next action is the physical Samsung ordinary-browser versus FULLSCREEN MOVE + LOOK comparison with `?perfprobe=1` on the `inputfallback1` artifact.
+The immediate next action is repository cleanup around the accepted `chromeinput2` behavior. Any gameplay card still requires explicit user authorization.
 
 After that device gate, the next proposed GDD card is `SNC-GDD-001B`: define the ruleset and save-migration contract without changing rendering. It still requires explicit authorization.
 

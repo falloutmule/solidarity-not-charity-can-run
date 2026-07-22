@@ -29,7 +29,7 @@ const identity = buildTool.validateProjectMetadata(metadata, ROOT);
 const currentCommit = childProcess.execFileSync('git', ['rev-parse', 'HEAD'], { cwd: ROOT, encoding: 'utf8' }).trim();
 const artifact = metadata.artifact;
 const distribution = metadata.distribution;
-const samsung = metadata.acceptance.samsungSmoothness;
+const chrome = metadata.acceptance.androidChrome;
 const visual = metadata.acceptance.userVisual;
 const farField = metadata.selection.farField;
 const artifactBytes = fs.readFileSync(path.join(ROOT, artifact.path));
@@ -55,9 +55,9 @@ assert(!Object.prototype.hasOwnProperty.call(metadata, 'release'), 'tracked meta
 assert(/^[0-9a-f]{40}$/.test(currentCommit), 'CI must derive the current commit from Git');
 assert.deepStrictEqual(farField.modes, { ffres: '400', ffangle: 'interp', ffproj: 'subpixel' }, 'selected far-field modes mismatch');
 assert.strictEqual(farField.status, 'selected', 'far-field candidate must be recorded as selected');
-assert.strictEqual(samsung.status, 'failed', 'Samsung smoothness must remain distinct from publication');
+assert.strictEqual(chrome.status, 'passed', 'accepted Android Chrome input behavior must remain distinct from publication');
 assert.strictEqual(visual.status, 'pending', 'general visual acceptance must not be inferred from publication');
-assert(samsung.scope.includes('MOVE plus LOOK'), 'Samsung smoothness scope must name the observed interaction');
+assert(chrome.scope.includes('MOVE plus LOOK'), 'Android Chrome scope must name the observed interaction');
 assert(visual.scope.includes('No general visual acceptance'), 'visual scope must prevent accidental acceptance inference');
 
 const badArtifact = clone(metadata);
@@ -77,8 +77,8 @@ badEvidence.selection.farField.evidence = 'docs/development/missing.md';
 assert(rejects(badEvidence, 'target does not exist'), 'validator must reject a missing evidence document');
 
 const badAcceptance = clone(metadata);
-badAcceptance.acceptance.samsungSmoothness.status = 'accepted';
-assert(rejects(badAcceptance, 'acceptance.samsungSmoothness'), 'validator must reject an unsupported acceptance status');
+badAcceptance.acceptance.androidChrome.status = 'accepted';
+assert(rejects(badAcceptance, 'acceptance.androidChrome'), 'validator must reject an unsupported acceptance status');
 
 console.log(JSON.stringify({
   check: 'project-metadata-truth',
@@ -88,6 +88,6 @@ console.log(JSON.stringify({
   artifactSha256: artifact.sha256,
   distribution: `${distribution.source.branch}:${distribution.source.path}`,
   farField: farField.status,
-  samsungSmoothness: samsung.status,
+  androidChrome: chrome.status,
   userVisual: visual.status,
 }));
