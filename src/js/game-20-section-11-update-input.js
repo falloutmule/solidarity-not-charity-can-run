@@ -314,11 +314,13 @@ view.addEventListener('mousedown',e=>{
     else giveCan();
   }
 });
-view.addEventListener('touchstart', e=>{
-  if(confirmAction) return;
-  if(e.touches.length !== 1) return;
-  if(handleMenuPointer(e.touches[0].clientY)) e.preventDefault();
-},{passive:false});
+if(typeof window.PointerEvent === 'undefined'){
+  view.addEventListener('touchstart', e=>{
+    if(confirmAction) return;
+    if(e.touches.length !== 1) return;
+    if(handleMenuPointer(e.touches[0].clientY)) e.preventDefault();
+  },{passive:false});
+}
 document.addEventListener('pointerlockchange',()=>{ locked = document.pointerLockElement===view; });
 addEventListener('mousemove',e=>{
   if(locked && state===STATE.PLAY && !paused) player.angle += e.movementX*options.mouseSens;

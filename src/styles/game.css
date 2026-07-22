@@ -30,13 +30,13 @@
     opacity:0;transition:opacity 0.3s ease;
   }
   #fstoast.show{display:block;opacity:1;}
-  #view{display:block;position:fixed;top:var(--vv-off-y);left:var(--vv-off-x);image-rendering:pixelated;touch-action:none;}
+  #view{display:block;position:fixed;top:var(--vv-off-y);left:var(--vv-off-x);image-rendering:pixelated;touch-action:none;overscroll-behavior:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
   #view.mob-touch-through{pointer-events:none;}
   /* ---- mobile control overlay ---- */
   #mob{
     display:none;position:fixed;top:var(--vv-off-y);left:var(--vv-off-x);
     width:var(--app-vw-px);height:var(--app-vh-px);
-    pointer-events:none;z-index:9;touch-action:none;
+    pointer-events:none;z-index:9;touch-action:none;overscroll-behavior:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
   }
   #mob.show{display:block;pointer-events:auto;}
   .mbtn{
@@ -48,7 +48,7 @@
     transition:background 0.08s;
   }
   .mbtn.pr{background:rgba(200,170,100,0.55);border-color:rgba(220,200,130,0.8);}
-  #ml{bottom:30px;left:20px;width:110px;height:110px;border-radius:50%;z-index:22;flex-direction:column;gap:2px;background:rgba(20,15,10,0.15);touch-action:none;}
+  #ml{bottom:30px;left:20px;width:110px;height:110px;border-radius:50%;z-index:22;flex-direction:column;gap:2px;background:rgba(20,15,10,0.15);touch-action:none;overscroll-behavior:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
   /* Right-half LOOK zone — transparent touch overlay; gameplay shows through */
   #mr{
     top:0;right:0;width:50vw;height:var(--app-vh-px);border-radius:0;z-index:10;
@@ -98,7 +98,7 @@
     border:2px solid rgba(200,170,100,0.40);color:#c8b888;
     display:flex;align-items:center;justify-content:center;flex-direction:column;
     gap:2px;font-size:10px;
-    touch-action:none;user-select:none;-webkit-user-select:none;
+    touch-action:none;overscroll-behavior:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
     z-index:12; /* same level as buttons */
   }
   #mlookpadhint{

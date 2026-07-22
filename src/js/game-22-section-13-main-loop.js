@@ -602,7 +602,7 @@ function getTouchActionProof(){
     rmenuOptionsTune: optionsPanY,
     rmenuExpected: optionsPanY ? 'pan-y' : 'none',
     gameplaySurfacesNone: ['view','ml','mlookpad','mr'].every(id=>cs(id)==='none'),
-    documentTouchcancelBound: true,
+    documentTouchcancelBound: typeof window.PointerEvent === 'undefined',
   };
 }
 function getControlDockRectProof(){

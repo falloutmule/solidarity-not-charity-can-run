@@ -43,13 +43,13 @@
     opacity:0;transition:opacity 0.3s ease;
   }
   #fstoast.show{display:block;opacity:1;}
-  #view{display:block;position:fixed;top:var(--vv-off-y);left:var(--vv-off-x);image-rendering:pixelated;touch-action:none;}
+  #view{display:block;position:fixed;top:var(--vv-off-y);left:var(--vv-off-x);image-rendering:pixelated;touch-action:none;overscroll-behavior:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
   #view.mob-touch-through{pointer-events:none;}
   /* ---- mobile control overlay ---- */
   #mob{
     display:none;position:fixed;top:var(--vv-off-y);left:var(--vv-off-x);
     width:var(--app-vw-px);height:var(--app-vh-px);
-    pointer-events:none;z-index:9;touch-action:none;
+    pointer-events:none;z-index:9;touch-action:none;overscroll-behavior:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
   }
   #mob.show{display:block;pointer-events:auto;}
   .mbtn{
@@ -61,7 +61,7 @@
     transition:background 0.08s;
   }
   .mbtn.pr{background:rgba(200,170,100,0.55);border-color:rgba(220,200,130,0.8);}
-  #ml{bottom:30px;left:20px;width:110px;height:110px;border-radius:50%;z-index:22;flex-direction:column;gap:2px;background:rgba(20,15,10,0.15);touch-action:none;}
+  #ml{bottom:30px;left:20px;width:110px;height:110px;border-radius:50%;z-index:22;flex-direction:column;gap:2px;background:rgba(20,15,10,0.15);touch-action:none;overscroll-behavior:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
   /* Right-half LOOK zone — transparent touch overlay; gameplay shows through */
   #mr{
     top:0;right:0;width:50vw;height:var(--app-vh-px);border-radius:0;z-index:10;
@@ -111,7 +111,7 @@
     border:2px solid rgba(200,170,100,0.40);color:#c8b888;
     display:flex;align-items:center;justify-content:center;flex-direction:column;
     gap:2px;font-size:10px;
-    touch-action:none;user-select:none;-webkit-user-select:none;
+    touch-action:none;overscroll-behavior:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
     z-index:12; /* same level as buttons */
   }
   #mlookpadhint{
@@ -711,7 +711,7 @@ const inp = {
   lookDeltaRad:0,
   _active:false, // true when any touch is on screen
 };
-var BUILD_ID = 'inputfallback1'; window.BUILD_ID = BUILD_ID;
+var BUILD_ID = 'chromeinput2'; window.BUILD_ID = BUILD_ID;
 const CR_FPV_STREET_SHIMMER_FIX = 1;
 const CR_FPV_STREET_MATTE = true;
 const CR_FPV_WALL_LINE_FIX = 1;
@@ -1892,6 +1892,20 @@ function triggerMobileSprintBurst(){
   crTriggerSoundCue('sprintDenied');
   return { fired: false, reason: 'no-stamina' };
 }
+/**
+ * Pointer Events are the authoritative mobile route when available.  Chrome
+ * aligns and coalesces continuous Pointer Events, so consume its coalesced
+ * samples here rather than maintaining a competing Touch Events path.
+ */
+function crPointerSamples(event){
+  try {
+    if(event && typeof event.getCoalescedEvents === 'function'){
+      const samples = event.getCoalescedEvents();
+      if(samples && samples.length) return Array.from(samples);
+    }
+  } catch(_e){}
+  return event ? [event] : [];
+}
 function bindMobileControls(){
   const ml = document.getElementById('ml');
   const mr = document.getElementById('mr');
@@ -1902,6 +1916,14 @@ function bindMobileControls(){
   const mportmenu = document.getElementById('mportmenu');
   const rmenu = document.getElementById('rmenu');
   ms_element = ms;
+  const hasPointerEvents = typeof window.PointerEvent === 'function';
+  // Do not register both APIs.  In Pointer-capable Chrome, legacy Touch
+  // listeners turn the document into a non-fast-scrollable input route.
+  const onMobileInput = (target, type, listener, options)=>{
+    const isPointer = type.indexOf('pointer') === 0;
+    if(isPointer !== hasPointerEvents) return;
+    target.addEventListener(type, listener, options);
+  };
 
   // ---- left joystick zone (pointer capture + element touchmove for WebViews) ----
   const beginJoy = (id, ptrId, cx, cy)=>{
@@ -1916,16 +1938,17 @@ function bindMobileControls(){
     clearMoveInput();
     updateJoyDot(0,0);
   };
-  ml.addEventListener('pointerdown', e=>{
+  onMobileInput(ml, 'pointerdown', e=>{
     if(_controlEditActive) return;
+    if(joy.active && joy.ptrId !== e.pointerId) return;
     e.preventDefault(); e.stopPropagation();
     try{ ml.setPointerCapture(e.pointerId); }catch(_e){}
     beginJoy(e.pointerId, e.pointerId, e.clientX, e.clientY);
   },{passive:false});
-  ml.addEventListener('pointermove', e=>{
+  onMobileInput(ml, 'pointermove', e=>{
     if(!joy.active || joy.ptrId !== e.pointerId) return;
     e.preventDefault(); e.stopPropagation();
-    applyJoyFromClient(e.clientX, e.clientY);
+    for(const sample of crPointerSamples(e)) applyJoyFromClient(sample.clientX, sample.clientY);
   },{passive:false});
   const joyPtrUp = e=>{
     if(joy.ptrId !== e.pointerId) return;
@@ -1933,15 +1956,15 @@ function bindMobileControls(){
     try{ ml.releasePointerCapture(e.pointerId); }catch(_e){}
     endJoy();
   };
-  ml.addEventListener('pointerup', joyPtrUp, {passive:false});
-  ml.addEventListener('pointercancel', joyPtrUp, {passive:false});
-  ml.addEventListener('touchstart', e=>{
+  onMobileInput(ml, 'pointerup', joyPtrUp, {passive:false});
+  onMobileInput(ml, 'pointercancel', joyPtrUp, {passive:false});
+  onMobileInput(ml, 'touchstart', e=>{
     e.preventDefault(); e.stopPropagation();
     const t = e.changedTouches[0];
     if(joy.active && joy.id !== null && joy.id !== t.identifier) return;
     beginJoy(t.identifier, null, t.clientX, t.clientY);
   },{passive:false});
-  ml.addEventListener('touchmove', e=>{
+  onMobileInput(ml, 'touchmove', e=>{
     if(!joy.active) return;
     for(const t of e.changedTouches){
       if(t.identifier !== joy.id) continue;
@@ -1949,19 +1972,19 @@ function bindMobileControls(){
       applyJoyFromClient(t.clientX, t.clientY);
     }
   },{passive:false});
-  ml.addEventListener('touchend', e=>{
+  onMobileInput(ml, 'touchend', e=>{
     for(const t of e.changedTouches){
       if(t.identifier === joy.id){ e.preventDefault(); e.stopPropagation(); endJoy(); }
     }
   },{passive:false});
-  ml.addEventListener('touchcancel', e=>{
+  onMobileInput(ml, 'touchcancel', e=>{
     for(const t of e.changedTouches){
       if(t.identifier === joy.id){ e.preventDefault(); e.stopPropagation(); endJoy(); }
     }
   },{passive:false});
 
   // ---- right turn zone (landscape) ----
-  mr.addEventListener('touchstart', e=>{
+  onMobileInput(mr, 'touchstart', e=>{
     if(isMobilePortrait()) return; // guard: portrait uses mlookpad instead
     e.preventDefault(); e.stopPropagation();
     const t = e.changedTouches[0];
@@ -1982,10 +2005,11 @@ function bindMobileControls(){
     if(!lpadMousePtr && !lpadTouchPtr) lpad.classList.remove('pr');
   };
 
-  lpad.addEventListener('pointerdown', e=>{
+  onMobileInput(lpad, 'pointerdown', e=>{
     if(_controlEditActive) return;
     e.preventDefault(); e.stopPropagation();
     if(e.pointerType === 'touch' || e.pointerType === 'pen'){
+      if(lpadTouchPtr && lpadTouchPtr.id !== e.pointerId) return;
       try{ lpad.setPointerCapture(e.pointerId); }catch(_e){}
       lpadTouchPtr = { id: e.pointerId, lastX: e.clientX };
       lookTouch.id = e.pointerId;
@@ -2001,12 +2025,17 @@ function bindMobileControls(){
     }
   },{passive:false});
 
-  lpad.addEventListener('pointermove', e=>{
+  onMobileInput(lpad, 'pointermove', e=>{
     if(state!==STATE.PLAY || paused) return;
     if(lpadTouchPtr && e.pointerId === lpadTouchPtr.id){
       e.preventDefault(); e.stopPropagation();
-      const dx = e.clientX - lpadTouchPtr.lastX;
-      if(crApplyLookPadDx(dx, e.timeStamp)){ lpadTouchPtr.lastX = e.clientX; lookTouch.lastX = e.clientX; }
+      for(const sample of crPointerSamples(e)){
+        const dx = sample.clientX - lpadTouchPtr.lastX;
+        if(crApplyLookPadDx(dx, sample.timeStamp)){
+          lpadTouchPtr.lastX = sample.clientX;
+          lookTouch.lastX = sample.clientX;
+        }
+      }
       return;
     }
     if(e.pointerType === 'touch') return;
@@ -2017,18 +2046,18 @@ function bindMobileControls(){
     touchDebug({type:'look_circle_move', orient:isMobilePortrait()?'port':'land', dx, angle:player.angle});
   },{passive:false});
 
-  lpad.addEventListener('pointerup', e=>{
+  onMobileInput(lpad, 'pointerup', e=>{
     e.preventDefault(); e.stopPropagation();
     try{ lpad.releasePointerCapture(e.pointerId); }catch(_e){}
     clearLpadPtr(e.pointerId);
   },{passive:false});
-  lpad.addEventListener('pointercancel', e=>{
+  onMobileInput(lpad, 'pointercancel', e=>{
     e.preventDefault(); e.stopPropagation();
     try{ lpad.releasePointerCapture(e.pointerId); }catch(_e){}
     clearLpadPtr(e.pointerId);
   },{passive:false});
 
-  lpad.addEventListener('touchstart', e=>{
+  onMobileInput(lpad, 'touchstart', e=>{
     e.preventDefault(); e.stopPropagation();
     for(const t of e.changedTouches){
       if(lookTouch.id !== null && lookTouch.id !== t.identifier) continue;
@@ -2039,7 +2068,7 @@ function bindMobileControls(){
       break;
     }
   },{passive:false});
-  lpad.addEventListener('touchcancel', e=>{
+  onMobileInput(lpad, 'touchcancel', e=>{
     for(const t of e.changedTouches){
       if(t.identifier === lookTouch.id){
         lookTouch.id = null; lookTouch.lastX = 0;
@@ -2051,46 +2080,56 @@ function bindMobileControls(){
   // ---- unified pointer look for landscape #mr ----
   // Use pointer events so both touch and mouse work on #mr in landscape.
   let mrPtr = null; // {id, startX}
-  mr.addEventListener('pointerdown', e=>{
+  onMobileInput(mr, 'pointerdown', e=>{
     if(isMobilePortrait()) return;
-    if(e.pointerType === 'touch') return;
     if(e.pointerType === 'mouse' && !mobileMode) return;
+    if(mrPtr && mrPtr.id !== e.pointerId) return;
     e.preventDefault(); e.stopPropagation();
     mrPtr = { id: e.pointerId, startX: e.clientX };
+    try{ mr.setPointerCapture(e.pointerId); }catch(_e){}
     dismissLookHint();
   },{passive:false});
 
-  mr.addEventListener('pointermove', e=>{
+  onMobileInput(mr, 'pointermove', e=>{
     if(!mrPtr || e.pointerId !== mrPtr.id) return;
     if(state!==STATE.PLAY || paused) return;
-    const dx = e.clientX - mrPtr.startX;
-    if(Math.abs(dx) > 0.5){
-      mrPtr.startX = e.clientX;
-      if(state===STATE.PLAY && !paused){
-        crApplyRawTouchLookDelta(dx * mobileLookSens(), e.timeStamp);
+    e.preventDefault(); e.stopPropagation();
+    for(const sample of crPointerSamples(e)){
+      const dx = sample.clientX - mrPtr.startX;
+      if(Math.abs(dx) > 0.5){
+        mrPtr.startX = sample.clientX;
+        if(state===STATE.PLAY && !paused){
+          crApplyRawTouchLookDelta(dx * mobileLookSens(), sample.timeStamp);
+        }
       }
+      touchDebug({type:'land_look_move', dx, angle:player.angle});
     }
-    touchDebug({type:'land_look_move', dx, angle:player.angle});
   },{passive:false});
 
-  mr.addEventListener('pointerup', e=>{ if(mrPtr && e.pointerId===mrPtr.id){ mrPtr=null; } },{passive:false});
-  mr.addEventListener('pointercancel', e=>{ if(mrPtr && e.pointerId===mrPtr.id){ mrPtr=null; } },{passive:false});
+  const clearMrPtr = e=>{
+    if(!mrPtr || e.pointerId !== mrPtr.id) return;
+    e.preventDefault(); e.stopPropagation();
+    try{ mr.releasePointerCapture(e.pointerId); }catch(_e){}
+    mrPtr=null;
+  };
+  onMobileInput(mr, 'pointerup', clearMrPtr,{passive:false});
+  onMobileInput(mr, 'pointercancel', clearMrPtr,{passive:false});
 
   // ---- GIVE button ----
-  mg.addEventListener('touchstart', e=>{
+  onMobileInput(mg, 'touchstart', e=>{
     if(_controlEditActive) return;
     e.preventDefault(); e.stopPropagation();
     inp.give = true; mg.classList.add('pr');
   },{passive:false});
-  mg.addEventListener('touchend', e=>{
+  onMobileInput(mg, 'touchend', e=>{
     e.preventDefault(); e.stopPropagation();
     inp.give = false; mg.classList.remove('pr');
   },{passive:false});
   const givePtrDown = e=>{ if(_controlEditActive) return; e.preventDefault(); e.stopPropagation(); inp.give = true; mg.classList.add('pr'); };
   const givePtrUp = e=>{ if(_controlEditActive) return; e.preventDefault(); e.stopPropagation(); inp.give = false; mg.classList.remove('pr'); };
-  mg.addEventListener('pointerdown', givePtrDown, {passive:false});
-  mg.addEventListener('pointerup', givePtrUp, {passive:false});
-  mg.addEventListener('pointercancel', givePtrUp, {passive:false});
+  onMobileInput(mg, 'pointerdown', givePtrDown, {passive:false});
+  onMobileInput(mg, 'pointerup', givePtrUp, {passive:false});
+  onMobileInput(mg, 'pointercancel', givePtrUp, {passive:false});
 
   // ---- SPRINT button (mobile: burst tap; desktop: Shift still works as hold) ----
   const sprintTap = e=>{
@@ -2098,34 +2137,46 @@ function bindMobileControls(){
     e.preventDefault(); e.stopPropagation();
     triggerMobileSprintBurst();
   };
-  ms.addEventListener('touchstart', sprintTap,{passive:false});
-  ms.addEventListener('pointerdown', sprintTap,{passive:false});
-  ms.addEventListener('touchend', e=>{
+  onMobileInput(ms, 'touchstart', sprintTap,{passive:false});
+  onMobileInput(ms, 'pointerdown', sprintTap,{passive:false});
+  onMobileInput(ms, 'pointerup', e=>{ e.preventDefault(); e.stopPropagation(); },{passive:false});
+  onMobileInput(ms, 'pointercancel', e=>{ e.preventDefault(); e.stopPropagation(); ms.classList.remove('pr'); },{passive:false});
+  onMobileInput(ms, 'touchend', e=>{
     e.preventDefault(); e.stopPropagation();
     // Do NOT cancel burst on touchend — it runs its course
   },{passive:false});
 
   // ---- MAP button ----
-  mmin.addEventListener('touchstart', e=>{
+  onMobileInput(mmin, 'touchstart', e=>{
     e.preventDefault(); e.stopPropagation();
     inp.map = true; mmin.classList.add('pr');
   },{passive:false});
-  mmin.addEventListener('touchend', e=>{
+  onMobileInput(mmin, 'touchend', e=>{
     e.preventDefault(); e.stopPropagation();
     inp.map = false; mmin.classList.remove('pr');
   },{passive:false});
+  const mapPtrDown = e=>{ e.preventDefault(); e.stopPropagation(); inp.map = true; mmin.classList.add('pr'); };
+  const mapPtrUp = e=>{ e.preventDefault(); e.stopPropagation(); inp.map = false; mmin.classList.remove('pr'); };
+  onMobileInput(mmin, 'pointerdown', mapPtrDown,{passive:false});
+  onMobileInput(mmin, 'pointerup', mapPtrUp,{passive:false});
+  onMobileInput(mmin, 'pointercancel', mapPtrUp,{passive:false});
 
   // ---- PAUSE button (desktop landscape only; hidden on all phone UI) ----
-  mpa.addEventListener('touchstart', e=>{
+  onMobileInput(mpa, 'touchstart', e=>{
     if(mobileMode) return;
     e.preventDefault(); e.stopPropagation();
     inp.pause = true; mpa.classList.add('pr');
   },{passive:false});
-  mpa.addEventListener('touchend', e=>{
+  onMobileInput(mpa, 'touchend', e=>{
     if(mobileMode) return;
     e.preventDefault(); e.stopPropagation();
     inp.pause = false; mpa.classList.remove('pr');
   },{passive:false});
+  const pausePtrDown = e=>{ if(mobileMode) return; e.preventDefault(); e.stopPropagation(); inp.pause = true; mpa.classList.add('pr'); };
+  const pausePtrUp = e=>{ if(mobileMode) return; e.preventDefault(); e.stopPropagation(); inp.pause = false; mpa.classList.remove('pr'); };
+  onMobileInput(mpa, 'pointerdown', pausePtrDown,{passive:false});
+  onMobileInput(mpa, 'pointerup', pausePtrUp,{passive:false});
+  onMobileInput(mpa, 'pointercancel', pausePtrUp,{passive:false});
   if(mportmenu){
     const openPauseFromMenu = ()=>{
       if(state!==STATE.PLAY) return;
@@ -2140,19 +2191,29 @@ function bindMobileControls(){
         drawMobileMenu();
       }
     };
-    mportmenu.addEventListener('touchstart', e=>{
+    onMobileInput(mportmenu, 'touchstart', e=>{
       e.preventDefault(); e.stopPropagation();
       mportmenu.classList.add('pr');
     },{passive:false});
-    mportmenu.addEventListener('touchend', e=>{
+    onMobileInput(mportmenu, 'touchend', e=>{
       e.preventDefault(); e.stopPropagation();
       mportmenu.classList.remove('pr');
       openPauseFromMenu();
     },{passive:false});
-    mportmenu.addEventListener('touchcancel', e=>{
+    onMobileInput(mportmenu, 'touchcancel', e=>{
       e.preventDefault(); e.stopPropagation();
       mportmenu.classList.remove('pr');
     },{passive:false});
+    const menuPtrDown = e=>{ e.preventDefault(); e.stopPropagation(); mportmenu.classList.add('pr'); };
+    const menuPtrUp = e=>{
+      e.preventDefault(); e.stopPropagation();
+      mportmenu.classList.remove('pr');
+      openPauseFromMenu();
+    };
+    const menuPtrCancel = e=>{ e.preventDefault(); e.stopPropagation(); mportmenu.classList.remove('pr'); };
+    onMobileInput(mportmenu, 'pointerdown', menuPtrDown,{passive:false});
+    onMobileInput(mportmenu, 'pointerup', menuPtrUp,{passive:false});
+    onMobileInput(mportmenu, 'pointercancel', menuPtrCancel,{passive:false});
     mportmenu.addEventListener('click', e=>{
       e.preventDefault(); e.stopPropagation();
       openPauseFromMenu();
@@ -2162,12 +2223,15 @@ function bindMobileControls(){
     inp.give=false; inp.sprint=false; inp.map=false; inp.pause=false;
     [mg,ms,mmin,mpa,mportmenu].forEach(el=>{ if(el) el.classList.remove('pr'); });
   };
-  [mg,ms,mmin,mpa,mportmenu].forEach(el=>{ if(!el) return; el.addEventListener('touchcancel', e=>{
+  [mg,ms,mmin,mpa,mportmenu].forEach(el=>{ if(!el) return; onMobileInput(el, 'touchcancel', e=>{
+    e.preventDefault(); e.stopPropagation(); clearHeldButtons();
+  },{passive:false}); });
+  [mg,ms,mmin,mpa,mportmenu].forEach(el=>{ if(!el) return; onMobileInput(el, 'pointercancel', e=>{
     e.preventDefault(); e.stopPropagation(); clearHeldButtons();
   },{passive:false}); });
 
   // ---- global touchmove: route joystick, landscape turn zone, LOOK circle (multi-touch) ----
-  document.addEventListener('touchmove', e=>{
+  onMobileInput(document, 'touchmove', e=>{
     let handled = false;
     const track = e.touches && e.touches.length ? e.touches : e.changedTouches;
     for(const t of track){
@@ -2201,7 +2265,7 @@ function bindMobileControls(){
     if(handled) e.preventDefault();
   },{passive:false});
 
-  document.addEventListener('touchend', e=>{
+  onMobileInput(document, 'touchend', e=>{
     for(const t of e.changedTouches){
       if(t.identifier === joy.id){ endJoy(); }
       if(t.identifier === tzone.id){ tzone.active=false; tzone.id=null; }
@@ -2213,7 +2277,7 @@ function bindMobileControls(){
     }
   },{passive:false});
 
-  document.addEventListener('touchcancel', e=>{
+  onMobileInput(document, 'touchcancel', e=>{
     for(const t of e.changedTouches){
       if(t.identifier === joy.id){ endJoy(); }
       if(t.identifier === tzone.id){ tzone.active=false; tzone.id=null; }
@@ -2237,7 +2301,8 @@ function bindMobileControls(){
   const fsbtn = document.getElementById('fsbtn');
   if(fsbtn){
     const fsAction = e=>{ e.preventDefault(); e.stopPropagation(); toggleFullscreen(); };
-    fsbtn.addEventListener('touchstart', fsAction, {passive:false});
+    onMobileInput(fsbtn, 'touchstart', fsAction, {passive:false});
+    onMobileInput(fsbtn, 'pointerdown', fsAction, {passive:false});
     fsbtn.addEventListener('click', fsAction);
   }
 
@@ -2245,7 +2310,7 @@ function bindMobileControls(){
   // Mobile frame loop may redraw rmenu between touchstart and touchend.
   // Store the selected action at touchstart so the tap survives DOM rebuilds.
   rmenu._touchAction = '';
-  rmenu.addEventListener('touchstart', e=>{
+  onMobileInput(rmenu, 'touchstart', e=>{
     const el = e.target.closest('.rit');
     if(!el) return;
     e.preventDefault();
@@ -2255,7 +2320,7 @@ function bindMobileControls(){
     rmenu.querySelectorAll('.rit').forEach(r=>r.classList.remove('sel'));
     el.classList.add('sel');
   },{passive:false, capture:true});
-  rmenu.addEventListener('touchend', e=>{
+  onMobileInput(rmenu, 'touchend', e=>{
     if(!rmenu._touchAction) return;
     e.preventDefault();
     e.stopPropagation();
@@ -2265,9 +2330,37 @@ function bindMobileControls(){
     rmenu._touchStartY = 0;
     rmenu.querySelectorAll('.rit').forEach(r=>r.classList.remove('sel'));
     if(dy > 28) return;
+    rmenu._lastClickAction = action;
+    rmenu._lastClickAt = performance.now();
     rmenuAction(action);
   },{passive:false, capture:true});
-  rmenu.addEventListener('touchcancel', e=>{
+  onMobileInput(rmenu, 'touchcancel', e=>{
+    rmenu._touchAction = '';
+    rmenu.querySelectorAll('.rit').forEach(r=>r.classList.remove('sel'));
+  },{passive:false});
+  onMobileInput(rmenu, 'pointerdown', e=>{
+    const el = e.target.closest('.rit');
+    if(!el) return;
+    e.preventDefault(); e.stopPropagation();
+    rmenu._touchAction = el.dataset.action || '';
+    rmenu._touchStartY = e.clientY;
+    rmenu.querySelectorAll('.rit').forEach(r=>r.classList.remove('sel'));
+    el.classList.add('sel');
+  },{passive:false, capture:true});
+  onMobileInput(rmenu, 'pointerup', e=>{
+    if(!rmenu._touchAction) return;
+    e.preventDefault(); e.stopPropagation();
+    const action = rmenu._touchAction;
+    const dy = Math.abs(e.clientY - (rmenu._touchStartY||0));
+    rmenu._touchAction = '';
+    rmenu._touchStartY = 0;
+    rmenu.querySelectorAll('.rit').forEach(r=>r.classList.remove('sel'));
+    if(dy > 28) return;
+    rmenu._lastClickAction = action;
+    rmenu._lastClickAt = performance.now();
+    rmenuAction(action);
+  },{passive:false, capture:true});
+  onMobileInput(rmenu, 'pointercancel', e=>{
     rmenu._touchAction = '';
     rmenu.querySelectorAll('.rit').forEach(r=>r.classList.remove('sel'));
   },{passive:false});
@@ -9242,9 +9335,11 @@ function bindAudioUnlockGate(){
   _audioUnlockBound = true;
   const unlockFromGesture = ()=>{ resumeAudioContext(); };
   const opts = { capture:true, passive:true };
-  document.addEventListener('pointerdown', unlockFromGesture, opts);
   document.addEventListener('keydown', unlockFromGesture, opts);
-  document.addEventListener('touchstart', unlockFromGesture, opts);
+  // Pointer Events already cover touch-capable modern browsers.  Keep the
+  // legacy event only for engines that do not implement Pointer Events.
+  if(typeof window.PointerEvent === 'function') document.addEventListener('pointerdown', unlockFromGesture, opts);
+  else document.addEventListener('touchstart', unlockFromGesture, opts);
 }
 
 function _beepNow(ctx, freq, dur, type, gain){
@@ -12642,11 +12737,13 @@ view.addEventListener('mousedown',e=>{
     else giveCan();
   }
 });
-view.addEventListener('touchstart', e=>{
-  if(confirmAction) return;
-  if(e.touches.length !== 1) return;
-  if(handleMenuPointer(e.touches[0].clientY)) e.preventDefault();
-},{passive:false});
+if(typeof window.PointerEvent === 'undefined'){
+  view.addEventListener('touchstart', e=>{
+    if(confirmAction) return;
+    if(e.touches.length !== 1) return;
+    if(handleMenuPointer(e.touches[0].clientY)) e.preventDefault();
+  },{passive:false});
+}
 document.addEventListener('pointerlockchange',()=>{ locked = document.pointerLockElement===view; });
 addEventListener('mousemove',e=>{
   if(locked && state===STATE.PLAY && !paused) player.angle += e.movementX*options.mouseSens;
@@ -14894,7 +14991,7 @@ function getTouchActionProof(){
     rmenuOptionsTune: optionsPanY,
     rmenuExpected: optionsPanY ? 'pan-y' : 'none',
     gameplaySurfacesNone: ['view','ml','mlookpad','mr'].every(id=>cs(id)==='none'),
-    documentTouchcancelBound: true,
+    documentTouchcancelBound: typeof window.PointerEvent === 'undefined',
   };
 }
 function getControlDockRectProof(){
