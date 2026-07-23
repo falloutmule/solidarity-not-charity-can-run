@@ -6,6 +6,7 @@ Run the smallest listed owner test for a changed path, then run `npm.cmd run bui
 |---|---|
 | `tools/build-single-file.js`, `src/build-manifest.json`, `project-metadata.json` | `test:metadata-truth`, `test:build-proof-routing` |
 | Dead harness boundaries in `game-22`, source CSS/body, or build assembly | `test:dead-harness-boundaries` |
+| Retired inert harness adapter and its former caller seams | `test:inert-adapter-retirement`; affected owner checks |
 | Retired query diagnostics in mobile input, portrait layout, CSS, or markup | `test:unowned-diagnostics-retirement`, `test:chrome-pointer-path` |
 | `src/js/game-06*`, `src/js/game-07*`, mobile input CSS, control markup | `test:chrome-pointer-path`; `test:mobile-ui-cache`; `test:mobile-options-persistence` when option persistence changes |
 | Render pose or frame loop | `test:render-interpolation`, `test:farfield-angle` |

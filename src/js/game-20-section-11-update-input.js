@@ -363,7 +363,7 @@ function startRun(useSeed){
   game.run.harnessOnly = false;
   onboardingOpen = false;
   syncOnboardingPanel();
-  if(!SNCHarnessAdapter.suppressSave()) SAVE.save();
+  SAVE.save();
   maybeShowFirstRunHelp();
 }
 function continueRun(){

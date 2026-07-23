@@ -78,7 +78,6 @@ function getAudioUnlockProof(){
     gestureEvents: ['pointerdown','keydown','touchstart'],
     resumeEntry: 'resumeAudioContext',
     soundOn: typeof options !== 'undefined' ? options.soundOn !== false : true,
-    harnessMuted: SNCHarnessAdapter.muteAudio(),
   };
 }
 
@@ -96,7 +95,6 @@ const _SOUND_CUE_DEFS = {
 };
 
 function crSoundEnabled(){
-  if(SNCHarnessAdapter.muteAudio()) return false;
   if(typeof options !== 'undefined' && options.soundOn === false) return false;
   return true;
 }

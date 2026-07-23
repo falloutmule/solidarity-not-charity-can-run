@@ -87,8 +87,6 @@ function crDrawPrefabFaceColumn(ctx, col, drawStart, sliceH, mapX, mapY, side, s
   return true;
 }
 function drawScene(now, renderPose){
-  SNCHarnessAdapter.captureSpriteGroundSnapshot(null);
-
   // --- SKY (rebuild only if modifier changed) ---
   if(skyBuilt!==game.modifier) buildSky(game.modifier);
   bctx.drawImage(skyCanvas,0,0);
@@ -306,13 +304,6 @@ function drawScene(now, renderPose){
         bctx.drawImage(s.tex, srcX,0,1,s.tex.height, col, top, 1, screenH);
       }
     }
-    SNCHarnessAdapter.captureSpriteGroundSnapshot({
-      kind: s.obj && s.obj.kind ? s.obj.kind : (s.tex === TEX.can ? 'can' : (s.obj === game.exit ? 'exit' : 'sprite')),
-      depth: +depth.toFixed(3),
-      groundedDelta: proj.groundedDelta,
-      yoff: proj.yoffUsed,
-      floating: proj.floating
-    });
     const isCan = s.tex === TEX.can;
     const isNpc = s.obj && game.npcs.indexOf(s.obj) >= 0;
     const isExit = s.obj === game.exit;
@@ -340,15 +331,6 @@ function drawScene(now, renderPose){
       if(rc >= 0){ bctx.beginPath(); bctx.moveTo(lc, top + screenH); bctx.lineTo(rc, top + screenH); bctx.stroke(); }
     }
   }
-
-  SNCHarnessAdapter.captureVisualSnapshot({
-    hasLivePickup: game.pickups.some(c => !c.taken),
-    hasLiveNpc: game.npcs.some(n => !n.helped),
-    hasExit: !!game.exit,
-    exitReady: !!(game.exit && game.exit.active && game.helped >= game.quota),
-    aimNpc: !!game.aimNpc,
-    giveReady: !!(game.aimNpc && player.cans >= game.aimNpc.need),
-  });
 
 }
 

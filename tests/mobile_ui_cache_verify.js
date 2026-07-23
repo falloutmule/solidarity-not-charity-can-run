@@ -109,7 +109,6 @@ function makeHarness(){
     SAVE:{ hasValid:()=>false, save(){}, clear(){} },
     view:getElement('view'), cfg:{},
     _forcePortraitLayout:false, _selfCheckForcePortrait:false,
-    SNCHarnessAdapter:{ forcePortrait:()=>false },
     isOrientationPortrait(){ return sandbox.visualViewport.height > sandbox.visualViewport.width; },
     isFullscreen(){ return !!sandbox.document.fullscreenElement; },
     portraitLayout(){

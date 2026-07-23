@@ -255,7 +255,6 @@ assert(mainSource.includes('drawScene(now, renderPose)'), 'frame passes one reso
     player: { x: 7, y: 8, angle: 0.25, cans: 0 },
     cfg: { fov: 0.66 }, bctx, skyBuilt: 'clear', skyCanvas: {}, RH: 200, RW: 0,
     crDrawFpvStreetReadabilityCues() {},
-    SNCHarnessAdapter: { captureVisualSnapshot() {}, captureSpriteGroundSnapshot() {} },
     dbg: {},
   };
   sandbox.globalThis = sandbox;

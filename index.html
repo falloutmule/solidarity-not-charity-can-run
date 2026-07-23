@@ -674,21 +674,6 @@ const cfg = {
   baseTime:95,
 };
 
-// ---------------------------------------------------------------------------
-// RUNTIME/HARNESS ADAPTER — inert production boundary
-// ---------------------------------------------------------------------------
-// The self-check artifact may replace these methods before its harness starts.
-// Production must not acquire harness behavior through this boundary.
-window.SNCHarnessAdapter = {
-  isActive: () => false,
-  allowFrame: () => true,
-  suppressSave: () => false,
-  suppressUnloadSave: () => false,
-  muteAudio: () => false,
-  forcePortrait: () => false,
-  captureVisualSnapshot: () => null,
-  captureSpriteGroundSnapshot: () => null,
-};
 // -----------------------------------------------------------------------
 // SECTION 2b — MOBILE / TOUCH INPUT
 // -----------------------------------------------------------------------
@@ -1410,9 +1395,9 @@ function crSafeControlsYOffsetPx(requested){
 function crMigrateUnsafeControlsYOffset(opts){
   const quiet = opts && opts.quiet;
   const req = Number(options.controlsYOffsetPx) || 0;
-  if(!mobileInputActive() && !_forcePortraitLayout && !SNCHarnessAdapter.forcePortrait()) return { changed: false, from: req, to: req };
+  if(!mobileInputActive() && !_forcePortraitLayout) return { changed: false, from: req, to: req };
   const { cw, ch } = layoutCssSize();
-  if(ch <= cw && !_forcePortraitLayout && !SNCHarnessAdapter.forcePortrait()) return { changed: false, from: req, to: req };
+  if(ch <= cw && !_forcePortraitLayout) return { changed: false, from: req, to: req };
   const safe = crSafeControlsYOffsetPx(req);
   if(safe === req) return { changed: false, from: req, to: req };
   options.controlsYOffsetPx = safe;
@@ -1560,7 +1545,7 @@ function syncPortraitMenuLabel(){
 }
 function isMobilePortrait(){
   if(!mobileInputActive()) return false;
-  if(SNCHarnessAdapter.forcePortrait() || _forcePortraitLayout) return true;
+  if(_forcePortraitLayout) return true;
   const { cw, ch } = layoutCssSize();
   if(ch > cw) return true;
   return isOrientationPortrait();
@@ -2286,7 +2271,7 @@ let _optionsMenuStamp = 0;
 let _crSaveAvailability = false;
 function crCheapMobilePortraitKey(){
   if(!mobileInputActive()) return false;
-  if(SNCHarnessAdapter.forcePortrait() || _forcePortraitLayout) return true;
+  if(_forcePortraitLayout) return true;
   const vv = window.visualViewport;
   const w = Math.round((vv && vv.width) || innerWidth || 0);
   const h = Math.round((vv && vv.height) || innerHeight || 0);
@@ -8949,7 +8934,6 @@ function dismissOnboardingHelp(persist){
 }
 
 function maybeShowFirstRunHelp(){
-  if(SNCHarnessAdapter.isActive()) return;
   crOpenFirstRunHelpIfNeeded();
 }
 
@@ -9000,7 +8984,7 @@ function startCustomLevel(id){
   initRunTracking(game.seed);
   game.run.customLevel = id;
   game.run.modifierUsed = game.modifier;
-  if(!SNCHarnessAdapter.suppressSave()) SAVE.save();
+  SAVE.save();
 }
 
 function activeCustomLevel(){
@@ -9257,7 +9241,6 @@ function getAudioUnlockProof(){
     gestureEvents: ['pointerdown','keydown','touchstart'],
     resumeEntry: 'resumeAudioContext',
     soundOn: typeof options !== 'undefined' ? options.soundOn !== false : true,
-    harnessMuted: SNCHarnessAdapter.muteAudio(),
   };
 }
 
@@ -9275,7 +9258,6 @@ const _SOUND_CUE_DEFS = {
 };
 
 function crSoundEnabled(){
-  if(SNCHarnessAdapter.muteAudio()) return false;
   if(typeof options !== 'undefined' && options.soundOn === false) return false;
   return true;
 }
@@ -9672,7 +9654,6 @@ const SAVE = {
     return data;
   },
   save(){
-    if(SNCHarnessAdapter.suppressSave()) return;
     if(game.run && game.run.harnessOnly) return;
     if(!game.run.active) return;
     try { lsSet(K.save, this.serialize()); } catch(e){}
@@ -9721,7 +9702,7 @@ const SAVE = {
   clear(){ lsDel(K.save); },
 };
 // save before tab close
-addEventListener('beforeunload', ()=>{ if(SNCHarnessAdapter.suppressUnloadSave()) return; if(state===STATE.PLAY && game.run.active && !(game.run.harnessOnly)) SAVE.save(); });
+addEventListener('beforeunload', ()=>{ if(state===STATE.PLAY && game.run.active && !(game.run.harnessOnly)) SAVE.save(); });
 // ---------------------------------------------------------------------------
 // SECTION 6 — PROCEDURAL ASSETS
 // ---------------------------------------------------------------------------
@@ -10975,8 +10956,6 @@ function crDrawPrefabFaceColumn(ctx, col, drawStart, sliceH, mapX, mapY, side, s
   return true;
 }
 function drawScene(now, renderPose){
-  SNCHarnessAdapter.captureSpriteGroundSnapshot(null);
-
   // --- SKY (rebuild only if modifier changed) ---
   if(skyBuilt!==game.modifier) buildSky(game.modifier);
   bctx.drawImage(skyCanvas,0,0);
@@ -11194,13 +11173,6 @@ function drawScene(now, renderPose){
         bctx.drawImage(s.tex, srcX,0,1,s.tex.height, col, top, 1, screenH);
       }
     }
-    SNCHarnessAdapter.captureSpriteGroundSnapshot({
-      kind: s.obj && s.obj.kind ? s.obj.kind : (s.tex === TEX.can ? 'can' : (s.obj === game.exit ? 'exit' : 'sprite')),
-      depth: +depth.toFixed(3),
-      groundedDelta: proj.groundedDelta,
-      yoff: proj.yoffUsed,
-      floating: proj.floating
-    });
     const isCan = s.tex === TEX.can;
     const isNpc = s.obj && game.npcs.indexOf(s.obj) >= 0;
     const isExit = s.obj === game.exit;
@@ -11228,15 +11200,6 @@ function drawScene(now, renderPose){
       if(rc >= 0){ bctx.beginPath(); bctx.moveTo(lc, top + screenH); bctx.lineTo(rc, top + screenH); bctx.stroke(); }
     }
   }
-
-  SNCHarnessAdapter.captureVisualSnapshot({
-    hasLivePickup: game.pickups.some(c => !c.taken),
-    hasLiveNpc: game.npcs.some(n => !n.helped),
-    hasExit: !!game.exit,
-    exitReady: !!(game.exit && game.exit.active && game.helped >= game.quota),
-    aimNpc: !!game.aimNpc,
-    giveReady: !!(game.aimNpc && player.cans >= game.aimNpc.need),
-  });
 
 }
 
@@ -12652,7 +12615,7 @@ function startRun(useSeed){
   game.run.harnessOnly = false;
   onboardingOpen = false;
   syncOnboardingPanel();
-  if(!SNCHarnessAdapter.suppressSave()) SAVE.save();
+  SAVE.save();
   maybeShowFirstRunHelp();
 }
 function continueRun(){
@@ -14636,7 +14599,6 @@ let last=performance.now();
 function frame(now){
   if(CR_PERF_PROBE) crPerfProbeEnsureInstalled();
   if(CR_PERF_PROBE) crPerfProbeFrameStart(now);
-  if(!SNCHarnessAdapter.allowFrame()) return requestAnimationFrame(frame);
   const rawDt = crFixedStepVisibilityResetPending ? 0 : (now-last)/1000;
   crFixedStepVisibilityResetPending = false;
   last=now;
