@@ -1,0 +1,1 @@
+{ "type": "template", "object": { "name": "player-start", "type": "player-start", "point": true, "visible": true, "properties": [ { "name": "angleRadians", "type": "float", "value": 0 }, { "name": "faces", "type": "string", "value": "" } ] } }

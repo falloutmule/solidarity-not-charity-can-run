@@ -1,0 +1,1 @@
+{ "type": "template", "object": { "name": "npc", "type": "npc", "point": true, "visible": true, "properties": [ { "name": "kind", "type": "string", "value": "hungry" }, { "name": "need", "type": "int", "value": 1 } ] } }

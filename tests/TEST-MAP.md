@@ -5,6 +5,8 @@ Run the smallest listed owner test for a changed path, then run `npm.cmd run bui
 | Changed area | Required focused check |
 |---|---|
 | `tools/build-single-file.js`, `src/build-manifest.json`, `project-metadata.json` | `test:metadata-truth`, `test:build-proof-routing` |
+| `tools/building-asset-*`, `tools/register-building-asset.js`, `authoring/buildings/` | `test:building-asset-compiler`, `test:building-asset-preview`; `build`, `build:check` when a runtime asset is registered |
+| `tools/tiled-level-*`, `authoring/levels/` | `test:tiled-d1-roundtrip`; `test:authored-d1` when a production authored level is generated |
 | Dead harness boundaries in `game-22`, source CSS/body, or build assembly | `test:dead-harness-boundaries` |
 | Retired inert harness adapter and its former caller seams | `test:inert-adapter-retirement`; affected owner checks |
 | Retired query diagnostics in mobile input, portrait layout, CSS, or markup | `test:unowned-diagnostics-retirement`, `test:chrome-pointer-path` |
