@@ -44,12 +44,16 @@ async function dismissIfVisible(page, selector, action) {
 
 async function reachPlay(page, url) {
   await page.goto(url, { waitUntil: 'load', timeout: 15000 });
-  await page.waitForFunction((buildId) => window.CR && window.BUILD_ID === buildId && typeof CR.startRun === 'function', EXPECTED_BUILD_ID, { timeout: 10000 });
+  await page.waitForSelector('[data-action="title-start"]', { state:'visible', timeout:10000 });
+  await page.waitForFunction((buildId) => window.SNCDiagnostics && window.SNCDiagnostics.buildId === buildId, EXPECTED_BUILD_ID, { timeout:10000 });
   await dismissIfVisible(page, '#porthint', '#portplay');
-  await page.evaluate(() => CR.startRun(42));
-  await page.waitForFunction(() => window.CR && CR.state === CR.STATE.PLAY, null, { timeout: 10000 });
+  await page.locator('[data-action="title-start"]').click();
+  await page.waitForFunction(() => window.SNCDiagnostics.getSnapshot().runtime.state === 'play', null, { timeout: 10000 });
   await dismissIfVisible(page, '#cronboard.show', '#cronboardok');
-  await page.waitForFunction(() => CR.state === CR.STATE.PLAY && !CR.paused && !CR.onboardingOpen, null, { timeout: 5000 });
+  await page.waitForFunction(() => {
+    const runtime = window.SNCDiagnostics.getSnapshot().runtime;
+    return runtime.state === 'play' && !runtime.paused;
+  }, null, { timeout: 5000 });
   await page.waitForTimeout(750);
 }
 
@@ -61,7 +65,7 @@ async function main() {
     const socialContext = await browser.newContext({ viewport: { width: 1280, height: 640 }, deviceScaleFactor: 1 });
     const socialPage = await socialContext.newPage();
     await socialPage.goto(local.url, { waitUntil: 'load', timeout: 15000 });
-    await socialPage.waitForFunction((buildId) => window.CR && window.BUILD_ID === buildId, EXPECTED_BUILD_ID, { timeout: 10000 });
+    await socialPage.waitForFunction((buildId) => window.SNCDiagnostics && window.SNCDiagnostics.buildId === buildId, EXPECTED_BUILD_ID, { timeout: 10000 });
     await socialPage.waitForTimeout(750);
     await socialPage.screenshot({ path: path.join(OUTPUT, 'social-preview.png') });
     await socialContext.close();

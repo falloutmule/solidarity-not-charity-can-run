@@ -157,7 +157,7 @@ const HARNESS_END = '/* SNC_TEST_HARNESS_END */';
 const HARNESS_HTML_BEGIN = '<!-- SNC_TEST_HARNESS_BEGIN -->';
 const HARNESS_HTML_END = '<!-- SNC_TEST_HARNESS_END -->';
 
-function selectHarnessSource(source, includeHarness) {
+function stripHarnessSource(source) {
   const beginMarker = source.includes(HARNESS_BEGIN) ? HARNESS_BEGIN : HARNESS_HTML_BEGIN;
   const endMarker = source.includes(HARNESS_END) ? HARNESS_END : HARNESS_HTML_END;
   const begin = source.indexOf(beginMarker);
@@ -167,16 +167,15 @@ function selectHarnessSource(source, includeHarness) {
     throw new Error('invalid SNC test-harness boundary markers');
   }
   const before = source.slice(0, begin);
-  const harness = source.slice(begin + beginMarker.length, end);
   const after = source.slice(end + endMarker.length);
-  return includeHarness ? `${before}${harness}${after}` : `${before}${after}`;
+  return `${before}${after}`;
 }
 
-function combine(manifest, { includeHarness = false } = {}) {
+function combine(manifest) {
   const template = readUtf8(manifest.template);
-  const styles = manifest.styles.map((rel) => selectHarnessSource(readUtf8(rel), includeHarness)).join('\n').replace(/[ \t]+\n/g, '\n').trimEnd();
-  const body = selectHarnessSource(readUtf8(manifest.body), includeHarness).replace(/[ \t]+\n/g, '\n').trimEnd();
-  let script = manifest.scripts.map((rel) => selectHarnessSource(readUtf8(rel), includeHarness)).join('');
+  const styles = manifest.styles.map((rel) => stripHarnessSource(readUtf8(rel))).join('\n').replace(/[ \t]+\n/g, '\n').trimEnd();
+  const body = stripHarnessSource(readUtf8(manifest.body)).replace(/[ \t]+\n/g, '\n').trimEnd();
+  let script = manifest.scripts.map((rel) => stripHarnessSource(readUtf8(rel))).join('');
   script = script.replace(/\n+$/, '\n');
   const html = template.replace('{{STYLES}}', styles).replace('{{BODY}}', body).replace('{{SCRIPT}}', script).replace(/\r\n/g, '\n');
   return html.endsWith('\n') ? html : `${html}\n`;
@@ -190,22 +189,6 @@ function synchronizeArtifactMetadata(metadata, html) {
 
 function writeProjectMetadata(metadata) {
   fs.writeFileSync(path.join(ROOT, METADATA_FILE), JSON.stringify(metadata, null, 2) + '\n', 'utf8');
-}
-
-function resolveSelfcheckRunDir() {
-  const runDir = process.env.CR_SELFCHECK_RUN_DIR;
-  if (!runDir) return null;
-  const selfcheckRoot = path.resolve(ROOT, 'test-results', 'selfcheck-runs');
-  const resolvedRunDir = path.resolve(ROOT, runDir);
-  const relative = path.relative(selfcheckRoot, resolvedRunDir);
-  const isStrictDescendant = relative !== '' && !relative.startsWith(`..${path.sep}`) && relative !== '..' && !path.isAbsolute(relative);
-  if (!isStrictDescendant) {
-    throw new Error(`CR_SELFCHECK_RUN_DIR must be a strict descendant of test-results/selfcheck-runs: ${runDir}`);
-  }
-  if (!fs.existsSync(resolvedRunDir) || !fs.statSync(resolvedRunDir).isDirectory()) {
-    throw new Error(`CR_SELFCHECK_RUN_DIR must be an existing directory: ${runDir}`);
-  }
-  return resolvedRunDir;
 }
 
 function resolveBuildProofDir(args) {
@@ -224,7 +207,7 @@ function resolveBuildProofDir(args) {
 }
 
 function resolveProofDir(args) {
-  return resolveSelfcheckRunDir() || resolveBuildProofDir(args);
+  return resolveBuildProofDir(args);
 }
 
 function proofOutputPath(name, resolvedProofDir) {
@@ -256,23 +239,10 @@ function main() {
   const args = new Set(process.argv.slice(2));
   const checkOnly = args.has('--check');
   const doMin = args.has('--min');
-  const testArtifactArg = [...args].find((arg) => arg.startsWith('--test-artifact='));
-  const testArtifact = testArtifactArg ? testArtifactArg.slice('--test-artifact='.length) : null;
-  if (testArtifact && (checkOnly || doMin)) throw new Error('--test-artifact cannot be combined with --check or --min');
   const proofDir = resolveProofDir(args);
   const metadata = loadProjectMetadata();
   const manifest = loadManifest();
   const preflight = validateProjectMetadata(metadata, ROOT, { skipArtifactValidation: !checkOnly });
-  if (testArtifact) {
-    const testRoot = path.resolve(ROOT, 'test-results');
-    const testPath = path.resolve(ROOT, testArtifact);
-    if (!isStrictDescendant(testRoot, testPath)) throw new Error('--test-artifact must be a strict descendant of test-results');
-    fs.mkdirSync(path.dirname(testPath), { recursive: true });
-    const html = combine(manifest, { includeHarness: true });
-    fs.writeFileSync(testPath, html, 'utf8');
-    console.log('Wrote test artifact', path.relative(ROOT, testPath), Buffer.byteLength(html, 'utf8'), 'bytes');
-    return;
-  }
   const html = combine(manifest);
   const outPath = path.join(ROOT, manifest.output || 'index.html');
 
@@ -309,4 +279,4 @@ function main() {
 
 if (require.main === module) main();
 
-module.exports = { extractBuildId, loadProjectMetadata, validateProjectMetadata, synchronizeArtifactMetadata, combine, selectHarnessSource };
+module.exports = { extractBuildId, loadProjectMetadata, validateProjectMetadata, synchronizeArtifactMetadata, combine };

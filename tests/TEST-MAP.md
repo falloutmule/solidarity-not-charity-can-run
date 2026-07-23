@@ -5,12 +5,12 @@ Run the smallest listed owner test for a changed path, then run `npm.cmd run bui
 | Changed area | Required focused check |
 |---|---|
 | `tools/build-single-file.js`, `src/build-manifest.json`, `project-metadata.json` | `test:metadata-truth`, `test:build-proof-routing` |
-| `src/js/game-06*`, mobile input CSS, control markup | `test:chrome-pointer-path`; `test:mobile-ui-cache` when layout/cache changes |
+| `src/js/game-06*`, `src/js/game-07*`, mobile input CSS, control markup | `test:chrome-pointer-path`; `test:mobile-ui-cache`; `test:mobile-options-persistence` when option persistence changes |
 | Render pose or frame loop | `test:render-interpolation`, `test:farfield-angle` |
 | Far-field resolution or projection | matching `test:farfield-resolution`, `test:farfield-angle`, or `test:farfield-projection` |
 | Bitmap building renderer or facade data | `test:custom-next` and `tests/bitmap_building_renderer_verify.js` |
-| Authored District 1 data or save behavior | `test:authored-d1`, `test:authored-d1-save`, and `test:authored-d1-smoke` as applicable |
+| Authored District 1 data or save behavior | `test:authored-d1`, `test:authored-d1-save`, and `test:custom-next` when bitmap identity changes |
 | Performance diagnostics | `test:perf-probe-v2` or `test:farfield-profiler` as applicable |
 | Documentation only | `git diff --check` |
 
-`test:selfcheck` is historical characterization, not a default release gate. Use it only for a broad milestone or a systemic regression investigation.
+The legacy aggregate self-check is retired. Its valid behavior is owned by the focused checks above; its 320x200 and historical procedural-material expectations are recorded in `docs/evidence/SNC-CLEAN-P4-010-LEGACY-SELFCHECK-INVENTORY.md`.
