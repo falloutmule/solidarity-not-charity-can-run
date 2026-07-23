@@ -387,7 +387,6 @@ let last=performance.now();
 function frame(now){
   if(CR_PERF_PROBE) crPerfProbeEnsureInstalled();
   if(CR_PERF_PROBE) crPerfProbeFrameStart(now);
-  if(!SNCHarnessAdapter.allowFrame()) return requestAnimationFrame(frame);
   const rawDt = crFixedStepVisibilityResetPending ? 0 : (now-last)/1000;
   crFixedStepVisibilityResetPending = false;
   last=now;

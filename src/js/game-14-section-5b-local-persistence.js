@@ -362,7 +362,6 @@ const SAVE = {
     return data;
   },
   save(){
-    if(SNCHarnessAdapter.suppressSave()) return;
     if(game.run && game.run.harnessOnly) return;
     if(!game.run.active) return;
     try { lsSet(K.save, this.serialize()); } catch(e){}
@@ -411,4 +410,4 @@ const SAVE = {
   clear(){ lsDel(K.save); },
 };
 // save before tab close
-addEventListener('beforeunload', ()=>{ if(SNCHarnessAdapter.suppressUnloadSave()) return; if(state===STATE.PLAY && game.run.active && !(game.run.harnessOnly)) SAVE.save(); });
+addEventListener('beforeunload', ()=>{ if(state===STATE.PLAY && game.run.active && !(game.run.harnessOnly)) SAVE.save(); });

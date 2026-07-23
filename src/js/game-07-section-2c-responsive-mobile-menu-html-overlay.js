@@ -6,7 +6,7 @@ let _optionsMenuStamp = 0;
 let _crSaveAvailability = false;
 function crCheapMobilePortraitKey(){
   if(!mobileInputActive()) return false;
-  if(SNCHarnessAdapter.forcePortrait() || _forcePortraitLayout) return true;
+  if(_forcePortraitLayout) return true;
   const vv = window.visualViewport;
   const w = Math.round((vv && vv.width) || innerWidth || 0);
   const h = Math.round((vv && vv.height) || innerHeight || 0);
