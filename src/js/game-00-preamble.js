@@ -47,7 +47,7 @@
     12   OVERLAYS
     13   MAIN LOOP + BOOT (production diagnostics / test-harness boundary)
 
-   DEBUG: ?debug ?layoutdebug=1 ?touchdebug=1 ?mobile=on
+   DEBUG: ?debug ?mobile=on
    ========================================================================== */
 
 // Lightweight runtime error capture for verification/debugging; empty in normal play.
@@ -58,4 +58,3 @@ window.addEventListener('error', e=>{
 window.addEventListener('unhandledrejection', e=>{
   window.__crRuntimeErrors.push({message:'unhandledrejection', reason:String(e.reason||'')});
 });
-

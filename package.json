@@ -22,6 +22,7 @@
     "test:build-proof-routing": "node tests/build_proof_routing_verify.js",
     "test:production-harness-boundary": "node tests/production_harness_boundary_verify.js",
     "test:dead-harness-boundaries": "node tests/dead_harness_boundaries_verify.js",
+    "test:unowned-diagnostics-retirement": "node tests/unowned_diagnostics_retirement_verify.js",
     "test:legacy-selfcheck-retirement": "node tests/legacy_selfcheck_retirement_verify.js",
     "test:docs-capture-boundary": "node tests/docs_capture_production_boundary_verify.js",
     "test:renderer-static-regression": "node tests/renderer_static_regression_verify.js",

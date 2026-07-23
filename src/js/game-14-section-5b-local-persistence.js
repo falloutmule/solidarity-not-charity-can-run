@@ -120,7 +120,6 @@ crMigrateUnsafeControlsYOffset({ quiet: true });
 //   ?mobile=on          — force mobile controls visible for this page load
 //   ?resetcontrols=1     — reset control-related settings to safe defaults
 //   ?clearsave=1         — wipe active game save (NOT stats) for a fresh start
-//   ?touchdebug=1        — show live diagnostics overlay (does not block input)
 // ---------------------------------------------------------------------------
 (function applyUrlFlags(){
   const P = new URLSearchParams(location.search);
@@ -413,4 +412,3 @@ const SAVE = {
 };
 // save before tab close
 addEventListener('beforeunload', ()=>{ if(SNCHarnessAdapter.suppressUnloadSave()) return; if(state===STATE.PLAY && game.run.active && !(game.run.harnessOnly)) SAVE.save(); });
-
