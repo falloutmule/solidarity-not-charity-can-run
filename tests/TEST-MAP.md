@@ -9,6 +9,7 @@ Run the smallest listed owner test for a changed path, then run `npm.cmd run bui
 | Retired inert harness adapter and its former caller seams | `test:inert-adapter-retirement`; affected owner checks |
 | Retired query diagnostics in mobile input, portrait layout, CSS, or markup | `test:unowned-diagnostics-retirement`, `test:chrome-pointer-path` |
 | `src/js/game-06*`, `src/js/game-07*`, mobile input CSS, control markup | `test:chrome-pointer-path`; `test:mobile-ui-cache`; `test:mobile-options-persistence` when option persistence changes |
+| Retired LOOK-pad instrumentation | `test:lookpad-counter-retirement`; `test:chrome-pointer-path`; `test:farfield-angle` |
 | Render pose or frame loop | `test:render-interpolation`, `test:farfield-angle` |
 | Far-field resolution or projection | matching `test:farfield-resolution`, `test:farfield-angle`, or `test:farfield-projection` |
 | Bitmap building renderer or facade data | `test:custom-next` and `tests/bitmap_building_renderer_verify.js` |

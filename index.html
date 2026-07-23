@@ -773,14 +773,10 @@ function mobileInputActive(){
 const tzone = { active:false, id:null, lastX:0 };
 // Dedicated LOOK circle (#mlookpad) — tracked by touch identifier for multi-touch
 const lookTouch = { id:null, lastX:0 };
-/** Incremented when a LOOK pad drag applies angle (tests / dedupe verification). */
-let _crLookPadApplyCount = 0;
 const CR_RAW_LOOK_SAMPLE_CAP = 512;
 let _crRawLookDeltas = [];
 let _crRawLookEventTimestamps = [];
 let _crPendingLookEventTimestamp = null;
-function crResetLookPadApplyCount(){ _crLookPadApplyCount = 0; }
-function crGetLookPadApplyCount(){ return _crLookPadApplyCount; }
 function crRawLookProfilerActive(){
   try { return typeof CR_PERF_PROBE !== 'undefined' && !!CR_PERF_PROBE; } catch(_e){ return false; }
 }
@@ -834,7 +830,6 @@ function crApplyLookPadDx(dx, eventTimestamp){
   if(state!==STATE.PLAY || paused) return false;
   if(Math.abs(dx) <= 0.2) return false;
   crApplyRawTouchLookDelta(dx * mobileLookSens(), eventTimestamp);
-  _crLookPadApplyCount++;
   return true;
 }
 /** Apply accumulated look delta from input handlers (simulation step). */
