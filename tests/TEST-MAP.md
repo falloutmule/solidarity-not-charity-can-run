@@ -5,6 +5,7 @@ Run the smallest listed owner test for a changed path, then run `npm.cmd run bui
 | Changed area | Required focused check |
 |---|---|
 | `tools/build-single-file.js`, `src/build-manifest.json`, `project-metadata.json` | `test:metadata-truth`, `test:build-proof-routing` |
+| Dead harness boundaries in `game-22`, source CSS/body, or build assembly | `test:dead-harness-boundaries` |
 | `src/js/game-06*`, `src/js/game-07*`, mobile input CSS, control markup | `test:chrome-pointer-path`; `test:mobile-ui-cache`; `test:mobile-options-persistence` when option persistence changes |
 | Render pose or frame loop | `test:render-interpolation`, `test:farfield-angle` |
 | Far-field resolution or projection | matching `test:farfield-resolution`, `test:farfield-angle`, or `test:farfield-projection` |
