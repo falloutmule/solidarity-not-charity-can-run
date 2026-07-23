@@ -1,0 +1,1 @@
+{ "type": "template", "object": { "name": "exit", "type": "exit", "point": true, "visible": true, "properties": [ { "name": "active", "type": "bool", "value": false } ] } }

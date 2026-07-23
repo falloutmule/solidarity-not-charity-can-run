@@ -17,6 +17,13 @@
     "build:proof": "node tools/build-single-file.js --proof-dir=test-results/build-proofs/local",
     "build:check": "node tools/build-single-file.js --check",
     "build:min": "node tools/build-single-file.js --min",
+    "building:build": "node tools/building-asset-compiler.js",
+    "building:check": "node tools/building-asset-compiler.js --check",
+    "building:preview": "node tools/building-asset-preview.js",
+    "building:register": "node tools/register-building-asset.js --write",
+    "level:export-tiled": "node tools/tiled-level-export.js",
+    "level:import-tiled": "node tools/tiled-level-import.js",
+    "level:check-tiled": "node tools/tiled-level-import.js",
     "docs:capture": "node tools/capture-docs-images.js",
     "test:metadata-truth": "node tests/project_metadata_truth_verify.js",
     "test:build-proof-routing": "node tests/build_proof_routing_verify.js",
@@ -30,6 +37,9 @@
     "test:facade-global-retirement": "node tests/facade_global_retirement_verify.js",
     "test:mobile-menu-alias-retirement": "node tests/mobile_menu_alias_retirement_verify.js",
     "test:docs-capture-boundary": "node tests/docs_capture_production_boundary_verify.js",
+    "test:building-asset-compiler": "node tests/building_asset_compiler_verify.js",
+    "test:building-asset-preview": "node tests/building_asset_preview_verify.js",
+    "test:tiled-d1-roundtrip": "node tests/tiled_d1_roundtrip_verify.js",
     "test:renderer-static-regression": "node tests/renderer_static_regression_verify.js",
     "test:custom-next": "node tests/custom_next_001_face_reuse_runtime_verify.js",
     "test:authored-d1": "node tests/authored_d1_level_verify.js",
@@ -48,6 +58,7 @@
     "test:farfield-final-smoke": "node tests/far_field_final_candidate_smoke.js"
   },
   "devDependencies": {
-    "playwright": "^1.52.0"
+    "playwright": "^1.52.0",
+    "pngjs": "^7.0.0"
   }
 }
