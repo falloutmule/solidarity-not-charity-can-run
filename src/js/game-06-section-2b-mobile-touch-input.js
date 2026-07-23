@@ -10,17 +10,7 @@ const inp = {
   _active:false, // true when any touch is on screen
 };
 var BUILD_ID = 'chromeinput2'; window.BUILD_ID = BUILD_ID;
-const CR_FPV_STREET_SHIMMER_FIX = 1;
 const CR_FPV_STREET_MATTE = true;
-const CR_FPV_WALL_LINE_FIX = 1;
-const CR_FPV_FACADE_TARGET_POLISH = 1;
-const CR_BUILDING_MODULE_FACADE = 1;
-const CR_FACADE_PACK_BRIDGE = 1;
-const CR_FACADE_PACK_V2_SAFE = 1;
-const CR_FACADE_COMPOSE_READABILITY = 1;
-const CR_FACADE_ART_VOCABULARY = 1;
-/** Final D2/D3 facade readability polish: composed facades use inset framed, phone-readable shapes. */
-const CR_D2_D3_FACADE_READABILITY_FINAL = 1;
 /** Building visual reset: smooth, low-noise wall masses with sparse readable cues. */
 const CR_BUILDING_SMOOTH_STYLE = 1;
 /** Continuous facade texture pass retained for compatibility/debug; calmwalls1 bypasses it visibly. */
@@ -35,10 +25,6 @@ const CR_PROPS1_RESTORE_SIMPLE_MATERIALS = 1;
 const CR_PROPS1_RESTORE_PROP_DENSITY = 1;
 /** solidwalls1: opaque hex building fills + per-segment map material grouping (no transparent wall mass). */
 const CR_SOLID_WALLS_OPAQUE_BASELINE = 1;
-/** Floor-anchored FPV wall mass / sprite contact plane alignment. */
-const CR_FPV_GROUND_PLANE_ALIGNMENT = 1;
-/** Split-source pipeline active: edit src/ and regenerate root index.html with npm run build. */
-const CR_SOURCE_BUILD_PIPELINE_ACTIVE = 1;
 /** Coarse FPV wall texture U sampling (reduces vertical stripe/moiré on buildings). */
 const CR_FPV_WALL_TEX_COARSE = 16;
 /** Visual readability contract (render/HUD only; gameplay unchanged). */

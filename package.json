@@ -26,6 +26,7 @@
     "test:legacy-selfcheck-retirement": "node tests/legacy_selfcheck_retirement_verify.js",
     "test:inert-adapter-retirement": "node tests/inert_adapter_retirement_verify.js",
     "test:lookpad-counter-retirement": "node tests/lookpad_counter_retirement_verify.js",
+    "test:dead-visual-flags": "node tests/dead_visual_flags_verify.js",
     "test:docs-capture-boundary": "node tests/docs_capture_production_boundary_verify.js",
     "test:renderer-static-regression": "node tests/renderer_static_regression_verify.js",
     "test:custom-next": "node tests/custom_next_001_face_reuse_runtime_verify.js",
