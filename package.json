@@ -38,6 +38,7 @@
     "test:chrome-pointer-path": "node tests/chrome_pointer_path_verify.js",
     "test:render-interpolation": "node tests/render_interpolation_verify.js",
     "test:runtime-diagnostics-boundary": "node tests/runtime_diagnostics_boundary_verify.js",
+    "test:render-profile-selection-boundary": "node tests/render_profile_selection_boundary_verify.js",
     "test:mobile-ui-cache": "node tests/mobile_ui_cache_verify.js",
     "test:mobile-options-persistence": "node tests/mobile_options_persistence_verify.js",
     "test:farfield-resolution": "node tests/far_field_resolution_verify.js",

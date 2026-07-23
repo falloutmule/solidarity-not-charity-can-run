@@ -7,11 +7,13 @@ const vm = require('vm');
 const crypto = require('crypto');
 
 const root = path.resolve(__dirname, '..');
+const selectionPath = path.join(root, 'src/js/game-01aa-render-profile-selection.js');
 const profilesPath = path.join(root, 'src/js/game-01a-render-resolution-profiles.js');
 
 // RED/GREEN slice 1: canonical profiles and strict query selection.
+assert(fs.existsSync(selectionPath), 'render profile selection module must exist');
 assert(fs.existsSync(profilesPath), 'resolution profile module must exist');
-const source = fs.readFileSync(profilesPath, 'utf8');
+const source = fs.readFileSync(selectionPath, 'utf8') + fs.readFileSync(profilesPath, 'utf8');
 const sandbox = {
   console,
   URLSearchParams,
@@ -192,4 +194,3 @@ assert.strictEqual(bitmapBytes.length, 185412, 'canonical bitmap byte length');
 assert.strictEqual(crypto.createHash('sha256').update(bitmapBytes).digest('hex'), 'bffb437c0c6772669233bd58124cded53fe8e32faa9b0e3c96736c4f87ec140c', 'canonical bitmap SHA-256');
 
 console.log(`far_field_resolution_verify: PASS profiles=320,400,480 costRatios=400:${ratio400.toFixed(6)},480:${ratio480.toFixed(6)} selfContained=true`);
-

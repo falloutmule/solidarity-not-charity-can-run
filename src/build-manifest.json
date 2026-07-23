@@ -9,6 +9,7 @@
   "scripts": [
     "src/js/game-00-preamble.js",
     "src/js/game-01-section-0-canvas-resolution.js",
+    "src/js/game-01aa-render-profile-selection.js",
     "src/js/game-01a-render-resolution-profiles.js",
     "src/js/game-02-section-0b-fullscreen-api-helpers.js",
     "src/js/game-03-section-0c-debug-flag.js",
