@@ -9,7 +9,6 @@ function portraitPlayH(){
   const w = cw || view.width;
   return Math.round(w * (RH/RW) * 1.05);
 }
-const _layoutDebugActive = new URLSearchParams(location.search).get('layoutdebug') === '1';
 function rectsOverlap(a,b){
   if(!a||!b) return true;
   return !(a.left+a.width <= b.left || b.left+b.width <= a.left ||
@@ -37,7 +36,6 @@ function portraitShiftY(rect, dy){
  *
  * Layout tuning: JOY SIZE, BUTTON SIZE, LOOK SIZE are independent OPTIONS steps.
  * Do not "clean up" overlap, recentre MENU with dock, or widen minimap outside contract.
- * Debug: ?layoutdebug=1, CR.getControlDockRectProof(), CR.getLayoutProof().
  * Kanban Card 5 / BUILD_ID contract1 documents this contract for future edits.
  */
 /** Portrait layout — FPV (fixed) → minimap (fixed) → MENU (fixed below minimap) → dock controls → stats (fixed). */
@@ -136,21 +134,6 @@ function drawPortraitDashboardChrome(){
   [L.minimapRect.y, L.controlsRect.y, L.statsRect.y].forEach(yy=>{
     ctx.beginPath(); ctx.moveTo(0, yy); ctx.lineTo(view.width, yy); ctx.stroke();
   });
-  if(_layoutDebugActive){
-    const zones = [
-      ['FPV', L.fpvRect, '#00ff66'],
-      ['MINI', L.minimapRect, '#00e5ff'],
-      ['DOCK', L.controlsRect, '#ffee00'],
-      ['STATS', L.statsRect, '#ff66ff'],
-    ];
-    ctx.font = 'bold 10px monospace';
-    zones.forEach(([lbl, r, col])=>{
-      ctx.strokeStyle = col; ctx.lineWidth = 2;
-      ctx.strokeRect(r.x + 1, r.y + 1, r.w - 2, r.h - 2);
-      ctx.fillStyle = col;
-      ctx.fillText(lbl, r.x + 4, r.y + 12);
-    });
-  }
   ctx.font = 'bold 9px monospace';
   ctx.fillStyle = 'rgba(210,170,110,0.92)';
   ctx.fillText('build ' + BUILD_ID, L.menuRect.left, L.menuRect.top + L.menuRect.height + 11);

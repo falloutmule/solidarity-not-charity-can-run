@@ -106,16 +106,6 @@
     pointer-events:none;user-select:none;text-shadow:0 1px 4px rgba(0,0,0,0.7);
     text-align:center;transform:rotate(-28deg);line-height:1.1;
   }
-  /* ---- touch debug overlay ---- */
-  #touchdebug{
-    display:none;position:fixed;top:calc(4px + var(--safe-top));left:calc(4px + var(--safe-left));
-    background:rgba(0,0,0,0.82);border:1px solid rgba(255,200,80,0.5);
-    color:#ffd24a;font:10px monospace;line-height:1.55;
-    padding:5px 7px;z-index:9999;pointer-events:none;
-    max-width:210px;white-space:pre;
-    border-radius:4px;
-  }
-
   .mjl{
     position:absolute;width:44px;height:44px;border-radius:50%;
     background:rgba(160,130,60,0.3);border:2px solid rgba(200,170,100,0.5);

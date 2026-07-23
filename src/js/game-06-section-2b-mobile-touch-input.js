@@ -1002,111 +1002,6 @@ function dismissLookHint(){
   crWriteStyle(h, 'opacity', '0');
   crWriteStyle(h, 'display', 'none');
 }
-// ---- touch debug overlay (activated by ?touchdebug=1) ----
-let _tdbElement = null;
-let _touchDebugActive = false;
-function touchDebug(data){
-  const el = _tdbElement || (_tdbElement = document.getElementById('touchdebug'));
-  if(!el || !_touchDebugActive) return;
-  if(data === 'show'){
-    el.style.display = '';
-    return;
-  }
-  if(data === 'hide'){
-    el.style.display = 'none';
-    return;
-  }
-  if(typeof data === 'object' && data !== null){
-    el.textContent = Object.entries(data).map(([k,v])=>k+': '+v).join('\n');
-  }
-}
-// Parse ?touchdebug=1 on load to enable the overlay
-(function(){
-  const params = new URLSearchParams(location.search);
-  if(params.get('touchdebug') === '1'){
-    _touchDebugActive = true;
-    let _lastTouch = { type:'', target:'', x:0, y:0, consumed:false, handler:'' };
-    // Capture last touch/pointer event for diagnostics
-    ['touchstart','touchmove','touchend','pointerdown','pointermove','pointerup'].forEach(ev=>{
-      document.addEventListener(ev, e=>{
-        const t = e.changedTouches ? e.changedTouches[0] : e;
-        const tgt = e.target;
-        const id = tgt ? (tgt.id || tgt.className || tgt.tagName) : '?';
-        _lastTouch = { type:ev, target:id, x:(t.clientX|0), y:(t.clientY|0), consumed:e.defaultPrevented, handler: tgt?.dataset?.action||'' };
-      }, { passive:true, capture:true });
-    });
-    document.addEventListener('DOMContentLoaded', ()=>{
-      touchDebug('show');
-      // Update with initial state every 500ms while in play
-      const iv = setInterval(()=>{
-        if(!_touchDebugActive){ clearInterval(iv); return; }
-        const portrait = isMobilePortrait();
-        const ml=document.getElementById('ml'), mr=document.getElementById('mr'), mg=document.getElementById('mg'), ms=document.getElementById('ms'), mm=document.getElementById('mm'), mp=document.getElementById('mp');
-        const mlookpad=document.getElementById('mlookpad');
-        const mportmenu=document.getElementById('mportmenu');
-        const mob=document.getElementById('mob');
-        const zone = el=>{ if(!el) return 'MISSING'; const b=el.getBoundingClientRect?.(); const pe=getComputedStyle(el).pointerEvents; const dp=getComputedStyle(el).display; return `${b?(b.left|0)+','+(b.top|0)+' '+(b.right|0)+'x'+(b.bottom|0):'?'} d:${dp} pe:${pe}`; };
-        const menuTxt = mportmenu ? String(mportmenu.innerText||'').replace(/\s+/g,' ').trim() : 'MISSING';
-        const vv=window.visualViewport;
-        touchDebug({
-          orient: portrait ? 'PORTRAIT' : 'LANDSCAPE',
-          state: typeof state !== 'undefined' ? ['TITLE','PLAY','LB','RES','PAUSE'][state] : '?',
-          angle: typeof player !== 'undefined' ? (+player.angle).toFixed(3) : '?',
-          mobileMode: typeof mobileMode !== 'undefined' ? mobileMode : '?',
-          mobileControls: typeof options !== 'undefined' ? options.mobileControls : '?',
-          mobileOverride: typeof mobileOverride !== 'undefined' ? mobileOverride : '?',
-          isMobile: typeof isMobile === 'function' ? isMobile() : '?',
-          innerWH: typeof innerWidth !== 'undefined' ? innerWidth+'x'+innerHeight : '?',
-          vvWH: vv ? (vv.width|0)+'x'+(vv.height|0) : 'n/a',
-          mobClass: mob ? mob.className : 'MISSING',
-          mobPE: mob ? getComputedStyle(mob).pointerEvents : '?',
-          '#ml': zone(ml),
-          '#mr': zone(mr),
-          '#mlookpad': zone(mlookpad),
-          '#mg': zone(mg),
-          '#ms': zone(ms),
-          '#mm/map': zone(mm),
-          '#mp/pause': zone(mp),
-          '#mportmenu': zone(mportmenu),
-          mportmenu_display: mportmenu ? getComputedStyle(mportmenu).display : 'MISSING',
-          mportmenu_pe: mportmenu ? getComputedStyle(mportmenu).pointerEvents : 'MISSING',
-          mportmenu_text: menuTxt,
-          lastTouch: _lastTouch.type + ' #' + _lastTouch.target + ' (' + _lastTouch.x + ',' + _lastTouch.y + ')' + (_lastTouch.consumed?' PREVENTED':'') + (_lastTouch.handler?' ['+_lastTouch.handler+']':''),
-          inp: typeof inp !== 'undefined' ? JSON.stringify({g:inp.give,s:inp.sprint,m:inp.map,p:inp.pause}) : '?',
-        });
-      }, 500);
-    });
-  }
-})();
-// ---- layout debug mode (activated by ?layoutdebug=1) ----
-// Adds bright outlines to all mobile controls for screenshot verification.
-(function(){
-  const params = new URLSearchParams(location.search);
-  if(params.get('layoutdebug') !== '1') return;
-  document.addEventListener('DOMContentLoaded', ()=>{
-    const ids = ['ml','mlookpad','mg','ms','mm','mp','mr','mportmenu'];
-    const colors = { ml:'#ff0', mlookpad:'#0ff', mg:'#f80', ms:'#08f', mm:'#8f0', mp:'#f08', mr:'#888', mportmenu:'#f0f' };
-    function applyOutlines(){
-      ids.forEach(id=>{
-        const el = document.getElementById(id);
-        if(!el) return;
-        el.style.outline = '3px solid ' + (colors[id] || '#ff0');
-        el.style.outlineOffset = '1px';
-        if(!el.querySelector('._ldbg')){
-          const lbl = document.createElement('div');
-          lbl.className = '_ldbg';
-          lbl.textContent = '#' + id;
-          lbl.style.cssText = 'position:absolute;top:-14px;left:0;font:bold 9px monospace;color:#ff0;background:#000;padding:1px 3px;border-radius:2px;pointer-events:none;z-index:9999;white-space:nowrap;';
-          el.style.position = el.style.position || 'absolute';
-          el.appendChild(lbl);
-        }
-      });
-      if(typeof applyMobileControlSettings === 'function') applyMobileControlSettings();
-    }
-    applyOutlines();
-    setInterval(applyOutlines, 2000);
-  });
-})();
 let _crLookHintTimer = null;
 function syncLookHintUI(){
   const h = document.getElementById('mlookhint');
@@ -1341,7 +1236,6 @@ function bindMobileControls(){
     e.preventDefault(); e.stopPropagation();
     const dx = e.clientX - lpadMousePtr.startX;
     if(crApplyLookPadDx(dx, e.timeStamp)) lpadMousePtr.startX = e.clientX;
-    touchDebug({type:'look_circle_move', orient:isMobilePortrait()?'port':'land', dx, angle:player.angle});
   },{passive:false});
 
   onMobileInput(lpad, 'pointerup', e=>{
@@ -1400,7 +1294,6 @@ function bindMobileControls(){
           crApplyRawTouchLookDelta(dx * mobileLookSens(), sample.timeStamp);
         }
       }
-      touchDebug({type:'land_look_move', dx, angle:player.angle});
     }
   },{passive:false});
 
@@ -1554,7 +1447,6 @@ function bindMobileControls(){
             const dx = t.clientX - lookTouch.lastX;
             if(crApplyLookPadDx(dx, e.timeStamp)){
               lookTouch.lastX = t.clientX;
-              touchDebug({type:'look_circle_touch_move', orient:isMobilePortrait()?'port':'land', dx, angle:player.angle, joyId:joy.id, lookId:lookTouch.id});
             }
           }
         }
