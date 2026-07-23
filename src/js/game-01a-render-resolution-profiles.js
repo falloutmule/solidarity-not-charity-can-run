@@ -1,3 +1,4 @@
+
 function crRenderTargetsMatch(profile){
   return RW === profile.width && RH === profile.height &&
     !!buf && buf.width === profile.width && buf.height === profile.height &&

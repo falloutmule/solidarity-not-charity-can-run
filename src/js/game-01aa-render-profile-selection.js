@@ -45,4 +45,3 @@ function crCanonicalRenderProfile(profile){
 function crGetRenderProfile(){
   return crAppliedRenderProfile || crResolvedRenderProfile;
 }
-
