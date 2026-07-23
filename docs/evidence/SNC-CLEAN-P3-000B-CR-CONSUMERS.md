@@ -1,7 +1,7 @@
 # SNC-CLEAN-P3-000B — `window.CR` and maintained-test consumer map
 
-**Baseline:** `889fcbb88eb176dd811897c551467cfe43c68dca` (`chromeinput2`)  
-**Card:** read-only inventory  
+**Baseline:** `889fcbb88eb176dd811897c551467cfe43c68dca` (`chromeinput2`)
+**Card:** read-only inventory
 **Result:** PASS
 
 ## Inspected paths

@@ -1,7 +1,7 @@
 # SNC-CLEAN-P3-000A — Bootstrap ownership audit
 
-**Baseline:** `889fcbb88eb176dd811897c551467cfe43c68dca` (`chromeinput2`)  
-**Mode:** read-only source/test inspection; no build or self-check run  
+**Baseline:** `889fcbb88eb176dd811897c551467cfe43c68dca` (`chromeinput2`)
+**Mode:** read-only source/test inspection; no build or self-check run
 **Result:** PASS — production carries query-gated test bootstrap and proof-scene code; ownership is sufficiently mapped for synthesis.
 
 ## Inspected paths

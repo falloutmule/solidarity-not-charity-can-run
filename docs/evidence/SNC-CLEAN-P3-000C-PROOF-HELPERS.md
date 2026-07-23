@@ -1,7 +1,7 @@
 # SNC-CLEAN-P3-000C — Proof-helper audit
 
-**Baseline:** `889fcbb88eb176dd811897c551467cfe43c68dca` (`chromeinput2`)  
-**Method:** read-only source and maintained-test inspection; no self-check run; no runtime, test, build, or branch change.  
+**Baseline:** `889fcbb88eb176dd811897c551467cfe43c68dca` (`chromeinput2`)
+**Method:** read-only source and maintained-test inspection; no self-check run; no runtime, test, build, or branch change.
 **Result:** PASS — production contains source-text and stateful proof helpers that have a clear test-artifact destination.
 
 ## Inspected paths

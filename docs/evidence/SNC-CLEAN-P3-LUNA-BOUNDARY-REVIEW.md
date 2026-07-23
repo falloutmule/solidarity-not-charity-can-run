@@ -1,7 +1,7 @@
 # SNC CLEAN P3 — Luna runtime/harness boundary review
 
-**Baseline:** `889fcbb88eb176dd811897c551467cfe43c68dca` (`chromeinput2`)  
-**Review mode:** read-only; no full self-check run  
+**Baseline:** `889fcbb88eb176dd811897c551467cfe43c68dca` (`chromeinput2`)
+**Review mode:** read-only; no full self-check run
 **Final structural result:** **PASS**
 
 ## Protected runtime path
