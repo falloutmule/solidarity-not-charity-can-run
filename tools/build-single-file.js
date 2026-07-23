@@ -152,30 +152,11 @@ function fileEntry(rel) {
   return { path: rel, sha256: sha256(raw), bytes: raw.length };
 }
 
-const HARNESS_BEGIN = '/* SNC_TEST_HARNESS_BEGIN */';
-const HARNESS_END = '/* SNC_TEST_HARNESS_END */';
-const HARNESS_HTML_BEGIN = '<!-- SNC_TEST_HARNESS_BEGIN -->';
-const HARNESS_HTML_END = '<!-- SNC_TEST_HARNESS_END -->';
-
-function stripHarnessSource(source) {
-  const beginMarker = source.includes(HARNESS_BEGIN) ? HARNESS_BEGIN : HARNESS_HTML_BEGIN;
-  const endMarker = source.includes(HARNESS_END) ? HARNESS_END : HARNESS_HTML_END;
-  const begin = source.indexOf(beginMarker);
-  const end = source.indexOf(endMarker);
-  if (begin < 0 && end < 0) return source;
-  if (begin < 0 || end < 0 || end < begin) {
-    throw new Error('invalid SNC test-harness boundary markers');
-  }
-  const before = source.slice(0, begin);
-  const after = source.slice(end + endMarker.length);
-  return `${before}${after}`;
-}
-
 function combine(manifest) {
   const template = readUtf8(manifest.template);
-  const styles = manifest.styles.map((rel) => stripHarnessSource(readUtf8(rel))).join('\n').replace(/[ \t]+\n/g, '\n').trimEnd();
-  const body = stripHarnessSource(readUtf8(manifest.body)).replace(/[ \t]+\n/g, '\n').trimEnd();
-  let script = manifest.scripts.map((rel) => stripHarnessSource(readUtf8(rel))).join('');
+  const styles = manifest.styles.map((rel) => readUtf8(rel)).join('\n').replace(/[ \t]+\n/g, '\n').trimEnd();
+  const body = readUtf8(manifest.body).replace(/[ \t]+\n/g, '\n').trimEnd();
+  let script = manifest.scripts.map((rel) => readUtf8(rel)).join('');
   script = script.replace(/\n+$/, '\n');
   const html = template.replace('{{STYLES}}', styles).replace('{{BODY}}', body).replace('{{SCRIPT}}', script).replace(/\r\n/g, '\n');
   return html.endsWith('\n') ? html : `${html}\n`;
