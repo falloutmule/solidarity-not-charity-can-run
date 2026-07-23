@@ -719,9 +719,9 @@ function crSafeControlsYOffsetPx(requested){
 function crMigrateUnsafeControlsYOffset(opts){
   const quiet = opts && opts.quiet;
   const req = Number(options.controlsYOffsetPx) || 0;
-  if(!mobileInputActive() && !_forcePortraitLayout && !_selfCheckForcePortrait) return { changed: false, from: req, to: req };
+  if(!mobileInputActive() && !_forcePortraitLayout && !SNCHarnessAdapter.forcePortrait()) return { changed: false, from: req, to: req };
   const { cw, ch } = layoutCssSize();
-  if(ch <= cw && !_forcePortraitLayout && !_selfCheckForcePortrait) return { changed: false, from: req, to: req };
+  if(ch <= cw && !_forcePortraitLayout && !SNCHarnessAdapter.forcePortrait()) return { changed: false, from: req, to: req };
   const safe = crSafeControlsYOffsetPx(req);
   if(safe === req) return { changed: false, from: req, to: req };
   options.controlsYOffsetPx = safe;
@@ -869,7 +869,7 @@ function syncPortraitMenuLabel(){
 }
 function isMobilePortrait(){
   if(!mobileInputActive()) return false;
-  if(_selfCheckForcePortrait || _forcePortraitLayout) return true;
+  if(SNCHarnessAdapter.forcePortrait() || _forcePortraitLayout) return true;
   const { cw, ch } = layoutCssSize();
   if(ch > cw) return true;
   return isOrientationPortrait();

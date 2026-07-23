@@ -115,6 +115,7 @@
     max-width:210px;white-space:pre;
     border-radius:4px;
   }
+  /* SNC_TEST_HARNESS_BEGIN */
   #crselfcheck{
     display:none;position:fixed;bottom:calc(8px + var(--safe-bottom));right:calc(8px + var(--safe-right));
     background:rgba(0,40,0,0.88);border:2px solid #3f8;
@@ -123,6 +124,7 @@
     max-width:240px;white-space:pre;border-radius:4px;
   }
   #crselfcheck.fail{background:rgba(50,0,0,0.9);border-color:#f55;color:#faa;}
+  /* SNC_TEST_HARNESS_END */
   .mjl{
     position:absolute;width:44px;height:44px;border-radius:50%;
     background:rgba(160,130,60,0.3);border:2px solid rgba(200,170,100,0.5);

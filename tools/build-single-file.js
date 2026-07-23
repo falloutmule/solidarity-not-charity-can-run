@@ -138,6 +138,11 @@ function readUtf8(rel) {
   return fs.readFileSync(path.join(ROOT, rel), 'utf8').replace(/\r\n/g, '\n');
 }
 
+function isStrictDescendant(root, target) {
+  const relative = path.relative(root, target);
+  return relative !== '' && !relative.startsWith(`..${path.sep}`) && relative !== '..' && !path.isAbsolute(relative);
+}
+
 function loadManifest() {
   return JSON.parse(readUtf8('src/build-manifest.json'));
 }
@@ -147,11 +152,31 @@ function fileEntry(rel) {
   return { path: rel, sha256: sha256(raw), bytes: raw.length };
 }
 
-function combine(manifest) {
+const HARNESS_BEGIN = '/* SNC_TEST_HARNESS_BEGIN */';
+const HARNESS_END = '/* SNC_TEST_HARNESS_END */';
+const HARNESS_HTML_BEGIN = '<!-- SNC_TEST_HARNESS_BEGIN -->';
+const HARNESS_HTML_END = '<!-- SNC_TEST_HARNESS_END -->';
+
+function selectHarnessSource(source, includeHarness) {
+  const beginMarker = source.includes(HARNESS_BEGIN) ? HARNESS_BEGIN : HARNESS_HTML_BEGIN;
+  const endMarker = source.includes(HARNESS_END) ? HARNESS_END : HARNESS_HTML_END;
+  const begin = source.indexOf(beginMarker);
+  const end = source.indexOf(endMarker);
+  if (begin < 0 && end < 0) return source;
+  if (begin < 0 || end < 0 || end < begin) {
+    throw new Error('invalid SNC test-harness boundary markers');
+  }
+  const before = source.slice(0, begin);
+  const harness = source.slice(begin + beginMarker.length, end);
+  const after = source.slice(end + endMarker.length);
+  return includeHarness ? `${before}${harness}${after}` : `${before}${after}`;
+}
+
+function combine(manifest, { includeHarness = false } = {}) {
   const template = readUtf8(manifest.template);
-  const styles = manifest.styles.map(readUtf8).join('\n').replace(/\n$/, '');
-  const body = readUtf8(manifest.body).replace(/\n$/, '');
-  let script = manifest.scripts.map(readUtf8).join('');
+  const styles = manifest.styles.map((rel) => selectHarnessSource(readUtf8(rel), includeHarness)).join('\n').replace(/[ \t]+\n/g, '\n').trimEnd();
+  const body = selectHarnessSource(readUtf8(manifest.body), includeHarness).replace(/[ \t]+\n/g, '\n').trimEnd();
+  let script = manifest.scripts.map((rel) => selectHarnessSource(readUtf8(rel), includeHarness)).join('');
   script = script.replace(/\n+$/, '\n');
   const html = template.replace('{{STYLES}}', styles).replace('{{BODY}}', body).replace('{{SCRIPT}}', script).replace(/\r\n/g, '\n');
   return html.endsWith('\n') ? html : `${html}\n`;
@@ -231,10 +256,23 @@ function main() {
   const args = new Set(process.argv.slice(2));
   const checkOnly = args.has('--check');
   const doMin = args.has('--min');
+  const testArtifactArg = [...args].find((arg) => arg.startsWith('--test-artifact='));
+  const testArtifact = testArtifactArg ? testArtifactArg.slice('--test-artifact='.length) : null;
+  if (testArtifact && (checkOnly || doMin)) throw new Error('--test-artifact cannot be combined with --check or --min');
   const proofDir = resolveProofDir(args);
   const metadata = loadProjectMetadata();
   const manifest = loadManifest();
   const preflight = validateProjectMetadata(metadata, ROOT, { skipArtifactValidation: !checkOnly });
+  if (testArtifact) {
+    const testRoot = path.resolve(ROOT, 'test-results');
+    const testPath = path.resolve(ROOT, testArtifact);
+    if (!isStrictDescendant(testRoot, testPath)) throw new Error('--test-artifact must be a strict descendant of test-results');
+    fs.mkdirSync(path.dirname(testPath), { recursive: true });
+    const html = combine(manifest, { includeHarness: true });
+    fs.writeFileSync(testPath, html, 'utf8');
+    console.log('Wrote test artifact', path.relative(ROOT, testPath), Buffer.byteLength(html, 'utf8'), 'bytes');
+    return;
+  }
   const html = combine(manifest);
   const outPath = path.join(ROOT, manifest.output || 'index.html');
 
@@ -271,4 +309,4 @@ function main() {
 
 if (require.main === module) main();
 
-module.exports = { extractBuildId, loadProjectMetadata, validateProjectMetadata, synchronizeArtifactMetadata };
+module.exports = { extractBuildId, loadProjectMetadata, validateProjectMetadata, synchronizeArtifactMetadata, combine, selectHarnessSource };

@@ -14,11 +14,13 @@ const http = require('http');
 const path = require('path');
 const { spawnSync } = require('child_process');
 const { chromium } = require('playwright');
+const { createHarnessArtifact } = require('./harness_artifact.js');
 
 const ROOT = path.resolve(__dirname, '..');
 const TEST_RESULTS = path.join(ROOT, 'test-results');
 const DEFAULT_RUN_ROOT = path.join(TEST_RESULTS, 'authored-d1-smoke-runs');
-const ARTIFACT = path.join(ROOT, 'index.html');
+const PRODUCTION_ARTIFACT = path.join(ROOT, 'index.html');
+const ARTIFACT = createHarnessArtifact('authored-d1-ordinary-smoke');
 const LEVEL_ID = 'district-1-authored-v1';
 const LEVEL_SCHEMA = 'snc-authored-level-static-v1';
 const STATIC_BYTES = 3516;
@@ -40,7 +42,7 @@ function isStrictDescendant(root, target) {
 
 function gitIgnored(target) {
   const relative = relativeDisplay(target);
-  const check = spawnSync('git', ['check-ignore', '-q', '--no-index', '--', relative], {
+  const check = spawnSync('git', ['-c', `safe.directory=${ROOT.replace(/\\/g, '/')}`, 'check-ignore', '-q', '--no-index', '--', relative], {
     cwd: ROOT,
     encoding: 'utf8',
   });
@@ -94,8 +96,8 @@ function preflight(run) {
   const collisionSource = fs.readFileSync(path.join(ROOT, 'src', 'js', 'game-12-section-4-collision-walk-helpers.js'), 'utf8');
   const levelSource = fs.readFileSync(path.join(ROOT, 'src', 'levels', 'district-01-authored.js'), 'utf8');
   const smokeSource = fs.readFileSync(__filename, 'utf8');
-  assert(fs.existsSync(ARTIFACT), 'rebuilt root index.html must exist before the one browser launch');
-  const artifact = fs.readFileSync(ARTIFACT, 'utf8');
+  assert(fs.existsSync(PRODUCTION_ARTIFACT), 'rebuilt root index.html must exist before the one browser launch');
+  const artifact = fs.readFileSync(PRODUCTION_ARTIFACT, 'utf8');
   const normalizedArtifact = artifact.replace(/\r\n/g, '\n');
   const buildId = metadata.runtime && metadata.runtime.buildId;
 
@@ -120,9 +122,9 @@ function preflight(run) {
   }, 'authored District 1 metadata mismatch');
   assert.deepStrictEqual(metadata.artifact, {
     path: 'index.html',
-    byteLength: 1313780,
-    sha256: 'df6bd7e4e443646acde6585a804ce260f3b793ece2b71246aaa4c82cd122b178',
-  }, 'canonical artifact metadata mismatch');
+    byteLength: Buffer.byteLength(normalizedArtifact),
+    sha256: crypto.createHash('sha256').update(normalizedArtifact).digest('hex'),
+  }, 'canonical artifact metadata must describe the current production build');
   assert.deepStrictEqual(metadata.distribution, {
     provider: 'github-pages',
     url: 'https://falloutmule.github.io/solidarity-not-charity-can-run/',

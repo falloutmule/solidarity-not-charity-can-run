@@ -17,6 +17,7 @@ const SELF_CHECK_ROOT = path.join(ROOT, 'test-results', 'selfcheck-runs');
 const PORT = 4173;
 const BASE = `http://127.0.0.1:${PORT}`;
 let activeRun = null;
+let selfcheckArtifactPath = null;
 
 function isStrictDescendant(root, target) {
   const relative = path.relative(root, target);
@@ -125,10 +126,20 @@ function finalizeRunManifest(run, result = {}) {
  * Set CR_RELEASE_ARTIFACT=dist to test dist/index.html when a build pipeline exists.
  */
 function resolveReleaseArtifactPath() {
+  if (selfcheckArtifactPath) return selfcheckArtifactPath;
   const rootIndex = path.join(ROOT, 'index.html');
   const distIndex = path.join(ROOT, 'dist', 'index.html');
   if (process.env.CR_RELEASE_ARTIFACT === 'dist' && fs.existsSync(distIndex)) return distIndex;
   return rootIndex;
+}
+
+function createRunLocalHarnessArtifact() {
+  if (!activeRun) throw new Error('cannot create test artifact before self-check run initialization');
+  const manifest = JSON.parse(fs.readFileSync(path.join(ROOT, 'src', 'build-manifest.json'), 'utf8'));
+  const html = buildTool.combine(manifest, { includeHarness: true });
+  const artifact = runOutputPath('index.html');
+  fs.writeFileSync(artifact, html, 'utf8');
+  return artifact;
 }
 
 function getGitCommitShort() {
@@ -4789,6 +4800,7 @@ async function main() {
   const run = resolveSelfcheckRun({ requested: outputArgIndex >= 0 ? process.argv[outputArgIndex + 1] : null });
   activeRun = run;
   process.env.CR_SELFCHECK_RUN_DIR = run.dir;
+  selfcheckArtifactPath = createRunLocalHarnessArtifact();
   console.log(`SELF-CHECK OUTPUT: ${displayPath(run.dir)} (${run.automatic ? `automatic${run.collisionSuffix ? ` collision suffix ${run.collisionSuffix}` : ''}` : 'explicit'})`);
   const recorder = new SectionRecorder();
   activeSectionRecorder = recorder;
@@ -5224,6 +5236,7 @@ async function main() {
     const manifest = finalizeRunManifest(run, { pass: output.pass, exitCode, summaryPath });
     activeSectionRecorder = null;
     activeRun = null;
+    selfcheckArtifactPath = null;
     console.log(JSON.stringify({ pass: output.pass, failedSections: output.failedSections, proof: 'proof-playwright-summary.json', manifest: displayPath(run.dir + path.sep + 'manifest.json'), artifacts: manifest.artifacts.length }));
   }
   return exitCode;

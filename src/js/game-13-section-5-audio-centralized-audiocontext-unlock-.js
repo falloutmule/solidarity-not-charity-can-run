@@ -78,7 +78,7 @@ function getAudioUnlockProof(){
     gestureEvents: ['pointerdown','keydown','touchstart'],
     resumeEntry: 'resumeAudioContext',
     soundOn: typeof options !== 'undefined' ? options.soundOn !== false : true,
-    harnessMuted: typeof _crHarnessDepth !== 'undefined' && _crHarnessDepth > 0,
+    harnessMuted: SNCHarnessAdapter.muteAudio(),
   };
 }
 
@@ -96,7 +96,7 @@ const _SOUND_CUE_DEFS = {
 };
 
 function crSoundEnabled(){
-  if(typeof _crHarnessDepth !== 'undefined' && _crHarnessDepth > 0) return false;
+  if(SNCHarnessAdapter.muteAudio()) return false;
   if(typeof options !== 'undefined' && options.soundOn === false) return false;
   return true;
 }
@@ -129,4 +129,3 @@ function crSoundFeedbackCueIds(){
 }
 
 bindAudioUnlockGate();
-

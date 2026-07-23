@@ -185,7 +185,7 @@ function dismissOnboardingHelp(persist){
 }
 
 function maybeShowFirstRunHelp(){
-  if(_crHarnessDepth > 0) return;
+  if(SNCHarnessAdapter.isActive()) return;
   crOpenFirstRunHelpIfNeeded();
 }
 
@@ -236,7 +236,7 @@ function startCustomLevel(id){
   initRunTracking(game.seed);
   game.run.customLevel = id;
   game.run.modifierUsed = game.modifier;
-  if(!_crBlockHarnessSave) SAVE.save();
+  if(!SNCHarnessAdapter.suppressSave()) SAVE.save();
 }
 
 function activeCustomLevel(){
