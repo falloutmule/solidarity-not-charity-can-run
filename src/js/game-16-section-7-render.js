@@ -1,7 +1,6 @@
 // ---------------------------------------------------------------------------
 // SECTION 7 — RENDER
 // ---------------------------------------------------------------------------
-let _crSpriteGroundHarnessSamples = [];
 function crIsFlatBuildingWallType(wt){
   return wt === WALL.BUILDING ||
          wt === WALL.BRICK ||
@@ -88,7 +87,7 @@ function crDrawPrefabFaceColumn(ctx, col, drawStart, sliceH, mapX, mapY, side, s
   return true;
 }
 function drawScene(now, renderPose){
-  if(_crHarnessDepth > 0) _crSpriteGroundHarnessSamples = [];
+  SNCHarnessAdapter.captureSpriteGroundSnapshot(null);
 
   // --- SKY (rebuild only if modifier changed) ---
   if(skyBuilt!==game.modifier) buildSky(game.modifier);
@@ -307,15 +306,13 @@ function drawScene(now, renderPose){
         bctx.drawImage(s.tex, srcX,0,1,s.tex.height, col, top, 1, screenH);
       }
     }
-    if(_crHarnessDepth > 0 && _crSpriteGroundHarnessSamples.length < 24){
-      _crSpriteGroundHarnessSamples.push({
-        kind: s.obj && s.obj.kind ? s.obj.kind : (s.tex === TEX.can ? 'can' : (s.obj === game.exit ? 'exit' : 'sprite')),
-        depth: +depth.toFixed(3),
-        groundedDelta: proj.groundedDelta,
-        yoff: proj.yoffUsed,
-        floating: proj.floating
-      });
-    }
+    SNCHarnessAdapter.captureSpriteGroundSnapshot({
+      kind: s.obj && s.obj.kind ? s.obj.kind : (s.tex === TEX.can ? 'can' : (s.obj === game.exit ? 'exit' : 'sprite')),
+      depth: +depth.toFixed(3),
+      groundedDelta: proj.groundedDelta,
+      yoff: proj.yoffUsed,
+      floating: proj.floating
+    });
     const isCan = s.tex === TEX.can;
     const isNpc = s.obj && game.npcs.indexOf(s.obj) >= 0;
     const isExit = s.obj === game.exit;
@@ -344,16 +341,14 @@ function drawScene(now, renderPose){
     }
   }
 
-  if(_crHarnessDepth > 0){
-    _crVisualHarnessSnapshot = {
-      hasLivePickup: game.pickups.some(c => !c.taken),
-      hasLiveNpc: game.npcs.some(n => !n.helped),
-      hasExit: !!game.exit,
-      exitReady: !!(game.exit && game.exit.active && game.helped >= game.quota),
-      aimNpc: !!game.aimNpc,
-      giveReady: !!(game.aimNpc && player.cans >= game.aimNpc.need),
-    };
-  }
+  SNCHarnessAdapter.captureVisualSnapshot({
+    hasLivePickup: game.pickups.some(c => !c.taken),
+    hasLiveNpc: game.npcs.some(n => !n.helped),
+    hasExit: !!game.exit,
+    exitReady: !!(game.exit && game.exit.active && game.helped >= game.quota),
+    aimNpc: !!game.aimNpc,
+    giveReady: !!(game.aimNpc && player.cans >= game.aimNpc.need),
+  });
 
 }
 

@@ -559,11 +559,6 @@ function crPerfProbeEnsureInstalled() {
     };
   }
 
-  if (globalThis.CR && typeof globalThis.CR === 'object') {
-    globalThis.CR.crPerfProbeGetReport = crPerfProbeGetReport;
-    globalThis.CR.crPerfProbeReset = crPerfProbeReset;
-  }
-
   const viewEl = document.getElementById('view');
   if (viewEl) {
     viewEl.addEventListener('pointerdown', (event) => {

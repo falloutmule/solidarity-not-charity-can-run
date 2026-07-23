@@ -363,7 +363,7 @@ function startRun(useSeed){
   game.run.harnessOnly = false;
   onboardingOpen = false;
   syncOnboardingPanel();
-  if(!_crBlockHarnessSave) SAVE.save();
+  if(!SNCHarnessAdapter.suppressSave()) SAVE.save();
   maybeShowFirstRunHelp();
 }
 function continueRun(){
@@ -537,4 +537,3 @@ function completeRun(){
   state=STATE.RESULTS;
   beep(880,0.3,'triangle',0.06);
 }
-

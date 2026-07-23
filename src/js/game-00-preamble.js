@@ -12,7 +12,8 @@
    7) No runtime external dependencies (no CDN scripts, fonts, or APIs).
    8) No eval().
    9) No inline event handlers (no onclick= in HTML).
-  10) No hidden globals — export public API via window.CR only.
+  10) Production diagnostics are read-only via window.SNCDiagnostics; the
+      mutable window.CR API exists only in the run-local self-check artifact.
   11) One Kanban card at a time.
   12) Every edit must pass the Playwright harness (tests/run_selfcheck_playwright.js).
   13) Harness scenes must be temporary and state-isolated (no benchmark leak).
@@ -44,7 +45,7 @@
     10   GAMEPLAY ACTIONS
     11   UPDATE + INPUT
     12   OVERLAYS
-    13   MAIN LOOP + BOOT (window.CR)
+    13   MAIN LOOP + BOOT (production diagnostics / test-harness boundary)
 
    DEBUG: ?debug ?layoutdebug=1 ?touchdebug=1 ?mobile=on
    ========================================================================== */

@@ -6,6 +6,7 @@ const crypto = require('crypto');
 const fs = require('fs');
 const http = require('http');
 const path = require('path');
+const { createHarnessArtifact } = require('./harness_artifact.js');
 
 function loadChromium() {
   try { return require('playwright').chromium; }
@@ -13,7 +14,7 @@ function loadChromium() {
 }
 
 const ROOT = path.resolve(__dirname, '..');
-const DEFAULT_ARTIFACT = path.join(ROOT, 'index.html');
+const DEFAULT_ARTIFACT = createHarnessArtifact('farfield-default-equivalence');
 const METADATA = JSON.parse(fs.readFileSync(path.join(ROOT, 'project-metadata.json'), 'utf8'));
 function defaultOutput(name) {
   return path.join(ROOT, 'test-results', 'farfield-runs', `${name}-${process.pid}-${Date.now()}.json`);

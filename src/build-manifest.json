@@ -14,6 +14,7 @@
     "src/js/game-03-section-0c-debug-flag.js",
     "src/js/game-04-section-1-seeded-rng-mulberry32.js",
     "src/js/game-05-section-2-game-state.js",
+    "src/js/game-05a-runtime-harness-adapter.js",
     "src/js/game-06-section-2b-mobile-touch-input.js",
     "src/js/game-07-section-2c-responsive-mobile-menu-html-overlay.js",
     "src/js/game-08-section-2d-mobile-init.js",

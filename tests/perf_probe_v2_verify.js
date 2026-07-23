@@ -46,8 +46,7 @@ function makeContext(search) {
     crGetFixedStepState() { return { droppedFrames: 0, stepDt: 1 / 60 }; },
     drawMobileMenu() { return 'menu'; },
     applyMobileControlSettings() { return 'layout'; },
-    drawWholeFaceBitmapBuildingColumn() { return true; },
-    CR: {}
+    drawWholeFaceBitmapBuildingColumn() { return true; }
   };
   context.window = context;
   context.globalThis = context;
@@ -71,7 +70,7 @@ function makeContext(search) {
   );
   assert.strictEqual(c.crPerfProbeGetReport(), null);
   assert.strictEqual(JSON.stringify(c.game), stateBefore, 'disabled probe must not mutate gameplay state');
-  assert.strictEqual(c.CR.crPerfProbeGetReport, undefined, 'disabled probe must not alter CR API');
+  assert.strictEqual(c.SNCDiagnostics, undefined, 'disabled probe must not alter diagnostic API');
 }
 
 const c = makeContext('?perfprobe=1');
@@ -94,7 +93,7 @@ c.crStepSimulationFixed = function(dt) {
   return { dt, steps, accumulator: dt / 2, droppedFrames: dropped };
 };
 c.crPerfProbeEnsureInstalled();
-assert.strictEqual(typeof c.CR.crPerfProbeGetReport, 'function', 'report must be exposed through CR');
+assert.strictEqual(typeof c.crPerfProbeGetReport, 'function', 'report must remain available to its focused verifier');
 
 const owner = { marker: true };
 assert.strictEqual(c.drawScene.call(owner, 2, 3), 5, 'scene wrapper return value');
@@ -110,7 +109,7 @@ assert.strictEqual(receiver, owner, 'simulation wrapper must preserve this');
 
 // Frame bucket boundaries: one sample in every required bucket.
 for (const now of [100, 109, 119, 134, 159, 199, 250]) c.crPerfProbeFrameStart(now);
-let report = c.CR.crPerfProbeGetReport();
+let report = c.crPerfProbeGetReport();
 assert.strictEqual(report.stepFrames0, 1);
 assert.strictEqual(report.stepFrames1, 1);
 assert.strictEqual(report.stepFrames2, 1);
@@ -146,7 +145,7 @@ correlation.drawPortraitDashboardChrome();
 correlation.drawHUD();
 correlation.drawMobileMenu();
 correlation.crPerfProbeFrameStart(145);
-const correlationReport = correlation.CR.crPerfProbeGetReport();
+const correlationReport = correlation.crPerfProbeGetReport();
 assert.strictEqual(correlationReport.longFrame.thresholdMs, 33);
 assert.strictEqual(correlationReport.longFrame.samples, 1);
 assert.strictEqual(correlationReport.longFrame.gapMs.worst, 45);
@@ -165,7 +164,7 @@ mobileStats = {
   drawCalls: 16, stableEarlyOuts: 8, uiFlushes: 3, layoutFlushes: 3,
   domWrites: 9, styleWrites: 11, safeAreaReads: 7, overrideStorageReads: 9
 };
-report = c.CR.crPerfProbeGetReport();
+report = c.crPerfProbeGetReport();
 assert.strictEqual(report.mobileStableEarlyOuts, 5);
 assert.strictEqual(report.mobileLayoutFlushes, 2);
 assert.strictEqual(report.mobileMenuDomWorkCalls, 1);
@@ -214,7 +213,7 @@ interpAngleStats = {
   repeatedRenderAngleFramesDuringActiveLook: 2
 };
 for (let i = 0; i < 3; i++) { interp.crStepSimulationFixed(0.01); interp.drawScene(10 + i); }
-const interpReport = interp.CR.crPerfProbeGetReport();
+const interpReport = interp.crPerfProbeGetReport();
 assert.strictEqual(interpReport.interpolationActive, true);
 assert.strictEqual(interpReport.interpolatedFrames, 3);
 assert.strictEqual(interpReport.zeroStepInterpolatedFrames, 2);
@@ -261,7 +260,7 @@ assert(detailedOverlayCtx.lines.some(line => line === 'look n/g 3/20 d 0.04/0.04
 
 interp.crPerfProbeReset();
 assert.strictEqual(interpCadenceResets, 2, 'probe reset clears cadence telemetry before taking its next baseline');
-const reset = interp.CR.crPerfProbeGetReport();
+const reset = interp.crPerfProbeGetReport();
 for (const field of ['stepFrames0', 'stepFrames1', 'stepFrames2', 'stepFrames3Plus',
   'fixedStepDrops', 'accumulatorAlphaAvg', 'accumulatorAlphaMin', 'accumulatorAlphaMax',
   'interpolatedFrames', 'zeroStepInterpolatedFrames',

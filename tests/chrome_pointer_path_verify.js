@@ -4,9 +4,10 @@ const assert = require('assert');
 const fs = require('fs');
 const http = require('http');
 const path = require('path');
+const { createHarnessArtifact } = require('./harness_artifact.js');
 
 const ROOT = path.resolve(__dirname, '..');
-const ARTIFACT = path.join(ROOT, 'index.html');
+const ARTIFACT = createHarnessArtifact('chrome-pointer-path');
 const OUTPUT = process.argv.find(value => value.startsWith('--output='))?.slice('--output='.length)
   || path.join(ROOT, 'test-results', 'snc-chrome-pointer-path', `chrome-pointer-path-${process.pid}.json`);
 

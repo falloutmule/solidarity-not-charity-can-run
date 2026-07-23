@@ -68,7 +68,8 @@ function makeSandbox() {
   const sandbox = {
     console, game, player, profile: { name: 'RUNNER' },
     STATE: { TITLE: 'title', PLAY: 'play', UPGRADE: 'upgrade' }, state: 'play', paused: false,
-    SAVE_VERSION: 1, K: { save: 'save' }, _crBlockHarnessSave: false,
+    SAVE_VERSION: 1, K: { save: 'save' },
+    SNCHarnessAdapter: { suppressSave() { return false; }, suppressUnloadSave() { return false; } },
     localStorage: {
       getItem(key) { return storage.has(key) ? storage.get(key) : null; },
       setItem(key, value) { storage.set(key, String(value)); },
