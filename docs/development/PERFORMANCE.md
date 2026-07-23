@@ -16,6 +16,6 @@ This is a scoped acceptance of the Chrome input path, not proof that every futur
 
 ## Diagnostics and retained guardrails
 
-The query-gated `?perfprobe=1` overlay and its `CR.crPerfProbeGetReport().longFrame` report remain available for future bounded investigation. The broad historical self-check is characterization only.
+The query-gated `?perfprobe=1` overlay and its `SNCDiagnostics.getSnapshot().performance.longFrame` report remain available for future bounded investigation. The broad historical self-check is characterization only.
 
 Future mobile changes must preserve the accepted Pointer-only Chrome route, coalesced-sample exact-once handling, static `touch-action: none`, no-scroll interaction surface, 400x250 profile, fixed-step simulation, and render interpolation unless a new card explicitly tests a different hypothesis.
