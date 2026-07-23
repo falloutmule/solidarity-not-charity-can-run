@@ -120,8 +120,8 @@ function preflight(run) {
   }, 'authored District 1 metadata mismatch');
   assert.deepStrictEqual(metadata.artifact, {
     path: 'index.html',
-    byteLength: 1314349,
-    sha256: '83d676c607ab4788a33d11150f630f69c8231ada72c5e3706891d2c576e0238b',
+    byteLength: 1313780,
+    sha256: 'df6bd7e4e443646acde6585a804ce260f3b793ece2b71246aaa4c82cd122b178',
   }, 'canonical artifact metadata mismatch');
   assert.deepStrictEqual(metadata.distribution, {
     provider: 'github-pages',
@@ -308,6 +308,14 @@ function attachObservers(page, baseUrl) {
 function installReconstructionObserver() {
   window.__authoredD1SmokeTrace = [];
   window.__authoredD1SmokeObserverReady = false;
+  window.__authoredD1SmokeHudText = [];
+  const originalFillText = CanvasRenderingContext2D.prototype.fillText;
+  CanvasRenderingContext2D.prototype.fillText = function(text, ...args) {
+    if (this.canvas && this.canvas.id === 'view' && window.__authoredD1SmokeHudText.length < 512) {
+      window.__authoredD1SmokeHudText.push(String(text));
+    }
+    return originalFillText.call(this, text, ...args);
+  };
   const snapshotStatic = () => {
     const g = window.CR && window.CR.game;
     if (!g) return null;
@@ -813,6 +821,9 @@ async function main() {
     check('exact authored entities quota exit', initial.counts.pickups === 10 && initial.counts.npcs === 6 && initial.counts.props === 12 && initial.quota === 4 && initial.exit.x === 36.5 && initial.exit.y === 17 && initial.exit.active === false, { counts: initial.counts, quota: initial.quota, exit: initial.exit });
     check('accessible exact perimeter', initial.reach.pass && initial.reach.count === 666 && initial.perimeterCount === 22 && initial.perimeterReachable, { reach: initial.reach, perimeterCount: initial.perimeterCount });
     check('exact bitmap loaded', initial.asset && initial.asset.id === ASSET_ID && initial.asset.renderMode === 'importedWholeFaceAsset' && initial.asset.approvalStatus === 'pending_art_review' && initial.asset.byteLength === ASSET_BYTES && initial.asset.sha256 === ASSET_SHA256 && initial.asset.width === 1280 && initial.asset.height === 160 && initial.asset.loadState === 'loaded', initial.asset);
+    const historicalHudText = await page.evaluate(() => (window.__authoredD1SmokeHudText || [])
+      .filter(text => /D1 PROOF|slot_02|custom_next_001/.test(text)));
+    check('normal HUD excludes historical proof text', historicalHudText.length === 0, historicalHudText);
 
     const rendererInstall = await page.evaluate(() => {
       const original = window.drawWholeFaceBitmapBuildingColumn;

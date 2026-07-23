@@ -184,11 +184,6 @@ function drawPortraitStatsPanel(){
   const meta = 'D' + game.district + ' [' + game.modifier.toUpperCase() + '] x' + game.scoreMult +
     '   SEED ' + game.seed + '   SCORE ' + game.totalScore;
   ctx.fillText(meta, r.x + 10, r.y + 54);
-  if(game.d1CustomBuildingRegistry && game.d1CustomBuildingRegistry.slot_02){
-    ctx.font = 'bold 11px monospace';
-    ctx.fillStyle = '#ffd86a';
-    ctx.fillText('D1 PROOF slot_02 custom_next_001', r.x + 10, r.y + 70);
-  }
   ctx.fillStyle = '#4a4035';
   ctx.font = '10px monospace';
   ctx.fillText('build ' + BUILD_ID, r.x + r.w - 88, r.y + r.h - 8);

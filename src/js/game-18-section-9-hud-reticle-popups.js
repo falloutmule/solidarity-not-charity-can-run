@@ -195,17 +195,11 @@ function drawHUD(now){
   const meta=['DISTRICT '+game.district+'   ['+game.modifier.toUpperCase()+']   x'+game.scoreMult,
               'SEED '+game.seed+'    SCORE '+game.totalScore];
   const ut=upgradeTag(); if(ut) meta.push(ut);
-  const extraProof = (game.d1CustomBuildingRegistry && game.d1CustomBuildingRegistry.slot_02) ? ['D1 PROOF slot_02 custom_next_001'] : [];
-  const mh=(meta.length + extraProof.length)*16 + 10;
+  const mh=meta.length*16+10;
   panel(hudX, hudY+ph+6, 360, mh);
   ctx.font='12px monospace';
   ctx.fillStyle='#e9d8b0';
   for(let i=0;i<meta.length;i++) ctx.fillText(meta[i], hudX+6, hudY+ph+12+i*16);
-  for(let j=0;j<extraProof.length;j++){
-    ctx.font='bold 11px monospace';
-    ctx.fillStyle='#ffd86a';
-    ctx.fillText(extraProof[j], hudX+6, hudY+ph+12+(meta.length+j)*16);
-  }
 
   // controls hint
   if(!mobileMode){
