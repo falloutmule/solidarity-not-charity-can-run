@@ -152,7 +152,6 @@ function rmenuAction(action){
       break;
   }
 }
-window._rmenuAction = rmenuAction;
 
 function drawMobileMenu(){
   _crMobileUiStats.drawCalls++;
@@ -413,4 +412,3 @@ function drawMobileMenu(){
     }
   }
 }
-
