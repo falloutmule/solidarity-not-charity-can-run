@@ -20,6 +20,7 @@
     "src/js/game-08-section-2d-mobile-init.js",
     "src/imported-handoff-assets/strip_mall_001.asset.js",
     "src/imported-handoff-assets/custom_next_001.asset.js",
+    "src/imported-handoff-assets/dumpster_001.asset.js",
     "src/levels/district-01-authored.js",
     "src/js/game-09-section-3-city-generation.js",
     "src/js/game-09a-authored-level-runtime.js",
