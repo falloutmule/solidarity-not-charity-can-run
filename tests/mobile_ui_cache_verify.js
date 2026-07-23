@@ -58,7 +58,7 @@ class FakeElement {
 }
 
 function makeHarness(){
-  const counters = { rawStyleAssignments:0, rawInnerHtmlAssignments:0, storageGets:0 };
+  const counters = { rawStyleAssignments:0, rawInnerHtmlAssignments:0, storageGets:0, clearInputStateCalls:0 };
   const elements = new Map();
   const getElement = id => {
     if(!elements.has(id)) elements.set(id, new FakeElement(id, counters));
@@ -120,7 +120,7 @@ function makeHarness(){
         menuRect:{ left:w/2-40, top:h-80, width:80, height:40 }, minimapRect:{ x:10, y:10, w:82, h:82 }
       };
     },
-    clearInputState(){}, setMsg(){}, showToast(){}, beep(){}, crTriggerSoundCue(){},
+    clearInputState(){ counters.clearInputStateCalls++; }, setMsg(){}, showToast(){}, beep(){}, crTriggerSoundCue(){},
     updateFsBtnLabel(){}, toggleFullscreen(){}, startRun(){}, continueRun(){}, restartRun(){}, startCustomLevel(){},
     chooseUpgrade(){}, showOnboardingHelp(){}, syncOnboardingPanel(){}, crCycleSelectedStartDistrict(){},
     buildTitleRmenuBody(){ return '<div class="rit">START</div>'; }, fmtTime(){ return '0:00'; }, prompt(){ return null; }
@@ -234,6 +234,13 @@ menu._touchAction = '';
 h.run('crMarkMobileUiDirty("touch-complete"); drawMobileMenu();');
 assert.notStrictEqual(menu.innerHTML, htmlBeforeTouch, 'deferred menu update flushes after touch completion');
 
+// Pause/resume must restore normal PLAY input ownership without a broad harness.
+h.run('state=STATE.PLAY; paused=true; document.getElementById("rmenu").classList.remove("in"); rmenuAction("pause-resume");');
+assert.strictEqual(h.run('paused'), false, 'pause-resume clears the paused state');
+assert.strictEqual(h.elements.get('rmenu').classList.contains('in'), true, 'pause-resume hides the pause menu');
+assert.strictEqual(h.counters.clearInputStateCalls, 1, 'pause-resume clears prior input ownership once');
+assert(fs.readFileSync(menuPath, 'utf8').includes("crResetPauseRenderHistory('pause-resume')"), 'pause-resume resets presentation history with its explicit reason');
+
 const report = h.run('crGetMobileUiSyncStats()');
 assert(Object.isFrozen(report), 'stats snapshot is immutable');
 assert.strictEqual(typeof report.lastUiKey, 'string');
@@ -251,5 +258,6 @@ console.log('PASS mobile UI cache verifier', JSON.stringify({
   safeAreaCacheHits:report.safeAreaCacheHits,
   overrideStorageReads:report.overrideStorageReads,
   overrideCacheHits:report.overrideCacheHits,
-  touchSafety:'preserved'
+  touchSafety:'preserved',
+  pauseResume:'preserved'
 }));

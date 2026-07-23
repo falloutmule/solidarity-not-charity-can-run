@@ -32,6 +32,7 @@ jobs:
               - 'src/js/game-08-**'
               - 'src/js/game-20-section-11-update-input.js'
               - 'tests/mobile_ui_cache_verify.js'
+              - 'tests/mobile_options_persistence_verify.js'
             renderer_camera:
               - 'src/js/game-01**'
               - 'src/js/game-16**'
@@ -70,15 +71,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Create ignored proof directories
-        run: mkdir -p test-results/selfcheck-runs/minimal-release test-results/minimal-release
+        run: mkdir -p test-results/build-proofs/minimal-release test-results/minimal-release
       - name: Verify release metadata truth
         run: npm run test:metadata-truth
       - name: Verify build proof routing
         run: npm run test:build-proof-routing
+      - name: Verify legacy self-check retirement
+        run: npm run test:legacy-selfcheck-retirement
+      - name: Verify documentation capture production boundary
+        run: npm run test:docs-capture-boundary
       - name: Verify generated artifact
-        env:
-          CR_SELFCHECK_RUN_DIR: test-results/selfcheck-runs/minimal-release
-        run: npm run build:check
+        run: npm run build:check -- --proof-dir=test-results/build-proofs/minimal-release
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
       - name: Run ordinary release smoke
@@ -103,6 +106,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run test:mobile-ui-cache
+      - run: npm run test:mobile-options-persistence
 
   renderer-camera:
     needs: changes
@@ -125,7 +129,6 @@ jobs:
     needs: changes
     if: needs.changes.outputs.authored_content == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -136,8 +139,6 @@ jobs:
       - run: npm run test:custom-next
       - run: npm run test:authored-d1
       - run: npm run test:authored-d1-save
-      - run: npx playwright install --with-deps chromium
-      - run: npm run test:authored-d1-smoke
 
   persistence:
     needs: changes

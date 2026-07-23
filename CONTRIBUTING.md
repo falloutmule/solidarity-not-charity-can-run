@@ -23,7 +23,7 @@ npm.cmd run build:check
 npm.cmd run test:farfield-final-smoke -- --output=test-results/local-release/farfield-final-smoke.json
 ```
 
-Also run the smallest focused test for the subsystem being changed; [tests/TEST-MAP.md](tests/TEST-MAP.md) names the owner checks. The broad historical self-check is a characterization tool, not a release blocker; see [docs/development/TESTING.md](docs/development/TESTING.md).
+Also run the smallest focused test for the subsystem being changed; [tests/TEST-MAP.md](tests/TEST-MAP.md) names the owner checks. The obsolete aggregate self-check is retired; see [docs/development/TESTING.md](docs/development/TESTING.md).
 
 ## Pull requests
 

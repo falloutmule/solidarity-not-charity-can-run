@@ -2,8 +2,8 @@
 
 /**
  * Production release smoke. This deliberately uses only normal DOM/input
- * behavior and SNCDiagnostics' read-only snapshot; test-harness CR APIs are
- * exercised only by the run-local self-check artifact.
+ * behavior and SNCDiagnostics' read-only snapshot; it never relies on a
+ * mutable test-harness API.
  */
 const assert = require('assert');
 const fs = require('fs');

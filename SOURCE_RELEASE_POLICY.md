@@ -24,7 +24,7 @@ Before a runtime release:
 4. Run the ordinary release smoke against root `index.html`.
 5. Require physical Android Chrome evidence for touch, pacing, mobile-layout, or visible-performance changes.
 
-Proof output is opt-in and belongs under ignored `test-results/`; it is not release source and is never committed. Use `npm.cmd run build:proof` for a local build proof, or set `CR_SELFCHECK_RUN_DIR` only for an isolated self-check run.
+Proof output is opt-in and belongs under ignored `test-results/`; it is not release source and is never committed. Use `npm.cmd run build:proof` for a local build proof or `--proof-dir=test-results/build-proofs/<run>` for an explicit isolated proof.
 
 ## Public history
 

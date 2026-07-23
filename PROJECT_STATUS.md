@@ -26,7 +26,7 @@
 - The current run rules predate the approved no-fail, nine-level campaign design.
 - Recipient types, household delivery, portal upgrades, world-specific movement, and Hall abilities require bounded implementation cards.
 - Existing menus and progression scaffolding do not yet represent the complete approved flow.
-- The broad historical self-check includes obsolete expectations and remains characterization-only.
+- The obsolete aggregate self-check was retired in Phase 4; its useful coverage now has focused owners.
 
 ## Current authorized work
 
