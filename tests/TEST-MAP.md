@@ -6,7 +6,7 @@ Run the smallest listed owner test for a changed path, then run `npm.cmd run bui
 |---|---|
 | `tools/build-single-file.js`, `src/build-manifest.json`, `project-metadata.json` | `test:metadata-truth`, `test:build-proof-routing` |
 | `tools/building-asset-*`, `tools/register-building-asset.js`, `authoring/buildings/` | `test:building-asset-compiler`, `test:building-asset-preview`; `build`, `build:check` when a runtime asset is registered |
-| `authoring/buildings/dumpster_001/`, generated `dumpster_001.asset.js`, dumpster Tiled example | `test:dumpster-pilot`, `test:dumpster-pilot-runtime`, `test:building-asset-compiler`, `test:building-asset-preview` |
+| `authoring/buildings/dumpster_001/`, generated `dumpster_001.asset.js`, dumpster Tiled example, short bitmap geometry | `test:dumpster-pilot`, `test:dumpster-pilot-runtime`, `test:short-building-geometry`, `test:building-asset-compiler`, `test:building-asset-preview` |
 | `game-11-section-3b.js` Dumpster Pilot special level | `test:dumpster-pilot-runtime`, `test:dumpster-pilot-browser` |
 | `tools/tiled-level-*`, `authoring/levels/` | `test:tiled-d1-roundtrip`; `test:authored-d1` when a production authored level is generated |
 | Dead harness boundaries in `game-22`, source CSS/body, or build assembly | `test:dead-harness-boundaries` |

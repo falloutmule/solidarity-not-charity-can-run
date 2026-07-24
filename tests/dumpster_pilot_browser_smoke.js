@@ -9,6 +9,7 @@ const { chromium } = require('playwright');
 const root = path.resolve(__dirname, '..');
 const artifact = path.join(root, 'index.html');
 const output = path.join(root, 'test-results', 'dumpster-pilot-route', `browser-smoke-${process.pid}.json`);
+const screenshot = output.replace(/\.json$/, '.png');
 
 async function serve(html) {
   const server = http.createServer((request, response) => {
@@ -46,6 +47,8 @@ async function main() {
     const snapshot = await page.evaluate(() => window.SNCDiagnostics.getSnapshot());
     result.checks.playReached = snapshot.runtime.state === 'play';
     result.checks.canvasVisible = await page.locator('#view').evaluate((canvas) => canvas.width > 0 && canvas.height > 0 && canvas.getContext('2d').getImageData(0, 0, Math.min(64, canvas.width), Math.min(64, canvas.height)).data.some((value) => value !== 0));
+    await page.screenshot({ path: screenshot, fullPage: true });
+    result.screenshot = path.relative(root, screenshot);
     result.checks.clean = observed.pageErrors.length === 0 && observed.consoleErrors.length === 0 && observed.externalRequests.length === 0;
     result.pass = Object.values(result.checks).every(Boolean);
   } catch (error) {

@@ -144,7 +144,9 @@ function genDumpsterPilot(){
   const footprint = asset.footprint || {};
   const widthCells = Number(footprint.widthCells || footprint.wCells || footprint.w);
   const depthCells = Number(footprint.depthCells || footprint.hCells || footprint.h);
+  const heightScale = Number.isFinite(asset.heightScale) ? asset.heightScale : 1;
   if(widthCells !== 1 || depthCells !== 2) throw new Error('dumpster_001 footprint must remain 1x2 cells');
+  if(heightScale !== 0.5) throw new Error('dumpster_001 heightScale must remain 0.5');
 
   game.map = map; game.MAP_W = GW; game.MAP_H = GH; game.wallShade = shade;
   game.modifier = 'clear';
@@ -162,6 +164,7 @@ function genDumpsterPilot(){
     renderMode: 'importedWholeFaceAsset',
     x: x0, y: y0, x0, y0,
     rotation: 0,
+    heightScale,
     widthCells, depthCells,
     w: widthCells, h: depthCells,
     footprint: { widthCells, depthCells },
@@ -177,7 +180,10 @@ function genDumpsterPilot(){
 
   player.x = 3.5; player.y = 6.5; player.angle = -Math.PI / 2;
   game.pickups = [];
-  game.npcs = [];
+  // This NPC is beyond the dumpster from the initial north-facing player pose.
+  // Its upper body must remain visible over the short obstacle while its lower
+  // portion remains correctly occluded.
+  game.npcs = [{ x:3.5, y:2.5, kind:'family', helped:false }];
   game.props = [];
   game.quota = 0;
   game.helped = 0; game.delivered = 0;
@@ -185,8 +191,8 @@ function genDumpsterPilot(){
   game.timeLeft = 110;
   dbg.reachableCells = 0;
   dbg.cansSpawned = 0;
-  dbg.npcsSpawned = 0;
-  dbg.props = 0;
+  dbg.npcsSpawned = game.npcs.length;
+  dbg.props = game.props.length;
   setMsg('Dumpster Pilot — walk around the 1×2 building.');
 }
 

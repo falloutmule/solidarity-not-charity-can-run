@@ -212,6 +212,13 @@
     };
   }
 
+  function resolveBitmapBuildingHeightScale(placement, asset){
+    const candidate = Number(placement && placement.heightScale);
+    const assetScale = Number(asset && asset.heightScale);
+    const scale = Number.isFinite(candidate) ? candidate : (Number.isFinite(assetScale) ? assetScale : 1);
+    return Number.isFinite(scale) && scale > 0 && scale <= 1 ? scale : 1;
+  }
+
   function drawWholeFaceBitmapBuildingColumn(hit, placement){
     if(!placement || placement.renderMode !== 'importedWholeFaceAsset') return false;
     const ctx = hit && hit.ctx;
@@ -256,6 +263,7 @@
   root.inverseRotateBitmapFace = inverseRotateBitmapFace;
   root.resolveBitmapLocalHit = resolveBitmapLocalHit;
   root.orientBitmapCanonicalU = orientBitmapCanonicalU;
+  root.resolveBitmapBuildingHeightScale = resolveBitmapBuildingHeightScale;
   root.getBitmapFaceCanvas = getBitmapFaceCanvas;
   root.drawBitmapFaceColumn = drawBitmapFaceColumn;
   root.drawBitmapFailureColumn = drawBitmapFailureColumn;

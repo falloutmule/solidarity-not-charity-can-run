@@ -46,16 +46,6 @@ function resizeNearest(source, width, height) {
   return output;
 }
 
-function upperHalfTransparency(png) {
-  const upperRows = Math.floor(png.height / 2);
-  let transparent = 0;
-  const total = png.width * upperRows;
-  for (let y = 0; y < upperRows; y += 1) for (let x = 0; x < png.width; x += 1) {
-    if (png.data[(y * png.width + x) * 4 + 3] <= 16) transparent += 1;
-  }
-  return total ? transparent / total : 0;
-}
-
 function loadSource(buildingDir) {
   const manifestPath = path.join(buildingDir, 'building.json');
   const source = readJson(manifestPath);
@@ -64,10 +54,14 @@ function loadSource(buildingDir) {
   const footprint = source.footprint || {};
   assert(Number.isInteger(footprint.widthCells) && footprint.widthCells > 0, 'footprint.widthCells must be a positive integer');
   assert(Number.isInteger(footprint.depthCells) && footprint.depthCells > 0, 'footprint.depthCells must be a positive integer');
+  if (Object.prototype.hasOwnProperty.call(source, 'heightScale')) {
+    assert(Number.isFinite(source.heightScale) && source.heightScale > 0 && source.heightScale <= 1,
+      'heightScale must be a finite number greater than 0 and at most 1');
+  }
   const reusableMode = typeof source.face === 'string';
   assert(reusableMode || (source.faces && typeof source.faces === 'object'), 'building.json requires face or faces');
   if (!reusableMode) for (const name of ['front', 'side', 'back']) assert(typeof source.faces[name] === 'string', `faces.${name} is required`);
-  const allowed = new Set(['schema', 'id', 'displayName', 'category', 'notes', 'footprint', 'face', 'faces']);
+  const allowed = new Set(['schema', 'id', 'displayName', 'category', 'notes', 'footprint', 'heightScale', 'face', 'faces']);
   for (const key of Object.keys(source)) assert(allowed.has(key), `unknown building.json property: ${key}`);
   const sourceInputs = {};
   const faceFiles = {};
@@ -82,7 +76,6 @@ function loadSource(buildingDir) {
   }
   let pixelsPerCell;
   if (reusableMode) {
-    assert(upperHalfTransparency(sourceInputs[source.face].png) >= 0.95, 'reusable face upper half must be at least 95% transparent');
     pixelsPerCell = DEFAULT_PIXELS_PER_CELL;
     for (const [name, face] of Object.entries(faceFiles)) {
       const spanCells = (name === 'front' || name === 'back') ? footprint.widthCells : footprint.depthCells;
@@ -162,6 +155,7 @@ function compileBuilding(buildingDir) {
     renderMode: 'importedWholeFaceAsset',
     approvalStatus: 'unreviewed',
     footprint: { wCells: source.footprint.widthCells, hCells: source.footprint.depthCells },
+    heightScale: Number.isFinite(source.heightScale) ? source.heightScale : 1,
     atlas: {
       fileName: `${id}.atlas.png`, mime: 'image/png', encoding: 'data-uri', width: atlas.width, height: atlas.height,
       byteLength: atlas.bytes.length, sha256: sha256(atlas.bytes), dataUri: `data:image/png;base64,${atlas.bytes.toString('base64')}`
@@ -226,4 +220,4 @@ if (require.main === module) {
   catch (error) { console.error(error.message); process.exitCode = 1; }
 }
 
-module.exports = { COMPILER_VERSION, SOURCE_SCHEMA, RUNTIME_SCHEMA, compileBuilding, emitAssetModule, loadSource, packAtlas, resizeNearest, upperHalfTransparency, writeCompiledBuilding };
+module.exports = { COMPILER_VERSION, SOURCE_SCHEMA, RUNTIME_SCHEMA, compileBuilding, emitAssetModule, loadSource, packAtlas, resizeNearest, writeCompiledBuilding };

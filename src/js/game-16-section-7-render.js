@@ -24,6 +24,14 @@ function crDrawFlatBuildingWallColumn(ctx, col, drawStart, sliceH, wt){
   ctx.fillRect(col, drawStart, 1, sliceH);
 }
 
+let crWallOcclusionTop = new Float32Array(0);
+let crWallOcclusionShort = new Uint8Array(0);
+function crEnsureWallOcclusionBuffers(width){
+  if(crWallOcclusionTop.length !== width) crWallOcclusionTop = new Float32Array(width);
+  if(crWallOcclusionShort.length !== width) crWallOcclusionShort = new Uint8Array(width);
+  return {top:crWallOcclusionTop, short:crWallOcclusionShort};
+}
+
 // Whole-face prefab render: sample one generated/imported face bitmap by
 // faceU across the FULL building width (not per-cell). Falls back to the
 // procedural per-cell path only for non-prefab/legacy objects.
@@ -106,6 +114,7 @@ function drawScene(now, renderPose){
   const visRange = game.modifier==='rainy'?9.0:17.0;
   const fog = game.modifier==='rainy'?[40,48,60] : [196,168,128]; // dusty warm fog / cool rainy
   const fogStrength = game.modifier==='rainy'?0.9:0.78;
+  const wallOcclusion = crEnsureWallOcclusionBuffers(RW);
 
   // ---- WALLS (DDA, textured) -> fills zbuffer per column (occlusion source of truth) ----
   for(let col=0; col<RW; col++){
@@ -141,9 +150,16 @@ function drawScene(now, renderPose){
     const hitCell = (game.buildingGrid && game.buildingGrid[mapY] && game.buildingGrid[mapY][mapX]) || null;
     const hitReg = hitCell && game.buildingRegistry ? game.buildingRegistry[hitCell.bid] : null;
     const hitIsBitmap = !!(hitReg && hitReg.renderMode === 'importedWholeFaceAsset');
+    const bitmapHeightScale = hitIsBitmap && typeof resolveBitmapBuildingHeightScale === 'function'
+      ? resolveBitmapBuildingHeightScale(hitReg, typeof lookupBitmapBuildingAsset === 'function' ? lookupBitmapBuildingAsset(hitReg.assetId) : null)
+      : 1;
+    const renderSliceH = bitmapHeightScale < 1 ? Math.max(1, Math.round(sliceH * bitmapHeightScale)) : sliceH;
+    const renderDrawStart = bitmapHeightScale < 1 ? drawEnd - renderSliceH : drawStart;
+    wallOcclusion.top[col] = renderDrawStart;
+    wallOcclusion.short[col] = bitmapHeightScale < 1 ? 1 : 0;
     const bitmapHandled = hitIsBitmap && typeof drawWholeFaceBitmapBuildingColumn === 'function'
       ? drawWholeFaceBitmapBuildingColumn({
-          ctx: bctx, col, drawStart, sliceH, cell: hitCell,
+          ctx: bctx, col, drawStart: renderDrawStart, sliceH: renderSliceH, cell: hitCell,
           side, stepX, stepY, wallFraction: wallX
         }, hitReg)
       : false;
@@ -175,38 +191,38 @@ function drawScene(now, renderPose){
     } else if(proofMode && inProofZone){
       const owner = (typeof crD1ProofZoneCellOwner === 'function') ? crD1ProofZoneCellOwner(mapX, mapY) : null;
       if(owner){
-        const drewProof = (typeof crDrawD1ProofPrefabFaceColumn === 'function') && crDrawD1ProofPrefabFaceColumn(bctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX, owner);
+        const drewProof = (typeof crDrawD1ProofPrefabFaceColumn === 'function') && crDrawD1ProofPrefabFaceColumn(bctx, col, renderDrawStart, renderSliceH, mapX, mapY, side, stepX, stepY, wallX, owner);
         if(!drewProof){
-          if(typeof crDrawIllegalD1ProofWall === 'function') crDrawIllegalD1ProofWall(bctx, col, drawStart, sliceH, 'PROOF SLOT RENDER FAILED', mapX, mapY, owner);
+          if(typeof crDrawIllegalD1ProofWall === 'function') crDrawIllegalD1ProofWall(bctx, col, renderDrawStart, renderSliceH, 'PROOF SLOT RENDER FAILED', mapX, mapY, owner);
         }
       } else {
-        if(typeof crDrawIllegalD1ProofWall === 'function') crDrawIllegalD1ProofWall(bctx, col, drawStart, sliceH, 'ILLEGAL PROCEDURAL WALL IN D1 PROOF ZONE', mapX, mapY, null);
+        if(typeof crDrawIllegalD1ProofWall === 'function') crDrawIllegalD1ProofWall(bctx, col, renderDrawStart, renderSliceH, 'ILLEGAL PROCEDURAL WALL IN D1 PROOF ZONE', mapX, mapY, null);
       }
     } else if(proofZoneIllegal){
       bctx.fillStyle = '#ff00ff';
-      bctx.fillRect(col, drawStart, 1, sliceH);
+      bctx.fillRect(col, renderDrawStart, 1, renderSliceH);
       bctx.fillStyle = '#120014';
-      bctx.fillRect(col, drawStart + Math.max(0, (sliceH / 2) | 0) - 1, 1, 2);
-    } else if(crDrawPrefabFaceColumn(bctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX)){
+      bctx.fillRect(col, renderDrawStart + Math.max(0, (renderSliceH / 2) | 0) - 1, 1, 2);
+    } else if(crDrawPrefabFaceColumn(bctx, col, renderDrawStart, renderSliceH, mapX, mapY, side, stepX, stepY, wallX)){
       // whole-face prefab asset drawn; nothing else needed
     } else if(buildingMaterialWall){
-      crDrawBuildingMaterialWallColumn(bctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX, facadeRole);
+      crDrawBuildingMaterialWallColumn(bctx, col, renderDrawStart, renderSliceH, mapX, mapY, side, stepX, stepY, wallX, facadeRole);
     } else if(flatBuildingWall){
-      crDrawFlatBuildingWallColumn(bctx, col, drawStart, sliceH, wt);
+      crDrawFlatBuildingWallColumn(bctx, col, renderDrawStart, renderSliceH, wt);
     } else if(facadeRole){
-      crDrawComposedFacadeFaceColumn(bctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX, facadeRole);
+      crDrawComposedFacadeFaceColumn(bctx, col, renderDrawStart, renderSliceH, mapX, mapY, side, stepX, stepY, wallX, facadeRole);
     } else {
-      bctx.drawImage(tex, texX, 0, texSampleW, TEXSIZE, col, drawStart, 1, sliceH);
+      bctx.drawImage(tex, texX, 0, texSampleW, TEXSIZE, col, renderDrawStart, 1, renderSliceH);
       if(mass > 1.05 && wt !== WALL.FENCE && wt !== WALL.VAN){
-        crDrawFpvWorldFacadePanel(bctx, col, drawStart, sliceH, wt, mapX, mapY, side, wallX);
+        crDrawFpvWorldFacadePanel(bctx, col, renderDrawStart, renderSliceH, wt, mapX, mapY, side, wallX);
       }
     }
 
     if(flatBuildingWall){
-      if(side===1){ bctx.fillStyle='rgba(0,0,0,0.08)'; bctx.fillRect(col,drawStart,1,sliceH); }
-    } else if(sh<1){ bctx.fillStyle=`rgba(0,0,0,${(1-sh).toFixed(3)})`; bctx.fillRect(col,drawStart,1,sliceH); }
+      if(side===1){ bctx.fillStyle='rgba(0,0,0,0.08)'; bctx.fillRect(col,renderDrawStart,1,renderSliceH); }
+    } else if(sh<1){ bctx.fillStyle=`rgba(0,0,0,${(1-sh).toFixed(3)})`; bctx.fillRect(col,renderDrawStart,1,renderSliceH); }
     const f = Math.min(1, d/visRange)*fogStrength;
-    if(f>0){ bctx.fillStyle=`rgba(${fog[0]},${fog[1]},${fog[2]},${f.toFixed(3)})`; bctx.fillRect(col,drawStart,1,sliceH); }
+    if(f>0){ bctx.fillStyle=`rgba(${fog[0]},${fog[1]},${fog[2]},${f.toFixed(3)})`; bctx.fillRect(col,renderDrawStart,1,renderSliceH); }
   }
 
   // ---- SPRITES (billboards), projected from WORLD coords (UNCHANGED math) ----
@@ -241,6 +257,10 @@ function drawScene(now, renderPose){
     const groundBottomY = proj.groundBottomY;
     const startCol=Math.floor(screenX-screenW/2);
     const endCol=Math.ceil(screenX+screenW/2);
+    let hasShortOcclusion = false;
+    for(let col=startCol; col<endCol; col++){
+      if(col >= 0 && col < RW && depth >= zbuffer[col] && wallOcclusion.short[col]){ hasShortOcclusion = true; break; }
+    }
     let farFieldProjection = null;
     let useSubpixelProjection = false;
     try {
@@ -261,7 +281,7 @@ function drawScene(now, renderPose){
           farFieldProjection.occlusionStartCol, farFieldProjection.occlusionEndCol,
           farFieldProjection.sourceWidth
         ] : [];
-        useSubpixelProjection = !!(farFieldProjection && farFieldProjection.mode === 'subpixel' &&
+        useSubpixelProjection = !!(!hasShortOcclusion && farFieldProjection && farFieldProjection.mode === 'subpixel' &&
           farFieldNumbers.every(Number.isFinite) &&
           Number.isInteger(farFieldProjection.occlusionStartCol) &&
           Number.isInteger(farFieldProjection.occlusionEndCol) &&
@@ -297,11 +317,15 @@ function drawScene(now, renderPose){
     if(!useSubpixelProjection){
       for(let col=startCol; col<endCol; col++){
         if(col<0||col>=RW) continue;
-        if(depth >= zbuffer[col]) continue;   // OCCLUSION GUARD: per-column zbuffer vs sprite depth
+        const spriteBehindWall = depth >= zbuffer[col];
+        if(spriteBehindWall && !wallOcclusion.short[col]) continue;
+        const visibleBottom = spriteBehindWall ? Math.min(top + screenH, wallOcclusion.top[col]) : top + screenH;
+        const visibleH = visibleBottom - top;
+        if(visibleH <= 0) continue;
         const u=(col-(screenX-screenW/2))/screenW;
         const srcX=Math.max(0,Math.min(s.tex.width-1, (u*s.tex.width)|0));
-        const yoff = 0;
-        bctx.drawImage(s.tex, srcX,0,1,s.tex.height, col, top, 1, screenH);
+        const sourceH = Math.max(1, Math.min(s.tex.height, Math.ceil(visibleH / screenH * s.tex.height)));
+        bctx.drawImage(s.tex, srcX,0,1,sourceH, col, top, 1, visibleH);
       }
     }
     const isCan = s.tex === TEX.can;
@@ -333,4 +357,3 @@ function drawScene(now, renderPose){
   }
 
 }
-

@@ -13,7 +13,7 @@ const messages = [];
 const sandbox = {
   Array, Boolean, Error, Math, Number, Object, String,
   WALL: { CONCRETE: 8, BRICK: 2, BUILDING: 1 },
-  BITMAP_BUILDING_ASSET_REGISTRY: { dumpster_001: { id: 'dumpster_001', renderMode: 'importedWholeFaceAsset', footprint: { wCells: 1, hCells: 2 } } },
+  BITMAP_BUILDING_ASSET_REGISTRY: { dumpster_001: { id: 'dumpster_001', renderMode: 'importedWholeFaceAsset', footprint: { wCells: 1, hCells: 2 }, heightScale: 0.5 } },
   game,
   player: {},
   dbg: {},
@@ -48,9 +48,12 @@ assert.deepEqual(JSON.parse(JSON.stringify(building.footprint)), { widthCells: 1
 assert.equal(building.assetId, 'dumpster_001');
 assert.equal(building.renderMode, 'importedWholeFaceAsset');
 assert.equal(building.rotation, 0);
+assert.equal(building.heightScale, 0.5);
 assert.deepEqual(JSON.parse(JSON.stringify(game.buildingGrid[3][3])), { bid: 1, lx: 0, ly: 0 });
 assert.deepEqual(JSON.parse(JSON.stringify(game.buildingGrid[4][3])), { bid: 1, lx: 0, ly: 1 });
 assert.equal(game.map[Math.floor(sandbox.player.y)][Math.floor(sandbox.player.x)], 0, 'player start must be walkable');
+assert.deepEqual(JSON.parse(JSON.stringify(game.npcs)), [{ x: 3.5, y: 2.5, kind: 'family', helped: false }],
+  'pilot must place an ordinary world sprite behind the short dumpster');
 assert(messages.some((message) => message.includes('Dumpster Pilot')));
 
 const tiled = JSON.parse(fs.readFileSync(tiledPath, 'utf8'));
@@ -61,5 +64,6 @@ assert.equal(building.y, object.y / tiled.tileheight, 'runtime y must follow the
 assert.equal(building.assetId, valueOf('assetId'));
 assert.equal(building.widthCells, valueOf('widthCells'));
 assert.equal(building.depthCells, valueOf('depthCells'));
+assert.equal(building.heightScale, valueOf('heightScale'));
 
 process.stdout.write(`${JSON.stringify({ pass: true, level: definition.id, assetId: building.assetId, footprint: building.footprint })}\n`);

@@ -4,7 +4,7 @@ Building sources are canonical here; generated runtime assets under `src/importe
 
 ## Building workflow
 
-1. Create `authoring/buildings/<asset-id>/building.json` and one transparent `source/face.png`.
+1. Create `authoring/buildings/<asset-id>/building.json` and one tightly cropped `source/face.png`.
 2. Run `npm.cmd run building:build -- authoring/buildings/<asset-id>`.
 3. Run `npm.cmd run building:preview -- authoring/buildings/<asset-id>` and open the reported ignored local HTML preview.
 4. Place the generated asset in Tiled using the Building template, then validate the map.
@@ -16,13 +16,16 @@ The primary manifest is:
   "schema": "snc-building-source-v1",
   "id": "dumpster_001",
   "footprint": { "widthCells": 1, "depthCells": 2 },
+  "heightScale": 0.5,
   "face": "source/face.png"
 }
 ```
 
 The compiler derives front/back and side atlas slices from that one PNG. The west face reuses east without mirroring. Optional directional overrides may be added later under `faces`.
 
-For low objects such as `dumpster_001`, at least 95% of the source PNG's upper half must be transparent. Visible art belongs in the lower half so the renderer's existing full face does not read as a tall wall.
+`heightScale` is optional and defaults to `1`. For low objects such as `dumpster_001`, set it to `0.5` and supply tightly cropped art. The renderer anchors the short face at the wall-floor position, so no transparent upper-half padding is needed.
+
+Short imported buildings still occupy their full grid footprint for collision. Their renderer tracks the real top edge, so sprites behind a short building can remain visible above it while full-height buildings keep their existing occlusion behavior.
 
 ## Tiled companion map
 

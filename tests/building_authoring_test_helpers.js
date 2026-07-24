@@ -7,14 +7,14 @@ const { PNG } = require('pngjs');
 
 const ROOT = path.resolve(__dirname, '..');
 
-function makePng(width, height, color, { transparentUpper = false } = {}) {
+function makePng(width, height, color) {
   const image = new PNG({ width, height, colorType: 6, inputColorType: 6, inputHasAlpha: true });
   for (let y = 0; y < height; y += 1) for (let x = 0; x < width; x += 1) {
     const offset = (width * y + x) * 4;
     image.data[offset] = (color[0] + x * 7) % 256;
     image.data[offset + 1] = (color[1] + y * 11) % 256;
     image.data[offset + 2] = color[2];
-    image.data[offset + 3] = transparentUpper && y < height / 2 ? 0 : 255;
+    image.data[offset + 3] = 255;
   }
   return PNG.sync.write(image, { colorType: 6, inputColorType: 6, inputHasAlpha: true, deflateLevel: 9, deflateStrategy: 3 });
 }
@@ -36,7 +36,7 @@ function createFixture({ directional = false, west = false } = {}) {
     manifest.footprint = { widthCells: 3, depthCells: 2 };
     manifest.faces = Object.fromEntries(Object.keys(files).map((name) => [name, `source/${name}.png`]));
   } else {
-    fs.writeFileSync(path.join(sourceDir, 'face.png'), makePng(128, 128, [52, 112, 70], { transparentUpper: true }));
+    fs.writeFileSync(path.join(sourceDir, 'face.png'), makePng(128, 128, [52, 112, 70]));
     manifest.face = 'source/face.png';
   }
   fs.writeFileSync(path.join(directory, 'building.json'), `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');

@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 const { PNG } = require('pngjs');
-const { compileBuilding, emitAssetModule, upperHalfTransparency } = require('../tools/building-asset-compiler');
+const { compileBuilding, emitAssetModule } = require('../tools/building-asset-compiler');
 
 const root = path.resolve(__dirname, '..');
 const buildingDir = path.join(root, 'authoring', 'buildings', 'dumpster_001');
@@ -14,13 +14,27 @@ const assetPath = path.join(root, 'src', 'imported-handoff-assets', 'dumpster_00
 const tiledPath = path.join(root, 'authoring', 'levels', 'dumpster-pilot', 'dumpster-pilot.tmj');
 
 const sourcePng = PNG.sync.read(fs.readFileSync(facePath));
-assert(upperHalfTransparency(sourcePng) >= 0.95, 'dumpster upper half must remain transparent');
+let minX = sourcePng.width, minY = sourcePng.height, maxX = -1, maxY = -1;
+for (let y = 0; y < sourcePng.height; y += 1) for (let x = 0; x < sourcePng.width; x += 1) {
+  if (sourcePng.data[(y * sourcePng.width + x) * 4 + 3] > 16) {
+    minX = Math.min(minX, x); minY = Math.min(minY, y);
+    maxX = Math.max(maxX, x); maxY = Math.max(maxY, y);
+  }
+}
+assert.equal(minX, 0, 'dumpster face must be tightly cropped at the left edge');
+assert.equal(minY, 0, 'dumpster face must be tightly cropped at the top edge');
+assert.equal(maxX, sourcePng.width - 1, 'dumpster face must be tightly cropped at the right edge');
+assert.equal(maxY, sourcePng.height - 1, 'dumpster face must be tightly cropped at the bottom edge');
 
 const compiled = compileBuilding(buildingDir);
 assert.equal(compiled.asset.id, 'dumpster_001');
 assert.deepEqual(compiled.asset.footprint, { wCells: 1, hCells: 2 });
+assert.equal(compiled.asset.heightScale, 0.5);
 assert.equal(compiled.asset.source.mode, 'single-reusable-face');
 assert.deepEqual(Object.keys(compiled.asset.source.sourceHashes), ['face']);
+assert.deepEqual(Object.keys(compiled.asset.faces), ['south', 'east', 'north', 'west']);
+for (const direction of ['south', 'east', 'north', 'west']) assert.equal(compiled.asset.faces[direction].mirror, false,
+  `dumpster ${direction} must reuse the one source face without mirroring`);
 assert.equal(compiled.asset.faces.west.reuse, 'east');
 assert.equal(compiled.asset.faces.west.mirror, false);
 assert.equal(compiled.asset.atlas.width, 512);
@@ -45,6 +59,7 @@ const property = (name) => object.properties.find((entry) => entry.name === name
 assert.equal(property('assetId'), 'dumpster_001');
 assert.equal(property('widthCells'), 1);
 assert.equal(property('depthCells'), 2);
+assert.equal(property('heightScale'), 0.5);
 assert.equal(object.width, 32);
 assert.equal(object.height, 64);
 assert.equal(collision.data.filter((value) => value === 1).length, 2);
@@ -53,6 +68,7 @@ process.stdout.write(`${JSON.stringify({
   pass: true,
   assetId: compiled.asset.id,
   footprint: compiled.asset.footprint,
-  upperHalfTransparency: upperHalfTransparency(sourcePng),
+  sourceDimensions: { width: sourcePng.width, height: sourcePng.height },
+  heightScale: compiled.asset.heightScale,
   atlasSha256: compiled.asset.atlas.sha256
 })}\n`);
