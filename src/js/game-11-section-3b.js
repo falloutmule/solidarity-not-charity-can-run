@@ -146,7 +146,7 @@ function genDumpsterPilot(){
   const depthCells = Number(footprint.depthCells || footprint.hCells || footprint.h);
   const heightScale = Number.isFinite(asset.heightScale) ? asset.heightScale : 1;
   if(widthCells !== 1 || depthCells !== 2) throw new Error('dumpster_001 footprint must remain 1x2 cells');
-  if(heightScale !== 0.3) throw new Error('dumpster_001 heightScale must remain 0.3');
+  if(heightScale !== 0.4) throw new Error('dumpster_001 heightScale must remain 0.4');
 
   game.map = map; game.MAP_W = GW; game.MAP_H = GH; game.wallShade = shade;
   game.modifier = 'clear';

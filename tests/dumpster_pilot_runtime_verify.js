@@ -13,7 +13,7 @@ const messages = [];
 const sandbox = {
   Array, Boolean, Error, Math, Number, Object, String,
   WALL: { CONCRETE: 8, BRICK: 2, BUILDING: 1 },
-  BITMAP_BUILDING_ASSET_REGISTRY: { dumpster_001: { id: 'dumpster_001', renderMode: 'importedWholeFaceAsset', footprint: { wCells: 1, hCells: 2 }, heightScale: 0.3 } },
+  BITMAP_BUILDING_ASSET_REGISTRY: { dumpster_001: { id: 'dumpster_001', renderMode: 'importedWholeFaceAsset', footprint: { wCells: 1, hCells: 2 }, heightScale: 0.4 } },
   game,
   player: {},
   dbg: {},
@@ -48,7 +48,7 @@ assert.deepEqual(JSON.parse(JSON.stringify(building.footprint)), { widthCells: 1
 assert.equal(building.assetId, 'dumpster_001');
 assert.equal(building.renderMode, 'importedWholeFaceAsset');
 assert.equal(building.rotation, 0);
-assert.equal(building.heightScale, 0.3);
+assert.equal(building.heightScale, 0.4);
 assert.deepEqual(JSON.parse(JSON.stringify(game.buildingGrid[3][3])), { bid: 1, lx: 0, ly: 0 });
 assert.deepEqual(JSON.parse(JSON.stringify(game.buildingGrid[4][3])), { bid: 1, lx: 0, ly: 1 });
 assert.equal(game.map[Math.floor(sandbox.player.y)][Math.floor(sandbox.player.x)], 0, 'player start must be walkable');

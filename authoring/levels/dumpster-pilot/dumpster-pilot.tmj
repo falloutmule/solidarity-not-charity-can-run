@@ -38,7 +38,7 @@
             { "name": "rotationQ", "type": "int", "value": 0 },
             { "name": "widthCells", "type": "int", "value": 1 },
             { "name": "depthCells", "type": "int", "value": 2 },
-            { "name": "heightScale", "type": "float", "value": 0.3 },
+            { "name": "heightScale", "type": "float", "value": 0.4 },
             { "name": "front", "type": "string", "value": "south" }
           ],
           "rotation": 0,

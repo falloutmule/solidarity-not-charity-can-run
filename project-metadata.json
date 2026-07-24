@@ -11,8 +11,8 @@
   },
   "artifact": {
     "path": "index.html",
-    "byteLength": 1237575,
-    "sha256": "24dd1454d186643992bcc1e1686944354ae56d4b54d3686241bc33ad847c6ba8"
+    "byteLength": 1240178,
+    "sha256": "63dc2068c11a82922bf154af42ce294998ea0d1fa78aea76f1a4f968658a3aef"
   },
   "distribution": {
     "provider": "github-pages",

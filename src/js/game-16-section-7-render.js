@@ -69,6 +69,44 @@ function crDrawShortBitmapTopCaps(px, py, dirX, dirY, planeX, planeY){
     bctx.fill();
   }
 }
+function crFindWallBehindShortBitmapHit(mapX, mapY, sdx, sdy, ddx, ddy, rdx, rdy, stepX, stepY, skipBid){
+  let nextX = mapX, nextY = mapY, nextSdx = sdx, nextSdy = sdy;
+  for(let count = 0; count < 80; count++){
+    let side;
+    if(nextSdx < nextSdy){ nextSdx += ddx; nextX += stepX; side = 0; }
+    else { nextSdy += ddy; nextY += stepY; side = 1; }
+    if(!World.inBounds(nextX, nextY)) return null;
+    const wt = World.rawCell(nextX, nextY);
+    const cell = (game.buildingGrid && game.buildingGrid[nextY] && game.buildingGrid[nextY][nextX]) || null;
+    if(wt !== 0 && (!cell || cell.bid !== skipBid)){
+      const perp = side === 0 ? nextSdx - ddx : nextSdy - ddy;
+      return { mapX:nextX, mapY:nextY, wt, side, stepX, stepY, perp, rdx, rdy };
+    }
+  }
+  return null;
+}
+function crDrawWallBehindShortBitmapColumn(front, shortTop, visRange, fog, fogStrength){
+  const back = crFindWallBehindShortBitmapHit(front.mapX, front.mapY, front.sdx, front.sdy, front.ddx, front.ddy, front.rdx, front.rdy, front.stepX, front.stepY, front.bid);
+  if(!back) return;
+  const mass = crWallVisualMassScale(back.mapX, back.mapY, back.wt);
+  const projection = crWallProjectionMetrics(Math.max(0.05, back.perp), mass);
+  const drawStart = projection.wallDrawStart;
+  const drawEnd = Math.min(projection.wallDrawEnd, shortTop);
+  const sliceH = drawEnd - drawStart;
+  if(sliceH < 1) return;
+  let wallX = back.side === 0 ? front.py + back.perp * back.rdy : front.px + back.perp * back.rdx;
+  wallX -= Math.floor(wallX);
+  const tex = WALL_TEX[back.wt] || WALL_TEX[WALL.BUILDING];
+  const texSampleW = back.wt === WALL.FENCE ? 2 : CR_FPV_WALL_TEX_COARSE;
+  const texX = crCoarseWallTexX(wallX, back.side, back.rdx, back.rdy, back.wt);
+  const sourceH = Math.max(1, Math.min(TEXSIZE, Math.ceil(sliceH / projection.massLineH * TEXSIZE)));
+  bctx.drawImage(tex, texX, 0, texSampleW, sourceH, front.col, drawStart, 1, sliceH);
+  let shade = game.wallShade[back.mapY] ? 0.94 + 0.06 * (game.wallShade[back.mapY][back.mapX] || 0.5) : 1;
+  if(back.side === 1) shade *= 0.72;
+  if(shade < 1){ bctx.fillStyle = `rgba(0,0,0,${(1-shade).toFixed(3)})`; bctx.fillRect(front.col, drawStart, 1, sliceH); }
+  const fogAmount = Math.min(1, back.perp / visRange) * fogStrength;
+  if(fogAmount > 0){ bctx.fillStyle = `rgba(${fog[0]},${fog[1]},${fog[2]},${fogAmount.toFixed(3)})`; bctx.fillRect(front.col, drawStart, 1, sliceH); }
+}
 
 // Whole-face prefab render: sample one generated/imported face bitmap by
 // faceU across the FULL building width (not per-cell). Falls back to the
@@ -153,7 +191,6 @@ function drawScene(now, renderPose){
   const fog = game.modifier==='rainy'?[40,48,60] : [196,168,128]; // dusty warm fog / cool rainy
   const fogStrength = game.modifier==='rainy'?0.9:0.78;
   const wallOcclusion = crEnsureWallOcclusionBuffers(RW);
-  crDrawShortBitmapTopCaps(px, py, dirX, dirY, planeX, planeY);
 
   // ---- WALLS (DDA, textured) -> fills zbuffer per column (occlusion source of truth) ----
   for(let col=0; col<RW; col++){
@@ -196,6 +233,7 @@ function drawScene(now, renderPose){
     const renderDrawStart = bitmapHeightScale < 1 ? drawEnd - renderSliceH : drawStart;
     wallOcclusion.top[col] = renderDrawStart;
     wallOcclusion.short[col] = bitmapHeightScale < 1 ? 1 : 0;
+    if(bitmapHeightScale < 1) crDrawWallBehindShortBitmapColumn({ col, mapX, mapY, sdx, sdy, ddx, ddy, rdx, rdy, stepX, stepY, bid:hitCell.bid, px, py }, renderDrawStart, visRange, fog, fogStrength);
     const bitmapHandled = hitIsBitmap && typeof drawWholeFaceBitmapBuildingColumn === 'function'
       ? drawWholeFaceBitmapBuildingColumn({
           ctx: bctx, col, drawStart: renderDrawStart, sliceH: renderSliceH, cell: hitCell,
@@ -263,6 +301,7 @@ function drawScene(now, renderPose){
     const f = Math.min(1, d/visRange)*fogStrength;
     if(f>0){ bctx.fillStyle=`rgba(${fog[0]},${fog[1]},${fog[2]},${f.toFixed(3)})`; bctx.fillRect(col,renderDrawStart,1,renderSliceH); }
   }
+  crDrawShortBitmapTopCaps(px, py, dirX, dirY, planeX, planeY);
 
   // ---- SPRITES (billboards), projected from WORLD coords (UNCHANGED math) ----
   //   depth  = camera-plane projection (forward distance)

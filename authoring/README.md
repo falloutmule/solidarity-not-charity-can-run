@@ -16,14 +16,14 @@ The primary manifest is:
   "schema": "snc-building-source-v1",
   "id": "dumpster_001",
   "footprint": { "widthCells": 1, "depthCells": 2 },
-  "heightScale": 0.3,
+  "heightScale": 0.4,
   "face": "source/face.png"
 }
 ```
 
 The compiler derives front/back and side atlas slices from that one PNG. The west face reuses east without mirroring. Optional directional overrides may be added later under `faces`.
 
-`heightScale` is optional and defaults to `1`. For low objects such as `dumpster_001`, set it to `0.3` and supply a tightly cropped, fully opaque face. The renderer anchors the short face at the wall-floor position and draws an opaque top cap, so no transparent upper-half padding or cutout is needed.
+`heightScale` is optional and defaults to `1`. For low objects such as `dumpster_001`, set it to `0.4` and supply a tightly cropped, fully opaque face. The renderer anchors the short face at the wall-floor position and draws an opaque top cap, so no transparent upper-half padding or cutout is needed.
 
 Short imported buildings still occupy their full grid footprint for collision. Their renderer tracks the real top edge, so sprites behind a short building can remain visible above it while full-height buildings keep their existing occlusion behavior.
 
