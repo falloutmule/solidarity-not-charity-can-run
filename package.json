@@ -40,6 +40,7 @@
     "test:building-asset-compiler": "node tests/building_asset_compiler_verify.js",
     "test:building-asset-preview": "node tests/building_asset_preview_verify.js",
     "test:dumpster-pilot": "node tests/dumpster_pilot_authoring_verify.js",
+    "test:dumpster-binary-cutout": "node tests/dumpster_binary_cutout_verify.js",
     "test:dumpster-pilot-runtime": "node tests/dumpster_pilot_runtime_verify.js",
     "test:dumpster-pilot-browser": "node tests/dumpster_pilot_browser_smoke.js",
     "test:short-building-geometry": "node tests/short_building_geometry_verify.js",
