@@ -54,6 +54,8 @@ assert.deepEqual(JSON.parse(JSON.stringify(game.buildingGrid[4][3])), { bid: 1, 
 assert.equal(game.map[Math.floor(sandbox.player.y)][Math.floor(sandbox.player.x)], 0, 'player start must be walkable');
 assert.deepEqual(JSON.parse(JSON.stringify(game.npcs)), [{ x: 3.5, y: 2.5, kind: 'family', helped: false }],
   'pilot must place an ordinary world sprite behind the short dumpster');
+assert.deepEqual(JSON.parse(JSON.stringify(game.exit)), { x: 3.5, y: 2.5, active: true },
+  'pilot must place tall world content beyond the short dumpster');
 assert(messages.some((message) => message.includes('Dumpster Pilot')));
 
 const tiled = JSON.parse(fs.readFileSync(tiledPath, 'utf8'));

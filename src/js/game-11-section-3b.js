@@ -187,7 +187,10 @@ function genDumpsterPilot(){
   game.props = [];
   game.quota = 0;
   game.helped = 0; game.delivered = 0;
-  game.exit = {x:1.5, y:6.5, active:false};
+  // The active exit is a taller ordinary world sprite beyond the dumpster. It
+  // makes the short-wall occlusion boundary visible in the pilot without
+  // changing collision or the authored District 1 route.
+  game.exit = {x:3.5, y:2.5, active:true};
   game.timeLeft = 110;
   dbg.reachableCells = 0;
   dbg.cansSpawned = 0;
