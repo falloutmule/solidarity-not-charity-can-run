@@ -40,6 +40,8 @@
     "test:building-asset-compiler": "node tests/building_asset_compiler_verify.js",
     "test:building-asset-preview": "node tests/building_asset_preview_verify.js",
     "test:dumpster-pilot": "node tests/dumpster_pilot_authoring_verify.js",
+    "test:dumpster-pilot-runtime": "node tests/dumpster_pilot_runtime_verify.js",
+    "test:dumpster-pilot-browser": "node tests/dumpster_pilot_browser_smoke.js",
     "test:tiled-d1-roundtrip": "node tests/tiled_d1_roundtrip_verify.js",
     "test:renderer-static-regression": "node tests/renderer_static_regression_verify.js",
     "test:custom-next": "node tests/custom_next_001_face_reuse_runtime_verify.js",

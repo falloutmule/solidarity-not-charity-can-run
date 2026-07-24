@@ -22,6 +22,14 @@ const CUSTOM_LEVELS = {
       'hall_quiet','hall_kitchen','hall_servant',
     ],
   },
+  dumpster_pilot: {
+    id: 'dumpster_pilot',
+    title: 'Dumpster Pilot',
+    shortTitle: 'Dumpster Pilot',
+    generator: genDumpsterPilot,
+    thankLines: [],
+    spriteKinds: [],
+  },
 };
 
 function hallFillMap(GW, GH){
@@ -124,6 +132,62 @@ function genHallOfServants(){
   dbg.npcsSpawned = game.npcs.length;
   dbg.props = game.props.length;
   setMsg('SNC Hall Of Servants — fill the hall with care.');
+}
+
+// Generated placement companion: authoring/levels/dumpster-pilot/dumpster-pilot.tmj.
+// This special level deliberately keeps the pilot outside District 1 and its save identity.
+function genDumpsterPilot(){
+  const GW = 8, GH = 8;
+  const {map, shade} = hallFillMap(GW, GH);
+  const asset = BITMAP_BUILDING_ASSET_REGISTRY && BITMAP_BUILDING_ASSET_REGISTRY.dumpster_001;
+  if(!asset || asset.renderMode !== 'importedWholeFaceAsset') throw new Error('dumpster_001 imported bitmap asset is unavailable');
+  const footprint = asset.footprint || {};
+  const widthCells = Number(footprint.widthCells || footprint.wCells || footprint.w);
+  const depthCells = Number(footprint.depthCells || footprint.hCells || footprint.h);
+  if(widthCells !== 1 || depthCells !== 2) throw new Error('dumpster_001 footprint must remain 1x2 cells');
+
+  game.map = map; game.MAP_W = GW; game.MAP_H = GH; game.wallShade = shade;
+  game.modifier = 'clear';
+  game.scoreMult = 1;
+  game.authoredLevelId = null;
+  game.authoredLevelSchema = null;
+  game.authoredStaticSha256 = null;
+  crClearBuildingModules(GW, GH);
+
+  const x0 = 3, y0 = 3, bid = game._nextBuildingId++;
+  game.buildingRegistry[bid] = {
+    bid,
+    id: 'dumpster-pilot',
+    assetId: asset.id,
+    renderMode: 'importedWholeFaceAsset',
+    x: x0, y: y0, x0, y0,
+    rotation: 0,
+    widthCells, depthCells,
+    w: widthCells, h: depthCells,
+    footprint: { widthCells, depthCells },
+    front: 'south',
+  };
+  for(let ly = 0; ly < depthCells; ly++){
+    for(let lx = 0; lx < widthCells; lx++){
+      map[y0 + ly][x0 + lx] = WALL.BUILDING;
+      shade[y0 + ly][x0 + lx] = 0.5;
+      game.buildingGrid[y0 + ly][x0 + lx] = { bid, lx, ly };
+    }
+  }
+
+  player.x = 3.5; player.y = 6.5; player.angle = -Math.PI / 2;
+  game.pickups = [];
+  game.npcs = [];
+  game.props = [];
+  game.quota = 0;
+  game.helped = 0; game.delivered = 0;
+  game.exit = {x:1.5, y:6.5, active:false};
+  game.timeLeft = 110;
+  dbg.reachableCells = 0;
+  dbg.cansSpawned = 0;
+  dbg.npcsSpawned = 0;
+  dbg.props = 0;
+  setMsg('Dumpster Pilot — walk around the 1×2 building.');
 }
 
 function clearInputState(){
@@ -255,4 +319,3 @@ function pickHallThankLine(npc){
   const lines = CUSTOM_LEVELS.hall_of_servants.thankLines;
   return lines[(Math.random()*lines.length)|0];
 }
-
