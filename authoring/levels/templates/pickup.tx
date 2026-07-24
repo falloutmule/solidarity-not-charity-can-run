@@ -1,0 +1,1 @@
+{ "type": "template", "object": { "name": "pickup", "type": "pickup", "point": true, "visible": true, "properties": [ { "name": "amt", "type": "int", "value": 1 } ] } }

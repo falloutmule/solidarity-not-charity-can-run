@@ -1,0 +1,14 @@
+{
+  "automaticallyReloadTilesets": true,
+  "extensionsPath": "",
+  "objectTypes": [
+    { "name": "building", "color": "#d9a441" },
+    { "name": "player-start", "color": "#4ea4e8" },
+    { "name": "pickup", "color": "#f0d66e" },
+    { "name": "npc", "color": "#8dce8d" },
+    { "name": "prop", "color": "#ba90d9" },
+    { "name": "exit", "color": "#e36b6b" },
+    { "name": "metadata", "color": "#777777" }
+  ],
+  "commands": []
+}
