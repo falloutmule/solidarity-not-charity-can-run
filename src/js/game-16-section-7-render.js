@@ -24,6 +24,235 @@ function crDrawFlatBuildingWallColumn(ctx, col, drawStart, sliceH, wt){
   ctx.fillRect(col, drawStart, 1, sliceH);
 }
 
+let crWallOcclusionTop = new Float32Array(0);
+let crWallOcclusionShort = new Uint8Array(0);
+let crWallOcclusionAlphaCutout = new Uint8Array(0);
+let crWallDepthPixels = new Float32Array(0);
+let crAlphaCutoutCoveragePixels = new Uint8Array(0);
+let crAlphaCutoutOpaquePixels = new Uint8Array(0);
+let crAlphaCutoutColumnCanvas = null;
+let crAlphaCutoutColumnContext = null;
+let crAlphaCutoutProof = Object.freeze({ enabled:false, opaquePixels:0, transparentPixels:0, opaqueDepthWrites:0, transparentDepthPreserved:0, transparentColorPreserved:0, opaqueColorReplaced:0, backgroundDepthWrites:0, spriteVisibleThroughTransparentPixels:0, spriteHiddenBehindOpaquePixels:0, sampleOpaque:null, sampleTransparent:null });
+function crEnsureWallOcclusionBuffers(width, height){
+  if(crWallOcclusionTop.length !== width) crWallOcclusionTop = new Float32Array(width);
+  if(crWallOcclusionShort.length !== width) crWallOcclusionShort = new Uint8Array(width);
+  if(crWallOcclusionAlphaCutout.length !== width) crWallOcclusionAlphaCutout = new Uint8Array(width);
+  if(crWallDepthPixels.length !== width * height) crWallDepthPixels = new Float32Array(width * height);
+  if(crAlphaCutoutCoveragePixels.length !== width * height) crAlphaCutoutCoveragePixels = new Uint8Array(width * height);
+  if(crAlphaCutoutOpaquePixels.length !== width * height) crAlphaCutoutOpaquePixels = new Uint8Array(width * height);
+  crWallDepthPixels.fill(Infinity);
+  crWallOcclusionAlphaCutout.fill(0);
+  crAlphaCutoutCoveragePixels.fill(0);
+  crAlphaCutoutOpaquePixels.fill(0);
+  return {top:crWallOcclusionTop, short:crWallOcclusionShort, alphaCutout:crWallOcclusionAlphaCutout, depthPixels:crWallDepthPixels, alphaCoverage:crAlphaCutoutCoveragePixels, alphaOpaque:crAlphaCutoutOpaquePixels};
+}
+function crSetWallDepthRange(depthPixels, col, start, end, depth){
+  const y0 = Math.max(0, Math.floor(start));
+  const y1 = Math.min(RH, Math.ceil(end));
+  for(let y=y0; y<y1; y++) depthPixels[y * RW + col] = depth;
+}
+function crAlphaCutoutProofEnabled(){
+  return typeof location !== 'undefined' && /(?:[?&])cutoutproof=1(?:&|$)/.test(location.search || '');
+}
+function crBeginAlphaCutoutProof(){
+  crAlphaCutoutProof = {
+    enabled: crAlphaCutoutProofEnabled(), opaquePixels:0, transparentPixels:0,
+    opaqueDepthWrites:0, transparentDepthPreserved:0, transparentColorPreserved:0, opaqueColorReplaced:0, backgroundDepthWrites:0, spriteVisibleThroughTransparentPixels:0, spriteHiddenBehindOpaquePixels:0,
+    sampleOpaque:null, sampleTransparent:null
+  };
+}
+function crGetAlphaCutoutProof(){
+  return Object.freeze({
+    enabled: crAlphaCutoutProof.enabled,
+    opaquePixels: crAlphaCutoutProof.opaquePixels,
+    transparentPixels: crAlphaCutoutProof.transparentPixels,
+    opaqueDepthWrites: crAlphaCutoutProof.opaqueDepthWrites,
+    transparentDepthPreserved: crAlphaCutoutProof.transparentDepthPreserved,
+    transparentColorPreserved: crAlphaCutoutProof.transparentColorPreserved,
+    opaqueColorReplaced: crAlphaCutoutProof.opaqueColorReplaced,
+    backgroundDepthWrites: crAlphaCutoutProof.backgroundDepthWrites,
+    spriteVisibleThroughTransparentPixels: crAlphaCutoutProof.spriteVisibleThroughTransparentPixels,
+    spriteHiddenBehindOpaquePixels: crAlphaCutoutProof.spriteHiddenBehindOpaquePixels,
+    sampleOpaque: crAlphaCutoutProof.sampleOpaque,
+    sampleTransparent: crAlphaCutoutProof.sampleTransparent
+  });
+}
+function crProjectShortBitmapTopPoint(wx, wy, heightScale, px, py, dirX, dirY, planeX, planeY){
+  const relX = wx - px, relY = wy - py;
+  const invDet = 1 / (planeX * dirY - dirX * planeY);
+  const depth = invDet * (-planeY * relX + planeX * relY);
+  if(depth <= 0.12) return null;
+  const screen = invDet * (dirY * relX - dirX * relY);
+  const metrics = crWallProjectionMetrics(depth, CR_BUILDING_FPV_MASS);
+  return { x: RW * 0.5 * (1 + screen / depth), y: metrics.floorBottomY - metrics.massLineH * heightScale };
+}
+function crDrawShortBitmapTopCaps(px, py, dirX, dirY, planeX, planeY){
+  const registry = game.buildingRegistry;
+  if(!registry || typeof resolveBitmapBuildingHeightScale !== 'function') return;
+  for(const bid in registry){
+    const reg = registry[bid];
+    if(!reg || reg.renderMode !== 'importedWholeFaceAsset') continue;
+    const asset = typeof lookupBitmapBuildingAsset === 'function' ? lookupBitmapBuildingAsset(reg.assetId) : null;
+    if(!asset || asset.topCap !== 'solid') continue;
+    const heightScale = resolveBitmapBuildingHeightScale(reg, asset);
+    if(heightScale >= 1) continue;
+    const x0 = Number.isFinite(reg.x0) ? reg.x0 : reg.x;
+    const y0 = Number.isFinite(reg.y0) ? reg.y0 : reg.y;
+    const width = Math.max(1, Number(reg.widthCells || reg.w || (reg.footprint && reg.footprint.w) || 1));
+    const depth = Math.max(1, Number(reg.depthCells || reg.h || (reg.footprint && reg.footprint.h) || 1));
+    if(!Number.isFinite(x0) || !Number.isFinite(y0)) continue;
+    const points = [
+      crProjectShortBitmapTopPoint(x0, y0, heightScale, px, py, dirX, dirY, planeX, planeY),
+      crProjectShortBitmapTopPoint(x0 + width, y0, heightScale, px, py, dirX, dirY, planeX, planeY),
+      crProjectShortBitmapTopPoint(x0 + width, y0 + depth, heightScale, px, py, dirX, dirY, planeX, planeY),
+      crProjectShortBitmapTopPoint(x0, y0 + depth, heightScale, px, py, dirX, dirY, planeX, planeY)
+    ];
+    if(points.some((point) => !point)) continue;
+    bctx.fillStyle = '#223529';
+    bctx.beginPath();
+    bctx.moveTo(points[0].x, points[0].y);
+    for(let index = 1; index < points.length; index++) bctx.lineTo(points[index].x, points[index].y);
+    bctx.closePath();
+    bctx.fill();
+  }
+}
+function crFindWallBehindShortBitmapHit(mapX, mapY, sdx, sdy, ddx, ddy, rdx, rdy, stepX, stepY, skipBid){
+  let nextX = mapX, nextY = mapY, nextSdx = sdx, nextSdy = sdy;
+  for(let count = 0; count < 80; count++){
+    let side;
+    if(nextSdx < nextSdy){ nextSdx += ddx; nextX += stepX; side = 0; }
+    else { nextSdy += ddy; nextY += stepY; side = 1; }
+    if(!World.inBounds(nextX, nextY)) return null;
+    const wt = World.rawCell(nextX, nextY);
+    const cell = (game.buildingGrid && game.buildingGrid[nextY] && game.buildingGrid[nextY][nextX]) || null;
+    if(wt !== 0 && (!cell || cell.bid !== skipBid)){
+      const perp = side === 0 ? nextSdx - ddx : nextSdy - ddy;
+      return { mapX:nextX, mapY:nextY, wt, side, stepX, stepY, perp, rdx, rdy };
+    }
+  }
+  return null;
+}
+function crDrawWallBehindBitmapColumn(front, clipBottom, visRange, fog, fogStrength, depthPixels){
+  const back = crFindWallBehindShortBitmapHit(front.mapX, front.mapY, front.sdx, front.sdy, front.ddx, front.ddy, front.rdx, front.rdy, front.stepX, front.stepY, front.bid);
+  if(!back) return null;
+  const mass = crWallVisualMassScale(back.mapX, back.mapY, back.wt);
+  const projection = crWallProjectionMetrics(Math.max(0.05, back.perp), mass);
+  const drawStart = projection.wallDrawStart;
+  const drawEnd = Number.isFinite(clipBottom) ? Math.min(projection.wallDrawEnd, clipBottom) : projection.wallDrawEnd;
+  const sliceH = drawEnd - drawStart;
+  if(sliceH < 1) return { depth:back.perp, drawStart, drawEnd };
+  let wallX = back.side === 0 ? front.py + back.perp * back.rdy : front.px + back.perp * back.rdx;
+  wallX -= Math.floor(wallX);
+  if(crAlphaCutoutProofEnabled() && !Number.isFinite(clipBottom)){
+    const y0 = Math.max(0, Math.floor(drawStart));
+    const y1 = Math.min(RH, Math.ceil(drawEnd));
+    for(let y=y0; y<y1; y++){
+      bctx.fillStyle = ((y - y0) >> 2) & 1 ? '#ffdf00' : '#6d3caf';
+      bctx.fillRect(front.col, y, 1, 1);
+    }
+  } else {
+    const tex = WALL_TEX[back.wt] || WALL_TEX[WALL.BUILDING];
+    const texSampleW = back.wt === WALL.FENCE ? 2 : CR_FPV_WALL_TEX_COARSE;
+    const texX = crCoarseWallTexX(wallX, back.side, back.rdx, back.rdy, back.wt);
+    const sourceH = Math.max(1, Math.min(TEXSIZE, Math.ceil(sliceH / projection.massLineH * TEXSIZE)));
+    bctx.drawImage(tex, texX, 0, texSampleW, sourceH, front.col, drawStart, 1, sliceH);
+  }
+  let shade = game.wallShade[back.mapY] ? 0.94 + 0.06 * (game.wallShade[back.mapY][back.mapX] || 0.5) : 1;
+  if(back.side === 1) shade *= 0.72;
+  if(shade < 1){ bctx.fillStyle = `rgba(0,0,0,${(1-shade).toFixed(3)})`; bctx.fillRect(front.col, drawStart, 1, sliceH); }
+  const fogAmount = Math.min(1, back.perp / visRange) * fogStrength;
+  if(fogAmount > 0){ bctx.fillStyle = `rgba(${fog[0]},${fog[1]},${fog[2]},${fogAmount.toFixed(3)})`; bctx.fillRect(front.col, drawStart, 1, sliceH); }
+  if(depthPixels){
+    crSetWallDepthRange(depthPixels, front.col, drawStart, drawEnd, back.perp);
+    if(crAlphaCutoutProof.enabled && !Number.isFinite(clipBottom)) crAlphaCutoutProof.backgroundDepthWrites += Math.max(0, Math.ceil(drawEnd) - Math.floor(drawStart));
+  }
+  return { depth:back.perp, drawStart, drawEnd };
+}
+function crDrawWallBehindShortBitmapColumn(front, shortTop, visRange, fog, fogStrength, depthPixels){
+  return crDrawWallBehindBitmapColumn(front, shortTop, visRange, fog, fogStrength, depthPixels);
+}
+function crEnsureAlphaCutoutColumnCanvas(){
+  if(!crAlphaCutoutColumnCanvas || crAlphaCutoutColumnCanvas.width !== 1 || crAlphaCutoutColumnCanvas.height !== RH){
+    crAlphaCutoutColumnCanvas = document.createElement('canvas');
+    crAlphaCutoutColumnCanvas.width = 1;
+    crAlphaCutoutColumnCanvas.height = RH;
+    crAlphaCutoutColumnContext = crAlphaCutoutColumnCanvas.getContext('2d', { willReadFrequently:true });
+  }
+  return crAlphaCutoutColumnContext;
+}
+function crDrawAlphaCutoutBitmapColumn(resolved, col, drawStart, sliceH, depth, shade, fog, fogAmount, depthPixels, coveragePixels, opaquePixels){
+  const context = crEnsureAlphaCutoutColumnCanvas();
+  if(!context || !resolved || !resolved.face) return false;
+  const y0 = Math.max(0, Math.round(drawStart));
+  const y1 = Math.min(RH, Math.round(drawStart + sliceH));
+  const height = Math.max(1, y1 - y0);
+  context.clearRect(0, 0, 1, RH);
+  context.save();
+  context.imageSmoothingEnabled = false;
+  context.drawImage(resolved.face, resolved.sourceX, 0, 1, resolved.face.height, 0, y0, 1, height);
+  const alphaBefore = context.getImageData(0, y0, 1, height).data;
+  if(shade < 1){ context.globalCompositeOperation = 'source-atop'; context.fillStyle = `rgba(0,0,0,${(1-shade).toFixed(3)})`; context.fillRect(0, y0, 1, height); }
+  if(fogAmount > 0){ context.globalCompositeOperation = 'source-atop'; context.fillStyle = `rgba(${fog[0]},${fog[1]},${fog[2]},${fogAmount.toFixed(3)})`; context.fillRect(0, y0, 1, height); }
+  context.restore();
+  const backgroundPixels = crAlphaCutoutProof.enabled ? bctx.getImageData(col, y0, 1, height).data : null;
+  bctx.drawImage(crAlphaCutoutColumnCanvas, 0, 0, 1, RH, col, 0, 1, RH);
+  const compositePixels = crAlphaCutoutProof.enabled ? bctx.getImageData(col, y0, 1, height).data : null;
+  for(let offset=0; offset<height; offset++){
+    const y = y0 + offset;
+    const before = depthPixels[y * RW + col];
+    const pixelIndex = y * RW + col;
+    coveragePixels[pixelIndex] = 1;
+    const alpha = alphaBefore[offset * 4 + 3];
+    if(alpha === 255){
+      depthPixels[pixelIndex] = depth;
+      opaquePixels[pixelIndex] = 1;
+      if(crAlphaCutoutProof.enabled){
+        crAlphaCutoutProof.opaquePixels++;
+        crAlphaCutoutProof.opaqueDepthWrites++;
+        const colorOffset = offset * 4;
+        const changed = backgroundPixels[colorOffset] !== compositePixels[colorOffset] || backgroundPixels[colorOffset + 1] !== compositePixels[colorOffset + 1] || backgroundPixels[colorOffset + 2] !== compositePixels[colorOffset + 2];
+        if(changed) crAlphaCutoutProof.opaqueColorReplaced++;
+        if(!crAlphaCutoutProof.sampleOpaque && Number.isFinite(before)) crAlphaCutoutProof.sampleOpaque = { col, y, alpha, depthBefore:before, depthAfter:depth, background:[backgroundPixels[colorOffset], backgroundPixels[colorOffset + 1], backgroundPixels[colorOffset + 2]], composite:[compositePixels[colorOffset], compositePixels[colorOffset + 1], compositePixels[colorOffset + 2]] };
+      }
+    } else if(crAlphaCutoutProof.enabled){
+      crAlphaCutoutProof.transparentPixels++;
+      const colorOffset = offset * 4;
+      const preserved = backgroundPixels[colorOffset] === compositePixels[colorOffset] && backgroundPixels[colorOffset + 1] === compositePixels[colorOffset + 1] && backgroundPixels[colorOffset + 2] === compositePixels[colorOffset + 2] && backgroundPixels[colorOffset + 3] === compositePixels[colorOffset + 3];
+      if(preserved) crAlphaCutoutProof.transparentColorPreserved++;
+      if(depthPixels[y * RW + col] === before){
+        crAlphaCutoutProof.transparentDepthPreserved++;
+        if(!crAlphaCutoutProof.sampleTransparent && Number.isFinite(before)) crAlphaCutoutProof.sampleTransparent = { col, y, alpha, depthBefore:before, depthAfter:depthPixels[y * RW + col], background:[backgroundPixels[colorOffset], backgroundPixels[colorOffset + 1], backgroundPixels[colorOffset + 2]], composite:[compositePixels[colorOffset], compositePixels[colorOffset + 1], compositePixels[colorOffset + 2]] };
+      }
+    }
+  }
+  return true;
+}
+function crDrawSpriteColumnWithDepthSpans(ctx, texture, col, screenLeft, screenW, top, screenH, depth, depthPixels, coveragePixels, opaquePixels){
+  const y0 = Math.max(0, Math.ceil(top));
+  const y1 = Math.min(RH, Math.ceil(top + screenH));
+  if(y1 <= y0) return;
+  const u = (col - screenLeft) / screenW;
+  const sourceX = Math.max(0, Math.min(texture.width - 1, Math.floor(u * texture.width)));
+  let runStart = -1;
+  function drawRun(start, end){
+    if(end <= start) return;
+    const sourceY = Math.max(0, Math.min(texture.height - 1, Math.floor((start - top) / screenH * texture.height)));
+    const sourceEnd = Math.max(sourceY + 1, Math.min(texture.height, Math.ceil((end - top) / screenH * texture.height)));
+    ctx.drawImage(texture, sourceX, sourceY, 1, sourceEnd - sourceY, col, start, 1, end - start);
+  }
+  for(let y=y0; y<y1; y++){
+    const visible = depth < depthPixels[y * RW + col];
+    if(crAlphaCutoutProof.enabled){
+      const pixelIndex = y * RW + col;
+      if(coveragePixels[pixelIndex] && visible && !opaquePixels[pixelIndex]) crAlphaCutoutProof.spriteVisibleThroughTransparentPixels++;
+      if(coveragePixels[pixelIndex] && !visible && opaquePixels[pixelIndex]) crAlphaCutoutProof.spriteHiddenBehindOpaquePixels++;
+    }
+    if(visible && runStart < 0) runStart = y;
+    if(!visible && runStart >= 0){ drawRun(runStart, y); runStart = -1; }
+  }
+  if(runStart >= 0) drawRun(runStart, y1);
+}
+
 // Whole-face prefab render: sample one generated/imported face bitmap by
 // faceU across the FULL building width (not per-cell). Falls back to the
 // procedural per-cell path only for non-prefab/legacy objects.
@@ -106,6 +335,8 @@ function drawScene(now, renderPose){
   const visRange = game.modifier==='rainy'?9.0:17.0;
   const fog = game.modifier==='rainy'?[40,48,60] : [196,168,128]; // dusty warm fog / cool rainy
   const fogStrength = game.modifier==='rainy'?0.9:0.78;
+  const wallOcclusion = crEnsureWallOcclusionBuffers(RW, RH);
+  crBeginAlphaCutoutProof();
 
   // ---- WALLS (DDA, textured) -> fills zbuffer per column (occlusion source of truth) ----
   for(let col=0; col<RW; col++){
@@ -141,9 +372,19 @@ function drawScene(now, renderPose){
     const hitCell = (game.buildingGrid && game.buildingGrid[mapY] && game.buildingGrid[mapY][mapX]) || null;
     const hitReg = hitCell && game.buildingRegistry ? game.buildingRegistry[hitCell.bid] : null;
     const hitIsBitmap = !!(hitReg && hitReg.renderMode === 'importedWholeFaceAsset');
-    const bitmapHandled = hitIsBitmap && typeof drawWholeFaceBitmapBuildingColumn === 'function'
+    const bitmapAsset = hitIsBitmap && typeof lookupBitmapBuildingAsset === 'function' ? lookupBitmapBuildingAsset(hitReg.assetId) : null;
+    const alphaCutoutBitmap = !!(bitmapAsset && bitmapAsset.alphaCutout === true);
+    const bitmapHeightScale = hitIsBitmap && typeof resolveBitmapBuildingHeightScale === 'function'
+      ? resolveBitmapBuildingHeightScale(hitReg, bitmapAsset)
+      : 1;
+    const renderSliceH = bitmapHeightScale < 1 ? Math.max(1, Math.round(sliceH * bitmapHeightScale)) : sliceH;
+    const renderDrawStart = bitmapHeightScale < 1 ? drawEnd - renderSliceH : drawStart;
+    wallOcclusion.top[col] = renderDrawStart;
+    wallOcclusion.short[col] = bitmapHeightScale < 1 ? 1 : 0;
+    wallOcclusion.alphaCutout[col] = alphaCutoutBitmap ? 1 : 0;
+    const bitmapHandled = hitIsBitmap && !alphaCutoutBitmap && typeof drawWholeFaceBitmapBuildingColumn === 'function'
       ? drawWholeFaceBitmapBuildingColumn({
-          ctx: bctx, col, drawStart, sliceH, cell: hitCell,
+          ctx: bctx, col, drawStart: renderDrawStart, sliceH: renderSliceH, cell: hitCell,
           side, stepX, stepY, wallFraction: wallX
         }, hitReg)
       : false;
@@ -170,44 +411,63 @@ function drawScene(now, renderPose){
       if(side===1) sh*=0.72;
     }
 
+    if(alphaCutoutBitmap){
+      const front = { col, mapX, mapY, sdx, sdy, ddx, ddy, rdx, rdy, stepX, stepY, bid:hitCell.bid, px, py };
+      const background = crDrawWallBehindBitmapColumn(front, null, visRange, fog, fogStrength, wallOcclusion.depthPixels);
+      zbuffer[col] = background ? background.depth : Infinity;
+      const resolved = typeof resolveWholeFaceBitmapBuildingColumn === 'function'
+        ? resolveWholeFaceBitmapBuildingColumn({ col, drawStart:renderDrawStart, sliceH:renderSliceH, cell:hitCell, side, stepX, stepY, wallFraction:wallX }, hitReg)
+        : null;
+      const fogAmount = Math.min(1, d/visRange)*fogStrength;
+      if(!resolved || !crDrawAlphaCutoutBitmapColumn(resolved, col, renderDrawStart, renderSliceH, d, sh, fog, fogAmount, wallOcclusion.depthPixels, wallOcclusion.alphaCoverage, wallOcclusion.alphaOpaque)){
+        if(typeof drawBitmapFailureColumn === 'function') drawBitmapFailureColumn(bctx, col, renderDrawStart, renderSliceH);
+        crSetWallDepthRange(wallOcclusion.depthPixels, col, renderDrawStart, renderDrawStart + renderSliceH, d);
+      }
+      continue;
+    }
+
+    if(bitmapHeightScale < 1) crDrawWallBehindShortBitmapColumn({ col, mapX, mapY, sdx, sdy, ddx, ddy, rdx, rdy, stepX, stepY, bid:hitCell.bid, px, py }, renderDrawStart, visRange, fog, fogStrength, wallOcclusion.depthPixels);
+
     if(bitmapHandled){
       // Generic imported bitmap owner drew this column before procedural resolution.
     } else if(proofMode && inProofZone){
       const owner = (typeof crD1ProofZoneCellOwner === 'function') ? crD1ProofZoneCellOwner(mapX, mapY) : null;
       if(owner){
-        const drewProof = (typeof crDrawD1ProofPrefabFaceColumn === 'function') && crDrawD1ProofPrefabFaceColumn(bctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX, owner);
+        const drewProof = (typeof crDrawD1ProofPrefabFaceColumn === 'function') && crDrawD1ProofPrefabFaceColumn(bctx, col, renderDrawStart, renderSliceH, mapX, mapY, side, stepX, stepY, wallX, owner);
         if(!drewProof){
-          if(typeof crDrawIllegalD1ProofWall === 'function') crDrawIllegalD1ProofWall(bctx, col, drawStart, sliceH, 'PROOF SLOT RENDER FAILED', mapX, mapY, owner);
+          if(typeof crDrawIllegalD1ProofWall === 'function') crDrawIllegalD1ProofWall(bctx, col, renderDrawStart, renderSliceH, 'PROOF SLOT RENDER FAILED', mapX, mapY, owner);
         }
       } else {
-        if(typeof crDrawIllegalD1ProofWall === 'function') crDrawIllegalD1ProofWall(bctx, col, drawStart, sliceH, 'ILLEGAL PROCEDURAL WALL IN D1 PROOF ZONE', mapX, mapY, null);
+        if(typeof crDrawIllegalD1ProofWall === 'function') crDrawIllegalD1ProofWall(bctx, col, renderDrawStart, renderSliceH, 'ILLEGAL PROCEDURAL WALL IN D1 PROOF ZONE', mapX, mapY, null);
       }
     } else if(proofZoneIllegal){
       bctx.fillStyle = '#ff00ff';
-      bctx.fillRect(col, drawStart, 1, sliceH);
+      bctx.fillRect(col, renderDrawStart, 1, renderSliceH);
       bctx.fillStyle = '#120014';
-      bctx.fillRect(col, drawStart + Math.max(0, (sliceH / 2) | 0) - 1, 1, 2);
-    } else if(crDrawPrefabFaceColumn(bctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX)){
+      bctx.fillRect(col, renderDrawStart + Math.max(0, (renderSliceH / 2) | 0) - 1, 1, 2);
+    } else if(crDrawPrefabFaceColumn(bctx, col, renderDrawStart, renderSliceH, mapX, mapY, side, stepX, stepY, wallX)){
       // whole-face prefab asset drawn; nothing else needed
     } else if(buildingMaterialWall){
-      crDrawBuildingMaterialWallColumn(bctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX, facadeRole);
+      crDrawBuildingMaterialWallColumn(bctx, col, renderDrawStart, renderSliceH, mapX, mapY, side, stepX, stepY, wallX, facadeRole);
     } else if(flatBuildingWall){
-      crDrawFlatBuildingWallColumn(bctx, col, drawStart, sliceH, wt);
+      crDrawFlatBuildingWallColumn(bctx, col, renderDrawStart, renderSliceH, wt);
     } else if(facadeRole){
-      crDrawComposedFacadeFaceColumn(bctx, col, drawStart, sliceH, mapX, mapY, side, stepX, stepY, wallX, facadeRole);
+      crDrawComposedFacadeFaceColumn(bctx, col, renderDrawStart, renderSliceH, mapX, mapY, side, stepX, stepY, wallX, facadeRole);
     } else {
-      bctx.drawImage(tex, texX, 0, texSampleW, TEXSIZE, col, drawStart, 1, sliceH);
+      bctx.drawImage(tex, texX, 0, texSampleW, TEXSIZE, col, renderDrawStart, 1, renderSliceH);
       if(mass > 1.05 && wt !== WALL.FENCE && wt !== WALL.VAN){
-        crDrawFpvWorldFacadePanel(bctx, col, drawStart, sliceH, wt, mapX, mapY, side, wallX);
+        crDrawFpvWorldFacadePanel(bctx, col, renderDrawStart, renderSliceH, wt, mapX, mapY, side, wallX);
       }
     }
 
     if(flatBuildingWall){
-      if(side===1){ bctx.fillStyle='rgba(0,0,0,0.08)'; bctx.fillRect(col,drawStart,1,sliceH); }
-    } else if(sh<1){ bctx.fillStyle=`rgba(0,0,0,${(1-sh).toFixed(3)})`; bctx.fillRect(col,drawStart,1,sliceH); }
+      if(side===1){ bctx.fillStyle='rgba(0,0,0,0.08)'; bctx.fillRect(col,renderDrawStart,1,renderSliceH); }
+    } else if(sh<1){ bctx.fillStyle=`rgba(0,0,0,${(1-sh).toFixed(3)})`; bctx.fillRect(col,renderDrawStart,1,renderSliceH); }
     const f = Math.min(1, d/visRange)*fogStrength;
-    if(f>0){ bctx.fillStyle=`rgba(${fog[0]},${fog[1]},${fog[2]},${f.toFixed(3)})`; bctx.fillRect(col,drawStart,1,sliceH); }
+    if(f>0){ bctx.fillStyle=`rgba(${fog[0]},${fog[1]},${fog[2]},${f.toFixed(3)})`; bctx.fillRect(col,renderDrawStart,1,renderSliceH); }
+    crSetWallDepthRange(wallOcclusion.depthPixels, col, renderDrawStart, renderDrawStart + renderSliceH, d);
   }
+  crDrawShortBitmapTopCaps(px, py, dirX, dirY, planeX, planeY);
 
   // ---- SPRITES (billboards), projected from WORLD coords (UNCHANGED math) ----
   //   depth  = camera-plane projection (forward distance)
@@ -241,6 +501,10 @@ function drawScene(now, renderPose){
     const groundBottomY = proj.groundBottomY;
     const startCol=Math.floor(screenX-screenW/2);
     const endCol=Math.ceil(screenX+screenW/2);
+    let hasShortOcclusion = false;
+    for(let col=startCol; col<endCol; col++){
+      if(col >= 0 && col < RW && (wallOcclusion.alphaCutout[col] || (depth >= zbuffer[col] && wallOcclusion.short[col]))){ hasShortOcclusion = true; break; }
+    }
     let farFieldProjection = null;
     let useSubpixelProjection = false;
     try {
@@ -261,7 +525,7 @@ function drawScene(now, renderPose){
           farFieldProjection.occlusionStartCol, farFieldProjection.occlusionEndCol,
           farFieldProjection.sourceWidth
         ] : [];
-        useSubpixelProjection = !!(farFieldProjection && farFieldProjection.mode === 'subpixel' &&
+        useSubpixelProjection = !!(!hasShortOcclusion && farFieldProjection && farFieldProjection.mode === 'subpixel' &&
           farFieldNumbers.every(Number.isFinite) &&
           Number.isInteger(farFieldProjection.occlusionStartCol) &&
           Number.isInteger(farFieldProjection.occlusionEndCol) &&
@@ -276,7 +540,7 @@ function drawScene(now, renderPose){
       useSubpixelProjection = false;
     }
     const midCol = Math.min(RW - 1, Math.max(0, ((startCol + endCol) / 2) | 0));
-    const spriteFront = midCol >= 0 && midCol < RW && depth < zbuffer[midCol];
+    const spriteFront = midCol >= 0 && midCol < RW && !wallOcclusion.alphaCutout[midCol] && depth < zbuffer[midCol];
     if(spriteFront && !proj.floating && CR_SPRITE_GROUND_ANCHOR){
       const sw = Math.max(2, screenW * 0.32);
       bctx.fillStyle = 'rgba(0,0,0,0.14)';
@@ -297,11 +561,19 @@ function drawScene(now, renderPose){
     if(!useSubpixelProjection){
       for(let col=startCol; col<endCol; col++){
         if(col<0||col>=RW) continue;
-        if(depth >= zbuffer[col]) continue;   // OCCLUSION GUARD: per-column zbuffer vs sprite depth
+        if(wallOcclusion.alphaCutout[col]){
+          crDrawSpriteColumnWithDepthSpans(bctx, s.tex, col, screenX-screenW/2, screenW, top, screenH, depth, wallOcclusion.depthPixels, wallOcclusion.alphaCoverage, wallOcclusion.alphaOpaque);
+          continue;
+        }
+        const spriteBehindWall = depth >= zbuffer[col];
+        if(spriteBehindWall && !wallOcclusion.short[col]) continue;
+        const visibleBottom = spriteBehindWall ? Math.min(top + screenH, wallOcclusion.top[col]) : top + screenH;
+        const visibleH = visibleBottom - top;
+        if(visibleH <= 0) continue;
         const u=(col-(screenX-screenW/2))/screenW;
         const srcX=Math.max(0,Math.min(s.tex.width-1, (u*s.tex.width)|0));
-        const yoff = 0;
-        bctx.drawImage(s.tex, srcX,0,1,s.tex.height, col, top, 1, screenH);
+        const sourceH = Math.max(1, Math.min(s.tex.height, Math.ceil(visibleH / screenH * s.tex.height)));
+        bctx.drawImage(s.tex, srcX,0,1,sourceH, col, top, 1, visibleH);
       }
     }
     const isCan = s.tex === TEX.can;
@@ -333,4 +605,3 @@ function drawScene(now, renderPose){
   }
 
 }
-

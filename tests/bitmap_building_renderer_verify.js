@@ -61,6 +61,7 @@ const requiredFunctions = [
   'lookupBitmapBuildingAsset', 'resolveBitmapWorldFace',
   'inverseRotateBitmapFace', 'resolveBitmapLocalHit',
   'orientBitmapCanonicalU', 'getBitmapFaceCanvas',
+  'resolveBitmapBuildingHeightScale',
   'drawBitmapFaceColumn', 'drawBitmapFailureColumn',
   'drawWholeFaceBitmapBuildingColumn'
 ];
@@ -98,6 +99,12 @@ function makeAsset(id, options = {}) {
 
 registry['fixture-wide-5x2'] = makeAsset('fixture-wide-5x2');
 assert.strictEqual(sandbox.lookupBitmapBuildingAsset('fixture-wide-5x2').id, 'fixture-wide-5x2', 'arbitrary registry IDs must resolve');
+assert.strictEqual(sandbox.resolveBitmapBuildingHeightScale({}, registry['fixture-wide-5x2']), 1,
+  'heightScale must default to full-height behavior when absent');
+assert.strictEqual(sandbox.resolveBitmapBuildingHeightScale({ heightScale: 0.5 }, registry['fixture-wide-5x2']), 0.5,
+  'placement heightScale must select grounded short-wall geometry');
+assert.strictEqual(sandbox.resolveBitmapBuildingHeightScale({ heightScale: 2 }, registry['fixture-wide-5x2']), 1,
+  'invalid heightScale must fail safe to the full-height default');
 
 const expectedMappings = [
   [0, 'south', 'south', 'x', false, false],

@@ -22,6 +22,14 @@ const CUSTOM_LEVELS = {
       'hall_quiet','hall_kitchen','hall_servant',
     ],
   },
+  dumpster_pilot: {
+    id: 'dumpster_pilot',
+    title: 'Dumpster Pilot',
+    shortTitle: 'Dumpster Pilot',
+    generator: genDumpsterPilot,
+    thankLines: [],
+    spriteKinds: [],
+  },
 };
 
 function hallFillMap(GW, GH){
@@ -124,6 +132,82 @@ function genHallOfServants(){
   dbg.npcsSpawned = game.npcs.length;
   dbg.props = game.props.length;
   setMsg('SNC Hall Of Servants — fill the hall with care.');
+}
+
+// Generated placement companion: authoring/levels/dumpster-pilot/dumpster-pilot.tmj.
+// This special level deliberately keeps the pilot outside District 1 and its save identity.
+function genDumpsterPilot(){
+  const GW = 8, GH = 8;
+  const {map, shade} = hallFillMap(GW, GH);
+  const asset = BITMAP_BUILDING_ASSET_REGISTRY && BITMAP_BUILDING_ASSET_REGISTRY.dumpster_001;
+  if(!asset || asset.renderMode !== 'importedWholeFaceAsset') throw new Error('dumpster_001 imported bitmap asset is unavailable');
+  const footprint = asset.footprint || {};
+  const widthCells = Number(footprint.widthCells || footprint.wCells || footprint.w);
+  const depthCells = Number(footprint.depthCells || footprint.hCells || footprint.h);
+  const heightScale = Number.isFinite(asset.heightScale) ? asset.heightScale : 1;
+  if(widthCells !== 1 || depthCells !== 2) throw new Error('dumpster_001 footprint must remain 1x2 cells');
+  if(heightScale !== 0.3) throw new Error('dumpster_001 heightScale must remain 0.3');
+
+  game.map = map; game.MAP_W = GW; game.MAP_H = GH; game.wallShade = shade;
+  game.modifier = 'clear';
+  game.scoreMult = 1;
+  game.authoredLevelId = null;
+  game.authoredLevelSchema = null;
+  game.authoredStaticSha256 = null;
+  crClearBuildingModules(GW, GH);
+
+  const x0 = 3, y0 = 3, bid = game._nextBuildingId++;
+  const cutoutProofRotation = typeof location !== 'undefined' ? Number(new URLSearchParams(location.search || '').get('cutoutrotation')) : 0;
+  const rotation = Number.isInteger(cutoutProofRotation) && cutoutProofRotation >= 0 && cutoutProofRotation <= 3 ? cutoutProofRotation : 0;
+  game.buildingRegistry[bid] = {
+    bid,
+    id: 'dumpster-pilot',
+    assetId: asset.id,
+    renderMode: 'importedWholeFaceAsset',
+    x: x0, y: y0, x0, y0,
+    rotation,
+    heightScale,
+    widthCells, depthCells,
+    w: widthCells, h: depthCells,
+    footprint: { widthCells, depthCells },
+    front: 'south',
+  };
+  for(let ly = 0; ly < depthCells; ly++){
+    for(let lx = 0; lx < widthCells; lx++){
+      map[y0 + ly][x0 + lx] = WALL.BUILDING;
+      shade[y0 + ly][x0 + lx] = 0.5;
+      game.buildingGrid[y0 + ly][x0 + lx] = { bid, lx, ly };
+    }
+  }
+
+  const cutoutProofView = typeof location !== 'undefined' ? new URLSearchParams(location.search || '').get('cutoutview') : null;
+  const proofPoses = {
+    front: { x:3.5, y:6.5, angle:-Math.PI / 2 },
+    side: { x:1.5, y:4.0, angle:0 },
+    oblique: { x:1.5, y:6.2, angle:-0.62 },
+    near: { x:3.5, y:5.7, angle:-Math.PI / 2 },
+    far: { x:3.5, y:6.5, angle:-Math.PI / 2 }
+  };
+  const pose = proofPoses[cutoutProofView] || proofPoses.front;
+  player.x = pose.x; player.y = pose.y; player.angle = pose.angle;
+  game.pickups = [];
+  // This NPC is beyond the dumpster from the initial north-facing player pose.
+  // Its upper body must remain visible over the short obstacle while its lower
+  // portion remains correctly occluded.
+  game.npcs = [{ x:3.5, y:2.5, kind:'family', helped:false }];
+  game.props = [];
+  game.quota = 0;
+  game.helped = 0; game.delivered = 0;
+  // The active exit is a taller ordinary world sprite beyond the dumpster. It
+  // makes the short-wall occlusion boundary visible in the pilot without
+  // changing collision or the authored District 1 route.
+  game.exit = {x:3.5, y:2.5, active:true};
+  game.timeLeft = 110;
+  dbg.reachableCells = 0;
+  dbg.cansSpawned = 0;
+  dbg.npcsSpawned = game.npcs.length;
+  dbg.props = game.props.length;
+  setMsg('Dumpster Pilot — walk around the 1×2 building.');
 }
 
 function clearInputState(){
@@ -255,4 +339,3 @@ function pickHallThankLine(npc){
   const lines = CUSTOM_LEVELS.hall_of_servants.thankLines;
   return lines[(Math.random()*lines.length)|0];
 }
-

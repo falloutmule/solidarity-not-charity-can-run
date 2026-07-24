@@ -212,6 +212,48 @@
     };
   }
 
+  function resolveBitmapBuildingHeightScale(placement, asset){
+    const candidate = Number(placement && placement.heightScale);
+    const assetScale = Number(asset && asset.heightScale);
+    const scale = Number.isFinite(candidate) ? candidate : (Number.isFinite(assetScale) ? assetScale : 1);
+    return Number.isFinite(scale) && scale > 0 && scale <= 1 ? scale : 1;
+  }
+
+  // Resolve the exact face column without drawing it. Alpha-cutout buildings
+  // need this so the scene renderer can preserve the already-rendered world at
+  // transparent source pixels and write foreground depth only at opaque pixels.
+  function resolveWholeFaceBitmapBuildingColumn(hit, placement){
+    if(!placement || placement.renderMode !== 'importedWholeFaceAsset') return null;
+    try {
+      const asset = lookupBitmapBuildingAsset(placement.assetId);
+      if(!validAssetSchema(asset)) return null;
+      const worldFace = resolveBitmapWorldFace(hit.side, hit.stepX, hit.stepY);
+      const localFace = inverseRotateBitmapFace(worldFace, placement.rotation || 0);
+      const entry = resolveFaceDescriptor(asset, localFace);
+      if(!entry) return null;
+      if(entry.resolved.mirror === true && entry.resolved.mirrorSafe !== true && asset.mirrorSafe !== true) return null;
+      const footprint = placementFootprint(placement, asset);
+      if(!(footprint.width > 0) || !(footprint.depth > 0) || !hit.cell) return null;
+      const local = resolveBitmapLocalHit(hit.cell, localFace, placement.rotation || 0,
+        Number(hit.wallFraction), footprint.width, footprint.depth);
+      if(!Number.isFinite(local.localAlong)) return null;
+      let canonicalU = orientBitmapCanonicalU(localFace, local.localAlong,
+        entry.resolved.sourceUDirection || entry.resolved.sourceLeftToRightWorldDirection);
+      if(entry.resolved.mirror === true) canonicalU = 1 - canonicalU;
+      canonicalU = Math.max(0, Math.min(1 - Number.EPSILON, canonicalU));
+      const face = getBitmapFaceCanvas(asset, localFace);
+      if(!face) return null;
+      return {
+        asset,
+        face,
+        sourceX: Math.max(0, Math.min(face.width - 1, Math.floor(canonicalU * face.width))),
+        localFace
+      };
+    } catch(error){
+      return null;
+    }
+  }
+
   function drawWholeFaceBitmapBuildingColumn(hit, placement){
     if(!placement || placement.renderMode !== 'importedWholeFaceAsset') return false;
     const ctx = hit && hit.ctx;
@@ -221,27 +263,10 @@
     function fail(){ return drawBitmapFailureColumn(ctx, col, drawStart, sliceH); }
 
     try {
-      const asset = lookupBitmapBuildingAsset(placement.assetId);
-      if(!validAssetSchema(asset)) return fail();
-      const worldFace = resolveBitmapWorldFace(hit.side, hit.stepX, hit.stepY);
-      const localFace = inverseRotateBitmapFace(worldFace, placement.rotation || 0);
-      const entry = resolveFaceDescriptor(asset, localFace);
-      if(!entry) return fail();
-      if(entry.resolved.mirror === true && entry.resolved.mirrorSafe !== true && asset.mirrorSafe !== true) return fail();
-      const footprint = placementFootprint(placement, asset);
-      if(!(footprint.width > 0) || !(footprint.depth > 0) || !hit.cell) return fail();
-      const local = resolveBitmapLocalHit(hit.cell, localFace, placement.rotation || 0,
-        Number(hit.wallFraction), footprint.width, footprint.depth);
-      if(!Number.isFinite(local.localAlong)) return fail();
-      let canonicalU = orientBitmapCanonicalU(localFace, local.localAlong,
-        entry.resolved.sourceUDirection || entry.resolved.sourceLeftToRightWorldDirection);
-      if(entry.resolved.mirror === true) canonicalU = 1 - canonicalU;
-      canonicalU = Math.max(0, Math.min(1 - Number.EPSILON, canonicalU));
-      const face = getBitmapFaceCanvas(asset, localFace);
-      if(!face) return fail();
-      const sourceX = Math.max(0, Math.min(face.width - 1, Math.floor(canonicalU * face.width)));
+      const resolved = resolveWholeFaceBitmapBuildingColumn(hit, placement);
+      if(!resolved) return fail();
       try {
-        if(!drawBitmapFaceColumn(ctx, face, sourceX, col, drawStart, sliceH)) return fail();
+        if(!drawBitmapFaceColumn(ctx, resolved.face, resolved.sourceX, col, drawStart, sliceH)) return fail();
       } catch(error){
         return fail();
       }
@@ -256,6 +281,8 @@
   root.inverseRotateBitmapFace = inverseRotateBitmapFace;
   root.resolveBitmapLocalHit = resolveBitmapLocalHit;
   root.orientBitmapCanonicalU = orientBitmapCanonicalU;
+  root.resolveBitmapBuildingHeightScale = resolveBitmapBuildingHeightScale;
+  root.resolveWholeFaceBitmapBuildingColumn = resolveWholeFaceBitmapBuildingColumn;
   root.getBitmapFaceCanvas = getBitmapFaceCanvas;
   root.drawBitmapFaceColumn = drawBitmapFaceColumn;
   root.drawBitmapFailureColumn = drawBitmapFailureColumn;

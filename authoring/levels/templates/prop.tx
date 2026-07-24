@@ -1,0 +1,1 @@
+{ "type": "template", "object": { "name": "prop", "type": "prop", "point": true, "visible": true, "properties": [ { "name": "kind", "type": "string", "value": "bench" } ] } }

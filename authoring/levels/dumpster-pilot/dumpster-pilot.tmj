@@ -1,0 +1,69 @@
+{
+  "compressionlevel": -1,
+  "height": 8,
+  "infinite": false,
+  "layers": [
+    {
+      "data": [
+        2, 2, 2, 2, 2, 2, 2, 2,
+        2, 0, 0, 0, 0, 0, 0, 2,
+        2, 0, 0, 0, 0, 0, 0, 2,
+        2, 0, 0, 1, 0, 0, 0, 2,
+        2, 0, 0, 1, 0, 0, 0, 2,
+        2, 0, 0, 0, 0, 0, 0, 2,
+        2, 0, 0, 0, 0, 0, 0, 2,
+        2, 2, 2, 2, 2, 2, 2, 2
+      ],
+      "height": 8,
+      "id": 1,
+      "name": "Collision",
+      "opacity": 1,
+      "type": "tilelayer",
+      "visible": true,
+      "width": 8,
+      "x": 0,
+      "y": 0
+    },
+    {
+      "draworder": "topdown",
+      "id": 2,
+      "name": "Buildings",
+      "objects": [
+        {
+          "height": 64,
+          "id": 1,
+          "name": "dumpster-pilot",
+          "properties": [
+            { "name": "assetId", "type": "string", "value": "dumpster_001" },
+            { "name": "rotationQ", "type": "int", "value": 0 },
+            { "name": "widthCells", "type": "int", "value": 1 },
+            { "name": "depthCells", "type": "int", "value": 2 },
+            { "name": "heightScale", "type": "float", "value": 0.3 },
+            { "name": "front", "type": "string", "value": "south" }
+          ],
+          "rotation": 0,
+          "type": "building",
+          "visible": true,
+          "width": 32,
+          "x": 96,
+          "y": 96
+        }
+      ],
+      "opacity": 1,
+      "type": "objectgroup",
+      "visible": true,
+      "x": 0,
+      "y": 0
+    }
+  ],
+  "nextlayerid": 3,
+  "nextobjectid": 2,
+  "orientation": "orthogonal",
+  "renderorder": "right-down",
+  "tiledversion": "1.11",
+  "tileheight": 32,
+  "tilewidth": 32,
+  "type": "map",
+  "version": "1.10",
+  "width": 8
+}
