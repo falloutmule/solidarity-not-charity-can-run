@@ -6,6 +6,7 @@
 
   const FACE_DIRS = Object.freeze(['south', 'east', 'north', 'west']);
   const faceCache = new Map();
+  const faceOpaqueRunCache = new WeakMap();
 
   function bitmapRegistry(){
     return root.BITMAP_BUILDING_ASSET_REGISTRY ||
@@ -174,6 +175,37 @@
     return canvas;
   }
 
+  function getBitmapFaceOpaqueRuns(faceCanvas){
+    if(!faceCanvas) return null;
+    if(faceOpaqueRunCache.has(faceCanvas)) return faceOpaqueRunCache.get(faceCanvas);
+    let alpha;
+    try {
+      const context = faceCanvas.getContext('2d', { willReadFrequently:true });
+      if(!context || typeof context.getImageData !== 'function') return null;
+      alpha = context.getImageData(0, 0, faceCanvas.width, faceCanvas.height).data;
+    } catch(error){
+      return null;
+    }
+    const columns = new Array(faceCanvas.width);
+    for(let x = 0; x < faceCanvas.width; x++){
+      const runs = [];
+      let start = -1;
+      for(let y = 0; y < faceCanvas.height; y++){
+        const opaque = alpha[(y * faceCanvas.width + x) * 4 + 3] >= 128;
+        if(opaque && start < 0) start = y;
+        if(!opaque && start >= 0){
+          runs.push(Object.freeze({ start, end:y }));
+          start = -1;
+        }
+      }
+      if(start >= 0) runs.push(Object.freeze({ start, end:faceCanvas.height }));
+      columns[x] = Object.freeze(runs);
+    }
+    const cached = Object.freeze(columns);
+    faceOpaqueRunCache.set(faceCanvas, cached);
+    return cached;
+  }
+
   function drawBitmapFaceColumn(ctx, faceCanvas, sourceX, col, drawStart, sliceH){
     if(!ctx || !faceCanvas || sliceH < 1) return false;
     const sx = Math.max(0, Math.min(faceCanvas.width - 1, Math.floor(sourceX)));
@@ -243,10 +275,14 @@
       canonicalU = Math.max(0, Math.min(1 - Number.EPSILON, canonicalU));
       const face = getBitmapFaceCanvas(asset, localFace);
       if(!face) return null;
+      const sourceX = Math.max(0, Math.min(face.width - 1, Math.floor(canonicalU * face.width)));
+      const opaqueRuns = asset.alphaCutout === true ? getBitmapFaceOpaqueRuns(face) : null;
+      if(asset.alphaCutout === true && !opaqueRuns) return null;
       return {
         asset,
         face,
-        sourceX: Math.max(0, Math.min(face.width - 1, Math.floor(canonicalU * face.width))),
+        sourceX,
+        opaqueRuns: opaqueRuns ? opaqueRuns[sourceX] : null,
         localFace
       };
     } catch(error){
@@ -284,6 +320,7 @@
   root.resolveBitmapBuildingHeightScale = resolveBitmapBuildingHeightScale;
   root.resolveWholeFaceBitmapBuildingColumn = resolveWholeFaceBitmapBuildingColumn;
   root.getBitmapFaceCanvas = getBitmapFaceCanvas;
+  root.getBitmapFaceOpaqueRuns = getBitmapFaceOpaqueRuns;
   root.drawBitmapFaceColumn = drawBitmapFaceColumn;
   root.drawBitmapFailureColumn = drawBitmapFailureColumn;
   root.drawWholeFaceBitmapBuildingColumn = drawWholeFaceBitmapBuildingColumn;

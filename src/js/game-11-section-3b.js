@@ -181,6 +181,8 @@ function genDumpsterPilot(){
   }
 
   const cutoutProofView = typeof location !== 'undefined' ? new URLSearchParams(location.search || '').get('cutoutview') : null;
+  const cutoutProofEnabled = typeof location !== 'undefined' && new URLSearchParams(location.search || '').get('cutoutproof') === '1';
+  const cutoutProofWorldContent = cutoutProofEnabled && new URLSearchParams(location.search || '').get('cutoutnosprites') !== '1';
   const proofPoses = {
     front: { x:3.5, y:6.5, angle:-Math.PI / 2 },
     side: { x:1.5, y:4.0, angle:0 },
@@ -194,14 +196,14 @@ function genDumpsterPilot(){
   // This NPC is beyond the dumpster from the initial north-facing player pose.
   // Its upper body must remain visible over the short obstacle while its lower
   // portion remains correctly occluded.
-  game.npcs = [{ x:3.5, y:2.5, kind:'family', helped:false }];
+  game.npcs = cutoutProofWorldContent ? [{ x:3.5, y:2.5, kind:'family', helped:false }] : [];
   game.props = [];
   game.quota = 0;
   game.helped = 0; game.delivered = 0;
   // The active exit is a taller ordinary world sprite beyond the dumpster. It
   // makes the short-wall occlusion boundary visible in the pilot without
   // changing collision or the authored District 1 route.
-  game.exit = {x:3.5, y:2.5, active:true};
+  game.exit = cutoutProofWorldContent ? {x:3.5, y:2.5, active:true} : {x:6.5, y:1.5, active:false};
   game.timeLeft = 110;
   dbg.reachableCells = 0;
   dbg.cansSpawned = 0;

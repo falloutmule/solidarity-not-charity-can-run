@@ -17,6 +17,8 @@ const sandbox = {
   game,
   player: {},
   dbg: {},
+  location: { search: '?cutoutproof=1' },
+  URLSearchParams,
   setMsg: (message) => messages.push(message),
   crClearBuildingModules: (width, height) => {
     game.buildingRegistry = {};

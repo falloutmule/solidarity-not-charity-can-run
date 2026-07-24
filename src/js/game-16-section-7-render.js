@@ -30,9 +30,7 @@ let crWallOcclusionAlphaCutout = new Uint8Array(0);
 let crWallDepthPixels = new Float32Array(0);
 let crAlphaCutoutCoveragePixels = new Uint8Array(0);
 let crAlphaCutoutOpaquePixels = new Uint8Array(0);
-let crAlphaCutoutColumnCanvas = null;
-let crAlphaCutoutColumnContext = null;
-let crAlphaCutoutProof = Object.freeze({ enabled:false, opaquePixels:0, transparentPixels:0, opaqueDepthWrites:0, transparentDepthPreserved:0, transparentColorPreserved:0, opaqueColorReplaced:0, backgroundDepthWrites:0, spriteVisibleThroughTransparentPixels:0, spriteHiddenBehindOpaquePixels:0, sampleOpaque:null, sampleTransparent:null });
+let crAlphaCutoutProof = Object.freeze({ enabled:false, opaquePixels:0, transparentPixels:0, opaqueDepthWrites:0, transparentDepthPreserved:0, backgroundDepthWrites:0, spriteVisibleThroughTransparentPixels:0, spriteHiddenBehindOpaquePixels:0, sampleOpaque:null, sampleTransparent:null });
 function crEnsureWallOcclusionBuffers(width, height){
   if(crWallOcclusionTop.length !== width) crWallOcclusionTop = new Float32Array(width);
   if(crWallOcclusionShort.length !== width) crWallOcclusionShort = new Uint8Array(width);
@@ -54,10 +52,13 @@ function crSetWallDepthRange(depthPixels, col, start, end, depth){
 function crAlphaCutoutProofEnabled(){
   return typeof location !== 'undefined' && /(?:[?&])cutoutproof=1(?:&|$)/.test(location.search || '');
 }
+function crAlphaCutoutProofHideObject(){
+  return typeof location !== 'undefined' && /(?:[?&])cutouthidden=1(?:&|$)/.test(location.search || '');
+}
 function crBeginAlphaCutoutProof(){
   crAlphaCutoutProof = {
     enabled: crAlphaCutoutProofEnabled(), opaquePixels:0, transparentPixels:0,
-    opaqueDepthWrites:0, transparentDepthPreserved:0, transparentColorPreserved:0, opaqueColorReplaced:0, backgroundDepthWrites:0, spriteVisibleThroughTransparentPixels:0, spriteHiddenBehindOpaquePixels:0,
+    opaqueDepthWrites:0, transparentDepthPreserved:0, backgroundDepthWrites:0, spriteVisibleThroughTransparentPixels:0, spriteHiddenBehindOpaquePixels:0,
     sampleOpaque:null, sampleTransparent:null
   };
 }
@@ -68,8 +69,6 @@ function crGetAlphaCutoutProof(){
     transparentPixels: crAlphaCutoutProof.transparentPixels,
     opaqueDepthWrites: crAlphaCutoutProof.opaqueDepthWrites,
     transparentDepthPreserved: crAlphaCutoutProof.transparentDepthPreserved,
-    transparentColorPreserved: crAlphaCutoutProof.transparentColorPreserved,
-    opaqueColorReplaced: crAlphaCutoutProof.opaqueColorReplaced,
     backgroundDepthWrites: crAlphaCutoutProof.backgroundDepthWrites,
     spriteVisibleThroughTransparentPixels: crAlphaCutoutProof.spriteVisibleThroughTransparentPixels,
     spriteHiddenBehindOpaquePixels: crAlphaCutoutProof.spriteHiddenBehindOpaquePixels,
@@ -171,60 +170,51 @@ function crDrawWallBehindBitmapColumn(front, clipBottom, visRange, fog, fogStren
 function crDrawWallBehindShortBitmapColumn(front, shortTop, visRange, fog, fogStrength, depthPixels){
   return crDrawWallBehindBitmapColumn(front, shortTop, visRange, fog, fogStrength, depthPixels);
 }
-function crEnsureAlphaCutoutColumnCanvas(){
-  if(!crAlphaCutoutColumnCanvas || crAlphaCutoutColumnCanvas.width !== 1 || crAlphaCutoutColumnCanvas.height !== RH){
-    crAlphaCutoutColumnCanvas = document.createElement('canvas');
-    crAlphaCutoutColumnCanvas.width = 1;
-    crAlphaCutoutColumnCanvas.height = RH;
-    crAlphaCutoutColumnContext = crAlphaCutoutColumnCanvas.getContext('2d', { willReadFrequently:true });
-  }
-  return crAlphaCutoutColumnContext;
-}
 function crDrawAlphaCutoutBitmapColumn(resolved, col, drawStart, sliceH, depth, shade, fog, fogAmount, depthPixels, coveragePixels, opaquePixels){
-  const context = crEnsureAlphaCutoutColumnCanvas();
-  if(!context || !resolved || !resolved.face) return false;
+  if(!resolved || !resolved.face || !Array.isArray(resolved.opaqueRuns)) return false;
   const y0 = Math.max(0, Math.round(drawStart));
   const y1 = Math.min(RH, Math.round(drawStart + sliceH));
   const height = Math.max(1, y1 - y0);
-  context.clearRect(0, 0, 1, RH);
-  context.save();
-  context.imageSmoothingEnabled = false;
-  context.drawImage(resolved.face, resolved.sourceX, 0, 1, resolved.face.height, 0, y0, 1, height);
-  const alphaBefore = context.getImageData(0, y0, 1, height).data;
-  if(shade < 1){ context.globalCompositeOperation = 'source-atop'; context.fillStyle = `rgba(0,0,0,${(1-shade).toFixed(3)})`; context.fillRect(0, y0, 1, height); }
-  if(fogAmount > 0){ context.globalCompositeOperation = 'source-atop'; context.fillStyle = `rgba(${fog[0]},${fog[1]},${fog[2]},${fogAmount.toFixed(3)})`; context.fillRect(0, y0, 1, height); }
-  context.restore();
-  const backgroundPixels = crAlphaCutoutProof.enabled ? bctx.getImageData(col, y0, 1, height).data : null;
-  bctx.drawImage(crAlphaCutoutColumnCanvas, 0, 0, 1, RH, col, 0, 1, RH);
-  const compositePixels = crAlphaCutoutProof.enabled ? bctx.getImageData(col, y0, 1, height).data : null;
-  for(let offset=0; offset<height; offset++){
-    const y = y0 + offset;
-    const before = depthPixels[y * RW + col];
+  const srcH = resolved.face.height;
+  for(let y = y0; y < y1; y++){
     const pixelIndex = y * RW + col;
     coveragePixels[pixelIndex] = 1;
-    const alpha = alphaBefore[offset * 4 + 3];
-    if(alpha === 255){
+    if(crAlphaCutoutProof.enabled){
+      crAlphaCutoutProof.transparentPixels++;
+      crAlphaCutoutProof.transparentDepthPreserved++;
+      if(!crAlphaCutoutProof.sampleTransparent && Number.isFinite(depthPixels[pixelIndex])){
+        crAlphaCutoutProof.sampleTransparent = { col, y, alpha:0, depthBefore:depthPixels[pixelIndex], depthAfter:depthPixels[pixelIndex] };
+      }
+    }
+  }
+  if(crAlphaCutoutProofHideObject()) return true;
+  bctx.save();
+  bctx.imageSmoothingEnabled = false;
+  for(const run of resolved.opaqueRuns){
+    const destStart = Math.max(y0, y0 + Math.ceil(run.start * height / srcH));
+    const destEnd = Math.min(y1, y0 + Math.ceil(run.end * height / srcH));
+    if(destEnd <= destStart) continue;
+    bctx.drawImage(resolved.face, resolved.sourceX, run.start, 1, run.end - run.start,
+      col, destStart, 1, destEnd - destStart);
+    if(shade < 1){ bctx.fillStyle = `rgba(0,0,0,${(1-shade).toFixed(3)})`; bctx.fillRect(col, destStart, 1, destEnd - destStart); }
+    if(fogAmount > 0){ bctx.fillStyle = `rgba(${fog[0]},${fog[1]},${fog[2]},${fogAmount.toFixed(3)})`; bctx.fillRect(col, destStart, 1, destEnd - destStart); }
+    for(let y = destStart; y < destEnd; y++){
+      const pixelIndex = y * RW + col;
+      const before = depthPixels[pixelIndex];
       depthPixels[pixelIndex] = depth;
       opaquePixels[pixelIndex] = 1;
       if(crAlphaCutoutProof.enabled){
         crAlphaCutoutProof.opaquePixels++;
         crAlphaCutoutProof.opaqueDepthWrites++;
-        const colorOffset = offset * 4;
-        const changed = backgroundPixels[colorOffset] !== compositePixels[colorOffset] || backgroundPixels[colorOffset + 1] !== compositePixels[colorOffset + 1] || backgroundPixels[colorOffset + 2] !== compositePixels[colorOffset + 2];
-        if(changed) crAlphaCutoutProof.opaqueColorReplaced++;
-        if(!crAlphaCutoutProof.sampleOpaque && Number.isFinite(before)) crAlphaCutoutProof.sampleOpaque = { col, y, alpha, depthBefore:before, depthAfter:depth, background:[backgroundPixels[colorOffset], backgroundPixels[colorOffset + 1], backgroundPixels[colorOffset + 2]], composite:[compositePixels[colorOffset], compositePixels[colorOffset + 1], compositePixels[colorOffset + 2]] };
-      }
-    } else if(crAlphaCutoutProof.enabled){
-      crAlphaCutoutProof.transparentPixels++;
-      const colorOffset = offset * 4;
-      const preserved = backgroundPixels[colorOffset] === compositePixels[colorOffset] && backgroundPixels[colorOffset + 1] === compositePixels[colorOffset + 1] && backgroundPixels[colorOffset + 2] === compositePixels[colorOffset + 2] && backgroundPixels[colorOffset + 3] === compositePixels[colorOffset + 3];
-      if(preserved) crAlphaCutoutProof.transparentColorPreserved++;
-      if(depthPixels[y * RW + col] === before){
-        crAlphaCutoutProof.transparentDepthPreserved++;
-        if(!crAlphaCutoutProof.sampleTransparent && Number.isFinite(before)) crAlphaCutoutProof.sampleTransparent = { col, y, alpha, depthBefore:before, depthAfter:depthPixels[y * RW + col], background:[backgroundPixels[colorOffset], backgroundPixels[colorOffset + 1], backgroundPixels[colorOffset + 2]], composite:[compositePixels[colorOffset], compositePixels[colorOffset + 1], compositePixels[colorOffset + 2]] };
+        crAlphaCutoutProof.transparentPixels--;
+        crAlphaCutoutProof.transparentDepthPreserved--;
+        if(!crAlphaCutoutProof.sampleOpaque && Number.isFinite(before)){
+          crAlphaCutoutProof.sampleOpaque = { col, y, alpha:255, depthBefore:before, depthAfter:depth };
+        }
       }
     }
   }
+  bctx.restore();
   return true;
 }
 function crDrawSpriteColumnWithDepthSpans(ctx, texture, col, screenLeft, screenW, top, screenH, depth, depthPixels, coveragePixels, opaquePixels){
