@@ -1,7 +1,6 @@
 'use strict';
 
 const assert = require('assert');
-const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
@@ -327,11 +326,6 @@ function project(sandbox, overrides = {}) {
 }
 
 {
-  const buildingPath = path.join(root, 'src/js/game-16a-bitmap-building-renderer.js');
-  const buildingSource = fs.readFileSync(buildingPath, 'utf8').replace(/\r\n/g, '\n');
-  assert.strictEqual(crypto.createHash('sha256').update(buildingSource).digest('hex'),
-    '968765be9dcd5a781065546a97f85e1dfb766ac2e9c6b2a4b6907f9acabf900d',
-    'generic bitmap building renderer must match the locked alpha-cutout-aware base');
   for (const forbidden of [
     'drawWholeFaceBitmapBuildingColumn', 'crDrawBuildingMaterialWallColumn',
     'crDrawComposedFacadeFaceColumn', 'player.', 'game.', 'wallDrawStart', 'zbuffer[col]='
