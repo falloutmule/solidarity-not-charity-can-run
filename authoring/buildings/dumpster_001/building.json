@@ -8,5 +8,7 @@
     "depthCells": 2
   },
   "heightScale": 0.3,
+  "alphaCutout": true,
+  "topCap": "none",
   "face": "source/face.png"
 }

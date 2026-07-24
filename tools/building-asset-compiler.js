@@ -58,10 +58,12 @@ function loadSource(buildingDir) {
     assert(Number.isFinite(source.heightScale) && source.heightScale > 0 && source.heightScale <= 1,
       'heightScale must be a finite number greater than 0 and at most 1');
   }
+  if (Object.prototype.hasOwnProperty.call(source, 'alphaCutout')) assert(typeof source.alphaCutout === 'boolean', 'alphaCutout must be Boolean');
+  if (Object.prototype.hasOwnProperty.call(source, 'topCap')) assert(['none', 'solid', 'masked/asset'].includes(source.topCap), 'topCap must be none, solid, or masked/asset');
   const reusableMode = typeof source.face === 'string';
   assert(reusableMode || (source.faces && typeof source.faces === 'object'), 'building.json requires face or faces');
   if (!reusableMode) for (const name of ['front', 'side', 'back']) assert(typeof source.faces[name] === 'string', `faces.${name} is required`);
-  const allowed = new Set(['schema', 'id', 'displayName', 'category', 'notes', 'footprint', 'heightScale', 'face', 'faces']);
+  const allowed = new Set(['schema', 'id', 'displayName', 'category', 'notes', 'footprint', 'heightScale', 'alphaCutout', 'topCap', 'face', 'faces']);
   for (const key of Object.keys(source)) assert(allowed.has(key), `unknown building.json property: ${key}`);
   const sourceInputs = {};
   const faceFiles = {};
@@ -156,6 +158,8 @@ function compileBuilding(buildingDir) {
     approvalStatus: 'unreviewed',
     footprint: { wCells: source.footprint.widthCells, hCells: source.footprint.depthCells },
     heightScale: Number.isFinite(source.heightScale) ? source.heightScale : 1,
+    alphaCutout: source.alphaCutout === true,
+    topCap: source.topCap || 'none',
     atlas: {
       fileName: `${id}.atlas.png`, mime: 'image/png', encoding: 'data-uri', width: atlas.width, height: atlas.height,
       byteLength: atlas.bytes.length, sha256: sha256(atlas.bytes), dataUri: `data:image/png;base64,${atlas.bytes.toString('base64')}`

@@ -157,13 +157,15 @@ function genDumpsterPilot(){
   crClearBuildingModules(GW, GH);
 
   const x0 = 3, y0 = 3, bid = game._nextBuildingId++;
+  const cutoutProofRotation = typeof location !== 'undefined' ? Number(new URLSearchParams(location.search || '').get('cutoutrotation')) : 0;
+  const rotation = Number.isInteger(cutoutProofRotation) && cutoutProofRotation >= 0 && cutoutProofRotation <= 3 ? cutoutProofRotation : 0;
   game.buildingRegistry[bid] = {
     bid,
     id: 'dumpster-pilot',
     assetId: asset.id,
     renderMode: 'importedWholeFaceAsset',
     x: x0, y: y0, x0, y0,
-    rotation: 0,
+    rotation,
     heightScale,
     widthCells, depthCells,
     w: widthCells, h: depthCells,
@@ -178,7 +180,16 @@ function genDumpsterPilot(){
     }
   }
 
-  player.x = 3.5; player.y = 6.5; player.angle = -Math.PI / 2;
+  const cutoutProofView = typeof location !== 'undefined' ? new URLSearchParams(location.search || '').get('cutoutview') : null;
+  const proofPoses = {
+    front: { x:3.5, y:6.5, angle:-Math.PI / 2 },
+    side: { x:1.5, y:4.0, angle:0 },
+    oblique: { x:1.5, y:6.2, angle:-0.62 },
+    near: { x:3.5, y:5.7, angle:-Math.PI / 2 },
+    far: { x:3.5, y:6.5, angle:-Math.PI / 2 }
+  };
+  const pose = proofPoses[cutoutProofView] || proofPoses.front;
+  player.x = pose.x; player.y = pose.y; player.angle = pose.angle;
   game.pickups = [];
   // This NPC is beyond the dumpster from the initial north-facing player pose.
   // Its upper body must remain visible over the short obstacle while its lower

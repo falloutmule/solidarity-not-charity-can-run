@@ -23,7 +23,7 @@ The primary manifest is:
 
 The compiler derives front/back and side atlas slices from that one PNG. The west face reuses east without mirroring. Optional directional overrides may be added later under `faces`.
 
-`heightScale` is optional and defaults to `1`. For low objects such as `dumpster_001`, set it to `0.3` and supply a tightly cropped binary cutout: transparent outside the silhouette, fully opaque on the body and lid, with no semi-transparent pixels. The renderer anchors the short face at the wall-floor position and draws an opaque top cap.
+`heightScale` is optional and defaults to `1`. For a short cutout object such as `dumpster_001`, set `heightScale` to `0.3`, `alphaCutout` to `true`, and use a tightly cropped binary silhouette: transparent outside the object and fully opaque on its body and lid. The raycaster renders the background first, then writes the cutout and foreground depth only at opaque pixels. `topCap` is explicit: `none`, `solid`, or `masked/asset`; the dumpster uses `none` and never receives a generic full-footprint cap.
 
 Short imported buildings still occupy their full grid footprint for collision. Their renderer tracks the real top edge, so sprites behind a short building can remain visible above it while full-height buildings keep their existing occlusion behavior.
 

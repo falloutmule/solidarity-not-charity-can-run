@@ -5,14 +5,14 @@
     "name": "Solidarity Not Charity Can Run"
   },
   "runtime": {
-    "buildId": "dumpstercutout1",
+    "buildId": "dumpstercutout2",
     "sourcePolicy": "build-manifest",
     "releaseArtifact": "index.html"
   },
   "artifact": {
     "path": "index.html",
-    "byteLength": 1242609,
-    "sha256": "35b58835fb201151ca1a41ffe526677e090cb455cc44032782f708c7b822a617"
+    "byteLength": 1255545,
+    "sha256": "c33a7619adacd98618691e43b797f12e9eb992bc652bba34c869b8aeb23d7536"
   },
   "distribution": {
     "provider": "github-pages",

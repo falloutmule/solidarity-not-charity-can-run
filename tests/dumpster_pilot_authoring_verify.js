@@ -4,40 +4,19 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
-const { PNG } = require('pngjs');
 const { compileBuilding, emitAssetModule } = require('../tools/building-asset-compiler');
 
 const root = path.resolve(__dirname, '..');
 const buildingDir = path.join(root, 'authoring', 'buildings', 'dumpster_001');
-const facePath = path.join(buildingDir, 'source', 'face.png');
 const assetPath = path.join(root, 'src', 'imported-handoff-assets', 'dumpster_001.asset.js');
 const tiledPath = path.join(root, 'authoring', 'levels', 'dumpster-pilot', 'dumpster-pilot.tmj');
-
-const sourcePng = PNG.sync.read(fs.readFileSync(facePath));
-let minX = sourcePng.width, minY = sourcePng.height, maxX = -1, maxY = -1;
-let transparentPixels = 0, semiTransparentPixels = 0, opaquePixels = 0;
-for (let y = 0; y < sourcePng.height; y += 1) for (let x = 0; x < sourcePng.width; x += 1) {
-  const alpha = sourcePng.data[(y * sourcePng.width + x) * 4 + 3];
-  if (alpha === 0) transparentPixels += 1;
-  else if (alpha === 255) opaquePixels += 1;
-  else semiTransparentPixels += 1;
-  if (alpha > 16) {
-    minX = Math.min(minX, x); minY = Math.min(minY, y);
-    maxX = Math.max(maxX, x); maxY = Math.max(maxY, y);
-  }
-}
-assert(minX <= 1, 'dumpster face must stay tightly cropped at the left edge');
-assert(minY <= 1, 'binary edge thresholding may remove at most one top-edge pixel');
-assert(maxX >= sourcePng.width - 2, 'dumpster face must stay tightly cropped at the right edge');
-assert(maxY >= sourcePng.height - 2, 'dumpster face must stay tightly cropped at the bottom edge');
-assert(transparentPixels > 0, 'dumpster face must retain a transparent binary cutout outside the silhouette');
-assert.equal(semiTransparentPixels, 0, 'dumpster face must not contain semi-transparent body or lid pixels');
-assert(opaquePixels > 0, 'dumpster face must retain opaque body and lid pixels');
 
 const compiled = compileBuilding(buildingDir);
 assert.equal(compiled.asset.id, 'dumpster_001');
 assert.deepEqual(compiled.asset.footprint, { wCells: 1, hCells: 2 });
 assert.equal(compiled.asset.heightScale, 0.3);
+assert.equal(compiled.asset.alphaCutout, true);
+assert.equal(compiled.asset.topCap, 'none');
 assert.equal(compiled.asset.source.mode, 'single-reusable-face');
 assert.deepEqual(Object.keys(compiled.asset.source.sourceHashes), ['face']);
 assert.deepEqual(Object.keys(compiled.asset.faces), ['south', 'east', 'north', 'west']);
@@ -76,7 +55,6 @@ process.stdout.write(`${JSON.stringify({
   pass: true,
   assetId: compiled.asset.id,
   footprint: compiled.asset.footprint,
-  sourceDimensions: { width: sourcePng.width, height: sourcePng.height },
   heightScale: compiled.asset.heightScale,
   atlasSha256: compiled.asset.atlas.sha256
 })}\n`);

@@ -330,8 +330,8 @@ function project(sandbox, overrides = {}) {
   const buildingPath = path.join(root, 'src/js/game-16a-bitmap-building-renderer.js');
   const buildingSource = fs.readFileSync(buildingPath, 'utf8').replace(/\r\n/g, '\n');
   assert.strictEqual(crypto.createHash('sha256').update(buildingSource).digest('hex'),
-    '8330f6ddbe6e21b56efcc13e7adb348c4ff85945a70798a707d48f6fc547fcbb',
-    'generic bitmap building renderer must match the locked height-scale-aware base');
+    '968765be9dcd5a781065546a97f85e1dfb766ac2e9c6b2a4b6907f9acabf900d',
+    'generic bitmap building renderer must match the locked alpha-cutout-aware base');
   for (const forbidden of [
     'drawWholeFaceBitmapBuildingColumn', 'crDrawBuildingMaterialWallColumn',
     'crDrawComposedFacadeFaceColumn', 'player.', 'game.', 'wallDrawStart', 'zbuffer[col]='
