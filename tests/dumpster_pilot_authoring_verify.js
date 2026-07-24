@@ -15,8 +15,11 @@ const tiledPath = path.join(root, 'authoring', 'levels', 'dumpster-pilot', 'dump
 
 const sourcePng = PNG.sync.read(fs.readFileSync(facePath));
 let minX = sourcePng.width, minY = sourcePng.height, maxX = -1, maxY = -1;
+let nonOpaquePixels = 0;
 for (let y = 0; y < sourcePng.height; y += 1) for (let x = 0; x < sourcePng.width; x += 1) {
-  if (sourcePng.data[(y * sourcePng.width + x) * 4 + 3] > 16) {
+  const alpha = sourcePng.data[(y * sourcePng.width + x) * 4 + 3];
+  if (alpha !== 255) nonOpaquePixels += 1;
+  if (alpha > 16) {
     minX = Math.min(minX, x); minY = Math.min(minY, y);
     maxX = Math.max(maxX, x); maxY = Math.max(maxY, y);
   }
@@ -25,6 +28,7 @@ assert.equal(minX, 0, 'dumpster face must be tightly cropped at the left edge');
 assert.equal(minY, 0, 'dumpster face must be tightly cropped at the top edge');
 assert.equal(maxX, sourcePng.width - 1, 'dumpster face must be tightly cropped at the right edge');
 assert.equal(maxY, sourcePng.height - 1, 'dumpster face must be tightly cropped at the bottom edge');
+assert.equal(nonOpaquePixels, 0, 'dumpster face must be fully opaque; short geometry provides its height');
 
 const compiled = compileBuilding(buildingDir);
 assert.equal(compiled.asset.id, 'dumpster_001');
