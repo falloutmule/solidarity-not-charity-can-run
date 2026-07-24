@@ -7,6 +7,6 @@
     "widthCells": 1,
     "depthCells": 2
   },
-  "heightScale": 0.5,
+  "heightScale": 0.3,
   "face": "source/face.png"
 }

@@ -33,7 +33,7 @@ assert.equal(nonOpaquePixels, 0, 'dumpster face must be fully opaque; short geom
 const compiled = compileBuilding(buildingDir);
 assert.equal(compiled.asset.id, 'dumpster_001');
 assert.deepEqual(compiled.asset.footprint, { wCells: 1, hCells: 2 });
-assert.equal(compiled.asset.heightScale, 0.5);
+assert.equal(compiled.asset.heightScale, 0.3);
 assert.equal(compiled.asset.source.mode, 'single-reusable-face');
 assert.deepEqual(Object.keys(compiled.asset.source.sourceHashes), ['face']);
 assert.deepEqual(Object.keys(compiled.asset.faces), ['south', 'east', 'north', 'west']);
@@ -63,7 +63,7 @@ const property = (name) => object.properties.find((entry) => entry.name === name
 assert.equal(property('assetId'), 'dumpster_001');
 assert.equal(property('widthCells'), 1);
 assert.equal(property('depthCells'), 2);
-assert.equal(property('heightScale'), 0.5);
+assert.equal(property('heightScale'), 0.3);
 assert.equal(object.width, 32);
 assert.equal(object.height, 64);
 assert.equal(collision.data.filter((value) => value === 1).length, 2);

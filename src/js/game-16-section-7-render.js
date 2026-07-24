@@ -31,6 +31,44 @@ function crEnsureWallOcclusionBuffers(width){
   if(crWallOcclusionShort.length !== width) crWallOcclusionShort = new Uint8Array(width);
   return {top:crWallOcclusionTop, short:crWallOcclusionShort};
 }
+function crProjectShortBitmapTopPoint(wx, wy, heightScale, px, py, dirX, dirY, planeX, planeY){
+  const relX = wx - px, relY = wy - py;
+  const invDet = 1 / (planeX * dirY - dirX * planeY);
+  const depth = invDet * (-planeY * relX + planeX * relY);
+  if(depth <= 0.12) return null;
+  const screen = invDet * (dirY * relX - dirX * relY);
+  const metrics = crWallProjectionMetrics(depth, CR_BUILDING_FPV_MASS);
+  return { x: RW * 0.5 * (1 + screen / depth), y: metrics.floorBottomY - metrics.massLineH * heightScale };
+}
+function crDrawShortBitmapTopCaps(px, py, dirX, dirY, planeX, planeY){
+  const registry = game.buildingRegistry;
+  if(!registry || typeof resolveBitmapBuildingHeightScale !== 'function') return;
+  for(const bid in registry){
+    const reg = registry[bid];
+    if(!reg || reg.renderMode !== 'importedWholeFaceAsset') continue;
+    const asset = typeof lookupBitmapBuildingAsset === 'function' ? lookupBitmapBuildingAsset(reg.assetId) : null;
+    const heightScale = resolveBitmapBuildingHeightScale(reg, asset);
+    if(heightScale >= 1) continue;
+    const x0 = Number.isFinite(reg.x0) ? reg.x0 : reg.x;
+    const y0 = Number.isFinite(reg.y0) ? reg.y0 : reg.y;
+    const width = Math.max(1, Number(reg.widthCells || reg.w || (reg.footprint && reg.footprint.w) || 1));
+    const depth = Math.max(1, Number(reg.depthCells || reg.h || (reg.footprint && reg.footprint.h) || 1));
+    if(!Number.isFinite(x0) || !Number.isFinite(y0)) continue;
+    const points = [
+      crProjectShortBitmapTopPoint(x0, y0, heightScale, px, py, dirX, dirY, planeX, planeY),
+      crProjectShortBitmapTopPoint(x0 + width, y0, heightScale, px, py, dirX, dirY, planeX, planeY),
+      crProjectShortBitmapTopPoint(x0 + width, y0 + depth, heightScale, px, py, dirX, dirY, planeX, planeY),
+      crProjectShortBitmapTopPoint(x0, y0 + depth, heightScale, px, py, dirX, dirY, planeX, planeY)
+    ];
+    if(points.some((point) => !point)) continue;
+    bctx.fillStyle = '#223529';
+    bctx.beginPath();
+    bctx.moveTo(points[0].x, points[0].y);
+    for(let index = 1; index < points.length; index++) bctx.lineTo(points[index].x, points[index].y);
+    bctx.closePath();
+    bctx.fill();
+  }
+}
 
 // Whole-face prefab render: sample one generated/imported face bitmap by
 // faceU across the FULL building width (not per-cell). Falls back to the
@@ -115,6 +153,7 @@ function drawScene(now, renderPose){
   const fog = game.modifier==='rainy'?[40,48,60] : [196,168,128]; // dusty warm fog / cool rainy
   const fogStrength = game.modifier==='rainy'?0.9:0.78;
   const wallOcclusion = crEnsureWallOcclusionBuffers(RW);
+  crDrawShortBitmapTopCaps(px, py, dirX, dirY, planeX, planeY);
 
   // ---- WALLS (DDA, textured) -> fills zbuffer per column (occlusion source of truth) ----
   for(let col=0; col<RW; col++){

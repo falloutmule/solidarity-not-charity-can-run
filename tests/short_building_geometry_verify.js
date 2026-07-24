@@ -17,6 +17,10 @@ assert(sceneSource.includes('const renderDrawStart = bitmapHeightScale < 1 ? dra
   'short bitmap geometry must anchor its bottom at the existing wall floor');
 assert(sceneSource.includes('wallOcclusion.short[col] = bitmapHeightScale < 1 ? 1 : 0;'),
   'wall rendering must record which columns have short vertical occlusion');
+assert(sceneSource.includes('function crDrawShortBitmapTopCaps('),
+  'short bitmap geometry must draw an opaque top cap rather than exposing the sky through the obstacle');
+assert(sceneSource.includes("bctx.fillStyle = '#223529';"),
+  'short bitmap top caps must be opaque');
 assert(sceneSource.includes('const visibleBottom = spriteBehindWall ? Math.min(top + screenH, wallOcclusion.top[col]) : top + screenH;'),
   'sprites behind a short obstacle must be clipped only below its top edge');
 assert(sceneSource.includes('!hasShortOcclusion && farFieldProjection'),
