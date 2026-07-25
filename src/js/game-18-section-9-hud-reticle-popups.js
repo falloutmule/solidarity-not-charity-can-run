@@ -171,6 +171,7 @@ function drawHUD(now){
   if(mobileMode && isMobilePortrait()){
     drawPortraitStatsPanel();
     drawPortraitFpvOverlay(now);
+    crDrawAssetGalleryOverlay();
     return;
   }
   const hudX = 8;
@@ -271,6 +272,7 @@ function drawHUD(now){
     ];
     for(let i=0;i<d.length;i++) ctx.fillText(d[i], innerWidth-380, 13+i*16);
   }
+  crDrawAssetGalleryOverlay();
 }
 
 function crFacadeDebugHudLineSelfCheck(){
@@ -296,4 +298,3 @@ function crFacadeDebugHudLineSelfCheck(){
     lines.some(s => s.includes('blankCells:'));
   return { pass, lines, lineCount: lines.length };
 }
-

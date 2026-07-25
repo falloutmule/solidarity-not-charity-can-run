@@ -6,6 +6,12 @@ function getDebugState(){
     state, paused, mobileMode, mobileInputActive:mobileInputActive(), mobileAuto:isMobile(),
     customLevel: game.run && game.run.customLevel || null,
     levelType: game.run && game.run.customLevel ? 'custom' : 'procedural',
+    assetGallery: game.assetGallery ? {
+      active: game.assetGallery.active === true,
+      levelId: game.assetGallery.levelId || null,
+      exhibitCount: Array.isArray(game.assetGallery.exhibits) ? game.assetGallery.exhibits.length : 0,
+      focusId: game.assetGallery.focus ? game.assetGallery.focus.id : null
+    } : null,
     MAP_W: game.MAP_W, MAP_H: game.MAP_H,
     mapAspect: game.MAP_W && game.MAP_H ? +(game.MAP_W / game.MAP_H).toFixed(3) : null,
     seed:game.seed, district:game.district, score:game.totalScore,

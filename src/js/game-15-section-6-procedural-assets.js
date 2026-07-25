@@ -1156,7 +1156,7 @@ function crDebugSpriteProjection(){
     const p = crProjectBillboardSprite(obj, tex, hp, depth, hscr, performance.now());
     samples.push(Object.assign({ kind: label, depth: +depth.toFixed(3) }, p));
   }
-  for(const n of game.npcs){ if(!n.helped) sampleObj(n, npcSpriteTex(n.kind), HEIGHT[n.kind] || HEIGHT.hungry, 'npc:' + n.kind); }
+  for(const n of game.npcs){ if(!n.helped) sampleObj(n, npcSpriteTex(n.kind, n), npcSpriteHeight(n), 'npc:' + n.kind); }
   for(const c of game.pickups){ if(!c.taken) sampleObj(c, TEX.can, HEIGHT.can, 'can'); }
   for(const pr of game.props){ sampleObj(pr, propTex(pr.kind, pr), HEIGHT[pr.kind] || 0.5, 'prop:' + pr.kind); }
   if(game.exit && game.exit.active) sampleObj(game.exit, TEX.exit, HEIGHT.exit, 'exit');

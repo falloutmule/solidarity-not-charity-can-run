@@ -1,0 +1,104 @@
+{
+  "schema": "snc-asset-palette-v1",
+  "generatedFrom": "authoring/characters/character-isolation-v1.json",
+  "assets": [
+    {
+      "assetId": "npc_civilian_backpack_youth_001",
+      "category": "character.civilian",
+      "displayLabel": "npc_civilian_backpack_youth_001",
+      "approvalStatus": "candidate",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "previewPath": "authoring/characters/runtime/npc_civilian_backpack_youth_001.png",
+      "sha256": "a8a64018e03e46e39656e8c49427915f1f6dd71e4247bf75f2e1ba80c30d8b57",
+      "allowedLevelLayers": [
+        "NPCs",
+        "Gallery"
+      ]
+    },
+    {
+      "assetId": "npc_civilian_beanie_messenger_001",
+      "category": "character.civilian",
+      "displayLabel": "npc_civilian_beanie_messenger_001",
+      "approvalStatus": "candidate",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "previewPath": "authoring/characters/runtime/npc_civilian_beanie_messenger_001.png",
+      "sha256": "326c9d5eac28bbd89636a03b5a994eafcf4d1d88afe387e5109b56c8fcf7a329",
+      "allowedLevelLayers": [
+        "NPCs",
+        "Gallery"
+      ]
+    },
+    {
+      "assetId": "npc_civilian_grocery_carrier_001",
+      "category": "character.civilian",
+      "displayLabel": "npc_civilian_grocery_carrier_001",
+      "approvalStatus": "candidate",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "previewPath": "authoring/characters/runtime/npc_civilian_grocery_carrier_001.png",
+      "sha256": "db89218e7c1452fd49c5787689ec2554c54cc04696f92176f59a55476a242cb6",
+      "allowedLevelLayers": [
+        "NPCs",
+        "Gallery"
+      ]
+    },
+    {
+      "assetId": "npc_household_dog_walker_001",
+      "category": "character.household",
+      "displayLabel": "npc_household_dog_walker_001",
+      "approvalStatus": "candidate",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "previewPath": "authoring/characters/runtime/npc_household_dog_walker_001.png",
+      "sha256": "55a9923ab89f89856e9af5c39ae20d20ab4865d695db5ae5a1cfea50159677ea",
+      "allowedLevelLayers": [
+        "NPCs",
+        "Gallery"
+      ]
+    },
+    {
+      "assetId": "npc_household_parent_child_001",
+      "category": "character.household",
+      "displayLabel": "npc_household_parent_child_001",
+      "approvalStatus": "candidate",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "previewPath": "authoring/characters/runtime/npc_household_parent_child_001.png",
+      "sha256": "2f16ae034bf4083164e3f9f8f4fe20efc95bb1ec5a5a76f1d5a34b0e2743f1f2",
+      "allowedLevelLayers": [
+        "NPCs",
+        "Gallery"
+      ]
+    },
+    {
+      "assetId": "npc_volunteer_elder_cane_001",
+      "category": "character.volunteer",
+      "displayLabel": "npc_volunteer_elder_cane_001",
+      "approvalStatus": "candidate",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "previewPath": "authoring/characters/runtime/npc_volunteer_elder_cane_001.png",
+      "sha256": "0511f8fb197f73cf95f68867dca82d45a54c7fdcbcf8d36b207ed97747c712b6",
+      "allowedLevelLayers": [
+        "NPCs",
+        "Gallery"
+      ]
+    },
+    {
+      "assetId": "npc_volunteer_miguel_001",
+      "category": "character.volunteer",
+      "displayLabel": "npc_volunteer_miguel_001",
+      "approvalStatus": "candidate",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "previewPath": "authoring/characters/runtime/npc_volunteer_miguel_001.png",
+      "sha256": "eaf471b06c62cad15cc08022370ee38c097fd4c3c4831512fcf2bccabc4092f2",
+      "allowedLevelLayers": [
+        "NPCs",
+        "Gallery"
+      ]
+    }
+  ]
+}

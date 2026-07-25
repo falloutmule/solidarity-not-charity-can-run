@@ -169,13 +169,14 @@ addEventListener('keydown',e=>{
 
   // --- PLAY state keys ---
   if(state===STATE.PLAY){
+    const assetGallery = typeof crAssetGalleryIsActive === 'function' && crAssetGalleryIsActive();
     if(e.code==='KeyM') showMinimap=!showMinimap;
     if(e.code==='KeyP' || e.code==='Escape'){
-      if(!paused){ paused=true; SAVE.save(); crTriggerSoundCue('menuHelp'); }
+      if(!paused){ paused=true; if(!assetGallery) SAVE.save(); crTriggerSoundCue('menuHelp'); }
       else { paused=false; }
     }
-    if(!paused && e.code==='Space'){ giveCan(); e.preventDefault(); }
-    if(!paused && e.code==='KeyR'){
+    if(!assetGallery && !paused && e.code==='Space'){ giveCan(); e.preventDefault(); }
+    if(!assetGallery && !paused && e.code==='KeyR'){
       confirmAction={msg:'Restart run? Current progress will be lost.', onYes:()=>{ SAVE.clear(); restartRun(false); }, onNo:()=>{}};
     }
     return;
@@ -233,6 +234,12 @@ function activateResult(idx){
 }
 // pause menu items
 function pauseItems(){
+  if(typeof crAssetGalleryIsActive === 'function' && crAssetGalleryIsActive()){
+    return [
+      {label:'RESUME', action:()=>{ paused=false; }},
+      {label:'EXIT GALLERY', action:()=>{ location.href=location.pathname; }}
+    ];
+  }
   return [
     {label:'RESUME',           action:()=>{ paused=false; }},
     {label:'RESTART RUN',      action:()=>{ confirmAction={msg:'Restart run? Progress will be lost.', onYes:()=>{ SAVE.clear(); restartRun(false); }, onNo:()=>{}}; }},
@@ -403,8 +410,9 @@ function update(dt){
   if(state!==STATE.PLAY || paused || onboardingOpen) return;
 
   const act = crRefreshSemanticActionMap();
+  const assetGallery = typeof crAssetGalleryIsActive === 'function' && crAssetGalleryIsActive();
 
-  game.timeLeft -= dt;
+  if(!assetGallery) game.timeLeft -= dt;
   if(player.giveCD>0) player.giveCD=Math.max(0,player.giveCD-dt);
   if(game.revealT>0) game.revealT-=dt;
   if(player.speedBoostT>0) player.speedBoostT-=dt;
@@ -412,7 +420,7 @@ function update(dt){
     player.radarPingT -= dt;
     if(player.radarPingT<=0){ player.radarPingT=3; player.radarRingT=1; setMsg('* radar ping *'); }
   }
-  if(game.timeLeft<=0){ endRun(); return; }
+  if(!assetGallery && game.timeLeft<=0){ endRun(); return; }
 
   // sync mobile joystick to inp abstraction (keyboard fallback)
   if(joy.active) syncInpFromJoy();
@@ -421,10 +429,10 @@ function update(dt){
   // edge-detect for one-shot mobile actions
   if(inp.map && !inp._lastMap){ showMinimap=!showMinimap; }
   if(inp.pause && !inp._lastPause){
-    if(!paused){ paused=true; SAVE.save(); crTriggerSoundCue('menuHelp'); }
+    if(!paused){ paused=true; if(!assetGallery) SAVE.save(); crTriggerSoundCue('menuHelp'); }
     else { paused=false; }
   }
-  if(act.giveHold && !inp._lastGive && !paused){ giveCan(); }
+  if(!assetGallery && act.giveHold && !inp._lastGive && !paused){ giveCan(); }
   inp._lastMap = act.mapHold;
   inp._lastPause = act.pauseHold;
   inp._lastGive = act.giveHold;
@@ -476,9 +484,14 @@ function update(dt){
   if(shiftHeld && sprinting && moving){ player.stamina=Math.max(0,player.stamina-cfg.staminaDrain*dt); }
   else if(!burstActive){ player.stamina=Math.min(player.maxStamina, player.stamina+(cfg.staminaRegen+player.regenBonus)*dt); }
 
-  updateAim();
-  tickPickups();
-  tickExit();
+  if(assetGallery){
+    game.aimNpc = null;
+    crUpdateAssetGalleryFocus();
+  } else {
+    updateAim();
+    tickPickups();
+    tickExit();
+  }
 }
 function endRun(){
   game.run.runTime = (Date.now() - game.run.startedAt) / 1000;

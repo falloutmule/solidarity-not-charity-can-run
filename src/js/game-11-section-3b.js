@@ -247,12 +247,17 @@ function npcMechanicKind(kind){
   if(kind==='volunteer'||kind==='hall_volunteer') return 'volunteer';
   return 'hungry';
 }
-function npcSpriteTex(kind){
+function npcSpriteTex(kind, entity){
+  const asset = entity && entity.assetId && globalThis.SNC_RUNTIME_ASSET_REGISTRY && globalThis.SNC_RUNTIME_ASSET_REGISTRY[entity.assetId];
+  if(asset && asset.image && asset.image.complete && asset.image.naturalWidth > 0) return asset.image;
   return TEX[kind] || TEX.hungry;
+}
+function npcSpriteHeight(entity){
+  const asset = entity && entity.assetId && globalThis.SNC_RUNTIME_ASSET_REGISTRY && globalThis.SNC_RUNTIME_ASSET_REGISTRY[entity.assetId];
+  return asset && Number.isFinite(asset.heightScale) ? asset.heightScale : (HEIGHT[entity && entity.kind] || HEIGHT.hungry);
 }
 function pickHallThankLine(npc){
   if(npc && npc.thank) return npc.thank;
   const lines = CUSTOM_LEVELS.hall_of_servants.thankLines;
   return lines[(Math.random()*lines.length)|0];
 }
-

@@ -9,7 +9,7 @@ const inp = {
   lookDeltaRad:0,
   _active:false, // true when any touch is on screen
 };
-var BUILD_ID = 'chromeinput2'; window.BUILD_ID = BUILD_ID;
+var BUILD_ID = 'runtimegallery1'; window.BUILD_ID = BUILD_ID;
 const CR_FPV_STREET_MATTE = true;
 /** Building visual reset: smooth, low-noise wall masses with sparse readable cues. */
 const CR_BUILDING_SMOOTH_STYLE = 1;
@@ -1358,7 +1358,7 @@ function bindMobileControls(){
       }
       if(!paused){
         clearInputState();
-        paused=true; SAVE.save(); crTriggerSoundCue('menuHelp');
+        paused=true; if(!(typeof crAssetGalleryIsActive === 'function' && crAssetGalleryIsActive())) SAVE.save(); crTriggerSoundCue('menuHelp');
         crResetPauseRenderHistory('pause-entry');
         drawMobileMenu();
       }

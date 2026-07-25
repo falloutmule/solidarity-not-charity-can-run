@@ -475,6 +475,13 @@ try {
   }
 } catch(_renderProfileInitializationError){}
 crResetFixedStepSimulation();
+try {
+  if(typeof crBootAssetGalleryIfRequested === 'function' && crBootAssetGalleryIfRequested()){
+    crResetRenderPoseHistory('asset-gallery-boot');
+  }
+} catch(_assetGalleryBootError){
+  console.error(_assetGalleryBootError);
+}
 requestAnimationFrame(frame);
 
 function updateSeed(newSeed){
