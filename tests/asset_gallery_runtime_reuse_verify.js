@@ -1,0 +1,3 @@
+'use strict';
+const assert=require('assert'); const fs=require('fs'); const path=require('path'); const {validateRegistry}=require('../tools/asset-gallery-validate');
+const ROOT=path.resolve(__dirname,'..'); const gallery=validateRegistry(); const runtime=gallery.assets.filter(a=>a.stage==='runtime'); assert(runtime.length>=4,'runtime references missing'); for(const asset of runtime){assert.strictEqual(asset.sourcePath,null,`${asset.id} must not copy a runtime bitmap into authoring gallery`);const text=fs.readFileSync(path.join(ROOT,asset.runtimeRef.file),'utf8');assert(text.includes(asset.runtimeRef.symbol),`${asset.id} runtime symbol missing`);} console.log(JSON.stringify({pass:true,runtimeAssets:runtime.map(a=>a.id)},null,2));
