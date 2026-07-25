@@ -134,9 +134,11 @@ function drawPortraitDashboardChrome(){
   [L.minimapRect.y, L.controlsRect.y, L.statsRect.y].forEach(yy=>{
     ctx.beginPath(); ctx.moveTo(0, yy); ctx.lineTo(view.width, yy); ctx.stroke();
   });
-  ctx.font = 'bold 9px monospace';
-  ctx.fillStyle = 'rgba(210,170,110,0.92)';
-  ctx.fillText('build ' + BUILD_ID, L.menuRect.left, L.menuRect.top + L.menuRect.height + 11);
+  if(!crGalleryHudActive()){
+    ctx.font = 'bold 9px monospace';
+    ctx.fillStyle = 'rgba(210,170,110,0.92)';
+    ctx.fillText('build ' + BUILD_ID, L.menuRect.left, L.menuRect.top + L.menuRect.height + 11);
+  }
 }
 function drawPortraitStatsPanel(){
   const L = portraitLayout();

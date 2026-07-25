@@ -9,7 +9,7 @@ const inp = {
   lookDeltaRad:0,
   _active:false, // true when any touch is on screen
 };
-var BUILD_ID = 'runtimegallery1'; window.BUILD_ID = BUILD_ID;
+var BUILD_ID = 'runtimegallery2'; window.BUILD_ID = BUILD_ID;
 const CR_FPV_STREET_MATTE = true;
 /** Building visual reset: smooth, low-noise wall masses with sparse readable cues. */
 const CR_BUILDING_SMOOTH_STYLE = 1;
@@ -845,7 +845,10 @@ function readSafeAreaInsets(){
 function syncPortraitMenuLabel(){
   const mportmenu = document.getElementById('mportmenu');
   if(!mportmenu) return;
-  const want = `<span class="mportmenu-t">MENU</span><span class="mportmenu-b">${BUILD_ID}</span>`;
+  const galleryLabel = typeof crAssetGalleryIsActive === 'function' && crAssetGalleryIsActive();
+  const want = galleryLabel
+    ? '<span class="mportmenu-t">MENU</span><span class="mportmenu-b">GALLERY</span>'
+    : `<span class="mportmenu-t">MENU</span><span class="mportmenu-b">${BUILD_ID}</span>`;
   crWriteHtml(mportmenu, want);
 }
 function isMobilePortrait(){

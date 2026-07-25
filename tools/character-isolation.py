@@ -85,7 +85,10 @@ def build_candidate(source, entry, write):
             max_height = int(entry.get('runtimeMaxHeight', 192))
             scale = min(1.0, max_height / original.height)
             size = (max(1, round(original.width * scale)), max(1, round(original.height * scale)))
-            runtime = original.resize(size, Image.Resampling.LANCZOS) if size != original.size else original.copy()
+            # The candidate mask is intentionally binary. BOX performs area
+            # downsampling without LANCZOS's light-matte ringing in partial
+            # edge pixels, so the normal billboard path receives clean RGBA.
+            runtime = original.resize(size, Image.Resampling.BOX) if size != original.size else original.copy()
             os.makedirs(os.path.dirname(runtime_path), exist_ok=True)
             runtime.save(runtime_path, 'PNG', optimize=False)
     if not os.path.exists(runtime_path):

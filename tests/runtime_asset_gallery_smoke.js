@@ -44,6 +44,7 @@ async function main(){
     await page.goto(result.url + '?assetgallery=1', { waitUntil: 'load' });
     await page.waitForFunction(() => window.SNCDiagnostics && window.SNCDiagnostics.getSnapshot().runtime.assetGallery && window.SNCDiagnostics.getSnapshot().runtime.assetGallery.active === true);
     await page.waitForFunction(() => Object.values(window.SNC_RUNTIME_ASSET_REGISTRY || {}).every((entry) => entry.image.complete && entry.image.naturalWidth > 0));
+    result.checks.galleryMenuLabel = await page.locator('#mportmenu').textContent().then((text) => String(text || '').includes('GALLERY'));
     const beforeMove = await page.evaluate(() => window.SNCDiagnostics.getSnapshot());
     await page.keyboard.press('p');
     await page.waitForTimeout(80);

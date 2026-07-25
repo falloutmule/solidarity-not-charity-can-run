@@ -40,10 +40,17 @@ assert(level.includes('low-block raycaster spike acceptance'), 'deferred depende
 const input = source('src/js/game-20-section-11-update-input.js');
 const mobileInput = source('src/js/game-06-section-2b-mobile-touch-input.js');
 const responsiveMenu = source('src/js/game-07-section-2c-responsive-mobile-menu-html-overlay.js');
+const hud = source('src/js/game-18-section-9-hud-reticle-popups.js');
+const mainLoop = source('src/js/game-22-section-13-main-loop.js');
 assert(input.includes('if(!assetGallery) SAVE.save();'), 'keyboard and touch pause saves are gallery-guarded');
 assert(input.includes('if(!assetGallery && !paused && e.code===\'KeyR\')'), 'gallery cannot restart a campaign from keyboard');
 assert(mobileInput.includes('crAssetGalleryIsActive') && mobileInput.includes('SAVE.save()'), 'mobile pause save is gallery-guarded');
 assert(responsiveMenu.includes("action === 'pause-help' || action === 'pause-restart'"), 'gallery pause menu suppresses mutating actions');
+assert(hud.includes('function crGalleryHudActive()'), 'HUD owns one gallery-mode predicate');
+assert(hud.includes('if(crGalleryHudActive()){\n    drawAssetGalleryHUD();\n    return;\n  }'), 'gallery HUD exits before ordinary run status');
+assert(hud.includes('function drawAssetGalleryHUD()') && hud.includes('crDrawAssetGalleryOverlay()'), 'gallery HUD retains exhibit focus copy');
+assert(mainLoop.includes('if(!crGalleryHudActive()){\n    ctx.font = \'bold 9px monospace\';'), 'portrait chrome hides normal build copy in gallery mode');
+assert(mobileInput.includes("? '<span class=\"mportmenu-t\">MENU</span><span class=\"mportmenu-b\">GALLERY</span>'"), 'portrait menu uses a gallery-neutral label');
 
 const buildManifest = JSON.parse(source('src/build-manifest.json'));
 const registryIndex = buildManifest.scripts.indexOf('src/imported-handoff-assets/runtime-character-gallery-assets.js');

@@ -10,7 +10,7 @@
       "renderMode": "billboard-single",
       "collision": "none",
       "previewPath": "authoring/characters/runtime/npc_civilian_backpack_youth_001.png",
-      "sha256": "a8a64018e03e46e39656e8c49427915f1f6dd71e4247bf75f2e1ba80c30d8b57",
+      "sha256": "84b3beb46ce9d122cb23399c7ab0cae12f4b9d0472cffc0b28d9951b28518768",
       "allowedLevelLayers": [
         "NPCs",
         "Gallery"
@@ -24,7 +24,7 @@
       "renderMode": "billboard-single",
       "collision": "none",
       "previewPath": "authoring/characters/runtime/npc_civilian_beanie_messenger_001.png",
-      "sha256": "326c9d5eac28bbd89636a03b5a994eafcf4d1d88afe387e5109b56c8fcf7a329",
+      "sha256": "a9b021b516f9bf4323539d0701cbdb0c2eade98246aaed425d020f63fef11976",
       "allowedLevelLayers": [
         "NPCs",
         "Gallery"
@@ -38,7 +38,7 @@
       "renderMode": "billboard-single",
       "collision": "none",
       "previewPath": "authoring/characters/runtime/npc_civilian_grocery_carrier_001.png",
-      "sha256": "db89218e7c1452fd49c5787689ec2554c54cc04696f92176f59a55476a242cb6",
+      "sha256": "e6a11154f96b8749b443fc60465420c8b2585b095304d1e91482ae2c3b6b8a9b",
       "allowedLevelLayers": [
         "NPCs",
         "Gallery"
@@ -52,7 +52,7 @@
       "renderMode": "billboard-single",
       "collision": "none",
       "previewPath": "authoring/characters/runtime/npc_household_dog_walker_001.png",
-      "sha256": "55a9923ab89f89856e9af5c39ae20d20ab4865d695db5ae5a1cfea50159677ea",
+      "sha256": "902f83c2d8f8bddf7cf99a0f2daf0b39edad2aefeb0ad26b3c6298bd00fcfccb",
       "allowedLevelLayers": [
         "NPCs",
         "Gallery"
@@ -66,7 +66,7 @@
       "renderMode": "billboard-single",
       "collision": "none",
       "previewPath": "authoring/characters/runtime/npc_household_parent_child_001.png",
-      "sha256": "2f16ae034bf4083164e3f9f8f4fe20efc95bb1ec5a5a76f1d5a34b0e2743f1f2",
+      "sha256": "09f28b0a1de82421adb298d45afbe701078036a4fb15e45d211d25a63a5a1751",
       "allowedLevelLayers": [
         "NPCs",
         "Gallery"
@@ -80,7 +80,7 @@
       "renderMode": "billboard-single",
       "collision": "none",
       "previewPath": "authoring/characters/runtime/npc_volunteer_elder_cane_001.png",
-      "sha256": "0511f8fb197f73cf95f68867dca82d45a54c7fdcbcf8d36b207ed97747c712b6",
+      "sha256": "d732ab03a23aa1511d484cad7ac37baee16f55f2b0bca64114f136a9dc3fa3c0",
       "allowedLevelLayers": [
         "NPCs",
         "Gallery"
@@ -94,7 +94,7 @@
       "renderMode": "billboard-single",
       "collision": "none",
       "previewPath": "authoring/characters/runtime/npc_volunteer_miguel_001.png",
-      "sha256": "eaf471b06c62cad15cc08022370ee38c097fd4c3c4831512fcf2bccabc4092f2",
+      "sha256": "e445c1df94911de694d0dbf6beccd908a3b42027e52924cbe939af685d583a45",
       "allowedLevelLayers": [
         "NPCs",
         "Gallery"

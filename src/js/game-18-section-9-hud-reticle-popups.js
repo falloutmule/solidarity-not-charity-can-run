@@ -155,6 +155,20 @@ function drawPortraitFacadeDebug(){
 }
 function panel(x,y,w,h){ ctx.fillStyle='rgba(18,14,10,0.66)'; ctx.fillRect(x,y,w,h);
   ctx.strokeStyle='rgba(190,158,104,0.35)'; ctx.lineWidth=1; ctx.strokeRect(x+0.5,y+0.5,w-1,h-1); }
+function crGalleryHudActive(){
+  return typeof crAssetGalleryIsActive === 'function' && crAssetGalleryIsActive();
+}
+function drawAssetGalleryHUD(){
+  const portrait = mobileMode && isMobilePortrait();
+  const L = portrait ? portraitLayout() : null;
+  const cx = portrait ? L.fpvRect.x + L.fpvRect.w / 2 : innerWidth / 2;
+  const cy = portrait ? L.fpvRect.y + L.fpvRect.h / 2 : innerHeight / 2;
+  // Keep the browsing reticle, but do not expose ordinary run status here.
+  ctx.fillStyle='rgba(220,220,228,0.8)';
+  ctx.fillRect(cx-1,cy-5,2,4); ctx.fillRect(cx-1,cy+1,2,4);
+  ctx.fillRect(cx-5,cy-1,4,2); ctx.fillRect(cx+1,cy-1,4,2);
+  if(typeof crDrawAssetGalleryOverlay === 'function') crDrawAssetGalleryOverlay();
+}
 function drawHUD(now){
   ctx.textBaseline='top';
   
@@ -166,6 +180,11 @@ function drawHUD(now){
     } else {
       drawDesktopFacadeDebug();
     }
+  }
+
+  if(crGalleryHudActive()){
+    drawAssetGalleryHUD();
+    return;
   }
   
   if(mobileMode && isMobilePortrait()){

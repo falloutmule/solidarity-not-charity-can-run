@@ -25,6 +25,7 @@
     "characters:check": "py -3 tools/character-isolation.py --check",
     "characters:build-runtime": "node tools/build-runtime-character-assets.js --write",
     "characters:check-runtime": "node tools/build-runtime-character-assets.js --check",
+    "test:runtime-character-alpha": "py -3 tests/runtime_character_alpha_verify.py",
     "assets:build-palette": "node tools/build-asset-palette.js",
     "assets:check-palette": "node tools/build-asset-palette.js --check",
     "level:export-tiled": "node tools/tiled-level-export.js",
