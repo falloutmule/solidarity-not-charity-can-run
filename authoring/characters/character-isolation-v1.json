@@ -88,21 +88,82 @@
       ],
       "status": "candidate",
       "reason": "single-subject extraction; source name tag retained as provenance detail",
+      "manualBackgroundSeeds": [
+        [
+          88,
+          440
+        ]
+      ],
+      "clearBelowY": 560,
+      "manualForegroundPolygons": [
+        [
+          [
+            22,
+            548
+          ],
+          [
+            38,
+            537
+          ],
+          [
+            68,
+            546
+          ],
+          [
+            86,
+            565
+          ],
+          [
+            82,
+            570
+          ],
+          [
+            25,
+            570
+          ]
+        ],
+        [
+          [
+            101,
+            546
+          ],
+          [
+            125,
+            536
+          ],
+          [
+            165,
+            547
+          ],
+          [
+            185,
+            561
+          ],
+          [
+            185,
+            570
+          ],
+          [
+            105,
+            570
+          ]
+        ]
+      ],
       "outputPath": "authoring/characters/runtime-candidates/npc_volunteer_miguel_001.png",
       "runtimePath": "authoring/characters/runtime/npc_volunteer_miguel_001.png",
-      "outputSha256": "fad4b630b05e4825268192abc618d955703ccdabd20c3d04802b292e0debc9f4",
+      "outputSha256": "78d7cb85c77f17205fbf8305d6a8814fcc5954277073502f01f771725ac269cb",
       "alphaBounds": {
         "x": 0,
         "y": 0,
-        "w": 186,
-        "h": 603
+        "w": 184,
+        "h": 571
       },
       "alphaHistogram": {
-        "zero": 41169,
+        "zero": 48673,
         "partial": 0,
-        "opaque": 71361
+        "opaque": 63857
       },
-      "runtimeSha256": "e445c1df94911de694d0dbf6beccd908a3b42027e52924cbe939af685d583a45",
+      "runtimeSha256": "e42e7eb2dcda9a1e615ed1ca79e1eaffd8aff9552586e6b3eeae2fd5c87eaee5",
       "runtimeSize": {
         "width": 59,
         "height": 192
@@ -111,12 +172,12 @@
         "x": 0,
         "y": 0,
         "w": 59,
-        "h": 192
+        "h": 182
       },
       "runtimeAlphaHistogram": {
-        "zero": 3935,
-        "partial": 397,
-        "opaque": 6996
+        "zero": 4645,
+        "partial": 463,
+        "opaque": 6220
       }
     },
     {
@@ -134,21 +195,86 @@
       ],
       "status": "candidate",
       "reason": "locked parent-and-child composite",
+      "manualBackgroundSeeds": [
+        [
+          65,
+          420
+        ]
+      ],
+      "clearBelowY": 540,
+      "manualForegroundPolygons": [
+        [
+          [
+            0,
+            526
+          ],
+          [
+            21,
+            516
+          ],
+          [
+            45,
+            520
+          ],
+          [
+            66,
+            537
+          ],
+          [
+            68,
+            548
+          ],
+          [
+            0,
+            548
+          ]
+        ],
+        [
+          [
+            75,
+            524
+          ],
+          [
+            100,
+            518
+          ],
+          [
+            128,
+            526
+          ],
+          [
+            149,
+            542
+          ],
+          [
+            149,
+            548
+          ],
+          [
+            104,
+            550
+          ],
+          [
+            82,
+            546
+          ]
+        ]
+      ],
       "outputPath": "authoring/characters/runtime-candidates/npc_household_parent_child_001.png",
       "runtimePath": "authoring/characters/runtime/npc_household_parent_child_001.png",
-      "outputSha256": "4e45aed8c22bde8f801baea611ba376d863a0a86c31a68316d8fcb76aef2c155",
+      "outputSha256": "09ba8a2592ca39c514376b5348a8be0eb5a027641e03c79d6c2d2f76f7c36778",
       "alphaBounds": {
-        "x": 0,
+        "x": 2,
         "y": 7,
-        "w": 150,
-        "h": 570
+        "w": 148,
+        "h": 544
       },
       "alphaHistogram": {
-        "zero": 30394,
+        "zero": 37173,
         "partial": 0,
-        "opaque": 56606
+        "opaque": 49827
       },
-      "runtimeSha256": "09f28b0a1de82421adb298d45afbe701078036a4fb15e45d211d25a63a5a1751",
+      "runtimeSha256": "e650dc04b67d4ad74005d52dc9195bd70ca5ccdb270c6708ebb097de2f9b48d7",
       "runtimeSize": {
         "width": 50,
         "height": 192
@@ -157,12 +283,12 @@
         "x": 0,
         "y": 2,
         "w": 50,
-        "h": 189
+        "h": 181
       },
       "runtimeAlphaHistogram": {
-        "zero": 3136,
-        "partial": 443,
-        "opaque": 6021
+        "zero": 3838,
+        "partial": 531,
+        "opaque": 5231
       }
     },
     {

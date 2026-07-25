@@ -14,7 +14,7 @@ def sha256(path):
             h.update(chunk)
     return h.hexdigest()
 
-def background_mask(image, threshold=38, neighbor=24):
+def background_mask(image, threshold=38, neighbor=24, manual_seeds=()):
     """Flood-fill only border-connected pale background; never paints/inpaints."""
     rgb = image.convert('RGB')
     w, h = rgb.size
@@ -36,6 +36,12 @@ def background_mask(image, threshold=38, neighbor=24):
             visited[n] = 1; queue.append((x, y))
     for x in range(w): seed(x, 0); seed(x, h - 1)
     for y in range(h): seed(0, y); seed(w - 1, y)
+    for point in manual_seeds:
+        if not isinstance(point, (list, tuple)) or len(point) != 2:
+            raise ValueError('manual background seeds must be [x, y] pairs')
+        x, y = int(point[0]), int(point[1])
+        if 0 <= x < w and 0 <= y < h:
+            seed(x, y)
     while queue:
         x, y = queue.popleft()
         mask.putpixel((x, y), 0)
@@ -57,7 +63,30 @@ def alpha_bounds(mask):
 def build_candidate(source, entry, write):
     box = tuple(entry['bounds'])
     image = source.crop(box)
-    mask = background_mask(image)
+    mask = background_mask(image, manual_seeds=entry.get('manualBackgroundSeeds', ()))
+    original_mask = mask.copy()
+    clear_below = entry.get('clearBelowY')
+    if clear_below is not None:
+        clear_below = int(clear_below)
+        if clear_below < 0 or clear_below > image.height:
+            raise ValueError(f"{entry['assetId']}: clearBelowY outside the candidate crop")
+        for y in range(clear_below, image.height):
+            for x in range(image.width):
+                mask.putpixel((x, y), 0)
+    foreground_polygons = entry.get('manualForegroundPolygons', ())
+    if foreground_polygons:
+        restore = Image.new('L', image.size, 0)
+        draw = ImageDraw.Draw(restore)
+        for polygon in foreground_polygons:
+            if not isinstance(polygon, list) or len(polygon) < 3:
+                raise ValueError(f"{entry['assetId']}: manual foreground polygons need at least three points")
+            points = []
+            for point in polygon:
+                if not isinstance(point, list) or len(point) != 2:
+                    raise ValueError(f"{entry['assetId']}: manual foreground points must be [x, y] pairs")
+                points.append((int(point[0]), int(point[1])))
+            draw.polygon(points, fill=255)
+        mask.paste(original_mask, mask=restore)
     rgba = image.convert('RGBA')
     rgba.putalpha(mask)
     bounds = alpha_bounds(mask)

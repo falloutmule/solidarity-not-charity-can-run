@@ -66,7 +66,7 @@
       "renderMode": "billboard-single",
       "collision": "none",
       "previewPath": "authoring/characters/runtime/npc_household_parent_child_001.png",
-      "sha256": "09f28b0a1de82421adb298d45afbe701078036a4fb15e45d211d25a63a5a1751",
+      "sha256": "e650dc04b67d4ad74005d52dc9195bd70ca5ccdb270c6708ebb097de2f9b48d7",
       "allowedLevelLayers": [
         "NPCs",
         "Gallery"
@@ -94,7 +94,7 @@
       "renderMode": "billboard-single",
       "collision": "none",
       "previewPath": "authoring/characters/runtime/npc_volunteer_miguel_001.png",
-      "sha256": "e445c1df94911de694d0dbf6beccd908a3b42027e52924cbe939af685d583a45",
+      "sha256": "e42e7eb2dcda9a1e615ed1ca79e1eaffd8aff9552586e6b3eeae2fd5c87eaee5",
       "allowedLevelLayers": [
         "NPCs",
         "Gallery"

@@ -24,6 +24,16 @@ for asset in manifest['assets']:
                 partial += 1
                 if red >= 235 and green >= 235 and blue >= 235:
                     near_white_partial += 1
+    candidate_path = os.path.join(ROOT, asset['outputPath'])
+    with Image.open(candidate_path).convert('RGBA') as candidate:
+        for point in asset.get('manualBackgroundSeeds', []):
+            x, y = point
+            if candidate.getpixel((x, y))[3] != 0:
+                raise AssertionError(f"{asset['assetId']}: manual background seed {point} is not transparent")
+        clear_below = asset.get('clearBelowY')
+        if clear_below is not None:
+            if candidate.getpixel((0, candidate.height - 1))[3] != 0:
+                raise AssertionError(f"{asset['assetId']}: bottom cleanup must leave the lower-left border transparent")
     if near_white_partial > 1:
         raise AssertionError(f"{asset['assetId']}: {near_white_partial} near-white partial-alpha pixels")
     results.append({
