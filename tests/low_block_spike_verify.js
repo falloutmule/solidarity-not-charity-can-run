@@ -19,8 +19,9 @@ async function main(){
     await page.screenshot({path:screenshot,fullPage:true});
     await page.keyboard.down('w'); await page.waitForTimeout(2400); await page.keyboard.up('w'); const after=await page.evaluate(()=>window.SNCDiagnostics.getSnapshot());
     result.before=before.lowBlockSpike; result.after=after.lowBlockSpike; result.player=after.runtime.player;
-    result.checks.buildId=before.buildId==='lowblockspike2'; result.checks.play=before.runtime.state==='play'; result.checks.fixture=before.runtime.customLevel==='low_block_spike';
-    result.checks.lowBlock=before.lowBlockSpike.enabled&&before.lowBlockSpike.blocks===1&&before.lowBlockSpike.heightScale===0.6&&before.lowBlockSpike.activeColumns>0&&before.lowBlockSpike.capColumns>0&&before.lowBlockSpike.spriteClipColumns>0;
+    result.checks.buildId=before.buildId==='lowblockspike3'; result.checks.play=before.runtime.state==='play'; result.checks.fixture=before.runtime.customLevel==='low_block_spike';
+    const capMatchesEyePlane=before.lowBlockSpike.capColumns===0;
+    result.checks.lowBlock=before.lowBlockSpike.enabled&&before.lowBlockSpike.blocks===1&&before.lowBlockSpike.heightScale===0.5&&before.lowBlockSpike.activeColumns>0&&capMatchesEyePlane&&before.lowBlockSpike.spriteClipColumns>0;
     result.checks.bufferBudget=before.lowBlockSpike.metadataBytes>0&&before.lowBlockSpike.metadataBytes<65536&&before.lowBlockSpike.perFrameReadback===false;
     result.checks.collision=after.runtime.player.x<10.9; result.checks.errors=Object.values(observed).every(v=>v.length===0);
     result.pass=Object.values(result.checks).every(Boolean); await context.close();
