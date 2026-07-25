@@ -641,7 +641,7 @@ let paused = false;
 const game = {
   seed: 12345, district: 1, totalScore: 0,
   map: null, MAP_W: 0, MAP_H: 0, wallShade: null,
-  pickups: [], npcs: [], exit: null, props: [],
+  pickups: [], npcs: [], exit: null, props: [], lowBlocks: [], lowBlockGrid: null,
   quota: 0, helped: 0, delivered: 0, timeLeft: 0,
   modifier: 'clear', scoreMult: 1,
   msg: '', msgT: 0,
@@ -685,7 +685,7 @@ const inp = {
   lookDeltaRad:0,
   _active:false, // true when any touch is on screen
 };
-var BUILD_ID = 'chromeinput2'; window.BUILD_ID = BUILD_ID;
+var BUILD_ID = 'lowblockspike1'; window.BUILD_ID = BUILD_ID;
 const CR_FPV_STREET_MATTE = true;
 /** Building visual reset: smooth, low-noise wall masses with sparse readable cues. */
 const CR_BUILDING_SMOOTH_STYLE = 1;
@@ -2896,7 +2896,7 @@ if(typeof Image !== "undefined") {
 // -----------------------------------------------------------------------
 // Wall type constants. BUILDING=tan stucco, GLASS=storefront glass.
 const WALL = { BUILDING:1, BRICK:2, FENCE:3, MURAL:4, VAN:5, GLASS:6,
-               GARAGE:7, CONCRETE:8, SIGNAGE:9 };
+               GARAGE:7, CONCRETE:8, SIGNAGE:9, LOW_BLOCK:10 };
 
 // Splice into index.html — street-block level grammar (GW=40 GH=20 unchanged)
 
@@ -6637,6 +6637,8 @@ function crApplySolidwallsFrontProofHarness(opts){
 }
 
 function genCity(seed, district, modifier){
+  game.lowBlocks = [];
+  game.lowBlockGrid = null;
   RNG = mulberry32((seed ^ 0x9e3779b9) + district*2654435761);
   const r = RNG;
   game.seed = seed;
@@ -8749,6 +8751,14 @@ const CUSTOM_LEVELS = {
       'hall_quiet','hall_kitchen','hall_servant',
     ],
   },
+  low_block_spike: {
+    id: 'low_block_spike',
+    title: 'Low Block Raycaster Spike',
+    shortTitle: 'Low Block Spike',
+    generator: genLowBlockSpike,
+    thankLines: ['Renderer spike fixture.'],
+    spriteKinds: ['hungry'],
+  },
 };
 
 function hallFillMap(GW, GH){
@@ -8775,6 +8785,8 @@ function hallBrickBox(map, x0,y0,x1,y1, doorX, doorY){
 }
 
 function genHallOfServants(){
+  game.lowBlocks = [];
+  game.lowBlockGrid = null;
   const GW = 30, GH = 14;
   const {map, shade} = hallFillMap(GW, GH);
   // Pantry (north-west)
@@ -8851,6 +8863,29 @@ function genHallOfServants(){
   dbg.npcsSpawned = game.npcs.length;
   dbg.props = game.props.length;
   setMsg('SNC Hall Of Servants — fill the hall with care.');
+}
+
+function genLowBlockSpike(){
+  const GW=22, GH=14;
+  const {map, shade}=hallFillMap(GW, GH);
+  // A bright far wall, one 1x2 low prism, and one NPC behind it.
+  for(let y=3;y<=10;y++){ map[y][17]=WALL.SIGNAGE; shade[y][17]=0.55; }
+  map[6][11]=WALL.LOW_BLOCK; map[7][11]=WALL.LOW_BLOCK;
+  const block={ id:'dumpster_001_spike', assetId:'dumpster_001', x:11, y:6,
+    widthCells:1, depthCells:2, rotation:0, heightScale:CR_LOW_BLOCK_HEIGHT, collision:true };
+  game.lowBlocks=[block];
+  game.lowBlockGrid=Array.from({length:GH},()=>Array(GW).fill(null));
+  game.lowBlockGrid[6][11]=block; game.lowBlockGrid[7][11]=block;
+  game.map=map; game.MAP_W=GW; game.MAP_H=GH; game.wallShade=shade;
+  game.buildingGrid=null; game.buildingRegistry=null;
+  game.modifier='clear'; game.scoreMult=1;
+  player.x=5.5; player.y=6.8; player.angle=0;
+  game.pickups=[];
+  game.npcs=[{x:14.5,y:6.8,kind:'hungry',need:1,helped:false,wob:0,thank:'Spike sprite.'}];
+  game.props=[]; game.quota=1; game.helped=0; game.delivered=0;
+  game.exit={x:19.5,y:11.5,active:false}; game.timeLeft=180;
+  dbg.reachableCells=0; dbg.cansSpawned=0; dbg.npcsSpawned=1; dbg.props=0;
+  setMsg('LOW BLOCK SPIKE — yellow wall, capped prism, sprite behind.');
 }
 
 function clearInputState(){
@@ -8982,7 +9017,6 @@ function pickHallThankLine(npc){
   const lines = CUSTOM_LEVELS.hall_of_servants.thankLines;
   return lines[(Math.random()*lines.length)|0];
 }
-
 // ---------------------------------------------------------------------------
 // SECTION 4 — COLLISION / WALK HELPERS
 // ---------------------------------------------------------------------------
@@ -10953,6 +10987,8 @@ function drawScene(now, renderPose){
   const visRange = game.modifier==='rainy'?9.0:17.0;
   const fog = game.modifier==='rainy'?[40,48,60] : [196,168,128]; // dusty warm fog / cool rainy
   const fogStrength = game.modifier==='rainy'?0.9:0.78;
+  const lowFrame = typeof crLowBlockIsEnabled === 'function' && crLowBlockIsEnabled() &&
+    typeof crLowBlockResetFrame === 'function' ? crLowBlockResetFrame() : null;
 
   // ---- WALLS (DDA, textured) -> fills zbuffer per column (occlusion source of truth) ----
   for(let col=0; col<RW; col++){
@@ -10965,11 +11001,22 @@ function drawScene(now, renderPose){
     if(rdx<0){ stepX=-1; sdx=(px-mapX)*ddx; } else { stepX=1; sdx=(mapX+1-px)*ddx; }
     if(rdy<0){ stepY=-1; sdy=(py-mapY)*ddy; } else { stepY=1; sdy=(mapY+1-py)*ddy; }
     let hit=0, side=0, wt=1, steps=0;
+    let lowHit=0, lowMapX=0, lowMapY=0, lowSide=0, lowStepX=0, lowStepY=0, lowPerp=0, lowWallX=0, lowOwner=null;
     while(hit===0 && steps<80){
       if(sdx<sdy){ sdx+=ddx; mapX+=stepX; side=0; } else { sdy+=ddy; mapY+=stepY; side=1; }
       if(!World.inBounds(mapX, mapY)){ wt=1; hit=1; break; }
       const cell = World.rawCell(mapX, mapY);
-      if(cell !== 0){ wt=cell; hit=1; }
+      if(cell === WALL.LOW_BLOCK && lowFrame && typeof crLowBlockCellOwner === 'function'){
+        const owner=crLowBlockCellOwner(mapX,mapY);
+        if(!lowHit){
+          lowHit=1; lowMapX=mapX; lowMapY=mapY; lowSide=side; lowStepX=stepX; lowStepY=stepY;
+          lowPerp=(side===0)?(sdx-ddx):(sdy-ddy);
+          lowWallX=(side===0)?(py+lowPerp*rdy):(px+lowPerp*rdx); lowWallX-=Math.floor(lowWallX);
+          lowOwner=owner;
+        } else if(owner && owner !== lowOwner){
+          // The bounded spike ignores a second low block and seeks one opaque far wall.
+        }
+      } else if(cell !== 0){ wt=cell; hit=1; }
       steps++;
     }
     const perp = (side===0)? (sdx-ddx) : (sdy-ddy);
@@ -11054,7 +11101,19 @@ function drawScene(now, renderPose){
     } else if(sh<1){ bctx.fillStyle=`rgba(0,0,0,${(1-sh).toFixed(3)})`; bctx.fillRect(col,drawStart,1,sliceH); }
     const f = Math.min(1, d/visRange)*fogStrength;
     if(f>0){ bctx.fillStyle=`rgba(${fog[0]},${fog[1]},${fog[2]},${f.toFixed(3)})`; bctx.fillRect(col,drawStart,1,sliceH); }
+    if(lowHit && lowFrame && lowOwner){
+      const lowDepth=Math.max(0.05,lowPerp);
+      const lowBase=RH/lowDepth;
+      const lowBottom=Math.ceil(RH/2+lowBase/2);
+      const lowTop=Math.floor(lowBottom-lowBase*lowOwner.heightScale);
+      lowFrame.active[col]=1;
+      lowFrame.nearDepth[col]=lowDepth;
+      lowFrame.sideTop[col]=Math.max(0,Math.min(RH,lowTop));
+      lowFrame.sideBottom[col]=Math.max(0,Math.min(RH,lowBottom));
+      crDrawLowBlockSideColumn(bctx,col,lowFrame.sideTop[col],lowFrame.sideBottom[col],lowSide,lowDepth,fog,fogStrength,visRange);
+    }
   }
+  if(lowFrame && typeof crLowBlockDrawCap === 'function') crLowBlockDrawCap(px,py,dirX,dirY,planeX,planeY,fog,fogStrength,visRange);
 
   // ---- SPRITES (billboards), projected from WORLD coords (UNCHANGED math) ----
   //   depth  = camera-plane projection (forward distance)
@@ -11134,6 +11193,7 @@ function drawScene(now, renderPose){
     // SPRITE HALO REGRESSION GUARD — no full-rect sprite fog overlay.
     // Per-column or bbox fillRect fog draws through transparent sprite pixels and
     // creates phone-visible rectangular halos. Walls own distance fog; sprites stay clean.
+    if(lowFrame) useSubpixelProjection=false;
     if(useSubpixelProjection){
       try {
         crDrawFarFieldSpriteRuns(bctx, s.tex, farFieldProjection, zbuffer);
@@ -11144,11 +11204,11 @@ function drawScene(now, renderPose){
     if(!useSubpixelProjection){
       for(let col=startCol; col<endCol; col++){
         if(col<0||col>=RW) continue;
-        if(depth >= zbuffer[col]) continue;   // OCCLUSION GUARD: per-column zbuffer vs sprite depth
+        if(depth >= zbuffer[col]) continue;   // far-wall depth guard
         const u=(col-(screenX-screenW/2))/screenW;
         const srcX=Math.max(0,Math.min(s.tex.width-1, (u*s.tex.width)|0));
-        const yoff = 0;
-        bctx.drawImage(s.tex, srcX,0,1,s.tex.height, col, top, 1, screenH);
+        if(lowFrame && typeof crDrawLowBlockClippedSpriteColumn === 'function') crDrawLowBlockClippedSpriteColumn(bctx,s.tex,srcX,col,top,screenH,depth);
+        else bctx.drawImage(s.tex, srcX,0,1,s.tex.height, col, top, 1, screenH);
       }
     }
     const isCan = s.tex === TEX.can;
@@ -11180,7 +11240,6 @@ function drawScene(now, renderPose){
   }
 
 }
-
 'use strict';
 
 const CR_FFPROJ_ALLOWLIST = Object.freeze(['legacy', 'subpixel']);
@@ -11681,6 +11740,133 @@ function crDrawFarFieldSpriteRuns(ctx, texture, projected, zbuffer){
   root.drawBitmapFailureColumn = drawBitmapFailureColumn;
   root.drawWholeFaceBitmapBuildingColumn = drawWholeFaceBitmapBuildingColumn;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
+// ---------------------------------------------------------------------------
+// SECTION 7C — LOW-BLOCK RAYCASTER SPIKE (query-gated; not production content)
+// ---------------------------------------------------------------------------
+const CR_LOW_BLOCK_SPIKE = new URLSearchParams(location.search).get('lowblockspike') === '1';
+const CR_LOW_BLOCK_HEIGHT = 0.4;
+let crLowBlockFrame = null;
+let crLowBlockCapX = null;
+let crLowBlockCapY = null;
+let crLowBlockSpanTop = 0;
+let crLowBlockSpanBottom = 0;
+let crLowBlockSpriteClipColumns = 0;
+
+function crLowBlockEnsureFrame(){
+  if(crLowBlockFrame && crLowBlockFrame.width === RW) return crLowBlockFrame;
+  crLowBlockFrame = {
+    width: RW,
+    active: new Uint8Array(RW),
+    nearDepth: new Float32Array(RW),
+    sideTop: new Uint16Array(RW),
+    sideBottom: new Uint16Array(RW),
+    capTop: new Uint16Array(RW),
+    capBottom: new Uint16Array(RW),
+  };
+  crLowBlockCapX = new Float32Array(4);
+  crLowBlockCapY = new Float32Array(4);
+  return crLowBlockFrame;
+}
+function crLowBlockResetFrame(){
+  const f = crLowBlockEnsureFrame();
+  f.active.fill(0);
+  f.capTop.fill(0); f.capBottom.fill(0);
+  crLowBlockSpriteClipColumns=0;
+  return f;
+}
+function crLowBlockIsEnabled(){ return CR_LOW_BLOCK_SPIKE && !!(game && game.lowBlocks && game.lowBlocks.length); }
+function crGetLowBlockSpikeStats(){
+  const f=crLowBlockFrame;
+  let activeColumns=0, capColumns=0;
+  if(f) for(let i=0;i<f.capBottom.length;i++) capColumns+=f.capBottom[i]>f.capTop[i] ? 1 : 0;
+  if(f) for(let i=0;i<f.active.length;i++) activeColumns+=f.active[i] ? 1 : 0;
+  return Object.freeze({
+    enabled: CR_LOW_BLOCK_SPIKE,
+    heightScale: CR_LOW_BLOCK_HEIGHT,
+    blocks: game && game.lowBlocks ? game.lowBlocks.length : 0,
+    activeColumns,
+    capColumns,
+    spriteClipColumns: crLowBlockSpriteClipColumns,
+    metadataBytes: f ? f.active.byteLength + f.nearDepth.byteLength + f.sideTop.byteLength + f.sideBottom.byteLength + f.capTop.byteLength + f.capBottom.byteLength : 0,
+    perFrameReadback: false,
+  });
+}
+function crLowBlockCellOwner(x, y){
+  return game.lowBlockGrid && game.lowBlockGrid[y] ? game.lowBlockGrid[y][x] || null : null;
+}
+function crLowBlockShadeFog(ctx, col, top, bottom, side, depth, fog, fogStrength, visRange){
+  const h = bottom - top;
+  if(h < 1) return;
+  if(side === 1){ ctx.fillStyle='rgba(0,0,0,0.28)'; ctx.fillRect(col, top, 1, h); }
+  const f = Math.min(1, depth / visRange) * fogStrength;
+  if(f > 0){ ctx.fillStyle=`rgba(${fog[0]},${fog[1]},${fog[2]},${f.toFixed(3)})`; ctx.fillRect(col, top, 1, h); }
+}
+function crDrawLowBlockSideColumn(ctx, col, top, bottom, side, depth, fog, fogStrength, visRange){
+  const h = bottom - top;
+  if(h < 1) return;
+  ctx.fillStyle = side === 0 ? '#e0523d' : '#a63426';
+  ctx.fillRect(col, top, 1, h);
+  if((col & 7) === 0){ ctx.fillStyle='rgba(205,220,186,0.25)'; ctx.fillRect(col, top + Math.max(1, (h * 0.16) | 0), 1, Math.max(1, (h * 0.06) | 0)); }
+  crLowBlockShadeFog(ctx, col, top, bottom, side, depth, fog, fogStrength, visRange);
+}
+function crLowBlockProjectCapCorner(i, wx, wy, px, py, dirX, dirY, planeX, planeY, height){
+  const invDet = 1 / (planeX * dirY - dirX * planeY);
+  const rx = wx - px, ry = wy - py;
+  const depth = invDet * (-planeY * rx + planeX * ry);
+  const hscr = invDet * (dirY * rx - dirX * ry);
+  crLowBlockCapX[i] = depth > 0.05 ? RW * 0.5 * (1 + hscr / depth) : NaN;
+  crLowBlockCapY[i] = depth > 0.05 ? RH * 0.5 + (0.5 - height) * RH / depth : NaN;
+}
+function crLowBlockProjectCap(block, px, py, dirX, dirY, planeX, planeY){
+  const h = block.heightScale;
+  crLowBlockProjectCapCorner(0,block.x,block.y,px,py,dirX,dirY,planeX,planeY,h);
+  crLowBlockProjectCapCorner(1,block.x+block.widthCells,block.y,px,py,dirX,dirY,planeX,planeY,h);
+  crLowBlockProjectCapCorner(2,block.x+block.widthCells,block.y+block.depthCells,px,py,dirX,dirY,planeX,planeY,h);
+  crLowBlockProjectCapCorner(3,block.x,block.y+block.depthCells,px,py,dirX,dirY,planeX,planeY,h);
+}
+function crLowBlockCapSpanAt(x){
+  let lo=Infinity, hi=-Infinity;
+  for(let i=0;i<4;i++){
+    const j=(i+1)&3, x0=crLowBlockCapX[i], x1=crLowBlockCapX[j];
+    if(!Number.isFinite(x0)||!Number.isFinite(x1)||x0===x1) continue;
+    if((x0<=x && x<x1)||(x1<=x && x<x0)){
+      const t=(x-x0)/(x1-x0), y=crLowBlockCapY[i]+(crLowBlockCapY[j]-crLowBlockCapY[i])*t;
+      if(y<lo) lo=y;
+      if(y>hi) hi=y;
+    }
+  }
+  if(lo>hi) return false;
+  crLowBlockSpanTop=Math.max(0,Math.floor(lo));
+  crLowBlockSpanBottom=Math.min(RH,Math.ceil(hi));
+  return crLowBlockSpanBottom>crLowBlockSpanTop;
+}
+function crLowBlockDrawCap(px, py, dirX, dirY, planeX, planeY, fog, fogStrength, visRange){
+  if(!crLowBlockIsEnabled()) return;
+  const block=game.lowBlocks[0], f=crLowBlockEnsureFrame();
+  crLowBlockProjectCap(block, px, py, dirX, dirY, planeX, planeY);
+  for(let col=0;col<RW;col++){
+    if(!f.active[col]) continue;
+    if(!crLowBlockCapSpanAt(col+0.5)) continue;
+    f.capTop[col]=crLowBlockSpanTop; f.capBottom[col]=crLowBlockSpanBottom;
+    bctx.fillStyle='#3777c7'; bctx.fillRect(col,crLowBlockSpanTop,1,crLowBlockSpanBottom-crLowBlockSpanTop);
+    crLowBlockShadeFog(bctx,col,crLowBlockSpanTop,crLowBlockSpanBottom,0,f.nearDepth[col],fog,fogStrength,visRange);
+  }
+}
+function crDrawLowBlockClippedSpriteColumn(ctx, texture, srcX, col, top, screenH, depth){
+  const f=crLowBlockEnsureFrame();
+  const bottom=top+screenH;
+  function drawSegment(y0,y1){
+    y0=Math.max(top,y0); y1=Math.min(bottom,y1);
+    if(y1<=y0) return;
+    const sy=(y0-top)/screenH*texture.height, sh=(y1-y0)/screenH*texture.height;
+    ctx.drawImage(texture,srcX,sy,1,sh,col,y0,1,y1-y0);
+  }
+  if(!f.active[col] || depth < f.nearDepth[col]){ drawSegment(top,bottom); return; }
+  crLowBlockSpriteClipColumns++;
+  const a=Math.min(f.sideTop[col],f.capTop[col]||f.sideTop[col]);
+  const b=Math.max(f.sideBottom[col],f.capBottom[col]||f.sideBottom[col]);
+  drawSegment(top,a); drawSegment(b,bottom);
+}
 // ---------------------------------------------------------------------------
 // SECTION 8 — MINIMAP
 // ---------------------------------------------------------------------------
@@ -14665,6 +14851,9 @@ try {
   }
 } catch(_renderProfileInitializationError){}
 crResetFixedStepSimulation();
+if(typeof CR_LOW_BLOCK_SPIKE !== 'undefined' && CR_LOW_BLOCK_SPIKE){
+  setTimeout(()=>startCustomLevel('low_block_spike'),0);
+}
 requestAnimationFrame(frame);
 
 function updateSeed(newSeed){
@@ -14713,6 +14902,7 @@ window.SNCDiagnostics = Object.freeze({
     buildId: BUILD_ID,
     runtime: Object.freeze(getDebugState()),
     fixedStep: Object.freeze(crGetFixedStepState()),
+    lowBlockSpike: typeof crGetLowBlockSpikeStats === 'function' ? crGetLowBlockSpikeStats() : null,
     performance: typeof crPerfProbeGetReport === 'function' ? crPerfProbeGetReport() : null,
   }),
 });

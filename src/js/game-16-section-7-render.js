@@ -106,6 +106,8 @@ function drawScene(now, renderPose){
   const visRange = game.modifier==='rainy'?9.0:17.0;
   const fog = game.modifier==='rainy'?[40,48,60] : [196,168,128]; // dusty warm fog / cool rainy
   const fogStrength = game.modifier==='rainy'?0.9:0.78;
+  const lowFrame = typeof crLowBlockIsEnabled === 'function' && crLowBlockIsEnabled() &&
+    typeof crLowBlockResetFrame === 'function' ? crLowBlockResetFrame() : null;
 
   // ---- WALLS (DDA, textured) -> fills zbuffer per column (occlusion source of truth) ----
   for(let col=0; col<RW; col++){
@@ -118,11 +120,22 @@ function drawScene(now, renderPose){
     if(rdx<0){ stepX=-1; sdx=(px-mapX)*ddx; } else { stepX=1; sdx=(mapX+1-px)*ddx; }
     if(rdy<0){ stepY=-1; sdy=(py-mapY)*ddy; } else { stepY=1; sdy=(mapY+1-py)*ddy; }
     let hit=0, side=0, wt=1, steps=0;
+    let lowHit=0, lowMapX=0, lowMapY=0, lowSide=0, lowStepX=0, lowStepY=0, lowPerp=0, lowWallX=0, lowOwner=null;
     while(hit===0 && steps<80){
       if(sdx<sdy){ sdx+=ddx; mapX+=stepX; side=0; } else { sdy+=ddy; mapY+=stepY; side=1; }
       if(!World.inBounds(mapX, mapY)){ wt=1; hit=1; break; }
       const cell = World.rawCell(mapX, mapY);
-      if(cell !== 0){ wt=cell; hit=1; }
+      if(cell === WALL.LOW_BLOCK && lowFrame && typeof crLowBlockCellOwner === 'function'){
+        const owner=crLowBlockCellOwner(mapX,mapY);
+        if(!lowHit){
+          lowHit=1; lowMapX=mapX; lowMapY=mapY; lowSide=side; lowStepX=stepX; lowStepY=stepY;
+          lowPerp=(side===0)?(sdx-ddx):(sdy-ddy);
+          lowWallX=(side===0)?(py+lowPerp*rdy):(px+lowPerp*rdx); lowWallX-=Math.floor(lowWallX);
+          lowOwner=owner;
+        } else if(owner && owner !== lowOwner){
+          // The bounded spike ignores a second low block and seeks one opaque far wall.
+        }
+      } else if(cell !== 0){ wt=cell; hit=1; }
       steps++;
     }
     const perp = (side===0)? (sdx-ddx) : (sdy-ddy);
@@ -207,7 +220,19 @@ function drawScene(now, renderPose){
     } else if(sh<1){ bctx.fillStyle=`rgba(0,0,0,${(1-sh).toFixed(3)})`; bctx.fillRect(col,drawStart,1,sliceH); }
     const f = Math.min(1, d/visRange)*fogStrength;
     if(f>0){ bctx.fillStyle=`rgba(${fog[0]},${fog[1]},${fog[2]},${f.toFixed(3)})`; bctx.fillRect(col,drawStart,1,sliceH); }
+    if(lowHit && lowFrame && lowOwner){
+      const lowDepth=Math.max(0.05,lowPerp);
+      const lowBase=RH/lowDepth;
+      const lowBottom=Math.ceil(RH/2+lowBase/2);
+      const lowTop=Math.floor(lowBottom-lowBase*lowOwner.heightScale);
+      lowFrame.active[col]=1;
+      lowFrame.nearDepth[col]=lowDepth;
+      lowFrame.sideTop[col]=Math.max(0,Math.min(RH,lowTop));
+      lowFrame.sideBottom[col]=Math.max(0,Math.min(RH,lowBottom));
+      crDrawLowBlockSideColumn(bctx,col,lowFrame.sideTop[col],lowFrame.sideBottom[col],lowSide,lowDepth,fog,fogStrength,visRange);
+    }
   }
+  if(lowFrame && typeof crLowBlockDrawCap === 'function') crLowBlockDrawCap(px,py,dirX,dirY,planeX,planeY,fog,fogStrength,visRange);
 
   // ---- SPRITES (billboards), projected from WORLD coords (UNCHANGED math) ----
   //   depth  = camera-plane projection (forward distance)
@@ -287,6 +312,7 @@ function drawScene(now, renderPose){
     // SPRITE HALO REGRESSION GUARD — no full-rect sprite fog overlay.
     // Per-column or bbox fillRect fog draws through transparent sprite pixels and
     // creates phone-visible rectangular halos. Walls own distance fog; sprites stay clean.
+    if(lowFrame) useSubpixelProjection=false;
     if(useSubpixelProjection){
       try {
         crDrawFarFieldSpriteRuns(bctx, s.tex, farFieldProjection, zbuffer);
@@ -297,11 +323,11 @@ function drawScene(now, renderPose){
     if(!useSubpixelProjection){
       for(let col=startCol; col<endCol; col++){
         if(col<0||col>=RW) continue;
-        if(depth >= zbuffer[col]) continue;   // OCCLUSION GUARD: per-column zbuffer vs sprite depth
+        if(depth >= zbuffer[col]) continue;   // far-wall depth guard
         const u=(col-(screenX-screenW/2))/screenW;
         const srcX=Math.max(0,Math.min(s.tex.width-1, (u*s.tex.width)|0));
-        const yoff = 0;
-        bctx.drawImage(s.tex, srcX,0,1,s.tex.height, col, top, 1, screenH);
+        if(lowFrame && typeof crDrawLowBlockClippedSpriteColumn === 'function') crDrawLowBlockClippedSpriteColumn(bctx,s.tex,srcX,col,top,screenH,depth);
+        else bctx.drawImage(s.tex, srcX,0,1,s.tex.height, col, top, 1, screenH);
       }
     }
     const isCan = s.tex === TEX.can;
@@ -333,4 +359,3 @@ function drawScene(now, renderPose){
   }
 
 }
-

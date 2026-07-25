@@ -475,6 +475,9 @@ try {
   }
 } catch(_renderProfileInitializationError){}
 crResetFixedStepSimulation();
+if(typeof CR_LOW_BLOCK_SPIKE !== 'undefined' && CR_LOW_BLOCK_SPIKE){
+  setTimeout(()=>startCustomLevel('low_block_spike'),0);
+}
 requestAnimationFrame(frame);
 
 function updateSeed(newSeed){

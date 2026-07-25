@@ -36,6 +36,7 @@ window.SNCDiagnostics = Object.freeze({
     buildId: BUILD_ID,
     runtime: Object.freeze(getDebugState()),
     fixedStep: Object.freeze(crGetFixedStepState()),
+    lowBlockSpike: typeof crGetLowBlockSpikeStats === 'function' ? crGetLowBlockSpikeStats() : null,
     performance: typeof crPerfProbeGetReport === 'function' ? crPerfProbeGetReport() : null,
   }),
 });

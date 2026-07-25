@@ -22,6 +22,14 @@ const CUSTOM_LEVELS = {
       'hall_quiet','hall_kitchen','hall_servant',
     ],
   },
+  low_block_spike: {
+    id: 'low_block_spike',
+    title: 'Low Block Raycaster Spike',
+    shortTitle: 'Low Block Spike',
+    generator: genLowBlockSpike,
+    thankLines: ['Renderer spike fixture.'],
+    spriteKinds: ['hungry'],
+  },
 };
 
 function hallFillMap(GW, GH){
@@ -48,6 +56,8 @@ function hallBrickBox(map, x0,y0,x1,y1, doorX, doorY){
 }
 
 function genHallOfServants(){
+  game.lowBlocks = [];
+  game.lowBlockGrid = null;
   const GW = 30, GH = 14;
   const {map, shade} = hallFillMap(GW, GH);
   // Pantry (north-west)
@@ -124,6 +134,29 @@ function genHallOfServants(){
   dbg.npcsSpawned = game.npcs.length;
   dbg.props = game.props.length;
   setMsg('SNC Hall Of Servants — fill the hall with care.');
+}
+
+function genLowBlockSpike(){
+  const GW=22, GH=14;
+  const {map, shade}=hallFillMap(GW, GH);
+  // A bright far wall, one 1x2 low prism, and one NPC behind it.
+  for(let y=3;y<=10;y++){ map[y][17]=WALL.SIGNAGE; shade[y][17]=0.55; }
+  map[6][11]=WALL.LOW_BLOCK; map[7][11]=WALL.LOW_BLOCK;
+  const block={ id:'dumpster_001_spike', assetId:'dumpster_001', x:11, y:6,
+    widthCells:1, depthCells:2, rotation:0, heightScale:CR_LOW_BLOCK_HEIGHT, collision:true };
+  game.lowBlocks=[block];
+  game.lowBlockGrid=Array.from({length:GH},()=>Array(GW).fill(null));
+  game.lowBlockGrid[6][11]=block; game.lowBlockGrid[7][11]=block;
+  game.map=map; game.MAP_W=GW; game.MAP_H=GH; game.wallShade=shade;
+  game.buildingGrid=null; game.buildingRegistry=null;
+  game.modifier='clear'; game.scoreMult=1;
+  player.x=5.5; player.y=6.8; player.angle=0;
+  game.pickups=[];
+  game.npcs=[{x:14.5,y:6.8,kind:'hungry',need:1,helped:false,wob:0,thank:'Spike sprite.'}];
+  game.props=[]; game.quota=1; game.helped=0; game.delivered=0;
+  game.exit={x:19.5,y:11.5,active:false}; game.timeLeft=180;
+  dbg.reachableCells=0; dbg.cansSpawned=0; dbg.npcsSpawned=1; dbg.props=0;
+  setMsg('LOW BLOCK SPIKE — yellow wall, capped prism, sprite behind.');
 }
 
 function clearInputState(){
@@ -255,4 +288,3 @@ function pickHallThankLine(npc){
   const lines = CUSTOM_LEVELS.hall_of_servants.thankLines;
   return lines[(Math.random()*lines.length)|0];
 }
-

@@ -3,7 +3,7 @@
 // -----------------------------------------------------------------------
 // Wall type constants. BUILDING=tan stucco, GLASS=storefront glass.
 const WALL = { BUILDING:1, BRICK:2, FENCE:3, MURAL:4, VAN:5, GLASS:6,
-               GARAGE:7, CONCRETE:8, SIGNAGE:9 };
+               GARAGE:7, CONCRETE:8, SIGNAGE:9, LOW_BLOCK:10 };
 
 // Splice into index.html — street-block level grammar (GW=40 GH=20 unchanged)
 
@@ -3744,6 +3744,8 @@ function crApplySolidwallsFrontProofHarness(opts){
 }
 
 function genCity(seed, district, modifier){
+  game.lowBlocks = [];
+  game.lowBlockGrid = null;
   RNG = mulberry32((seed ^ 0x9e3779b9) + district*2654435761);
   const r = RNG;
   game.seed = seed;

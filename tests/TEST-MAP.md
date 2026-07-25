@@ -20,6 +20,7 @@ Run the smallest listed owner test for a changed path, then run `npm.cmd run bui
 | Render profile selection boundary | `test:render-profile-selection-boundary`, `test:farfield-resolution`, `test:farfield-final-smoke` |
 | Far-field resolution or projection | matching `test:farfield-resolution`, `test:farfield-angle`, or `test:farfield-projection` |
 | Bitmap building renderer or facade data | `test:custom-next` and `tests/bitmap_building_renderer_verify.js` |
+| Query-gated low-block raycaster spike | `test:low-block-spike`, `test:render-interpolation`, `test:farfield-angle`, `test:chrome-pointer-path` |
 | Authored District 1 data or save behavior | `test:authored-d1`, `test:authored-d1-save`, and `test:custom-next` when bitmap identity changes |
 | Performance diagnostics | `test:perf-probe-v2` or `test:farfield-profiler` as applicable |
 | Documentation only | `git diff --check` |
