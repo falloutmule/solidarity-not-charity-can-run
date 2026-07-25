@@ -2,7 +2,7 @@
 // SECTION 7C — LOW-BLOCK RAYCASTER SPIKE (query-gated; not production content)
 // ---------------------------------------------------------------------------
 const CR_LOW_BLOCK_SPIKE = new URLSearchParams(location.search).get('lowblockspike') === '1';
-const CR_LOW_BLOCK_HEIGHT = 0.4;
+const CR_LOW_BLOCK_HEIGHT = 0.6;
 let crLowBlockFrame = null;
 let crLowBlockCapX = null;
 let crLowBlockCapY = null;

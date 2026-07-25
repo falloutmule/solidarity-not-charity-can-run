@@ -139,7 +139,7 @@ function genHallOfServants(){
 function genLowBlockSpike(){
   const GW=22, GH=14;
   const {map, shade}=hallFillMap(GW, GH);
-  // A bright far wall, one 1x2 low prism, and one NPC behind it.
+  // A bright far wall, one 1x2 low prism, and one NPC plus can behind it.
   for(let y=3;y<=10;y++){ map[y][17]=WALL.SIGNAGE; shade[y][17]=0.55; }
   map[6][11]=WALL.LOW_BLOCK; map[7][11]=WALL.LOW_BLOCK;
   const block={ id:'dumpster_001_spike', assetId:'dumpster_001', x:11, y:6,
@@ -151,12 +151,12 @@ function genLowBlockSpike(){
   game.buildingGrid=null; game.buildingRegistry=null;
   game.modifier='clear'; game.scoreMult=1;
   player.x=5.5; player.y=6.8; player.angle=0;
-  game.pickups=[];
+  game.pickups=[{x:14.5,y:7.35,taken:false,amt:1,wob:0.35}];
   game.npcs=[{x:14.5,y:6.8,kind:'hungry',need:1,helped:false,wob:0,thank:'Spike sprite.'}];
   game.props=[]; game.quota=1; game.helped=0; game.delivered=0;
   game.exit={x:19.5,y:11.5,active:false}; game.timeLeft=180;
-  dbg.reachableCells=0; dbg.cansSpawned=0; dbg.npcsSpawned=1; dbg.props=0;
-  setMsg('LOW BLOCK SPIKE — yellow wall, capped prism, sprite behind.');
+  dbg.reachableCells=0; dbg.cansSpawned=1; dbg.npcsSpawned=1; dbg.props=0;
+  setMsg('LOW BLOCK SPIKE — yellow wall, capped prism, NPC and can behind.');
 }
 
 function clearInputState(){
