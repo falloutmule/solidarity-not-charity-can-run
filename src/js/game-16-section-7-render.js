@@ -87,6 +87,10 @@ function crDrawPrefabFaceColumn(ctx, col, drawStart, sliceH, mapX, mapY, side, s
   return true;
 }
 function drawScene(now, renderPose){
+  if(typeof crHeightfieldIsActive === 'function' && crHeightfieldIsActive() && typeof crDrawHeightfieldScene === 'function'){
+    crDrawHeightfieldScene(now, renderPose);
+    return;
+  }
   // --- SKY (rebuild only if modifier changed) ---
   if(skyBuilt!==game.modifier) buildSky(game.modifier);
   bctx.drawImage(skyCanvas,0,0);

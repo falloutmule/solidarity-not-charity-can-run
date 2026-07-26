@@ -43,5 +43,6 @@ window.SNCDiagnostics = Object.freeze({
     runtime: Object.freeze(getDebugState()),
     fixedStep: Object.freeze(crGetFixedStepState()),
     performance: typeof crPerfProbeGetReport === 'function' ? crPerfProbeGetReport() : null,
+    heightfield: typeof crGetHeightfieldDiagnostics === 'function' ? crGetHeightfieldDiagnostics() : null,
   }),
 });

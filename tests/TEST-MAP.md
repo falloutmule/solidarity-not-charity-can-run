@@ -19,6 +19,7 @@ Run the smallest listed owner test for a changed path, then run `npm.cmd run bui
 | Render pose or frame loop | `test:render-interpolation`, `test:farfield-angle` |
 | Runtime diagnostics boundary | `test:runtime-diagnostics-boundary`, `test:render-interpolation`, `test:farfield-angle`, `test:farfield-final-smoke` |
 | Render profile selection boundary | `test:render-profile-selection-boundary`, `test:farfield-resolution`, `test:farfield-final-smoke` |
+| Variable-height proof renderer | `test:vertical-projection`, `test:vertical-profiles`, `test:multi-height-dda`, `test:raised-plane`, `test:solid-height-assets`, `test:heightfield-proof`; then gallery, authored D1, interpolation, far-field, pointer-path, build, and build-parity gates |
 | Far-field resolution or projection | matching `test:farfield-resolution`, `test:farfield-angle`, or `test:farfield-projection` |
 | Bitmap building renderer or facade data | `test:custom-next` and `tests/bitmap_building_renderer_verify.js` |
 | Authored District 1 data or save behavior | `test:authored-d1`, `test:authored-d1-save`, and `test:custom-next` when bitmap identity changes |

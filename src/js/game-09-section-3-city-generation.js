@@ -3744,6 +3744,7 @@ function crApplySolidwallsFrontProofHarness(opts){
 }
 
 function genCity(seed, district, modifier){
+  if(typeof crHeightfieldClearState === 'function') crHeightfieldClearState();
   RNG = mulberry32((seed ^ 0x9e3779b9) + district*2654435761);
   const r = RNG;
   game.seed = seed;
@@ -3915,4 +3916,3 @@ function genCity(seed, district, modifier){
 
   game.timeLeft = cfg.baseTime + (district-1)*8;
 }
-

@@ -22,6 +22,10 @@ const CUSTOM_LEVELS = {
       'hall_quiet','hall_kitchen','hall_servant',
     ],
   },
+  heightfield_proof: {
+    id: 'heightfield_proof', title: 'Variable Height Proof', shortTitle: 'Height Proof',
+    generator: genHeightfieldProof, thankLines: ['Proof fixture.'], spriteKinds: ['hungry'],
+  },
 };
 
 function hallFillMap(GW, GH){
@@ -48,6 +52,7 @@ function hallBrickBox(map, x0,y0,x1,y1, doorX, doorY){
 }
 
 function genHallOfServants(){
+  crHeightfieldClearState();
   const GW = 30, GH = 14;
   const {map, shade} = hallFillMap(GW, GH);
   // Pantry (north-west)
@@ -124,6 +129,37 @@ function genHallOfServants(){
   dbg.npcsSpawned = game.npcs.length;
   dbg.props = game.props.length;
   setMsg('SNC Hall Of Servants — fill the hall with care.');
+}
+
+function genHeightfieldProof(){
+  const GW = 24, GH = 16;
+  const {map, shade} = hallFillMap(GW, GH);
+  for(let x = 4; x <= 19; x++){ map[3][x] = WALL.SIGNAGE; shade[3][x] = 0.5; }
+  const params = new URLSearchParams(location.search);
+  const rotation = Math.max(0, Math.min(3, parseInt(params.get('hfrot') || '0', 10) || 0));
+  const block = { x: 11, y: 7, rotation, profileId: CR_VERTICAL_PROFILE_IDS.HALF_DEBUG };
+  map[block.y][block.x] = WALL.BRICK;
+  game.verticalProfileWidth = GW; game.verticalProfileHeight = GH;
+  game.verticalProfileGrid = new Uint16Array(GW * GH);
+  game.verticalProfileGrid[block.y * GW + block.x] = block.profileId;
+  game.heightfieldProof = { block, rotation };
+  game.map = map; game.MAP_W = GW; game.MAP_H = GH; game.wallShade = shade;
+  game.buildingGrid = null; game.buildingRegistry = null; game.props = [];
+  game.modifier = 'clear'; game.scoreMult = 1;
+  const poseName = params.get('hfpose') || 'south-far';
+  const poses = {
+    'south-far': [11.5, 12.5], 'south-near': [11.5, 8.8], 'south-extreme': [11.5, 8.28],
+    'southwest-corner': [9.45, 9.45], 'southeast-corner': [13.55, 9.45], 'east-near': [13.35, 7.5],
+    'north-near': [11.5, 5.65], 'west-near': [9.65, 7.5], 'top-oblique': [9.35, 10.35]
+  };
+  const pose = poses[poseName] || poses['south-far'];
+  player.x = pose[0]; player.y = pose[1]; player.angle = Math.atan2(7.5 - player.y, 11.5 - player.x);
+  game.pickups = [{ x: 12.5, y: 5.7, taken: false, amt: 1, wob: 0 }];
+  game.npcs = [{ x: 11.5, y: 5.7, kind: 'hungry', need: 1, helped: false, wob: 0, thank: 'Proof NPC.' }];
+  game.quota = 1; game.helped = 0; game.delivered = 0;
+  game.exit = { x: 20.5, y: 12.5, active: false }; game.timeLeft = 9999;
+  dbg.reachableCells = 0; dbg.cansSpawned = 1; dbg.npcsSpawned = 1; dbg.props = 0;
+  setMsg('HEIGHTFIELD PROOF — 1x1 half block, raised top, NPC and far wall.');
 }
 
 function clearInputState(){
@@ -223,6 +259,15 @@ function playerStandProbe(px, py){
 function startCustomLevel(id){
   const def = CUSTOM_LEVELS[id];
   if(!def) return;
+  if(id === 'heightfield_proof'){
+    game.seed = 424242; game.district = 1; game.totalScore = 0;
+    resetPlayerUpgrades(); def.generator(); player.cans = 0; player.stamina = player.maxStamina;
+    sharedEnterPlay();
+    game.run = { active: true, startedAt: 0, seedUsed: game.seed, modifierUsed: game.modifier, customLevel: id,
+      cansCollected: 0, cansDelivered: 0, helpedByKind: { hungry: 0, family: 0, elder: 0, volunteer: 0 },
+      upgradesChosen: 0, highestDistrict: 0, runTime: 0, completed: false, leaderboardRank: null, harnessOnly: true };
+    return;
+  }
   SAVE.clear();
   game.seed = 424242;
   game.district = 1;

@@ -48,6 +48,7 @@ function crAssetGalleryInstallBuilding(level, map){
 function crAssetGalleryExhibit(id, category, label, object){ return { id, category, label, object }; }
 
 function crInstallAssetGallery(){
+  if(typeof crHeightfieldClearState === 'function') crHeightfieldClearState();
   const level = globalThis.SNC_ASSET_GALLERY_LEVEL;
   if(!level || level.schema !== 'snc-asset-gallery-level-v1') throw new Error('asset gallery level is unavailable');
   const map = crAssetGalleryBuildMap(level);
