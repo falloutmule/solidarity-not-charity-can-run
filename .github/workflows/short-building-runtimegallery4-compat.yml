@@ -1,0 +1,72 @@
+name: Short Building + Runtimegallery4 Compatibility
+
+on:
+  pull_request:
+    branches:
+      - feature/runtime-asset-gallery-level
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compatibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build compatibility artifact
+        run: npm run build
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Verify bitmap building renderer
+        run: node tests/bitmap_building_renderer_verify.js
+
+      - name: Verify short building geometry
+        run: node tests/short_building_geometry_verify.js
+
+      - name: Verify dumpster pilot runtime
+        run: node tests/dumpster_pilot_runtime_verify.js
+
+      - name: Verify alpha-cutout raycaster
+        run: node tests/alpha_cutout_raycast_browser_verify.js
+
+      - name: Verify dumpster browser smoke
+        run: node tests/dumpster_pilot_browser_smoke.js
+
+      - name: Verify runtime asset gallery contract
+        run: node tests/runtime_asset_gallery_verify.js
+
+      - name: Verify runtime asset gallery browser smoke
+        run: node tests/runtime_asset_gallery_smoke.js
+
+      - name: Verify gallery focus panel
+        run: node tests/runtime_asset_gallery_focus_panel_verify.js
+
+      - name: Verify authored District 1
+        run: node tests/authored_d1_level_verify.js
+
+      - name: Verify authored District 1 save/load
+        run: node tests/authored_d1_save_load_verify.js
+
+      - name: Verify render interpolation
+        run: node tests/render_interpolation_verify.js
+
+      - name: Verify far-field projection
+        run: node tests/far_field_projection_verify.js
+
+      - name: Verify no external artifact drift after build
+        run: node tools/build-single-file.js --check
