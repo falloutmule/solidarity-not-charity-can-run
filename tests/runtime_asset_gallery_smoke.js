@@ -44,6 +44,8 @@ async function main(){
     await page.goto(result.url + '?assetgallery=1', { waitUntil: 'load' });
     await page.waitForFunction(() => window.SNCDiagnostics && window.SNCDiagnostics.getSnapshot().runtime.assetGallery && window.SNCDiagnostics.getSnapshot().runtime.assetGallery.active === true);
     await page.waitForFunction(() => Object.values(window.SNC_RUNTIME_ASSET_REGISTRY || {}).every((entry) => entry.image.complete && entry.image.naturalWidth > 0));
+    await page.screenshot({ path: path.join(path.dirname(output), 'gallery-start-portrait.png') });
+    const startGallery = await page.evaluate(() => window.SNCDiagnostics.getSnapshot().runtime.assetGallery);
     result.checks.galleryMenuLabel = await page.locator('#mportmenu').textContent().then((text) => String(text || '').includes('GALLERY'));
     const beforeMove = await page.evaluate(() => window.SNCDiagnostics.getSnapshot());
     await page.keyboard.press('p');
@@ -61,7 +63,7 @@ async function main(){
     result.snapshot = afterMove;
     result.checks.galleryPlay = afterMove.runtime.state === 'play' && afterMove.runtime.customLevel === 'asset-gallery-v1';
     result.checks.galleryReadonly = afterMove.runtime.assetGallery && afterMove.runtime.assetGallery.exhibitCount === 22;
-    result.checks.focusLabel = afterMove.runtime.assetGallery && /^gallery-(npc|prop|pickup|marker|building)-/.test(String(afterMove.runtime.assetGallery.focusId || ''));
+    result.checks.focusLabel = startGallery && /^gallery-(npc|prop|pickup|marker|building)-/.test(String(startGallery.focusId || ''));
     result.checks.normalControlsMove = Math.hypot(afterMove.runtime.player.x - beforeMove.runtime.player.x, afterMove.runtime.player.y - beforeMove.runtime.player.y) > 0.3;
     result.checks.saveUntouched = afterSave.saved === beforeSave && afterSave.sentinel === beforeSave;
     result.checks.keyboardIsolation = afterMove.runtime.customLevel === 'asset-gallery-v1' && afterMove.runtime.state === 'play';

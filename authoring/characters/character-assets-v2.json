@@ -66,7 +66,7 @@
         "partial": 1612,
         "opaque": 5417
       },
-      "displayHeightCells": 1.4
+      "displayHeightCells": 0.72
     },
     {
       "assetId": "npc_volunteer_tote_001",
@@ -115,7 +115,7 @@
         "partial": 1815,
         "opaque": 4171
       },
-      "displayHeightCells": 1.4
+      "displayHeightCells": 0.72
     },
     {
       "assetId": "npc_volunteer_miguel_001",
@@ -164,7 +164,7 @@
         "partial": 1794,
         "opaque": 5238
       },
-      "displayHeightCells": 1.4
+      "displayHeightCells": 0.72
     },
     {
       "assetId": "npc_household_parent_child_001",
@@ -213,7 +213,7 @@
         "partial": 1847,
         "opaque": 4317
       },
-      "displayHeightCells": 1.4
+      "displayHeightCells": 0.72
     },
     {
       "assetId": "npc_civilian_backpack_youth_001",
@@ -262,7 +262,7 @@
         "partial": 1787,
         "opaque": 4494
       },
-      "displayHeightCells": 1.4
+      "displayHeightCells": 0.72
     },
     {
       "assetId": "npc_civilian_beanie_messenger_001",
@@ -311,7 +311,7 @@
         "partial": 1840,
         "opaque": 4229
       },
-      "displayHeightCells": 1.4
+      "displayHeightCells": 0.72
     },
     {
       "assetId": "npc_civilian_grocery_carrier_001",
@@ -360,7 +360,7 @@
         "partial": 1908,
         "opaque": 6449
       },
-      "displayHeightCells": 1.4
+      "displayHeightCells": 0.72
     },
     {
       "assetId": "npc_household_dog_walker_001",
@@ -409,7 +409,7 @@
         "partial": 2040,
         "opaque": 4539
       },
-      "displayHeightCells": 1.4
+      "displayHeightCells": 0.72
     },
     {
       "assetId": "npc_unhoused_dog_companion_001",
@@ -458,7 +458,7 @@
         "partial": 2702,
         "opaque": 10829
       },
-      "displayHeightCells": 1.4
+      "displayHeightCells": 0.72
     },
     {
       "assetId": "npc_unhoused_bicycle_001",
@@ -507,7 +507,7 @@
         "partial": 2446,
         "opaque": 17844
       },
-      "displayHeightCells": 1.4
+      "displayHeightCells": 0.72
     },
     {
       "assetId": "npc_unhoused_cane_001",
@@ -556,7 +556,7 @@
         "partial": 2402,
         "opaque": 11285
       },
-      "displayHeightCells": 1.4
+      "displayHeightCells": 0.72
     },
     {
       "assetId": "npc_unhoused_work_jacket_001",
@@ -605,7 +605,7 @@
         "partial": 1931,
         "opaque": 7519
       },
-      "displayHeightCells": 1.4
+      "displayHeightCells": 0.72
     },
     {
       "assetId": "npc_unhoused_dyed_hair_001",
@@ -654,7 +654,7 @@
         "partial": 2179,
         "opaque": 8301
       },
-      "displayHeightCells": 1.4
+      "displayHeightCells": 0.72
     },
     {
       "assetId": "npc_unhoused_blanket_wrap_001",
@@ -703,7 +703,7 @@
         "partial": 1931,
         "opaque": 10550
       },
-      "displayHeightCells": 1.4
+      "displayHeightCells": 0.72
     },
     {
       "assetId": "npc_unhoused_slumped_001",
@@ -752,7 +752,7 @@
         "partial": 2350,
         "opaque": 18844
       },
-      "displayHeightCells": 0.96
+      "displayHeightCells": 0.52
     },
     {
       "assetId": "npc_unhoused_cart_001",
@@ -801,7 +801,7 @@
         "partial": 2192,
         "opaque": 17199
       },
-      "displayHeightCells": 1.4
+      "displayHeightCells": 0.72
     }
   ]
 }
