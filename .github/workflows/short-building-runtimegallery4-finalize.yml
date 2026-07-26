@@ -1,0 +1,50 @@
+name: Finalize Short-Building Mirror Fix Artifact
+
+on:
+  push:
+    branches:
+      - integration/short-building-renderer-runtimegallery4
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout review branch
+        uses: actions/checkout@v5
+        with:
+          ref: integration/short-building-renderer-runtimegallery4
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate combined review artifact
+        run: npm run build
+
+      - name: Verify generated artifact
+        run: node tools/build-single-file.js --check
+
+      - name: Commit generated artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html project-metadata.json
+          if git diff --cached --quiet; then
+            echo "Generated artifact already matches source."
+            exit 0
+          fi
+          git commit -m "Regenerate short-building mirror-fix artifact"
+          git push origin HEAD:integration/short-building-renderer-runtimegallery4
