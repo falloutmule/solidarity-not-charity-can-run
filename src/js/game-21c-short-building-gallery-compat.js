@@ -13,21 +13,29 @@
     };
   }
 
-  // dumpster_001 is a single three-quarter cutout, not four orthographic wall
-  // paintings. Repeating the complete image on adjacent footprint faces creates
-  // a close-range hall-of-mirrors duplicate. Keep the 1×2 collision footprint,
-  // but permit only the camera-dominant exterior face to carry opaque pixels.
-  // Other hit faces remain transparent ray-continuation surfaces, preserving the
-  // proven alpha/depth behavior and the world behind the object.
-  const SINGLE_PLANE_CUTOUT_ASSETS = new Set(['dumpster_001']);
-  const EMPTY_OPAQUE_RUNS = Object.freeze([]);
+  // dumpster_001 is one three-quarter cutout, not four orthographic wall faces.
+  // The generic box renderer therefore repeated a complete dumpster on adjacent
+  // footprint faces at close range. Do not patch renderer bindings here: the live
+  // ray loop owns a closed-over resolver. Instead, replace this registry property
+  // with a getter that supplies the live renderer a directional asset variant.
+  // Exactly one local face keeps the real cutout; the other three resolve to a
+  // verified transparent atlas pixel and continue rays to the background.
+  const FACE_DIRS = Object.freeze(['south', 'east', 'north', 'west']);
+  const TRANSPARENT_SLICE = Object.freeze({ x:0, y:0, w:1, h:1 });
+  const TRANSPARENT_FACE = Object.freeze({
+    role: 'single-plane-suppressed',
+    spanCells: 1,
+    slice: TRANSPARENT_SLICE,
+    sourceUDirection: 'increasing',
+    mirror: false
+  });
   let singlePlaneDiagnostics = Object.freeze({
     active: false,
     assetId: null,
     selectedWorldFace: null,
-    lastWorldFace: null,
-    visibleColumns: 0,
-    suppressedColumns: 0,
+    selectedLocalFace: null,
+    placementId: null,
+    lookupCount: 0,
     playerX: null,
     playerY: null
   });
@@ -54,44 +62,102 @@
     return normalizedY < 0 ? 'north' : 'south';
   }
 
-  if(typeof root.resolveWholeFaceBitmapBuildingColumn === 'function' && typeof root.resolveBitmapWorldFace === 'function'){
-    const originalResolveWholeFaceBitmapBuildingColumn = root.resolveWholeFaceBitmapBuildingColumn;
-    root.resolveWholeFaceBitmapBuildingColumn = function resolveSinglePlaneCutoutColumn(hit, placement){
-      const resolved = originalResolveWholeFaceBitmapBuildingColumn(hit, placement);
-      if(!resolved || !placement || !SINGLE_PLANE_CUTOUT_ASSETS.has(placement.assetId)) return resolved;
-      const worldFace = root.resolveBitmapWorldFace(hit && hit.side, hit && hit.stepX, hit && hit.stepY);
-      const playerX = Number(hit && hit.px);
-      const playerY = Number(hit && hit.py);
-      const selectedWorldFace = dominantExteriorFace(placement, resolved.asset, playerX, playerY);
-      if(!worldFace || !selectedWorldFace) return resolved;
+  function activeDumpsterPlacement(){
+    let runtimeGame = null;
+    try { runtimeGame = typeof game !== 'undefined' ? game : null; } catch(_error){}
+    const registry = runtimeGame && runtimeGame.buildingRegistry;
+    if(!registry) return null;
+    for(const bid in registry){
+      const placement = registry[bid];
+      if(placement && placement.assetId === 'dumpster_001') return placement;
+    }
+    return null;
+  }
 
-      const samePose = singlePlaneDiagnostics.active &&
-        singlePlaneDiagnostics.assetId === placement.assetId &&
-        singlePlaneDiagnostics.selectedWorldFace === selectedWorldFace &&
-        singlePlaneDiagnostics.playerX === playerX &&
-        singlePlaneDiagnostics.playerY === playerY;
-      const visibleColumns = samePose ? singlePlaneDiagnostics.visibleColumns : 0;
-      const suppressedColumns = samePose ? singlePlaneDiagnostics.suppressedColumns : 0;
-      const visible = worldFace === selectedWorldFace;
-      singlePlaneDiagnostics = Object.freeze({
-        active: true,
-        assetId: placement.assetId,
-        selectedWorldFace,
-        lastWorldFace: worldFace,
-        visibleColumns: visibleColumns + (visible ? 1 : 0),
-        suppressedColumns: suppressedColumns + (visible ? 0 : 1),
-        playerX,
-        playerY
-      });
+  function activePlayer(){
+    try { return typeof player !== 'undefined' ? player : null; }
+    catch(_error){ return null; }
+  }
 
-      if(visible) return Object.assign({}, resolved, { worldFace, selectedWorldFace, singlePlaneSuppressed: false });
-      return Object.assign({}, resolved, {
-        worldFace,
-        selectedWorldFace,
-        opaqueRuns: EMPTY_OPAQUE_RUNS,
-        singlePlaneSuppressed: true
+  function resolveOriginalFaceDescriptor(asset, localFace){
+    if(!asset || !asset.faces || !asset.faces[localFace]) return null;
+    let descriptor = asset.faces[localFace];
+    const seen = Object.create(null);
+    while(descriptor && descriptor.reuse){
+      if(seen[descriptor.reuse]) return null;
+      seen[descriptor.reuse] = true;
+      const reused = asset.faces[descriptor.reuse];
+      if(!reused) return null;
+      descriptor = Object.assign({}, reused, descriptor, {
+        slice: descriptor.slice || reused.slice,
+        assetRef: descriptor.assetRef || reused.assetRef,
+        mirror: descriptor.mirror === true
       });
-    };
+      delete descriptor.reuse;
+    }
+    if(!descriptor) return null;
+    const referenced = descriptor.assetRef && asset.faceAssets && asset.faceAssets[descriptor.assetRef];
+    if(referenced){
+      descriptor = Object.assign({}, referenced, descriptor, {
+        slice: descriptor.slice || referenced.slice,
+        mirror: descriptor.mirror === true
+      });
+    }
+    delete descriptor.reuse;
+    return Object.freeze(descriptor);
+  }
+
+  const bitmapRegistry = root.BITMAP_BUILDING_ASSET_REGISTRY;
+  if(bitmapRegistry && bitmapRegistry.dumpster_001){
+    let originalDumpsterAsset = bitmapRegistry.dumpster_001;
+    const variants = new Map();
+
+    function variantFor(localFace){
+      if(!originalDumpsterAsset || !FACE_DIRS.includes(localFace)) return originalDumpsterAsset;
+      if(variants.has(localFace)) return variants.get(localFace);
+      const visibleDescriptor = resolveOriginalFaceDescriptor(originalDumpsterAsset, localFace);
+      if(!visibleDescriptor) return originalDumpsterAsset;
+      const faces = Object.create(null);
+      for(const face of FACE_DIRS) faces[face] = face === localFace ? visibleDescriptor : TRANSPARENT_FACE;
+      const variant = Object.freeze(Object.assign({}, originalDumpsterAsset, {
+        faces: Object.freeze(faces),
+        singlePlaneCutout: true,
+        selectedLocalFace: localFace
+      }));
+      variants.set(localFace, variant);
+      return variant;
+    }
+
+    Object.defineProperty(bitmapRegistry, 'dumpster_001', {
+      configurable: true,
+      enumerable: true,
+      get(){
+        const placement = activeDumpsterPlacement();
+        const runtimePlayer = activePlayer();
+        if(!placement || !runtimePlayer) return originalDumpsterAsset;
+        const selectedWorldFace = dominantExteriorFace(
+          placement, originalDumpsterAsset, Number(runtimePlayer.x), Number(runtimePlayer.y));
+        const selectedLocalFace = selectedWorldFace && typeof root.inverseRotateBitmapFace === 'function'
+          ? root.inverseRotateBitmapFace(selectedWorldFace, placement.rotation || 0)
+          : selectedWorldFace;
+        if(!selectedLocalFace) return originalDumpsterAsset;
+        singlePlaneDiagnostics = Object.freeze({
+          active: true,
+          assetId: 'dumpster_001',
+          selectedWorldFace,
+          selectedLocalFace,
+          placementId: placement.id || placement.bid || null,
+          lookupCount: singlePlaneDiagnostics.lookupCount + 1,
+          playerX: Number(runtimePlayer.x),
+          playerY: Number(runtimePlayer.y)
+        });
+        return variantFor(selectedLocalFace);
+      },
+      set(value){
+        originalDumpsterAsset = value;
+        variants.clear();
+      }
+    });
   }
 
   root.crGetSinglePlaneCutoutDiagnostics = function crGetSinglePlaneCutoutDiagnostics(){
