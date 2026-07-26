@@ -1,0 +1,14 @@
+{
+  "schema": "snc-building-source-v1",
+  "id": "dumpster_001",
+  "displayName": "Fictional dumpster",
+  "category": "street-object",
+  "footprint": {
+    "widthCells": 1,
+    "depthCells": 2
+  },
+  "heightScale": 0.3,
+  "alphaCutout": true,
+  "topCap": "none",
+  "face": "source/face.png"
+}

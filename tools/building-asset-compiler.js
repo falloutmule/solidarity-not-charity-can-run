@@ -10,6 +10,8 @@ const ROOT = path.resolve(__dirname, '..');
 const SOURCE_SCHEMA = 'snc-building-source-v1';
 const RUNTIME_SCHEMA = 'snc-bitmap-building-asset-v1';
 const COMPILER_VERSION = 'snc-building-asset-compiler-v1';
+const DEFAULT_PIXELS_PER_CELL = 128;
+const DEFAULT_FACE_HEIGHT = 256;
 
 function sha256(bytes) { return crypto.createHash('sha256').update(bytes).digest('hex'); }
 function stableJson(value) { return JSON.stringify(value); }
@@ -32,6 +34,18 @@ function readPng(filePath, label) {
   return { bytes, png, sha256: sha256(bytes), filePath };
 }
 
+function resizeNearest(source, width, height) {
+  const output = new PNG({ width, height, colorType: 6, inputColorType: 6, inputHasAlpha: true });
+  for (let y = 0; y < height; y += 1) for (let x = 0; x < width; x += 1) {
+    const sourceX = Math.min(source.width - 1, Math.floor(x * source.width / width));
+    const sourceY = Math.min(source.height - 1, Math.floor(y * source.height / height));
+    const sourceOffset = (sourceY * source.width + sourceX) * 4;
+    const outputOffset = (y * width + x) * 4;
+    source.data.copy(output.data, outputOffset, sourceOffset, sourceOffset + 4);
+  }
+  return output;
+}
+
 function loadSource(buildingDir) {
   const manifestPath = path.join(buildingDir, 'building.json');
   const source = readJson(manifestPath);
@@ -40,29 +54,53 @@ function loadSource(buildingDir) {
   const footprint = source.footprint || {};
   assert(Number.isInteger(footprint.widthCells) && footprint.widthCells > 0, 'footprint.widthCells must be a positive integer');
   assert(Number.isInteger(footprint.depthCells) && footprint.depthCells > 0, 'footprint.depthCells must be a positive integer');
-  assert(source.faces && typeof source.faces === 'object', 'building.json faces are required');
-  for (const name of ['front', 'side', 'back']) assert(typeof source.faces[name] === 'string', `faces.${name} is required`);
-  const allowed = new Set(['schema', 'id', 'displayName', 'category', 'notes', 'footprint', 'faces']);
-  for (const key of Object.keys(source)) assert(allowed.has(key), `unknown building.json property: ${key}`);
-  const faceFiles = {};
-  for (const [name, relativePath] of Object.entries(source.faces)) {
-    assert(['front', 'side', 'back', 'west'].includes(name), `unknown face name: ${name}`);
-    assert(!path.isAbsolute(relativePath) && !relativePath.includes('..'), `face path escapes building folder: ${name}`);
-    faceFiles[name] = readPng(path.join(buildingDir, relativePath), `faces.${name}`);
+  if (Object.prototype.hasOwnProperty.call(source, 'heightScale')) {
+    assert(Number.isFinite(source.heightScale) && source.heightScale > 0 && source.heightScale <= 1,
+      'heightScale must be a finite number greater than 0 and at most 1');
   }
-  const height = faceFiles.front.png.height;
-  for (const [name, face] of Object.entries(faceFiles)) assert(face.png.height === height, `faces.${name} height must match front.png`);
-  const pixelsPerCell = faceFiles.front.png.width / footprint.widthCells;
-  assert(Number.isInteger(pixelsPerCell) && pixelsPerCell > 0, 'front width must divide exactly by footprint.widthCells');
-  assert(faceFiles.back.png.width === footprint.widthCells * pixelsPerCell, 'back width must match footprint.widthCells');
-  assert(faceFiles.side.png.width === footprint.depthCells * pixelsPerCell, 'side width must match footprint.depthCells');
-  if (faceFiles.west) assert(faceFiles.west.png.width === footprint.depthCells * pixelsPerCell, 'west width must match footprint.depthCells');
-  return { source, manifestPath, faceFiles, pixelsPerCell };
+  if (Object.prototype.hasOwnProperty.call(source, 'alphaCutout')) assert(typeof source.alphaCutout === 'boolean', 'alphaCutout must be Boolean');
+  if (Object.prototype.hasOwnProperty.call(source, 'topCap')) assert(['none', 'solid', 'masked/asset'].includes(source.topCap), 'topCap must be none, solid, or masked/asset');
+  const reusableMode = typeof source.face === 'string';
+  assert(reusableMode || (source.faces && typeof source.faces === 'object'), 'building.json requires face or faces');
+  if (!reusableMode) for (const name of ['front', 'side', 'back']) assert(typeof source.faces[name] === 'string', `faces.${name} is required`);
+  const allowed = new Set(['schema', 'id', 'displayName', 'category', 'notes', 'footprint', 'heightScale', 'alphaCutout', 'topCap', 'face', 'faces']);
+  for (const key of Object.keys(source)) assert(allowed.has(key), `unknown building.json property: ${key}`);
+  const sourceInputs = {};
+  const faceFiles = {};
+  const facePaths = reusableMode
+    ? Object.fromEntries(['front', 'side', 'back', 'west'].map((name) => [name, source.faces && source.faces[name] ? source.faces[name] : source.face]))
+    : source.faces;
+  if (source.faces) for (const name of Object.keys(source.faces)) assert(['front', 'side', 'back', 'west'].includes(name), `unknown face name: ${name}`);
+  for (const [name, relativePath] of Object.entries(facePaths)) {
+    assert(!path.isAbsolute(relativePath) && !relativePath.includes('..'), `face path escapes building folder: ${name}`);
+    if (!sourceInputs[relativePath]) sourceInputs[relativePath] = readPng(path.join(buildingDir, relativePath), reusableMode && relativePath === source.face ? 'face' : `faces.${name}`);
+    faceFiles[name] = sourceInputs[relativePath];
+  }
+  let pixelsPerCell;
+  if (reusableMode) {
+    pixelsPerCell = DEFAULT_PIXELS_PER_CELL;
+    for (const [name, face] of Object.entries(faceFiles)) {
+      const spanCells = (name === 'front' || name === 'back') ? footprint.widthCells : footprint.depthCells;
+      faceFiles[name] = { ...face, png: resizeNearest(face.png, spanCells * pixelsPerCell, DEFAULT_FACE_HEIGHT) };
+    }
+  } else {
+    const height = faceFiles.front.png.height;
+    for (const [name, face] of Object.entries(faceFiles)) assert(face.png.height === height, `faces.${name} height must match front.png`);
+    pixelsPerCell = faceFiles.front.png.width / footprint.widthCells;
+    assert(Number.isInteger(pixelsPerCell) && pixelsPerCell > 0, 'front width must divide exactly by footprint.widthCells');
+    assert(faceFiles.back.png.width === footprint.widthCells * pixelsPerCell, 'back width must match footprint.widthCells');
+    assert(faceFiles.side.png.width === footprint.depthCells * pixelsPerCell, 'side width must match footprint.depthCells');
+    if (faceFiles.west) assert(faceFiles.west.png.width === footprint.depthCells * pixelsPerCell, 'west width must match footprint.depthCells');
+  }
+  return {
+    source, manifestPath, faceFiles, pixelsPerCell, reusableMode, sourceInputs,
+    hasWestOverride: reusableMode ? Boolean(source.faces && source.faces.west) : Boolean(faceFiles.west)
+  };
 }
 
 function packAtlas(loaded) {
   const order = ['front', 'side', 'back'];
-  if (loaded.faceFiles.west) order.push('west');
+  if (loaded.hasWestOverride) order.push('west');
   const height = loaded.faceFiles.front.png.height;
   const width = order.reduce((total, name) => total + loaded.faceFiles[name].png.width, 0);
   const atlas = new PNG({ width, height, colorType: 6, inputColorType: 6, inputHasAlpha: true });
@@ -90,8 +128,10 @@ function compileBuilding(buildingDir) {
   const { source, faceFiles } = loaded;
   const atlas = packAtlas(loaded);
   const id = source.id;
-  const hasWest = Boolean(faceFiles.west);
-  const sourceHashes = Object.fromEntries(Object.entries(faceFiles).map(([name, face]) => [name, face.sha256]));
+  const hasWest = loaded.hasWestOverride;
+  const sourceHashes = loaded.reusableMode
+    ? Object.fromEntries(Object.entries(loaded.sourceInputs).map(([relativePath, face]) => [relativePath === source.face ? 'face' : relativePath, face.sha256]))
+    : Object.fromEntries(Object.entries(faceFiles).map(([name, face]) => [name, face.sha256]));
   const faceAssets = {
     front_unique: faceAsset('unique', 'front', source.footprint.widthCells, atlas.slices.front),
     side_shared: faceAsset('shared', 'side', source.footprint.depthCells, atlas.slices.side, false),
@@ -117,11 +157,19 @@ function compileBuilding(buildingDir) {
     renderMode: 'importedWholeFaceAsset',
     approvalStatus: 'unreviewed',
     footprint: { wCells: source.footprint.widthCells, hCells: source.footprint.depthCells },
+    heightScale: Number.isFinite(source.heightScale) ? source.heightScale : 1,
+    alphaCutout: source.alphaCutout === true,
+    topCap: source.topCap || 'none',
     atlas: {
       fileName: `${id}.atlas.png`, mime: 'image/png', encoding: 'data-uri', width: atlas.width, height: atlas.height,
       byteLength: atlas.bytes.length, sha256: sha256(atlas.bytes), dataUri: `data:image/png;base64,${atlas.bytes.toString('base64')}`
     },
-    source: { schema: SOURCE_SCHEMA, manifest: path.relative(ROOT, loaded.manifestPath).replace(/\\/g, '/'), sourceHashes },
+    source: {
+      schema: SOURCE_SCHEMA,
+      mode: loaded.reusableMode ? 'single-reusable-face' : 'directional-faces',
+      manifest: path.relative(ROOT, loaded.manifestPath).replace(/\\/g, '/'),
+      sourceHashes
+    },
     faceAssets,
     faces
   };
@@ -176,4 +224,4 @@ if (require.main === module) {
   catch (error) { console.error(error.message); process.exitCode = 1; }
 }
 
-module.exports = { COMPILER_VERSION, SOURCE_SCHEMA, RUNTIME_SCHEMA, compileBuilding, emitAssetModule, loadSource, packAtlas, writeCompiledBuilding };
+module.exports = { COMPILER_VERSION, SOURCE_SCHEMA, RUNTIME_SCHEMA, compileBuilding, emitAssetModule, loadSource, packAtlas, resizeNearest, writeCompiledBuilding };
