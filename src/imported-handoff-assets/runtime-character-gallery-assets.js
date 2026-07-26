@@ -14,7 +14,7 @@
       "x": 0.5,
       "y": 1.0
     },
-    "heightScale": 0.72,
+    "heightScale": 0.62,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -38,7 +38,7 @@
       "x": 0.5,
       "y": 1.0
     },
-    "heightScale": 0.72,
+    "heightScale": 0.62,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -62,7 +62,7 @@
       "x": 0.5,
       "y": 1.0
     },
-    "heightScale": 0.72,
+    "heightScale": 0.62,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -86,7 +86,7 @@
       "x": 0.5,
       "y": 1.0
     },
-    "heightScale": 0.72,
+    "heightScale": 0.62,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -110,7 +110,7 @@
       "x": 0.5,
       "y": 1.0
     },
-    "heightScale": 0.72,
+    "heightScale": 0.62,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -134,7 +134,7 @@
       "x": 0.5,
       "y": 1.0
     },
-    "heightScale": 0.72,
+    "heightScale": 0.62,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -158,7 +158,7 @@
       "x": 0.5,
       "y": 1.0
     },
-    "heightScale": 0.72,
+    "heightScale": 0.62,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -182,7 +182,7 @@
       "x": 0.5,
       "y": 1.0
     },
-    "heightScale": 0.72,
+    "heightScale": 0.62,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -206,7 +206,7 @@
       "x": 0.5,
       "y": 1.0
     },
-    "heightScale": 0.72,
+    "heightScale": 0.62,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -230,7 +230,7 @@
       "x": 0.5,
       "y": 1.0
     },
-    "heightScale": 0.72,
+    "heightScale": 0.62,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -254,7 +254,7 @@
       "x": 0.5,
       "y": 1.0
     },
-    "heightScale": 0.72,
+    "heightScale": 0.62,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -278,7 +278,7 @@
       "x": 0.5,
       "y": 1.0
     },
-    "heightScale": 0.52,
+    "heightScale": 0.45,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -302,7 +302,7 @@
       "x": 0.5,
       "y": 1.0
     },
-    "heightScale": 0.72,
+    "heightScale": 0.62,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -326,7 +326,7 @@
       "x": 0.5,
       "y": 1.0
     },
-    "heightScale": 0.72,
+    "heightScale": 0.62,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -350,7 +350,7 @@
       "x": 0.5,
       "y": 1.0
     },
-    "heightScale": 0.72,
+    "heightScale": 0.62,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -374,7 +374,7 @@
       "x": 0.5,
       "y": 1.0
     },
-    "heightScale": 0.72,
+    "heightScale": 0.62,
     "alphaBounds": {
       "x": 3,
       "y": 3,

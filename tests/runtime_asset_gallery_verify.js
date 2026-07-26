@@ -25,8 +25,8 @@ assert.deepStrictEqual(manifest.assets.reduce((groups, asset) => {
   groups[asset.group] = (groups[asset.group] || 0) + 1;
   return groups;
 }, {}), { volunteer: 3, household: 2, civilian: 3, unhoused: 8 }, 'approved group counts');
-assert.strictEqual(manifest.assets.find((asset) => asset.assetId === 'npc_unhoused_slumped_001').displayHeightCells, 0.52, 'seated asset remains visibly shorter');
-for(const asset of manifest.assets.filter((asset) => asset.assetId !== 'npc_unhoused_slumped_001')) assert.strictEqual(asset.displayHeightCells, 0.72, `${asset.assetId}: compact gallery scale`);
+assert.strictEqual(manifest.assets.find((asset) => asset.assetId === 'npc_unhoused_slumped_001').displayHeightCells, 0.45, 'seated asset remains visibly shorter');
+for(const asset of manifest.assets.filter((asset) => asset.assetId !== 'npc_unhoused_slumped_001')) assert.strictEqual(asset.displayHeightCells, 0.62, `${asset.assetId}: compact gallery scale`);
 for(const asset of manifest.assets){
   assert.strictEqual(asset.reviewStatus, 'candidate', `${asset.assetId}: approved package records stay candidate review art`);
   assert.strictEqual(asset.anchor.y, 1.0, `${asset.assetId}: ground anchor`);

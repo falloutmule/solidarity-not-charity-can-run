@@ -12,7 +12,7 @@
   "artifact": {
     "path": "index.html",
     "byteLength": 1582786,
-    "sha256": "f97871b26961c9750fe01581e8243cf773f96cef0f47efab4fc10db2a091159c"
+    "sha256": "b9abeefb924378691bc379cb2f4d6c6d62ca60ad7e4a1c329e7c3798d7d544e7"
   },
   "distribution": {
     "provider": "github-pages",
