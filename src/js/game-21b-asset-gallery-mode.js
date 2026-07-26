@@ -56,7 +56,7 @@ function crInstallAssetGallery(){
   const npcs = level.characters.map((placement) => {
     const asset = crAssetGalleryRuntimeRecord(placement.assetId);
     if(!asset) throw new Error('gallery character asset is not registered: ' + placement.assetId);
-    const npc = { id: placement.id, assetId: placement.assetId, kind: 'volunteer', x: placement.x, y: placement.y, need: 99, helped: false, wob: 0, thank: '', galleryStatic: true };
+    const npc = { id: placement.id, assetId: placement.assetId, kind: asset.group, x: placement.x, y: placement.y, need: 99, helped: false, wob: 0, thank: '', galleryStatic: true, heightScale: asset.heightScale };
     exhibits.push(crAssetGalleryExhibit(placement.id, 'character/' + asset.group, placement.assetId, npc));
     return npc;
   });

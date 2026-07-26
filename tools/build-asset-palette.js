@@ -1,28 +1,31 @@
 #!/usr/bin/env node
 'use strict';
 
-/* Emits a future-editor palette from the same candidate manifest used by runtime compilation. */
+/* Emits a future-editor palette from the approved runtime asset authority. */
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 const root = path.resolve(__dirname, '..');
-const manifestPath = path.join(root, 'authoring', 'characters', 'character-isolation-v1.json');
+const manifestPath = path.join(root, 'authoring', 'characters', 'character-assets-v2.json');
 const outputPath = path.join(root, 'authoring', 'generated', 'asset-palette.json');
 
 function main(){
   const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-  const assets = manifest.assets.filter((asset) => asset.status === 'candidate').map((asset) => ({
+  if(manifest.schema !== 'snc-character-assets-v2') throw new Error('unexpected approved character manifest schema');
+  const assets = manifest.assets.map((asset) => ({
     assetId: asset.assetId,
-    category: asset.assetId.includes('_volunteer_') ? 'character.volunteer' : asset.assetId.includes('_civilian_') ? 'character.civilian' : 'character.household',
+    category: 'character.' + asset.group,
     displayLabel: asset.assetId,
-    approvalStatus: 'candidate',
-    renderMode: 'billboard-single',
-    collision: 'none',
+    approvalStatus: asset.reviewStatus,
+    renderMode: asset.renderMode,
+    collision: asset.collision,
     previewPath: asset.runtimePath,
     sha256: asset.runtimeSha256,
+    displayHeightCells: asset.displayHeightCells,
     allowedLevelLayers: ['NPCs', 'Gallery']
   })).sort((a, b) => a.assetId.localeCompare(b.assetId));
-  const output = { schema: 'snc-asset-palette-v1', generatedFrom: 'authoring/characters/character-isolation-v1.json', assets };
+  if(assets.length !== 16) throw new Error('approved cast palette must contain exactly sixteen assets');
+  const output = { schema: 'snc-asset-palette-v1', generatedFrom: 'authoring/characters/character-assets-v2.json', assets };
   const text = JSON.stringify(output, null, 2) + '\n';
   if(process.argv.includes('--check')){
     if(!fs.existsSync(outputPath) || fs.readFileSync(outputPath, 'utf8') !== text) throw new Error('asset palette drift; run without --check');

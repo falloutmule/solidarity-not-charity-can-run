@@ -1,0 +1,274 @@
+{
+  "source": "_cast_soft_clean.png",
+  "asset_count": 8,
+  "title_footer_decorations_included": false,
+  "transparent_rgb_normalized_to_zero": true,
+  "antialiasing_preserved": true,
+  "margin_pixels": 24,
+  "assets": [
+    {
+      "id": 1,
+      "name": "01_elderly_woman",
+      "file": "01_elderly_woman.png",
+      "source_partition": {
+        "min_x": 0,
+        "max_x": 168,
+        "y0": 150,
+        "y1": 825,
+        "row_adaptive": false
+      },
+      "source_bbox": [
+        17,
+        276,
+        161,
+        788
+      ],
+      "size": [
+        192,
+        560
+      ],
+      "margins": {
+        "left": 24,
+        "right": 24,
+        "top": 24,
+        "bottom": 24
+      },
+      "transparent": 58474,
+      "partial_alpha": 4108,
+      "opaque": 44938,
+      "hidden_rgb_nonzero_under_alpha_zero": 0,
+      "sha256": "801cf6bd1ba0c6c9eda27fa353a0621d6a0afcea609cdd18fd5a9aa1f1d1536a"
+    },
+    {
+      "id": 2,
+      "name": "02_volunteer",
+      "file": "02_volunteer.png",
+      "source_partition": {
+        "min_x": 168,
+        "max_x": 320,
+        "y0": 150,
+        "y1": 825,
+        "row_adaptive": false
+      },
+      "source_bbox": [
+        175,
+        212,
+        320,
+        790
+      ],
+      "size": [
+        193,
+        626
+      ],
+      "margins": {
+        "left": 24,
+        "right": 24,
+        "top": 24,
+        "bottom": 24
+      },
+      "transparent": 70066,
+      "partial_alpha": 5139,
+      "opaque": 45613,
+      "hidden_rgb_nonzero_under_alpha_zero": 0,
+      "sha256": "fa39b707626122ba415483296841ecfc61d5e6943ef85747144a43e9bb8fbf07"
+    },
+    {
+      "id": 3,
+      "name": "03_miguel",
+      "file": "03_miguel.png",
+      "source_partition": {
+        "min_x": 320,
+        "max_x": 501,
+        "y0": 150,
+        "y1": 825,
+        "row_adaptive": false
+      },
+      "source_bbox": [
+        322,
+        187,
+        501,
+        789
+      ],
+      "size": [
+        227,
+        650
+      ],
+      "margins": {
+        "left": 24,
+        "right": 24,
+        "top": 24,
+        "bottom": 24
+      },
+      "transparent": 81140,
+      "partial_alpha": 4531,
+      "opaque": 61879,
+      "hidden_rgb_nonzero_under_alpha_zero": 0,
+      "sha256": "ede9251075de148d70066db4944e5722bd3ead75353addaaee43cdf32bf8e26c"
+    },
+    {
+      "id": 4,
+      "name": "04_mother_and_child",
+      "file": "04_mother_and_child.png",
+      "source_partition": {
+        "min_x": 501,
+        "max_x": 651,
+        "y0": 150,
+        "y1": 825,
+        "row_adaptive": false
+      },
+      "source_bbox": [
+        513,
+        219,
+        651,
+        789
+      ],
+      "size": [
+        186,
+        618
+      ],
+      "margins": {
+        "left": 24,
+        "right": 24,
+        "top": 24,
+        "bottom": 24
+      },
+      "transparent": 63465,
+      "partial_alpha": 5035,
+      "opaque": 46448,
+      "hidden_rgb_nonzero_under_alpha_zero": 0,
+      "sha256": "010dad9a82ac988954fbc4e5841aec3190cfccde21ae26df26e8b97051b476a3"
+    },
+    {
+      "id": 5,
+      "name": "05_backpack_youth",
+      "file": "05_backpack_youth.png",
+      "source_partition": {
+        "min_x": 651,
+        "max_x": 799,
+        "y0": 150,
+        "y1": 825,
+        "row_adaptive": false
+      },
+      "source_bbox": [
+        651,
+        218,
+        799,
+        789
+      ],
+      "size": [
+        196,
+        619
+      ],
+      "margins": {
+        "left": 24,
+        "right": 24,
+        "top": 24,
+        "bottom": 24
+      },
+      "transparent": 68342,
+      "partial_alpha": 5284,
+      "opaque": 47698,
+      "hidden_rgb_nonzero_under_alpha_zero": 0,
+      "sha256": "452bf805fdb821ab7f91366df7444d4865f10e2192f1a4efc45df1dcda2949e6"
+    },
+    {
+      "id": 6,
+      "name": "06_beanie_person",
+      "file": "06_beanie_person.png",
+      "source_partition": {
+        "min_x": 799,
+        "max_x": 946,
+        "y0": 150,
+        "y1": 825,
+        "row_adaptive": true
+      },
+      "source_bbox": [
+        801,
+        212,
+        946,
+        792
+      ],
+      "size": [
+        193,
+        628
+      ],
+      "margins": {
+        "left": 24,
+        "right": 24,
+        "top": 24,
+        "bottom": 24
+      },
+      "transparent": 68773,
+      "partial_alpha": 5071,
+      "opaque": 47360,
+      "hidden_rgb_nonzero_under_alpha_zero": 0,
+      "sha256": "31898af13009588fdd0583faef1a68640dea03d549dcbede32bd833c54e7845c"
+    },
+    {
+      "id": 7,
+      "name": "07_grocery_carrier",
+      "file": "07_grocery_carrier.png",
+      "source_partition": {
+        "min_x": 925,
+        "max_x": 1138,
+        "y0": 150,
+        "y1": 825,
+        "row_adaptive": true
+      },
+      "source_bbox": [
+        925,
+        183,
+        1138,
+        790
+      ],
+      "size": [
+        261,
+        655
+      ],
+      "margins": {
+        "left": 24,
+        "right": 24,
+        "top": 24,
+        "bottom": 24
+      },
+      "transparent": 89580,
+      "partial_alpha": 5674,
+      "opaque": 75701,
+      "hidden_rgb_nonzero_under_alpha_zero": 0,
+      "sha256": "b2d2610caafc95edbff6d106bc729d63a7c66b9ba193a6eb0b97ea78511dd495"
+    },
+    {
+      "id": 8,
+      "name": "08_woman_and_dog",
+      "file": "08_woman_and_dog.png",
+      "source_partition": {
+        "min_x": 1110,
+        "max_x": 1280,
+        "y0": 150,
+        "y1": 825,
+        "row_adaptive": true
+      },
+      "source_bbox": [
+        1122,
+        236,
+        1262,
+        808
+      ],
+      "size": [
+        188,
+        620
+      ],
+      "margins": {
+        "left": 24,
+        "right": 24,
+        "top": 24,
+        "bottom": 24
+      },
+      "transparent": 62375,
+      "partial_alpha": 5860,
+      "opaque": 48325,
+      "hidden_rgb_nonzero_under_alpha_zero": 0,
+      "sha256": "d6c5595df553d5e213f3972c3849c9d575a6314093fe989cd6057f6f080c1e3d"
+    }
+  ]
+}

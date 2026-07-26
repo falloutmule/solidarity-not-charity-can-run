@@ -1,0 +1,807 @@
+{
+  "schema": "snc-character-assets-v2",
+  "packages": {
+    "dStyle": {
+      "archiveName": "SNC_cast_game_assets.zip",
+      "archiveSha256": "257acf709f99efff178a38a758fbd5e41fc27d0c006b55015322f7bdc8b52869",
+      "manifestPath": "authoring/characters/source-manifests/d-style-package-manifest.json",
+      "manifestSha256": "504ecac51fb27a1fcdfbba35af3cf762c8ba74d6349a9c5e4e760aaa02c2c4f0",
+      "assetCount": 8,
+      "sourceMarginPixels": 24
+    },
+    "unhoused": {
+      "archiveName": "UNHOUSED (1).zip",
+      "archiveSha256": "d4c3c6d9653c54dffd19b27b9677e141ba9aedaaf32a523586976019a8bc1c62",
+      "manifestPath": "authoring/characters/source-manifests/unhoused-package-manifest.json",
+      "manifestSha256": "2aa13b84959faa26a0539a817c6ed68b3e75ea14f71ae0f21048599e2b4377f7",
+      "assetCount": 8,
+      "sourceMarginPixels": 24
+    }
+  },
+  "assets": [
+    {
+      "assetId": "npc_volunteer_elder_cane_001",
+      "package": "dStyle",
+      "packageFile": "01_elderly_woman.png",
+      "group": "volunteer",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "reviewStatus": "candidate",
+      "sourcePath": "authoring/characters/runtime-candidates/npc_volunteer_elder_cane_001.png",
+      "sourceSha256": "801cf6bd1ba0c6c9eda27fa353a0621d6a0afcea609cdd18fd5a9aa1f1d1536a",
+      "sourceSize": {
+        "width": 192,
+        "height": 560
+      },
+      "sourceMarginPixels": 24,
+      "sourceAlphaBounds": {
+        "x": 24,
+        "y": 24,
+        "w": 144,
+        "h": 512
+      },
+      "sourceAlphaHistogram": {
+        "zero": 58474,
+        "partial": 4108,
+        "opaque": 44938
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "runtimePath": "authoring/characters/runtime/npc_volunteer_elder_cane_001.png",
+      "runtimeSha256": "be393cd4b8f0740c56274b6462ac7a39ffe10cf8caea34ac175df01c6ae3770f",
+      "runtimeSize": {
+        "width": 58,
+        "height": 192
+      },
+      "runtimeAlphaBounds": {
+        "x": 3,
+        "y": 3,
+        "w": 52,
+        "h": 186
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 4107,
+        "partial": 1612,
+        "opaque": 5417
+      },
+      "displayHeightCells": 1.4
+    },
+    {
+      "assetId": "npc_volunteer_tote_001",
+      "package": "dStyle",
+      "packageFile": "02_volunteer.png",
+      "group": "volunteer",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "reviewStatus": "candidate",
+      "sourcePath": "authoring/characters/runtime-candidates/npc_volunteer_tote_001.png",
+      "sourceSha256": "fa39b707626122ba415483296841ecfc61d5e6943ef85747144a43e9bb8fbf07",
+      "sourceSize": {
+        "width": 193,
+        "height": 626
+      },
+      "sourceMarginPixels": 24,
+      "sourceAlphaBounds": {
+        "x": 24,
+        "y": 24,
+        "w": 145,
+        "h": 578
+      },
+      "sourceAlphaHistogram": {
+        "zero": 70066,
+        "partial": 5139,
+        "opaque": 45613
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "runtimePath": "authoring/characters/runtime/npc_volunteer_tote_001.png",
+      "runtimeSha256": "c86a24f5159073e4db8e3773d24eedee638e88b9a69d3ff039620b58918c5e0d",
+      "runtimeSize": {
+        "width": 53,
+        "height": 192
+      },
+      "runtimeAlphaBounds": {
+        "x": 3,
+        "y": 3,
+        "w": 47,
+        "h": 186
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 4190,
+        "partial": 1815,
+        "opaque": 4171
+      },
+      "displayHeightCells": 1.4
+    },
+    {
+      "assetId": "npc_volunteer_miguel_001",
+      "package": "dStyle",
+      "packageFile": "03_miguel.png",
+      "group": "volunteer",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "reviewStatus": "candidate",
+      "sourcePath": "authoring/characters/runtime-candidates/npc_volunteer_miguel_001.png",
+      "sourceSha256": "ede9251075de148d70066db4944e5722bd3ead75353addaaee43cdf32bf8e26c",
+      "sourceSize": {
+        "width": 227,
+        "height": 650
+      },
+      "sourceMarginPixels": 24,
+      "sourceAlphaBounds": {
+        "x": 24,
+        "y": 24,
+        "w": 179,
+        "h": 602
+      },
+      "sourceAlphaHistogram": {
+        "zero": 81140,
+        "partial": 4531,
+        "opaque": 61879
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "runtimePath": "authoring/characters/runtime/npc_volunteer_miguel_001.png",
+      "runtimeSha256": "210f3088eb27d100c47e6067eac672fe048769f44fd18b9f19f09ee730ef8e45",
+      "runtimeSize": {
+        "width": 61,
+        "height": 192
+      },
+      "runtimeAlphaBounds": {
+        "x": 3,
+        "y": 3,
+        "w": 55,
+        "h": 186
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 4680,
+        "partial": 1794,
+        "opaque": 5238
+      },
+      "displayHeightCells": 1.4
+    },
+    {
+      "assetId": "npc_household_parent_child_001",
+      "package": "dStyle",
+      "packageFile": "04_mother_and_child.png",
+      "group": "household",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "reviewStatus": "candidate",
+      "sourcePath": "authoring/characters/runtime-candidates/npc_household_parent_child_001.png",
+      "sourceSha256": "010dad9a82ac988954fbc4e5841aec3190cfccde21ae26df26e8b97051b476a3",
+      "sourceSize": {
+        "width": 186,
+        "height": 618
+      },
+      "sourceMarginPixels": 24,
+      "sourceAlphaBounds": {
+        "x": 24,
+        "y": 24,
+        "w": 138,
+        "h": 570
+      },
+      "sourceAlphaHistogram": {
+        "zero": 63465,
+        "partial": 5035,
+        "opaque": 46448
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "runtimePath": "authoring/characters/runtime/npc_household_parent_child_001.png",
+      "runtimeSha256": "54eb982e75b96f26e10c97b78315088e27ebffeccbb9c9b90e38898e17513994",
+      "runtimeSize": {
+        "width": 51,
+        "height": 192
+      },
+      "runtimeAlphaBounds": {
+        "x": 3,
+        "y": 3,
+        "w": 45,
+        "h": 186
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 3628,
+        "partial": 1847,
+        "opaque": 4317
+      },
+      "displayHeightCells": 1.4
+    },
+    {
+      "assetId": "npc_civilian_backpack_youth_001",
+      "package": "dStyle",
+      "packageFile": "05_backpack_youth.png",
+      "group": "civilian",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "reviewStatus": "candidate",
+      "sourcePath": "authoring/characters/runtime-candidates/npc_civilian_backpack_youth_001.png",
+      "sourceSha256": "452bf805fdb821ab7f91366df7444d4865f10e2192f1a4efc45df1dcda2949e6",
+      "sourceSize": {
+        "width": 196,
+        "height": 619
+      },
+      "sourceMarginPixels": 24,
+      "sourceAlphaBounds": {
+        "x": 24,
+        "y": 24,
+        "w": 148,
+        "h": 571
+      },
+      "sourceAlphaHistogram": {
+        "zero": 68342,
+        "partial": 5284,
+        "opaque": 47698
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "runtimePath": "authoring/characters/runtime/npc_civilian_backpack_youth_001.png",
+      "runtimeSha256": "3d7d06f6747c19b625c9e125d4998485ae434e7f71b9f840a684a96eb2717bcc",
+      "runtimeSize": {
+        "width": 54,
+        "height": 192
+      },
+      "runtimeAlphaBounds": {
+        "x": 3,
+        "y": 3,
+        "w": 48,
+        "h": 186
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 4087,
+        "partial": 1787,
+        "opaque": 4494
+      },
+      "displayHeightCells": 1.4
+    },
+    {
+      "assetId": "npc_civilian_beanie_messenger_001",
+      "package": "dStyle",
+      "packageFile": "06_beanie_person.png",
+      "group": "civilian",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "reviewStatus": "candidate",
+      "sourcePath": "authoring/characters/runtime-candidates/npc_civilian_beanie_messenger_001.png",
+      "sourceSha256": "31898af13009588fdd0583faef1a68640dea03d549dcbede32bd833c54e7845c",
+      "sourceSize": {
+        "width": 193,
+        "height": 628
+      },
+      "sourceMarginPixels": 24,
+      "sourceAlphaBounds": {
+        "x": 24,
+        "y": 24,
+        "w": 145,
+        "h": 580
+      },
+      "sourceAlphaHistogram": {
+        "zero": 68773,
+        "partial": 5071,
+        "opaque": 47360
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "runtimePath": "authoring/characters/runtime/npc_civilian_beanie_messenger_001.png",
+      "runtimeSha256": "465d2e98f974da32f4b30eed687e9990af968c3aa1f045a1c2b0f8d299cc3f80",
+      "runtimeSize": {
+        "width": 52,
+        "height": 192
+      },
+      "runtimeAlphaBounds": {
+        "x": 3,
+        "y": 3,
+        "w": 46,
+        "h": 186
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 3915,
+        "partial": 1840,
+        "opaque": 4229
+      },
+      "displayHeightCells": 1.4
+    },
+    {
+      "assetId": "npc_civilian_grocery_carrier_001",
+      "package": "dStyle",
+      "packageFile": "07_grocery_carrier.png",
+      "group": "civilian",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "reviewStatus": "candidate",
+      "sourcePath": "authoring/characters/runtime-candidates/npc_civilian_grocery_carrier_001.png",
+      "sourceSha256": "b2d2610caafc95edbff6d106bc729d63a7c66b9ba193a6eb0b97ea78511dd495",
+      "sourceSize": {
+        "width": 261,
+        "height": 655
+      },
+      "sourceMarginPixels": 24,
+      "sourceAlphaBounds": {
+        "x": 24,
+        "y": 24,
+        "w": 213,
+        "h": 607
+      },
+      "sourceAlphaHistogram": {
+        "zero": 89580,
+        "partial": 5674,
+        "opaque": 75701
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "runtimePath": "authoring/characters/runtime/npc_civilian_grocery_carrier_001.png",
+      "runtimeSha256": "051114eba6211f3d52e7d2784c9d99466d94394cccde44beecff9f9abe648a69",
+      "runtimeSize": {
+        "width": 71,
+        "height": 192
+      },
+      "runtimeAlphaBounds": {
+        "x": 3,
+        "y": 3,
+        "w": 65,
+        "h": 186
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 5275,
+        "partial": 1908,
+        "opaque": 6449
+      },
+      "displayHeightCells": 1.4
+    },
+    {
+      "assetId": "npc_household_dog_walker_001",
+      "package": "dStyle",
+      "packageFile": "08_woman_and_dog.png",
+      "group": "household",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "reviewStatus": "candidate",
+      "sourcePath": "authoring/characters/runtime-candidates/npc_household_dog_walker_001.png",
+      "sourceSha256": "d6c5595df553d5e213f3972c3849c9d575a6314093fe989cd6057f6f080c1e3d",
+      "sourceSize": {
+        "width": 188,
+        "height": 620
+      },
+      "sourceMarginPixels": 24,
+      "sourceAlphaBounds": {
+        "x": 24,
+        "y": 24,
+        "w": 140,
+        "h": 572
+      },
+      "sourceAlphaHistogram": {
+        "zero": 62375,
+        "partial": 5860,
+        "opaque": 48325
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "runtimePath": "authoring/characters/runtime/npc_household_dog_walker_001.png",
+      "runtimeSha256": "5a831036f800fcab8818ac093899408fe574fb24590612f8bb0f0d86b51a4554",
+      "runtimeSize": {
+        "width": 52,
+        "height": 192
+      },
+      "runtimeAlphaBounds": {
+        "x": 3,
+        "y": 3,
+        "w": 46,
+        "h": 186
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 3405,
+        "partial": 2040,
+        "opaque": 4539
+      },
+      "displayHeightCells": 1.4
+    },
+    {
+      "assetId": "npc_unhoused_dog_companion_001",
+      "package": "unhoused",
+      "packageFile": "01_top_woman_and_dog.png",
+      "group": "unhoused",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "reviewStatus": "candidate",
+      "sourcePath": "authoring/characters/runtime-candidates/npc_unhoused_dog_companion_001.png",
+      "sourceSha256": "b372adbf13bf8dc17cf71ccb4f9a624c5af14e0e0b06aaacaac85d2b74ec95b4",
+      "sourceSize": {
+        "width": 314,
+        "height": 436
+      },
+      "sourceMarginPixels": 24,
+      "sourceAlphaBounds": {
+        "x": 24,
+        "y": 24,
+        "w": 266,
+        "h": 388
+      },
+      "sourceAlphaHistogram": {
+        "zero": 82098,
+        "partial": 5005,
+        "opaque": 49801
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "runtimePath": "authoring/characters/runtime/npc_unhoused_dog_companion_001.png",
+      "runtimeSha256": "69c663e71d0de0cfaa2acba9b1ba942128407721e65747a64eb254d359d632d0",
+      "runtimeSize": {
+        "width": 134,
+        "height": 192
+      },
+      "runtimeAlphaBounds": {
+        "x": 3,
+        "y": 3,
+        "w": 128,
+        "h": 186
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 12197,
+        "partial": 2702,
+        "opaque": 10829
+      },
+      "displayHeightCells": 1.4
+    },
+    {
+      "assetId": "npc_unhoused_bicycle_001",
+      "package": "unhoused",
+      "packageFile": "02_top_bike_traveler.png",
+      "group": "unhoused",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "reviewStatus": "candidate",
+      "sourcePath": "authoring/characters/runtime-candidates/npc_unhoused_bicycle_001.png",
+      "sourceSha256": "eaf36df3237d3583c5fd32e3ade483ade4c6e291143913752fbe479cce198a70",
+      "sourceSize": {
+        "width": 370,
+        "height": 429
+      },
+      "sourceMarginPixels": 24,
+      "sourceAlphaBounds": {
+        "x": 24,
+        "y": 24,
+        "w": 322,
+        "h": 381
+      },
+      "sourceAlphaHistogram": {
+        "zero": 76938,
+        "partial": 4212,
+        "opaque": 77580
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "runtimePath": "authoring/characters/runtime/npc_unhoused_bicycle_001.png",
+      "runtimeSha256": "a94077b7e027e71ab3e0596e45ababf6d1c55b11ef5eaafca5a31a99dbc47e28",
+      "runtimeSize": {
+        "width": 163,
+        "height": 192
+      },
+      "runtimeAlphaBounds": {
+        "x": 3,
+        "y": 3,
+        "w": 157,
+        "h": 186
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 11006,
+        "partial": 2446,
+        "opaque": 17844
+      },
+      "displayHeightCells": 1.4
+    },
+    {
+      "assetId": "npc_unhoused_cane_001",
+      "package": "unhoused",
+      "packageFile": "03_top_walker.png",
+      "group": "unhoused",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "reviewStatus": "candidate",
+      "sourcePath": "authoring/characters/runtime-candidates/npc_unhoused_cane_001.png",
+      "sourceSha256": "3aa5c27872c4b04b46e98a2896d727e947d8e6116544822bbdaa05c34aaa1acb",
+      "sourceSize": {
+        "width": 284,
+        "height": 424
+      },
+      "sourceMarginPixels": 24,
+      "sourceAlphaBounds": {
+        "x": 24,
+        "y": 24,
+        "w": 236,
+        "h": 376
+      },
+      "sourceAlphaHistogram": {
+        "zero": 68504,
+        "partial": 3829,
+        "opaque": 48083
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "runtimePath": "authoring/characters/runtime/npc_unhoused_cane_001.png",
+      "runtimeSha256": "7d2be5f2b1a405a28730b6ef243675f7bc89e4ef9548407788e851bb3b15348a",
+      "runtimeSize": {
+        "width": 123,
+        "height": 192
+      },
+      "runtimeAlphaBounds": {
+        "x": 3,
+        "y": 3,
+        "w": 117,
+        "h": 186
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 9929,
+        "partial": 2402,
+        "opaque": 11285
+      },
+      "displayHeightCells": 1.4
+    },
+    {
+      "assetId": "npc_unhoused_work_jacket_001",
+      "package": "unhoused",
+      "packageFile": "04_top_standing_man.png",
+      "group": "unhoused",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "reviewStatus": "candidate",
+      "sourcePath": "authoring/characters/runtime-candidates/npc_unhoused_work_jacket_001.png",
+      "sourceSha256": "35d62bf50f00c6848bf36d934c7e7cf2f75429d0dd3992e4c96394ce520b9b47",
+      "sourceSize": {
+        "width": 211,
+        "height": 456
+      },
+      "sourceMarginPixels": 24,
+      "sourceAlphaBounds": {
+        "x": 24,
+        "y": 24,
+        "w": 163,
+        "h": 408
+      },
+      "sourceAlphaHistogram": {
+        "zero": 54346,
+        "partial": 3005,
+        "opaque": 38865
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "runtimePath": "authoring/characters/runtime/npc_unhoused_work_jacket_001.png",
+      "runtimeSha256": "f74ec97987b0969d54b9108598b8bce0d55081b13762f806980bf0e88505ff61",
+      "runtimeSize": {
+        "width": 80,
+        "height": 192
+      },
+      "runtimeAlphaBounds": {
+        "x": 3,
+        "y": 3,
+        "w": 74,
+        "h": 186
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 5910,
+        "partial": 1931,
+        "opaque": 7519
+      },
+      "displayHeightCells": 1.4
+    },
+    {
+      "assetId": "npc_unhoused_dyed_hair_001",
+      "package": "unhoused",
+      "packageFile": "05_bottom_woman.png",
+      "group": "unhoused",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "reviewStatus": "candidate",
+      "sourcePath": "authoring/characters/runtime-candidates/npc_unhoused_dyed_hair_001.png",
+      "sourceSha256": "26bb67409e966998a946985e4e55928b7511fa56e6fe77d783334c5ca87b50be",
+      "sourceSize": {
+        "width": 234,
+        "height": 434
+      },
+      "sourceMarginPixels": 24,
+      "sourceAlphaBounds": {
+        "x": 24,
+        "y": 24,
+        "w": 186,
+        "h": 386
+      },
+      "sourceAlphaHistogram": {
+        "zero": 60255,
+        "partial": 3785,
+        "opaque": 37516
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "runtimePath": "authoring/characters/runtime/npc_unhoused_dyed_hair_001.png",
+      "runtimeSha256": "5e49674511f4f79efcefaff461f0fe166855e13d81f8085a5224cf8c1550e4a4",
+      "runtimeSize": {
+        "width": 96,
+        "height": 192
+      },
+      "runtimeAlphaBounds": {
+        "x": 3,
+        "y": 3,
+        "w": 90,
+        "h": 186
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 7952,
+        "partial": 2179,
+        "opaque": 8301
+      },
+      "displayHeightCells": 1.4
+    },
+    {
+      "assetId": "npc_unhoused_blanket_wrap_001",
+      "package": "unhoused",
+      "packageFile": "06_bottom_man.png",
+      "group": "unhoused",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "reviewStatus": "candidate",
+      "sourcePath": "authoring/characters/runtime-candidates/npc_unhoused_blanket_wrap_001.png",
+      "sourceSha256": "8ca28219c55e46bd593db3bddbb940ce1279e4fb638683a3c4875154cd7a7ba1",
+      "sourceSize": {
+        "width": 256,
+        "height": 436
+      },
+      "sourceMarginPixels": 24,
+      "sourceAlphaBounds": {
+        "x": 24,
+        "y": 24,
+        "w": 208,
+        "h": 388
+      },
+      "sourceAlphaHistogram": {
+        "zero": 60679,
+        "partial": 3367,
+        "opaque": 47570
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "runtimePath": "authoring/characters/runtime/npc_unhoused_blanket_wrap_001.png",
+      "runtimeSha256": "58a6b52a2511b285c62118060f0aec9975ccc9bbd4fe9f60f54bcd701f21fcb3",
+      "runtimeSize": {
+        "width": 106,
+        "height": 192
+      },
+      "runtimeAlphaBounds": {
+        "x": 3,
+        "y": 3,
+        "w": 100,
+        "h": 186
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 7871,
+        "partial": 1931,
+        "opaque": 10550
+      },
+      "displayHeightCells": 1.4
+    },
+    {
+      "assetId": "npc_unhoused_slumped_001",
+      "package": "unhoused",
+      "packageFile": "07_bottom_sitting_person.png",
+      "group": "unhoused",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "reviewStatus": "candidate",
+      "sourcePath": "authoring/characters/runtime-candidates/npc_unhoused_slumped_001.png",
+      "sourceSha256": "d7e2baac8df5f028c3a6532a15958698c3884b22e1b7bcf3bcad6a37e91dd1ce",
+      "sourceSize": {
+        "width": 275,
+        "height": 311
+      },
+      "sourceMarginPixels": 24,
+      "sourceAlphaBounds": {
+        "x": 24,
+        "y": 24,
+        "w": 227,
+        "h": 263
+      },
+      "sourceAlphaHistogram": {
+        "zero": 44610,
+        "partial": 2736,
+        "opaque": 38179
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "runtimePath": "authoring/characters/runtime/npc_unhoused_slumped_001.png",
+      "runtimeSha256": "0124303d47ccc1fbf0c0f4fd729ad9d82f3e0339cf4e21ee6b0c6f5dcd8b8895",
+      "runtimeSize": {
+        "width": 167,
+        "height": 192
+      },
+      "runtimeAlphaBounds": {
+        "x": 3,
+        "y": 3,
+        "w": 161,
+        "h": 186
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 10870,
+        "partial": 2350,
+        "opaque": 18844
+      },
+      "displayHeightCells": 0.96
+    },
+    {
+      "assetId": "npc_unhoused_cart_001",
+      "package": "unhoused",
+      "packageFile": "08_bottom_cart_woman.png",
+      "group": "unhoused",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "reviewStatus": "candidate",
+      "sourcePath": "authoring/characters/runtime-candidates/npc_unhoused_cart_001.png",
+      "sourceSha256": "fba093cc02253f9a3e3a3011a889268088cc7e54c6af7afed4c443d9e1f7487e",
+      "sourceSize": {
+        "width": 356,
+        "height": 423
+      },
+      "sourceMarginPixels": 24,
+      "sourceAlphaBounds": {
+        "x": 24,
+        "y": 24,
+        "w": 308,
+        "h": 375
+      },
+      "sourceAlphaHistogram": {
+        "zero": 75046,
+        "partial": 4202,
+        "opaque": 71340
+      },
+      "anchor": {
+        "x": 0.5,
+        "y": 1.0
+      },
+      "runtimePath": "authoring/characters/runtime/npc_unhoused_cart_001.png",
+      "runtimeSha256": "9c24e3a91d86a5aa7269c674baa329c2e282904ebcba886a1d09402ef1ace8c5",
+      "runtimeSize": {
+        "width": 159,
+        "height": 192
+      },
+      "runtimeAlphaBounds": {
+        "x": 3,
+        "y": 3,
+        "w": 153,
+        "h": 186
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 11137,
+        "partial": 2192,
+        "opaque": 17199
+      },
+      "displayHeightCells": 1.4
+    }
+  ]
+}

@@ -60,8 +60,8 @@ async function main(){
     const afterSave = await page.evaluate(() => ({ saved: localStorage.getItem('cannedRun.save.v1'), sentinel: localStorage.getItem('__rag_gallery_sentinel') }));
     result.snapshot = afterMove;
     result.checks.galleryPlay = afterMove.runtime.state === 'play' && afterMove.runtime.customLevel === 'asset-gallery-v1';
-    result.checks.galleryReadonly = afterMove.runtime.assetGallery && afterMove.runtime.assetGallery.exhibitCount === 13;
-    result.checks.focusLabel = afterMove.runtime.assetGallery && afterMove.runtime.assetGallery.focusId === 'gallery-prop-bench-001';
+    result.checks.galleryReadonly = afterMove.runtime.assetGallery && afterMove.runtime.assetGallery.exhibitCount === 22;
+    result.checks.focusLabel = afterMove.runtime.assetGallery && /^gallery-(npc|prop|pickup|marker|building)-/.test(String(afterMove.runtime.assetGallery.focusId || ''));
     result.checks.normalControlsMove = Math.hypot(afterMove.runtime.player.x - beforeMove.runtime.player.x, afterMove.runtime.player.y - beforeMove.runtime.player.y) > 0.3;
     result.checks.saveUntouched = afterSave.saved === beforeSave && afterSave.sentinel === beforeSave;
     result.checks.keyboardIsolation = afterMove.runtime.customLevel === 'asset-gallery-v1' && afterMove.runtime.state === 'play';
