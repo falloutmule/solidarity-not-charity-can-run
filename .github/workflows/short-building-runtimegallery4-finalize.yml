@@ -29,22 +29,41 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Set combined candidate BUILD_ID
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs = require('fs');
+          const file = 'src/js/game-06-section-2b-mobile-touch-input.js';
+          const before = "var BUILD_ID = 'runtimegallery4'; window.BUILD_ID = BUILD_ID;";
+          const after = "var BUILD_ID = 'runtimegallery4short1'; window.BUILD_ID = BUILD_ID;";
+          const source = fs.readFileSync(file, 'utf8');
+          const count = source.split(before).length - 1;
+          if (count === 0 && source.includes(after)) {
+            console.log('BUILD_ID already updated.');
+            process.exit(0);
+          }
+          if (count !== 1) throw new Error(`expected exactly one runtimegallery4 BUILD_ID source line, found ${count}`);
+          fs.writeFileSync(file, source.replace(before, after), 'utf8');
+          NODE
+
       - name: Generate review artifact
         run: npm run build
 
       - name: Verify generated artifact
         run: node tools/build-single-file.js --check
 
-      - name: Commit generated artifact to review branch
+      - name: Commit source identity and generated artifact to review branch
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html project-metadata.json
+          git add src/js/game-06-section-2b-mobile-touch-input.js index.html project-metadata.json
           if git diff --cached --quiet; then
-            echo "Generated artifact already matches source."
+            echo "Source and generated artifact already match."
             exit 0
           fi
-          git commit -m "Regenerate runtimegallery4short1 artifact [skip ci]"
+          git commit -m "Set runtimegallery4short1 candidate identity"
           git push origin HEAD:integration/short-building-renderer-runtimegallery4
