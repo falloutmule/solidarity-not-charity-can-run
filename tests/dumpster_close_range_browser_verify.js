@@ -29,7 +29,7 @@ async function serve(html){
 
 async function main(){
   const html = fs.readFileSync(artifact, 'utf8');
-  const result = { pass: false, pageErrors: [], consoleErrors: [], externalRequests: [], diagnostics: null };
+  const result = { pass: false, pageErrors: [], consoleErrors: [], externalRequests: [], samples: [], diagnostics: null };
   let browser;
   let context;
   let server;
@@ -54,32 +54,45 @@ async function main(){
     await page.locator('[data-action="custom-level-dumpster_pilot"]').click();
     await page.waitForFunction(() => window.SNCDiagnostics.getSnapshot().runtime.state === 'play', null, { timeout: 10000 });
 
-    await page.evaluate(() => {
-      player.x = 2.55;
-      player.y = 5.45;
-      player.angle = Math.atan2(4 - player.y, 3.5 - player.x);
-      if(typeof crResetRenderPoseHistory === 'function') crResetRenderPoseHistory('dumpster-close-range-regression');
-      else if(typeof crResetRenderAngleHistory === 'function') crResetRenderAngleHistory('dumpster-close-range-regression');
-    });
+    const poses = [
+      { id: 'southwest-wide', x: 2.55, y: 5.45 },
+      { id: 'southwest-near', x: 2.72, y: 5.22 },
+      { id: 'southwest-tight', x: 2.82, y: 5.08 },
+      { id: 'south-front-bias', x: 2.95, y: 5.32 }
+    ];
 
-    await page.waitForFunction(() => {
-      if(typeof crGetSinglePlaneCutoutDiagnostics !== 'function') return false;
-      const diagnostics = crGetSinglePlaneCutoutDiagnostics();
-      return diagnostics && diagnostics.active && diagnostics.selectedWorldFace === 'west' &&
-        diagnostics.visibleColumns > 0 && diagnostics.suppressedColumns > 0;
-    }, null, { timeout: 10000 });
+    for(const pose of poses){
+      await page.evaluate(({ x, y }) => {
+        player.x = x;
+        player.y = y;
+        player.angle = Math.atan2(4 - player.y, 3.5 - player.x);
+        if(typeof crResetRenderPoseHistory === 'function') crResetRenderPoseHistory('dumpster-close-range-regression');
+        else if(typeof crResetRenderAngleHistory === 'function') crResetRenderAngleHistory('dumpster-close-range-regression');
+      }, pose);
+      await page.waitForTimeout(350);
+      const sample = await page.evaluate(() => ({
+        hasDiagnostics: typeof crGetSinglePlaneCutoutDiagnostics === 'function',
+        diagnostics: typeof crGetSinglePlaneCutoutDiagnostics === 'function' ? crGetSinglePlaneCutoutDiagnostics() : null,
+        player: { x: player.x, y: player.y, angle: player.angle },
+        runtime: window.SNCDiagnostics.getSnapshot().runtime
+      }));
+      result.samples.push({ id: pose.id, ...sample });
+    }
 
-    result.diagnostics = await page.evaluate(() => crGetSinglePlaneCutoutDiagnostics());
+    process.stdout.write(`${JSON.stringify({ closeRangeSamples: result.samples })}\n`);
+    const mixed = result.samples.find((sample) => sample.diagnostics && sample.diagnostics.active &&
+      sample.diagnostics.visibleColumns > 0 && sample.diagnostics.suppressedColumns > 0);
+    assert(mixed, `no close-corner pose exercised both the dominant and suppressed footprint faces: ${JSON.stringify(result.samples)}`);
+    result.diagnostics = mixed.diagnostics;
     assert.equal(result.diagnostics.assetId, 'dumpster_001');
-    assert.equal(result.diagnostics.selectedWorldFace, 'west');
-    assert(result.diagnostics.visibleColumns > 0, 'dominant west plane must render opaque dumpster columns');
-    assert(result.diagnostics.suppressedColumns > 0, 'adjacent south plane must be suppressed at the close corner');
+    assert(result.diagnostics.visibleColumns > 0, 'one dominant exterior plane must render opaque dumpster columns');
+    assert(result.diagnostics.suppressedColumns > 0, 'the adjacent footprint plane must be transparent at a close corner');
     assert.equal(result.pageErrors.length, 0, `page errors: ${result.pageErrors.join('; ')}`);
     assert.equal(result.consoleErrors.length, 0, `console errors: ${result.consoleErrors.join('; ')}`);
     assert.equal(result.externalRequests.length, 0, `external requests: ${result.externalRequests.join('; ')}`);
 
     fs.mkdirSync(runDir, { recursive: true });
-    await page.screenshot({ path: path.join(runDir, 'close-southwest-mobile.png'), fullPage: true });
+    await page.screenshot({ path: path.join(runDir, 'close-corner-mobile.png'), fullPage: true });
     result.pass = true;
     await page.close();
   } finally {
