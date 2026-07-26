@@ -42,8 +42,11 @@ function loadSource(buildingDir) {
   assert(Number.isInteger(footprint.depthCells) && footprint.depthCells > 0, 'footprint.depthCells must be a positive integer');
   assert(source.faces && typeof source.faces === 'object', 'building.json faces are required');
   for (const name of ['front', 'side', 'back']) assert(typeof source.faces[name] === 'string', `faces.${name} is required`);
-  const allowed = new Set(['schema', 'id', 'displayName', 'category', 'notes', 'footprint', 'faces']);
+  const allowed = new Set(['schema', 'id', 'displayName', 'category', 'notes', 'footprint', 'faces', 'heightScale', 'alphaCutout', 'topCap']);
   for (const key of Object.keys(source)) assert(allowed.has(key), `unknown building.json property: ${key}`);
+  if (source.heightScale !== undefined) assert(Number.isFinite(source.heightScale) && source.heightScale > 0 && source.heightScale <= 1, 'heightScale must be greater than 0 and at most 1');
+  if (source.alphaCutout !== undefined) assert(typeof source.alphaCutout === 'boolean', 'alphaCutout must be boolean');
+  if (source.topCap !== undefined) assert(['none', 'solid', 'masked/asset'].includes(source.topCap), 'topCap must be none, solid, or masked/asset');
   const faceFiles = {};
   for (const [name, relativePath] of Object.entries(source.faces)) {
     assert(['front', 'side', 'back', 'west'].includes(name), `unknown face name: ${name}`);
@@ -125,6 +128,9 @@ function compileBuilding(buildingDir) {
     faceAssets,
     faces
   };
+  if (source.heightScale !== undefined) asset.heightScale = source.heightScale;
+  if (source.alphaCutout !== undefined) asset.alphaCutout = source.alphaCutout;
+  if (source.topCap !== undefined) asset.topCap = source.topCap;
   return { asset, atlas, loaded, outputPath: path.join(ROOT, assetModulePath(id)) };
 }
 
