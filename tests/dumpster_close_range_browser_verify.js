@@ -29,7 +29,7 @@ async function serve(html){
 
 async function main(){
   const html = fs.readFileSync(artifact, 'utf8');
-  const result = { pass: false, pageErrors: [], consoleErrors: [], externalRequests: [], samples: [], diagnostics: null };
+  const result = { pass: false, pageErrors: [], consoleErrors: [], externalRequests: [], samples: [], diagnostics: null, resolverProbe: null };
   let browser;
   let context;
   let server;
@@ -50,9 +50,47 @@ async function main(){
       if(/^https?:/i.test(request.url()) && new URL(request.url()).origin !== origin) result.externalRequests.push(request.url());
     });
 
-    await page.goto(result.url, { waitUntil: 'load', timeout: 15000 });
+    await page.goto(`${result.url}?cutoutproof=1&cutoutview=oblique&cutoutrotation=0`, { waitUntil: 'load', timeout: 15000 });
+    await page.waitForFunction(() => {
+      const asset = window.BITMAP_BUILDING_ASSET_REGISTRY && window.BITMAP_BUILDING_ASSET_REGISTRY.dumpster_001;
+      return asset && asset.loadState && asset.loadState.status === 'loaded';
+    }, null, { timeout: 10000 });
     await page.locator('[data-action="custom-level-dumpster_pilot"]').click();
     await page.waitForFunction(() => window.SNCDiagnostics.getSnapshot().runtime.state === 'play', null, { timeout: 10000 });
+
+    result.resolverProbe = await page.evaluate(() => {
+      const asset = BITMAP_BUILDING_ASSET_REGISTRY.dumpster_001;
+      const placement = game.buildingRegistry[1];
+      const before = typeof crGetSinglePlaneCutoutDiagnostics === 'function' ? crGetSinglePlaneCutoutDiagnostics() : null;
+      const manualWest = resolveWholeFaceBitmapBuildingColumn({
+        side: 0, stepX: 1, stepY: -1, px: 2.55, py: 5.45,
+        cell: game.buildingGrid[4][3], wallFraction: 0.5
+      }, placement);
+      const manualSouth = resolveWholeFaceBitmapBuildingColumn({
+        side: 1, stepX: 1, stepY: -1, px: 2.55, py: 5.45,
+        cell: game.buildingGrid[4][3], wallFraction: 0.5
+      }, placement);
+      const after = typeof crGetSinglePlaneCutoutDiagnostics === 'function' ? crGetSinglePlaneCutoutDiagnostics() : null;
+      return {
+        assetStatus: asset && asset.loadState && asset.loadState.status,
+        resolverName: resolveWholeFaceBitmapBuildingColumn.name,
+        resolverWrapped: String(resolveWholeFaceBitmapBuildingColumn).includes('resolveSinglePlaneCutoutColumn'),
+        before,
+        after,
+        manualWest: manualWest ? {
+          worldFace: manualWest.worldFace,
+          selectedWorldFace: manualWest.selectedWorldFace,
+          suppressed: manualWest.singlePlaneSuppressed,
+          opaqueRunCount: Array.isArray(manualWest.opaqueRuns) ? manualWest.opaqueRuns.length : null
+        } : null,
+        manualSouth: manualSouth ? {
+          worldFace: manualSouth.worldFace,
+          selectedWorldFace: manualSouth.selectedWorldFace,
+          suppressed: manualSouth.singlePlaneSuppressed,
+          opaqueRunCount: Array.isArray(manualSouth.opaqueRuns) ? manualSouth.opaqueRuns.length : null
+        } : null
+      };
+    });
 
     const poses = [
       { id: 'southwest-wide', x: 2.55, y: 5.45 },
@@ -69,7 +107,11 @@ async function main(){
         if(typeof crResetRenderPoseHistory === 'function') crResetRenderPoseHistory('dumpster-close-range-regression');
         else if(typeof crResetRenderAngleHistory === 'function') crResetRenderAngleHistory('dumpster-close-range-regression');
       }, pose);
-      await page.waitForTimeout(350);
+      await page.evaluate(() => new Promise((resolve) => {
+        let frames = 0;
+        function next(){ if(++frames >= 12) resolve(); else requestAnimationFrame(next); }
+        requestAnimationFrame(next);
+      }));
       const sample = await page.evaluate(() => ({
         hasDiagnostics: typeof crGetSinglePlaneCutoutDiagnostics === 'function',
         diagnostics: typeof crGetSinglePlaneCutoutDiagnostics === 'function' ? crGetSinglePlaneCutoutDiagnostics() : null,
@@ -79,10 +121,16 @@ async function main(){
       result.samples.push({ id: pose.id, ...sample });
     }
 
-    process.stdout.write(`${JSON.stringify({ closeRangeSamples: result.samples })}\n`);
+    process.stdout.write(`${JSON.stringify({ resolverProbe: result.resolverProbe, closeRangeSamples: result.samples })}\n`);
+    assert.equal(result.resolverProbe.assetStatus, 'loaded');
+    assert.equal(result.resolverProbe.resolverWrapped, true, `single-plane resolver was not installed: ${JSON.stringify(result.resolverProbe)}`);
+    assert(result.resolverProbe.manualWest && result.resolverProbe.manualSouth, `manual resolver probe failed: ${JSON.stringify(result.resolverProbe)}`);
+    assert.notEqual(result.resolverProbe.manualWest.suppressed, result.resolverProbe.manualSouth.suppressed,
+      `adjacent manual faces must not both remain opaque: ${JSON.stringify(result.resolverProbe)}`);
+
     const mixed = result.samples.find((sample) => sample.diagnostics && sample.diagnostics.active &&
       sample.diagnostics.visibleColumns > 0 && sample.diagnostics.suppressedColumns > 0);
-    assert(mixed, `no close-corner pose exercised both the dominant and suppressed footprint faces: ${JSON.stringify(result.samples)}`);
+    assert(mixed, `live ray loop did not exercise both dominant and suppressed faces: ${JSON.stringify({ probe:result.resolverProbe, samples:result.samples })}`);
     result.diagnostics = mixed.diagnostics;
     assert.equal(result.diagnostics.assetId, 'dumpster_001');
     assert(result.diagnostics.visibleColumns > 0, 'one dominant exterior plane must render opaque dumpster columns');
