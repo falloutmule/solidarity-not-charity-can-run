@@ -70,3 +70,13 @@ jobs:
 
       - name: Verify no external artifact drift after build
         run: node tools/build-single-file.js --check
+
+      - name: Upload generated compatibility artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: runtimegallery4-short-building-generated
+          if-no-files-found: error
+          retention-days: 7
+          path: |
+            index.html
+            project-metadata.json
