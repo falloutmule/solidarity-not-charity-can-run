@@ -29,7 +29,15 @@ async function serve(html){
 
 async function main(){
   const html = fs.readFileSync(artifact, 'utf8');
-  const result = { pass: false, pageErrors: [], consoleErrors: [], externalRequests: [], samples: [], diagnostics: null, resolverProbe: null };
+  const result = {
+    pass: false,
+    pageErrors: [],
+    consoleErrors: [],
+    externalRequests: [],
+    diagnosticsBefore: null,
+    diagnosticsAfterLiveFrames: null,
+    faceProbe: null
+  };
   let browser;
   let context;
   let server;
@@ -50,7 +58,8 @@ async function main(){
       if(/^https?:/i.test(request.url()) && new URL(request.url()).origin !== origin) result.externalRequests.push(request.url());
     });
 
-    await page.goto(`${result.url}?cutoutproof=1&cutoutview=oblique&cutoutrotation=0`, { waitUntil: 'load', timeout: 15000 });
+    // Normal visual mode: proof-mode striped walls must not disguise the close-range result.
+    await page.goto(result.url, { waitUntil: 'load', timeout: 15000 });
     await page.waitForFunction(() => {
       const asset = window.BITMAP_BUILDING_ASSET_REGISTRY && window.BITMAP_BUILDING_ASSET_REGISTRY.dumpster_001;
       return asset && asset.loadState && asset.loadState.status === 'loaded';
@@ -58,83 +67,65 @@ async function main(){
     await page.locator('[data-action="custom-level-dumpster_pilot"]').click();
     await page.waitForFunction(() => window.SNCDiagnostics.getSnapshot().runtime.state === 'play', null, { timeout: 10000 });
 
-    result.resolverProbe = await page.evaluate(() => {
-      const asset = BITMAP_BUILDING_ASSET_REGISTRY.dumpster_001;
+    result.diagnosticsBefore = await page.evaluate(() => crGetSinglePlaneCutoutDiagnostics());
+    await page.evaluate(() => {
+      player.x = 2.55;
+      player.y = 5.45;
+      player.angle = Math.atan2(4 - player.y, 3.5 - player.x);
+      if(typeof crResetRenderPoseHistory === 'function') crResetRenderPoseHistory('dumpster-close-range-regression');
+      else if(typeof crResetRenderAngleHistory === 'function') crResetRenderAngleHistory('dumpster-close-range-regression');
+    });
+
+    const beforeCount = Number(result.diagnosticsBefore && result.diagnosticsBefore.lookupCount) || 0;
+    await page.waitForFunction((baseline) => {
+      const diagnostics = crGetSinglePlaneCutoutDiagnostics();
+      return diagnostics && diagnostics.active && diagnostics.lookupCount > baseline &&
+        diagnostics.selectedWorldFace === 'west' && diagnostics.selectedLocalFace === 'west';
+    }, beforeCount, { timeout: 10000 });
+    await page.evaluate(() => new Promise((resolve) => {
+      let frames = 0;
+      function next(){ if(++frames >= 12) resolve(); else requestAnimationFrame(next); }
+      requestAnimationFrame(next);
+    }));
+    result.diagnosticsAfterLiveFrames = await page.evaluate(() => crGetSinglePlaneCutoutDiagnostics());
+
+    // Probe the exact variant used by the live renderer after the live lookup count advanced.
+    result.faceProbe = await page.evaluate(() => {
       const placement = game.buildingRegistry[1];
-      const before = typeof crGetSinglePlaneCutoutDiagnostics === 'function' ? crGetSinglePlaneCutoutDiagnostics() : null;
-      const manualWest = resolveWholeFaceBitmapBuildingColumn({
-        side: 0, stepX: 1, stepY: -1, px: 2.55, py: 5.45,
-        cell: game.buildingGrid[4][3], wallFraction: 0.5
+      const cell = game.buildingGrid[4][3];
+      const west = resolveWholeFaceBitmapBuildingColumn({
+        side: 0, stepX: 1, stepY: -1, cell, wallFraction: 0.5
       }, placement);
-      const manualSouth = resolveWholeFaceBitmapBuildingColumn({
-        side: 1, stepX: 1, stepY: -1, px: 2.55, py: 5.45,
-        cell: game.buildingGrid[4][3], wallFraction: 0.5
+      const south = resolveWholeFaceBitmapBuildingColumn({
+        side: 1, stepX: 1, stepY: -1, cell, wallFraction: 0.5
       }, placement);
-      const after = typeof crGetSinglePlaneCutoutDiagnostics === 'function' ? crGetSinglePlaneCutoutDiagnostics() : null;
       return {
-        assetStatus: asset && asset.loadState && asset.loadState.status,
-        resolverName: resolveWholeFaceBitmapBuildingColumn.name,
-        resolverWrapped: String(resolveWholeFaceBitmapBuildingColumn).includes('resolveSinglePlaneCutoutColumn'),
-        before,
-        after,
-        manualWest: manualWest ? {
-          worldFace: manualWest.worldFace,
-          selectedWorldFace: manualWest.selectedWorldFace,
-          suppressed: manualWest.singlePlaneSuppressed,
-          opaqueRunCount: Array.isArray(manualWest.opaqueRuns) ? manualWest.opaqueRuns.length : null
+        west: west ? {
+          localFace: west.localFace,
+          opaqueRunCount: Array.isArray(west.opaqueRuns) ? west.opaqueRuns.length : null,
+          faceWidth: west.face && west.face.width,
+          faceHeight: west.face && west.face.height
         } : null,
-        manualSouth: manualSouth ? {
-          worldFace: manualSouth.worldFace,
-          selectedWorldFace: manualSouth.selectedWorldFace,
-          suppressed: manualSouth.singlePlaneSuppressed,
-          opaqueRunCount: Array.isArray(manualSouth.opaqueRuns) ? manualSouth.opaqueRuns.length : null
-        } : null
+        south: south ? {
+          localFace: south.localFace,
+          opaqueRunCount: Array.isArray(south.opaqueRuns) ? south.opaqueRuns.length : null,
+          faceWidth: south.face && south.face.width,
+          faceHeight: south.face && south.face.height
+        } : null,
+        diagnostics: crGetSinglePlaneCutoutDiagnostics()
       };
     });
 
-    const poses = [
-      { id: 'southwest-wide', x: 2.55, y: 5.45 },
-      { id: 'southwest-near', x: 2.72, y: 5.22 },
-      { id: 'southwest-tight', x: 2.82, y: 5.08 },
-      { id: 'south-front-bias', x: 2.95, y: 5.32 }
-    ];
-
-    for(const pose of poses){
-      await page.evaluate(({ x, y }) => {
-        player.x = x;
-        player.y = y;
-        player.angle = Math.atan2(4 - player.y, 3.5 - player.x);
-        if(typeof crResetRenderPoseHistory === 'function') crResetRenderPoseHistory('dumpster-close-range-regression');
-        else if(typeof crResetRenderAngleHistory === 'function') crResetRenderAngleHistory('dumpster-close-range-regression');
-      }, pose);
-      await page.evaluate(() => new Promise((resolve) => {
-        let frames = 0;
-        function next(){ if(++frames >= 12) resolve(); else requestAnimationFrame(next); }
-        requestAnimationFrame(next);
-      }));
-      const sample = await page.evaluate(() => ({
-        hasDiagnostics: typeof crGetSinglePlaneCutoutDiagnostics === 'function',
-        diagnostics: typeof crGetSinglePlaneCutoutDiagnostics === 'function' ? crGetSinglePlaneCutoutDiagnostics() : null,
-        player: { x: player.x, y: player.y, angle: player.angle },
-        runtime: window.SNCDiagnostics.getSnapshot().runtime
-      }));
-      result.samples.push({ id: pose.id, ...sample });
-    }
-
-    process.stdout.write(`${JSON.stringify({ resolverProbe: result.resolverProbe, closeRangeSamples: result.samples })}\n`);
-    assert.equal(result.resolverProbe.assetStatus, 'loaded');
-    assert.equal(result.resolverProbe.resolverWrapped, true, `single-plane resolver was not installed: ${JSON.stringify(result.resolverProbe)}`);
-    assert(result.resolverProbe.manualWest && result.resolverProbe.manualSouth, `manual resolver probe failed: ${JSON.stringify(result.resolverProbe)}`);
-    assert.notEqual(result.resolverProbe.manualWest.suppressed, result.resolverProbe.manualSouth.suppressed,
-      `adjacent manual faces must not both remain opaque: ${JSON.stringify(result.resolverProbe)}`);
-
-    const mixed = result.samples.find((sample) => sample.diagnostics && sample.diagnostics.active &&
-      sample.diagnostics.visibleColumns > 0 && sample.diagnostics.suppressedColumns > 0);
-    assert(mixed, `live ray loop did not exercise both dominant and suppressed faces: ${JSON.stringify({ probe:result.resolverProbe, samples:result.samples })}`);
-    result.diagnostics = mixed.diagnostics;
-    assert.equal(result.diagnostics.assetId, 'dumpster_001');
-    assert(result.diagnostics.visibleColumns > 0, 'one dominant exterior plane must render opaque dumpster columns');
-    assert(result.diagnostics.suppressedColumns > 0, 'the adjacent footprint plane must be transparent at a close corner');
+    const live = result.diagnosticsAfterLiveFrames;
+    assert(live && live.active, `live registry getter did not activate: ${JSON.stringify(result)}`);
+    assert(live.lookupCount > beforeCount, `live ray loop did not read the directional asset: ${JSON.stringify(result)}`);
+    assert.equal(live.selectedWorldFace, 'west');
+    assert.equal(live.selectedLocalFace, 'west');
+    assert(result.faceProbe.west && result.faceProbe.south, `directional face probe failed: ${JSON.stringify(result.faceProbe)}`);
+    assert(result.faceProbe.west.opaqueRunCount > 0, `selected west face must retain the dumpster: ${JSON.stringify(result.faceProbe)}`);
+    assert.equal(result.faceProbe.south.opaqueRunCount, 0, `adjacent south face must be fully transparent: ${JSON.stringify(result.faceProbe)}`);
+    assert.equal(result.faceProbe.south.faceWidth, 1, 'suppressed face must resolve to the one-pixel transparent atlas slice');
+    assert.equal(result.faceProbe.south.faceHeight, 1, 'suppressed face must resolve to the one-pixel transparent atlas slice');
     assert.equal(result.pageErrors.length, 0, `page errors: ${result.pageErrors.join('; ')}`);
     assert.equal(result.consoleErrors.length, 0, `console errors: ${result.consoleErrors.join('; ')}`);
     assert.equal(result.externalRequests.length, 0, `external requests: ${result.externalRequests.join('; ')}`);
@@ -154,9 +145,10 @@ async function main(){
   process.stdout.write(`${JSON.stringify({
     pass: result.pass,
     output: path.relative(root, path.join(runDir, 'result.json')),
-    selectedWorldFace: result.diagnostics && result.diagnostics.selectedWorldFace,
-    visibleColumns: result.diagnostics && result.diagnostics.visibleColumns,
-    suppressedColumns: result.diagnostics && result.diagnostics.suppressedColumns
+    lookupCount: result.diagnosticsAfterLiveFrames && result.diagnosticsAfterLiveFrames.lookupCount,
+    selectedWorldFace: result.diagnosticsAfterLiveFrames && result.diagnosticsAfterLiveFrames.selectedWorldFace,
+    westOpaqueRuns: result.faceProbe && result.faceProbe.west && result.faceProbe.west.opaqueRunCount,
+    southOpaqueRuns: result.faceProbe && result.faceProbe.south && result.faceProbe.south.opaqueRunCount
   })}\n`);
 }
 
