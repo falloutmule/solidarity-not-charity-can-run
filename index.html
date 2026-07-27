@@ -685,7 +685,7 @@ const inp = {
   lookDeltaRad:0,
   _active:false, // true when any touch is on screen
 };
-var BUILD_ID = 'heightfieldmvp2'; window.BUILD_ID = BUILD_ID;
+var BUILD_ID = 'heightfieldintegration1'; window.BUILD_ID = BUILD_ID;
 const CR_FPV_STREET_MATTE = true;
 /** Building visual reset: smooth, low-noise wall masses with sparse readable cues. */
 const CR_BUILDING_SMOOTH_STYLE = 1;
@@ -11373,10 +11373,23 @@ const CR_HEIGHTFIELD_QUERY = new URLSearchParams(location.search).get('heightfie
 const CR_HEIGHTFIELD_CAMERA = Object.freeze({ eyeZ: 0.68 });
 const CR_HEIGHT_LEVELS = new Float32Array([0.0, 0.5, 1.0]);
 const CR_VERTICAL_PROFILE_IDS = Object.freeze({ EMPTY: 0, HALF_DEBUG: 1, FULL_LEGACY: 2 });
+const CR_HEIGHTFIELD_MATERIAL_IDS = Object.freeze({
+  GROUND: 0, DEBUG_NORTH: 1, DEBUG_EAST: 2, DEBUG_SOUTH: 3, DEBUG_WEST: 4, DEBUG_TOP: 5, LEGACY_WALL: 6
+});
+const CR_HEIGHTFIELD_FACE_INDEX = Object.freeze({ north: 0, east: 1, south: 2, west: 3 });
+const CR_HEIGHTFIELD_MATERIALS = Object.freeze([
+  Object.freeze({ id: 0, stableId: 'ground', mode: 'none', opaque: true }),
+  Object.freeze({ id: 1, stableId: 'debug_north', mode: 'debugPattern', opaque: true, face: 'north' }),
+  Object.freeze({ id: 2, stableId: 'debug_east', mode: 'debugPattern', opaque: true, face: 'east' }),
+  Object.freeze({ id: 3, stableId: 'debug_south', mode: 'debugPattern', opaque: true, face: 'south' }),
+  Object.freeze({ id: 4, stableId: 'debug_west', mode: 'debugPattern', opaque: true, face: 'west' }),
+  Object.freeze({ id: 5, stableId: 'debug_top', mode: 'debugTop', opaque: true, face: 'top' }),
+  Object.freeze({ id: 6, stableId: 'legacy_wall', mode: 'legacyWall', opaque: true }),
+]);
 const CR_VERTICAL_PROFILES = Object.freeze([
-  Object.freeze({ id: 0, topLevel: 0, collision: 'none', sideMaterials: Object.freeze(['ground', 'ground', 'ground', 'ground']), topMaterial: 'ground' }),
-  Object.freeze({ id: 1, topLevel: 1, collision: 'solid', sideMaterials: Object.freeze(['north', 'east', 'south', 'west']), topMaterial: 'top' }),
-  Object.freeze({ id: 2, topLevel: 2, collision: 'solid', sideMaterials: Object.freeze(['legacy', 'legacy', 'legacy', 'legacy']), topMaterial: 'none' }),
+  Object.freeze({ id: 0, stableId: 'empty', topLevel: 0, collision: 'none', sideMaterials: Object.freeze([0, 0, 0, 0]), topMaterial: null }),
+  Object.freeze({ id: 1, stableId: 'proof_debug_half', topLevel: 1, collision: 'solid', sideMaterials: Object.freeze([1, 2, 3, 4]), topMaterial: 5 }),
+  Object.freeze({ id: 2, stableId: 'full_legacy', topLevel: 2, collision: 'solid', sideMaterials: Object.freeze([6, 6, 6, 6]), topMaterial: null }),
 ]);
 const CR_HEIGHTFIELD_FACE_COLORS = Object.freeze({
   north: '#d9534f', east: '#4cae4c', south: '#e59a2f', west: '#8a62d5', top: '#2f9ed7'
@@ -11400,8 +11413,45 @@ const crHeightfieldStats = {
   worldDepthBytes: 0, allocations: 0
 };
 
+function crHeightfieldMaterialAt(id){
+  return Number.isInteger(id) ? (CR_HEIGHTFIELD_MATERIALS[id] || null) : null;
+}
+function crHeightfieldSideMaterialId(profile, face){
+  const index = CR_HEIGHTFIELD_FACE_INDEX[face];
+  if(!profile || !Number.isInteger(index) || !Array.isArray(profile.sideMaterials)) return null;
+  const materialId = profile.sideMaterials[index];
+  return crHeightfieldMaterialAt(materialId) ? materialId : null;
+}
+function crHeightfieldTopMaterialId(profile){
+  if(!profile || profile.topMaterial === null) return null;
+  return crHeightfieldMaterialAt(profile.topMaterial) ? profile.topMaterial : null;
+}
+function crHeightfieldProfileRegistryReady(){
+  return CR_VERTICAL_PROFILES.every((profile, id) => {
+    if(!profile || profile.id !== id || !profile.stableId || !Number.isInteger(profile.topLevel) ||
+      profile.topLevel < 0 || profile.topLevel >= CR_HEIGHT_LEVELS.length ||
+      (profile.collision !== 'none' && profile.collision !== 'solid') ||
+      !Array.isArray(profile.sideMaterials) || profile.sideMaterials.length !== 4) return false;
+    if(!profile.sideMaterials.every(materialId => !!crHeightfieldMaterialAt(materialId))) return false;
+    return profile.topMaterial === null || !!crHeightfieldMaterialAt(profile.topMaterial);
+  });
+}
+function crHeightfieldMaterialRegistryReady(){
+  return CR_HEIGHTFIELD_MATERIALS.every((material, id) => !!material && material.id === id &&
+    typeof material.stableId === 'string' && material.stableId.length > 0 && material.opaque === true &&
+    typeof material.mode === 'string' && material.mode.length > 0);
+}
+function crHeightfieldHasValidProfileGrid(){
+  const grid = game && game.verticalProfileGrid;
+  if(!grid || !Number.isInteger(game.verticalProfileWidth) || !Number.isInteger(game.verticalProfileHeight) ||
+    game.verticalProfileWidth !== game.MAP_W || game.verticalProfileHeight !== game.MAP_H ||
+    grid.length !== game.MAP_W * game.MAP_H) return false;
+  for(let i = 0; i < grid.length; i++) if(!CR_VERTICAL_PROFILES[grid[i]]) return false;
+  return true;
+}
 function crHeightfieldIsActive(){
-  return !!(game && game.verticalProfileGrid && game.run && game.run.customLevel === 'heightfield_proof');
+  const inPlay = typeof STATE !== 'undefined' && state === STATE.PLAY;
+  return !!(game && inPlay && crHeightfieldProfileRegistryReady() && crHeightfieldMaterialRegistryReady() && crHeightfieldHasValidProfileGrid());
 }
 function crHeightfieldClearState(){
   game.verticalProfileGrid = null;
