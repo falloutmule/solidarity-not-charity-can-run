@@ -13,7 +13,7 @@ const slumped = manifest.assets.find((asset) => asset.assetId === 'npc_unhoused_
 assert(standing.length === 15 && slumped, 'approved cast remains complete');
 for(const asset of standing){
   assert.strictEqual(asset.displayHeightScale, 0.62, `${asset.assetId}: legacy display height remains approved`);
-  assert.strictEqual(asset.worldHeight, 0.96, `${asset.assetId}: standing world height is calibrated`);
+  assert.strictEqual(asset.worldHeight, 0.68, `${asset.assetId}: standing world height matches the camera eye`);
   assert.notStrictEqual(asset.displayHeightScale, asset.worldHeight, `${asset.assetId}: display and world heights are distinct`);
 }
 assert.strictEqual(slumped.displayHeightScale, 0.45, 'slumped legacy display height remains approved');
@@ -45,9 +45,9 @@ assert(sprites.includes("params.get('hfcalibration') === '1'"), 'calibration sce
 assert(sprites.includes("id: 'half-block'") && sprites.includes("id: 'full-wall'"), 'calibration scene includes both geometry references');
 
 const eyeZ = 0.68, halfBlock = 0.5, can = 0.4;
-assert(standing[0].worldHeight > eyeZ, 'standing world height exceeds the camera eye');
+assert.strictEqual(standing[0].worldHeight, eyeZ, 'standing world height matches the camera eye');
 assert(can < halfBlock, 'can remains shorter than the half block');
-assert(slumped.worldHeight > halfBlock && slumped.worldHeight < standing[0].worldHeight, 'slumped person is physically between block and standing heights');
+assert(slumped.worldHeight > halfBlock && slumped.worldHeight === standing[0].worldHeight, 'slumped person remains above the block and uses the same eye-level physical scale');
 
 for(const asset of manifest.assets){
   const bounds = asset.runtimeAlphaBounds, size = asset.runtimeSize;

@@ -75,7 +75,7 @@ async function main(){
     result.checks.queryGate = equal.runtime.customLevel === 'heightfield_proof' && calibration.pose === 'equal-depth';
     result.checks.equalDepth = Math.max(...depths) - Math.min(...depths) < 1e-9;
     result.checks.worldOrder = standing.worldHeight > halfBlock.worldHeight && slumped.worldHeight > halfBlock.worldHeight && can.worldHeight < halfBlock.worldHeight && fullWall.worldHeight === 1;
-    result.checks.standingAboveEye = standing.topScreenY < 125 && standing.worldHeight > equal.heightfield.cameraZ;
+    result.checks.standingEyeLevel = Math.abs(standing.topScreenY - 125) < 1e-9 && standing.worldHeight === equal.heightfield.cameraZ;
     result.checks.grounded = subjects.every((subject) => Math.abs(subject.groundScreenY - subjects[0].groundScreenY) < 1e-9);
     result.checks.visibleBounds = [standing, slumped, can].every((subject) => {
       const bounds = subject.visibleBounds;
@@ -88,7 +88,7 @@ async function main(){
       comparisonCans.every((subject) => subject.visibleBounds && subject.visibleBounds.groundingErrorPixels <= 1) &&
       comparisonCans[0].projectedPixelHeight < comparisonCans[1].projectedPixelHeight && comparisonCans[1].projectedPixelHeight < comparisonCans[2].projectedPixelHeight;
     result.checks.projectedOrder = standing.projectedPixelHeight > halfBlock.projectedPixelHeight && slumped.projectedPixelHeight > can.projectedPixelHeight && fullWall.projectedPixelHeight > standing.projectedPixelHeight;
-    result.checks.closeRange = closeStanding.projectedPixelHeight > standing.projectedPixelHeight * 2 && closeStanding.topScreenY < 125;
+    result.checks.closeRange = closeStanding.projectedPixelHeight > standing.projectedPixelHeight * 2 && Math.abs(closeStanding.topScreenY - 125) < 1e-9;
     result.checks.heightfield = equal.heightfield.enabled === true && equal.heightfield.worldDepthWrites > 0;
     result.checks.noErrors = Object.values(result.observed).every((items) => items.length === 0);
     result.pass = Object.values(result.checks).every(Boolean);

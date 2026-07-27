@@ -15,7 +15,7 @@
       "y": 1.0
     },
     "displayHeightScale": 0.62,
-    "worldHeight": 0.96,
+    "worldHeight": 0.68,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -40,7 +40,7 @@
       "y": 1.0
     },
     "displayHeightScale": 0.62,
-    "worldHeight": 0.96,
+    "worldHeight": 0.68,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -65,7 +65,7 @@
       "y": 1.0
     },
     "displayHeightScale": 0.62,
-    "worldHeight": 0.96,
+    "worldHeight": 0.68,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -90,7 +90,7 @@
       "y": 1.0
     },
     "displayHeightScale": 0.62,
-    "worldHeight": 0.96,
+    "worldHeight": 0.68,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -115,7 +115,7 @@
       "y": 1.0
     },
     "displayHeightScale": 0.62,
-    "worldHeight": 0.96,
+    "worldHeight": 0.68,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -140,7 +140,7 @@
       "y": 1.0
     },
     "displayHeightScale": 0.62,
-    "worldHeight": 0.96,
+    "worldHeight": 0.68,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -165,7 +165,7 @@
       "y": 1.0
     },
     "displayHeightScale": 0.62,
-    "worldHeight": 0.96,
+    "worldHeight": 0.68,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -190,7 +190,7 @@
       "y": 1.0
     },
     "displayHeightScale": 0.62,
-    "worldHeight": 0.96,
+    "worldHeight": 0.68,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -215,7 +215,7 @@
       "y": 1.0
     },
     "displayHeightScale": 0.62,
-    "worldHeight": 0.96,
+    "worldHeight": 0.68,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -240,7 +240,7 @@
       "y": 1.0
     },
     "displayHeightScale": 0.62,
-    "worldHeight": 0.96,
+    "worldHeight": 0.68,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -265,7 +265,7 @@
       "y": 1.0
     },
     "displayHeightScale": 0.62,
-    "worldHeight": 0.96,
+    "worldHeight": 0.68,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -315,7 +315,7 @@
       "y": 1.0
     },
     "displayHeightScale": 0.62,
-    "worldHeight": 0.96,
+    "worldHeight": 0.68,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -340,7 +340,7 @@
       "y": 1.0
     },
     "displayHeightScale": 0.62,
-    "worldHeight": 0.96,
+    "worldHeight": 0.68,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -365,7 +365,7 @@
       "y": 1.0
     },
     "displayHeightScale": 0.62,
-    "worldHeight": 0.96,
+    "worldHeight": 0.68,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -390,7 +390,7 @@
       "y": 1.0
     },
     "displayHeightScale": 0.62,
-    "worldHeight": 0.96,
+    "worldHeight": 0.68,
     "alphaBounds": {
       "x": 3,
       "y": 3,

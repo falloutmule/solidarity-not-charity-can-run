@@ -29,7 +29,7 @@ assert.strictEqual(manifest.assets.find((asset) => asset.assetId === 'npc_unhous
 assert.strictEqual(manifest.assets.find((asset) => asset.assetId === 'npc_unhoused_slumped_001').worldHeight, 0.68, 'seated asset has a separate physical height');
 for(const asset of manifest.assets.filter((asset) => asset.assetId !== 'npc_unhoused_slumped_001')){
   assert.strictEqual(asset.displayHeightScale, 0.62, `${asset.assetId}: compact gallery scale`);
-  assert.strictEqual(asset.worldHeight, 0.96, `${asset.assetId}: physical standing height`);
+  assert.strictEqual(asset.worldHeight, 0.68, `${asset.assetId}: physical standing height matches the camera eye`);
 }
 for(const asset of manifest.assets){
   assert.strictEqual(asset.reviewStatus, 'candidate', `${asset.assetId}: approved package records stay candidate review art`);
@@ -54,6 +54,9 @@ assert.strictEqual(dataUris.length, 16, 'exactly one data URI per approved runti
 assert.strictEqual(new Set(dataUris).size, 16, 'runtime payloads are unique');
 for(const asset of manifest.assets) assert(generatedRegistry.includes(asset.assetId), `${asset.assetId}: runtime record exists`);
 assert(generatedRegistry.includes('displayHeightScale') && generatedRegistry.includes('worldHeight'), 'runtime records retain distinct display and world heights');
+const runtimeWorldHeights = [...generatedRegistry.matchAll(/"worldHeight": ([0-9.]+)/g)].map((match) => Number(match[1]));
+assert.strictEqual(runtimeWorldHeights.length, manifest.assets.length, 'runtime registry records every physical height');
+assert(runtimeWorldHeights.every((height) => height === 0.68), 'runtime registry stays in sync with the eye-level character height contract');
 assert(!generatedRegistry.includes('"heightScale"'), 'runtime records do not retain the ambiguous heightScale field');
 
 const level = load('src/levels/asset-gallery-authored.js');
