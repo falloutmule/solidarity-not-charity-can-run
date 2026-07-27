@@ -198,9 +198,9 @@ function genHeightfieldWorldScaleCalibration(params){
   const slumped = { calibrationId: 'slumped', id: 'calibration-slumped', assetId: 'npc_unhoused_slumped_001', kind: 'unhoused', x: 10.5, y: 8.5, need: 1, helped: false, wob: 0, thank: 'Calibration slumped.' };
   const canComparison = params.get('hfcancomparison') === '1';
   const cans = canComparison ? [
-    { calibrationId: 'can-024', x: 11.5, y: 8.5, worldHeight: 0.24, taken: false, amt: 1, wob: 0 },
-    { calibrationId: 'can-026', x: 12.5, y: 8.5, worldHeight: 0.26, taken: false, amt: 1, wob: 0 },
-    { calibrationId: 'can-028', x: 13.5, y: 8.5, worldHeight: 0.28, taken: false, amt: 1, wob: 0 }
+    { calibrationId: 'can-036', x: 11.5, y: 8.5, worldHeight: 0.36, taken: false, amt: 1, wob: 0 },
+    { calibrationId: 'can-040', x: 12.5, y: 8.5, worldHeight: 0.4, taken: false, amt: 1, wob: 0 },
+    { calibrationId: 'can-044', x: 13.5, y: 8.5, worldHeight: 0.44, taken: false, amt: 1, wob: 0 }
   ] : [{ calibrationId: 'can', x: 12.5, y: 8.5, taken: false, amt: 1, wob: 0 }];
   game.pickups = cans; game.npcs = [standing, slumped];
   game.heightfieldCalibration = Object.freeze({

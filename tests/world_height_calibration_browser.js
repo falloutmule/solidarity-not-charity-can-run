@@ -48,7 +48,7 @@ async function main(){
     await page.goto(`${result.url}?heightfield=1&hfcalibration=1&hfcalpose=equal-depth&hfcancomparison=1`, { waitUntil: 'load' });
     await page.waitForFunction(() => {
       const calibration = window.SNCDiagnostics && window.SNCDiagnostics.getSnapshot().heightfield.calibration;
-      return calibration && calibration.subjects.some((subject) => subject.id === 'can-024') && calibration.subjects.some((subject) => subject.id === 'can-028');
+      return calibration && calibration.subjects.some((subject) => subject.id === 'can-036') && calibration.subjects.some((subject) => subject.id === 'can-044');
     });
     await page.waitForTimeout(160);
     const comparison = await page.evaluate(() => window.SNCDiagnostics.getSnapshot());
@@ -63,7 +63,7 @@ async function main(){
     const depths = subjects.map((subject) => subject.cameraDepth);
     const closeStanding = byId(close.heightfield.calibration, 'standing');
     const comparisonCalibration = comparison.heightfield.calibration;
-    const comparisonCans = ['can-024', 'can-026', 'can-028'].map((id) => byId(comparisonCalibration, id));
+    const comparisonCans = ['can-036', 'can-040', 'can-044'].map((id) => byId(comparisonCalibration, id));
     result.measurements.equalDepth = calibration;
     result.measurements.standingClose = close.heightfield.calibration;
     result.measurements.canComparison = comparisonCalibration;
@@ -84,7 +84,7 @@ async function main(){
         bounds.groundSourceY === bounds.alphaBounds.y + bounds.alphaBounds.h && bounds.groundSourceY <= bounds.sourceCanvasHeight;
     });
     result.checks.visibleGrounding = [standing, slumped, can].every((subject) => subject.visibleBounds && Math.abs(subject.visibleBounds.projectedGroundY - subject.groundScreenY) < 1e-9 && subject.visibleBounds.groundingErrorPixels <= 1);
-    result.checks.canComparison = comparisonCans.every(Boolean) && comparisonCans.map((subject) => subject.worldHeight).join(',') === '0.24,0.26,0.28' &&
+    result.checks.canComparison = comparisonCans.every(Boolean) && comparisonCans.map((subject) => subject.worldHeight).join(',') === '0.36,0.4,0.44' &&
       comparisonCans.every((subject) => subject.visibleBounds && subject.visibleBounds.groundingErrorPixels <= 1) &&
       comparisonCans[0].projectedPixelHeight < comparisonCans[1].projectedPixelHeight && comparisonCans[1].projectedPixelHeight < comparisonCans[2].projectedPixelHeight;
     result.checks.projectedOrder = standing.projectedPixelHeight > halfBlock.projectedPixelHeight && slumped.projectedPixelHeight > can.projectedPixelHeight && fullWall.projectedPixelHeight > standing.projectedPixelHeight;
