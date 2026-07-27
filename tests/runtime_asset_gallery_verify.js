@@ -55,8 +55,11 @@ assert(level.includes("schema: 'snc-asset-gallery-level-v1'"), 'special authored
 assert(!level.includes('data:image/'), 'placements reference IDs rather than bitmap payloads');
 for(const asset of manifest.assets) assert(level.includes(asset.assetId), `${asset.assetId}: placement reference`);
 assert(level.includes("zone: 'volunteer'") && level.includes("zone: 'civilian'") && level.includes("zone: 'household'") && level.includes("zone: 'unhoused'"), 'four gallery zones');
-assert(level.includes("status: 'deferred'"), 'low-block obstruction bays explicitly deferred');
-assert(level.includes('low-block raycaster spike acceptance'), 'deferred dependency is recorded');
+assert(level.includes("assetId: 'low_block_concrete_001'"), 'one authored low block is placed by stable asset ID');
+assert(level.includes('environmentObjects:'), 'environment geometry has its own gallery authority');
+assert(level.includes('environmentNpcs:'), 'the low-block review bay includes an NPC occlusion lane');
+assert(level.includes('environmentReview:'), 'the review bay declares deterministic inspection poses');
+assert(!level.includes('deferredTestBays'), 'accepted low-block review is no longer deferred');
 const placements = [...level.matchAll(/assetId: '([^']+)', zone: '([^']+)', x: ([\d.]+), y: ([\d.]+)/g)].map((match) => ({ assetId: match[1], zone: match[2], x: Number(match[3]), y: Number(match[4]) }));
 assert.strictEqual(placements.length, 16, 'all approved characters are placed exactly once');
 assert.deepStrictEqual(placements.reduce((groups, placement) => {
@@ -82,6 +85,10 @@ for(const placement of placements) assert(reachable.has(`${Math.floor(placement.
 const galleryMode = load('src/js/game-21b-asset-gallery-mode.js');
 assert(galleryMode.includes('heightScale: asset.heightScale'), 'registry display scale reaches the existing NPC renderer path');
 assert(galleryMode.includes('galleryStatic: true'), 'gallery characters stay static');
+assert(galleryMode.includes('crAssetGalleryInstallEnvironment'), 'gallery installs authored low geometry through one bounded adapter');
+assert(galleryMode.includes('crHeightfieldProfileForSolidAsset(asset)'), 'gallery resolves the profile from the generic asset contract');
+assert(galleryMode.includes('game.verticalProfileGrid = environment.profileGrid'), 'gallery installs a map-sized heightfield profile grid');
+assert(galleryMode.includes('map[y][x] = WALL.CONCRETE'), 'low-block collision remains map-authoritative');
 const input = load('src/js/game-20-section-11-update-input.js');
 const mobileInput = load('src/js/game-06-section-2b-mobile-touch-input.js');
 const responsiveMenu = load('src/js/game-07-section-2c-responsive-mobile-menu-html-overlay.js');
@@ -98,9 +105,11 @@ assert(mobileInput.includes("? '<span class=\"mportmenu-t\">MENU</span><span cla
 
 const buildManifest = JSON.parse(load('src/build-manifest.json'));
 const registryIndex = buildManifest.scripts.indexOf('src/imported-handoff-assets/runtime-character-gallery-assets.js');
+const lowBlockAssetIndex = buildManifest.scripts.indexOf('src/imported-handoff-assets/low_block_concrete_001.asset.js');
 const levelIndex = buildManifest.scripts.indexOf('src/levels/asset-gallery-authored.js');
 const galleryModeIndex = buildManifest.scripts.indexOf('src/js/game-21b-asset-gallery-mode.js');
 assert(registryIndex > buildManifest.scripts.indexOf('src/imported-handoff-assets/custom_next_001.asset.js'), 'registry loads after existing imported assets');
+assert(lowBlockAssetIndex >= 0 && lowBlockAssetIndex < levelIndex, 'solid-height asset loads before its gallery placement authority');
 assert(levelIndex > registryIndex, 'gallery references load after registry');
 assert(galleryModeIndex > buildManifest.scripts.indexOf('src/js/game-20-section-11-update-input.js'), 'gallery mode loads after normal run helpers');
 
@@ -109,4 +118,4 @@ assert.strictEqual(palette.schema, 'snc-asset-palette-v1');
 assert.strictEqual(palette.generatedFrom, 'authoring/characters/character-assets-v2.json');
 assert.deepStrictEqual(palette.assets.map((asset) => asset.assetId).sort(), manifest.assets.map((asset) => asset.assetId).sort(), 'future palette uses runtime stable IDs');
 
-console.log(JSON.stringify({ pass: true, assets: 16, groups: { volunteer: 3, civilian: 3, household: 2, unhoused: 8 }, uniquePayloads: dataUris.length, deferredLowBlockBays: true }));
+console.log(JSON.stringify({ pass: true, assets: 16, groups: { volunteer: 3, civilian: 3, household: 2, unhoused: 8 }, uniquePayloads: dataUris.length, lowBlockGalleryBay: true }));

@@ -685,7 +685,7 @@ const inp = {
   lookDeltaRad:0,
   _active:false, // true when any touch is on screen
 };
-var BUILD_ID = 'heightfieldintegration3'; window.BUILD_ID = BUILD_ID;
+var BUILD_ID = 'heightfieldintegration5'; window.BUILD_ID = BUILD_ID;
 const CR_FPV_STREET_MATTE = true;
 /** Building visual reset: smooth, low-noise wall masses with sparse readable cues. */
 const CR_BUILDING_SMOOTH_STYLE = 1;
@@ -3360,18 +3360,26 @@ Object.keys(LOW_BLOCK_CONCRETE_001.materials).forEach(function(face){
       { id: 'gallery-prop-mailbox-001', kind: 'mailbox', x: 10.5, y: 16.5 },
       { id: 'gallery-prop-utility-box-001', kind: 'utility_box', x: 15.5, y: 16.5 }
     ],
-    pickups: [{ id: 'gallery-pickup-can-001', x: 20.5, y: 16.5, amt: 1 }],
+    pickups: [{ id: 'gallery-pickup-can-001', x: 26.5, y: 8.2, amt: 1 }],
     exit: { id: 'gallery-marker-portal-001', x: 24.5, y: 16.5, active: true },
     buildings: [{
       id: 'gallery-building-custom-next-001', assetId: 'custom_next_001', x: 29, y: 19,
       rotation: 0, widthCells: 6, depthCells: 3, front: 'south'
     }],
-    deferredTestBays: [{
-      id: 'low-block-height-bays',
-      status: 'deferred',
-      dependency: 'low-block raycaster spike acceptance',
-      heights: [0.4, 0.5, 0.6]
-    }]
+    environmentObjects: [{
+      id: 'gallery-low-block-concrete-001', assetId: 'low_block_concrete_001', x: 26, y: 10,
+      rotation: 0, widthCells: 1, depthCells: 1
+    }],
+    environmentNpcs: [{
+      id: 'gallery-low-block-npc-occlusion-001', assetId: 'npc_unhoused_work_jacket_001', x: 25.8, y: 8.2
+    }],
+    environmentReview: {
+      poses: {
+        'front-far': [26.5, 15.2], 'front-near': [26.5, 12.2], 'front-corner-left': [24.1, 12.7],
+        'front-corner-right': [28.9, 12.7], 'east-near': [28.7, 10.5], 'north-near': [26.5, 6.6],
+        'west-near': [24.3, 10.5], 'top-oblique': [24.3, 13.1], 'can-side': [29.0, 8.2, 26.5, 8.2]
+      }
+    }
   };
   root.SNC_ASSET_GALLERY_LEVEL = Object.freeze(level);
 })(globalThis);
@@ -11417,7 +11425,7 @@ const CR_VERTICAL_PROFILES = Object.freeze([
   Object.freeze({ id: 0, stableId: 'empty', topLevel: 0, collision: 'none', sideMaterials: Object.freeze([0, 0, 0, 0]), topMaterial: null }),
   Object.freeze({ id: 1, stableId: 'proof_debug_half', topLevel: 1, collision: 'solid', sideMaterials: Object.freeze([1, 2, 3, 4]), topMaterial: 5 }),
   Object.freeze({ id: 2, stableId: 'full_legacy', topLevel: 2, collision: 'solid', sideMaterials: Object.freeze([6, 6, 6, 6]), topMaterial: null }),
-  Object.freeze({ id: 3, stableId: 'authored_concrete_half', topLevel: 1, collision: 'solid', sideMaterials: Object.freeze([7, 8, 9, 10]), topMaterial: 11 }),
+  Object.freeze({ id: 3, stableId: 'authored_concrete_half', assetId: 'low_block_concrete_001', topLevel: 1, collision: 'solid', sideMaterials: Object.freeze([7, 8, 9, 10]), topMaterial: 11 }),
 ]);
 
 let worldDepthPixels = new Float32Array(0);
@@ -11496,6 +11504,10 @@ function crHeightfieldProfileIdAt(tx, ty){
 function crHeightfieldProfileAt(tx, ty){
   const id = crHeightfieldProfileIdAt(tx, ty);
   return CR_VERTICAL_PROFILES[id] || CR_VERTICAL_PROFILES[CR_VERTICAL_PROFILE_IDS.FULL_LEGACY];
+}
+function crHeightfieldProfileForSolidAsset(asset){
+  if(!asset || asset.renderMode !== 'solidHeightfield') return null;
+  return CR_VERTICAL_PROFILES.find((profile) => profile.assetId === asset.id && profile.topLevel === asset.solidTopLevel && profile.collision === asset.collision) || null;
 }
 function crHeightfieldRotationAt(tx, ty){
   const grid = game && game.verticalProfileRotationGrid;
@@ -11591,12 +11603,21 @@ function crHeightfieldMaterialRgb(material, u, v, rotation){
   return [cache.pixels[offset], cache.pixels[offset + 1], cache.pixels[offset + 2]];
 }
 function crHeightfieldSpriteOpaqueAt(tex, sourceX, sourceY){
-  if(!tex || typeof tex.getContext !== 'function') return false;
+  if(!tex) return false;
   let mask = crHeightfieldSpriteAlphaMasks.get(tex);
   if(!mask){
-    const textureCtx = tex.getContext('2d', { willReadFrequently: true });
-    const image = textureCtx.getImageData(0, 0, tex.width, tex.height);
-    mask = { width: tex.width, height: tex.height, alpha: image.data };
+    let width = tex.width, height = tex.height, textureCtx;
+    if(typeof tex.getContext === 'function'){
+      textureCtx = tex.getContext('2d', { willReadFrequently: true });
+    } else if(tex.naturalWidth > 0 && tex.naturalHeight > 0){
+      width = tex.naturalWidth; height = tex.naturalHeight;
+      const textureCanvas = document.createElement('canvas');
+      textureCanvas.width = width; textureCanvas.height = height;
+      textureCtx = textureCanvas.getContext('2d', { willReadFrequently: true });
+      textureCtx.drawImage(tex, 0, 0);
+    } else return false;
+    const image = textureCtx.getImageData(0, 0, width, height);
+    mask = { width, height, alpha: image.data };
     crHeightfieldSpriteAlphaMasks.set(tex, mask);
   }
   const x = Math.max(0, Math.min(mask.width - 1, sourceX | 0));
@@ -12478,7 +12499,7 @@ function crDrawFarFieldSpriteRuns(ctx, texture, projected, zbuffer){
   root.drawWholeFaceBitmapBuildingColumn = drawWholeFaceBitmapBuildingColumn;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
 // ---------------------------------------------------------------------------
-// SECTION 7D — VARIABLE-HEIGHT PROOF RENDERER
+// SECTION 7D — VARIABLE-HEIGHT RENDERER
 // ---------------------------------------------------------------------------
 const crHeightfieldDdaScratch = {
   capacity: 80,
@@ -14142,6 +14163,47 @@ function crAssetGalleryInstallBuilding(level, map){
   return { registry, grid, nextBid: bid };
 }
 
+function crAssetGalleryQuarterRotation(value){
+  const numeric = Number.parseInt(value, 10);
+  return Number.isInteger(numeric) ? ((numeric % 4 + 4) % 4) : 0;
+}
+
+function crAssetGalleryInstallEnvironment(level, map){
+  const profileGrid = new Uint16Array(level.width * level.height);
+  const rotationGrid = new Uint8Array(level.width * level.height);
+  for(let y = 0; y < level.height; y++) for(let x = 0; x < level.width; x++){
+    if(map[y][x] !== 0) profileGrid[y * level.width + x] = CR_VERTICAL_PROFILE_IDS.FULL_LEGACY;
+  }
+  const query = new URLSearchParams(location.search);
+  const requestedRotation = query.has('galleryrot') ? crAssetGalleryQuarterRotation(query.get('galleryrot')) : null;
+  const objects = [];
+  for(const placement of level.environmentObjects || []){
+    const asset = globalThis.SOLID_HEIGHT_ASSET_REGISTRY && globalThis.SOLID_HEIGHT_ASSET_REGISTRY[placement.assetId];
+    if(!asset || asset.schema !== 'snc-solid-height-runtime-v1') throw new Error('gallery solid-height asset is not registered: ' + placement.assetId);
+    const profile = crHeightfieldProfileForSolidAsset(asset);
+    if(!profile) throw new Error('gallery solid-height profile is not registered: ' + placement.assetId);
+    const width = placement.widthCells, depth = placement.depthCells;
+    if(width !== asset.footprint.widthCells || depth !== asset.footprint.depthCells || width !== 1 || depth !== 1) throw new Error('gallery solid-height footprint mismatch');
+    const x = placement.x, y = placement.y;
+    if(x <= 0 || x >= level.width - 1 || y <= 0 || y >= level.height - 1 || map[y][x] !== 0) throw new Error('invalid gallery environment footprint');
+    const rotation = requestedRotation == null ? crAssetGalleryQuarterRotation(placement.rotation) : requestedRotation;
+    map[y][x] = WALL.CONCRETE;
+    profileGrid[y * level.width + x] = profile.id;
+    rotationGrid[y * level.width + x] = rotation;
+    objects.push(Object.freeze({ id: placement.id, assetId: placement.assetId, x, y, widthCells: width, depthCells: depth, rotation, profileId: profile.id }));
+  }
+  return { objects, profileGrid, rotationGrid };
+}
+
+function crAssetGalleryApplyReviewPose(level, environment){
+  const poseName = new URLSearchParams(location.search).get('gallerypose');
+  const pose = poseName && level.environmentReview && level.environmentReview.poses && level.environmentReview.poses[poseName];
+  if(!pose || !environment.objects.length) return;
+  const block = environment.objects[0];
+  player.x = pose[0]; player.y = pose[1];
+  player.angle = Math.atan2((pose[3] == null ? block.y + 0.5 : pose[3]) - player.y, (pose[2] == null ? block.x + 0.5 : pose[2]) - player.x);
+}
+
 function crAssetGalleryExhibit(id, category, label, object){ return { id, category, label, object }; }
 
 function crInstallAssetGallery(){
@@ -14150,6 +14212,7 @@ function crInstallAssetGallery(){
   if(!level || level.schema !== 'snc-asset-gallery-level-v1') throw new Error('asset gallery level is unavailable');
   const map = crAssetGalleryBuildMap(level);
   const buildings = crAssetGalleryInstallBuilding(level, map);
+  const environment = crAssetGalleryInstallEnvironment(level, map);
   const exhibits = [];
   const npcs = level.characters.map((placement) => {
     const asset = crAssetGalleryRuntimeRecord(placement.assetId);
@@ -14158,6 +14221,11 @@ function crInstallAssetGallery(){
     exhibits.push(crAssetGalleryExhibit(placement.id, 'character/' + asset.group, placement.assetId, npc));
     return npc;
   });
+  for(const placement of level.environmentNpcs || []){
+    const asset = crAssetGalleryRuntimeRecord(placement.assetId);
+    if(!asset) throw new Error('gallery environment NPC asset is not registered: ' + placement.assetId);
+    npcs.push({ id: placement.id, assetId: placement.assetId, kind: asset.group, x: placement.x, y: placement.y, need: 99, helped: false, wob: 0, thank: '', galleryStatic: true, galleryEnvironmentFixture: true, heightScale: asset.heightScale });
+  }
   const props = level.props.map((placement) => {
     const prop = Object.assign({ wob: 0 }, placement);
     exhibits.push(crAssetGalleryExhibit(placement.id, 'prop', placement.kind, prop));
@@ -14176,6 +14244,13 @@ function crInstallAssetGallery(){
       widthCells: building.widthCells, depthCells: building.depthCells
     }));
   }
+  for(const object of environment.objects){
+    const asset = globalThis.SOLID_HEIGHT_ASSET_REGISTRY[object.assetId];
+    exhibits.push(crAssetGalleryExhibit(object.id, 'environment/low-block', asset.displayName, {
+      x: object.x + object.widthCells / 2, y: object.y + object.depthCells / 2,
+      widthCells: object.widthCells, depthCells: object.depthCells, heightScale: CR_HEIGHT_LEVELS[asset.solidTopLevel], rotation: object.rotation
+    }));
+  }
 
   game.seed = 8128;
   game.district = 0;
@@ -14185,6 +14260,10 @@ function crInstallAssetGallery(){
   game.map = map;
   game.MAP_W = level.width;
   game.MAP_H = level.height;
+  game.verticalProfileWidth = level.width;
+  game.verticalProfileHeight = level.height;
+  game.verticalProfileGrid = environment.profileGrid;
+  game.verticalProfileRotationGrid = environment.rotationGrid;
   game.wallShade = Array.from({ length: level.height }, () => new Array(level.width).fill(0.5));
   game.streetLayoutMeta = null;
   game.buildingRegistry = buildings.registry;
@@ -14204,11 +14283,12 @@ function crInstallAssetGallery(){
   game.popups = [];
   game.flash = 0;
   game.handoffFx = 0;
-  game.assetGallery = { active: true, levelId: level.id, exhibits, focus: null, deferredTestBays: level.deferredTestBays.slice() };
+  game.assetGallery = { active: true, levelId: level.id, exhibits, focus: null, environmentObjects: environment.objects, environmentNpcCount: (level.environmentNpcs || []).length };
   resetPlayerUpgrades();
   player.x = level.playerStart.x;
   player.y = level.playerStart.y;
   player.angle = level.playerStart.angle;
+  crAssetGalleryApplyReviewPose(level, environment);
   player.cans = 0;
   player.stamina = player.maxStamina;
   game.run = { active: true, startedAt: 0, seedUsed: game.seed, modifierUsed: game.modifier, customLevel: level.id,
@@ -15971,6 +16051,8 @@ function getDebugState(){
       active: game.assetGallery.active === true,
       levelId: game.assetGallery.levelId || null,
       exhibitCount: Array.isArray(game.assetGallery.exhibits) ? game.assetGallery.exhibits.length : 0,
+      environmentObjectCount: Array.isArray(game.assetGallery.environmentObjects) ? game.assetGallery.environmentObjects.length : 0,
+      environmentNpcCount: Number(game.assetGallery.environmentNpcCount) || 0,
       focusId: game.assetGallery.focus ? game.assetGallery.focus.id : null
     } : null,
     MAP_W: game.MAP_W, MAP_H: game.MAP_H,

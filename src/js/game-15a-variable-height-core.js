@@ -28,7 +28,7 @@ const CR_VERTICAL_PROFILES = Object.freeze([
   Object.freeze({ id: 0, stableId: 'empty', topLevel: 0, collision: 'none', sideMaterials: Object.freeze([0, 0, 0, 0]), topMaterial: null }),
   Object.freeze({ id: 1, stableId: 'proof_debug_half', topLevel: 1, collision: 'solid', sideMaterials: Object.freeze([1, 2, 3, 4]), topMaterial: 5 }),
   Object.freeze({ id: 2, stableId: 'full_legacy', topLevel: 2, collision: 'solid', sideMaterials: Object.freeze([6, 6, 6, 6]), topMaterial: null }),
-  Object.freeze({ id: 3, stableId: 'authored_concrete_half', topLevel: 1, collision: 'solid', sideMaterials: Object.freeze([7, 8, 9, 10]), topMaterial: 11 }),
+  Object.freeze({ id: 3, stableId: 'authored_concrete_half', assetId: 'low_block_concrete_001', topLevel: 1, collision: 'solid', sideMaterials: Object.freeze([7, 8, 9, 10]), topMaterial: 11 }),
 ]);
 
 let worldDepthPixels = new Float32Array(0);
@@ -107,6 +107,10 @@ function crHeightfieldProfileIdAt(tx, ty){
 function crHeightfieldProfileAt(tx, ty){
   const id = crHeightfieldProfileIdAt(tx, ty);
   return CR_VERTICAL_PROFILES[id] || CR_VERTICAL_PROFILES[CR_VERTICAL_PROFILE_IDS.FULL_LEGACY];
+}
+function crHeightfieldProfileForSolidAsset(asset){
+  if(!asset || asset.renderMode !== 'solidHeightfield') return null;
+  return CR_VERTICAL_PROFILES.find((profile) => profile.assetId === asset.id && profile.topLevel === asset.solidTopLevel && profile.collision === asset.collision) || null;
 }
 function crHeightfieldRotationAt(tx, ty){
   const grid = game && game.verticalProfileRotationGrid;
@@ -202,12 +206,21 @@ function crHeightfieldMaterialRgb(material, u, v, rotation){
   return [cache.pixels[offset], cache.pixels[offset + 1], cache.pixels[offset + 2]];
 }
 function crHeightfieldSpriteOpaqueAt(tex, sourceX, sourceY){
-  if(!tex || typeof tex.getContext !== 'function') return false;
+  if(!tex) return false;
   let mask = crHeightfieldSpriteAlphaMasks.get(tex);
   if(!mask){
-    const textureCtx = tex.getContext('2d', { willReadFrequently: true });
-    const image = textureCtx.getImageData(0, 0, tex.width, tex.height);
-    mask = { width: tex.width, height: tex.height, alpha: image.data };
+    let width = tex.width, height = tex.height, textureCtx;
+    if(typeof tex.getContext === 'function'){
+      textureCtx = tex.getContext('2d', { willReadFrequently: true });
+    } else if(tex.naturalWidth > 0 && tex.naturalHeight > 0){
+      width = tex.naturalWidth; height = tex.naturalHeight;
+      const textureCanvas = document.createElement('canvas');
+      textureCanvas.width = width; textureCanvas.height = height;
+      textureCtx = textureCanvas.getContext('2d', { willReadFrequently: true });
+      textureCtx.drawImage(tex, 0, 0);
+    } else return false;
+    const image = textureCtx.getImageData(0, 0, width, height);
+    mask = { width, height, alpha: image.data };
     crHeightfieldSpriteAlphaMasks.set(tex, mask);
   }
   const x = Math.max(0, Math.min(mask.width - 1, sourceX | 0));

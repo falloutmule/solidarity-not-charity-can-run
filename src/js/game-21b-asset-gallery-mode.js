@@ -45,6 +45,47 @@ function crAssetGalleryInstallBuilding(level, map){
   return { registry, grid, nextBid: bid };
 }
 
+function crAssetGalleryQuarterRotation(value){
+  const numeric = Number.parseInt(value, 10);
+  return Number.isInteger(numeric) ? ((numeric % 4 + 4) % 4) : 0;
+}
+
+function crAssetGalleryInstallEnvironment(level, map){
+  const profileGrid = new Uint16Array(level.width * level.height);
+  const rotationGrid = new Uint8Array(level.width * level.height);
+  for(let y = 0; y < level.height; y++) for(let x = 0; x < level.width; x++){
+    if(map[y][x] !== 0) profileGrid[y * level.width + x] = CR_VERTICAL_PROFILE_IDS.FULL_LEGACY;
+  }
+  const query = new URLSearchParams(location.search);
+  const requestedRotation = query.has('galleryrot') ? crAssetGalleryQuarterRotation(query.get('galleryrot')) : null;
+  const objects = [];
+  for(const placement of level.environmentObjects || []){
+    const asset = globalThis.SOLID_HEIGHT_ASSET_REGISTRY && globalThis.SOLID_HEIGHT_ASSET_REGISTRY[placement.assetId];
+    if(!asset || asset.schema !== 'snc-solid-height-runtime-v1') throw new Error('gallery solid-height asset is not registered: ' + placement.assetId);
+    const profile = crHeightfieldProfileForSolidAsset(asset);
+    if(!profile) throw new Error('gallery solid-height profile is not registered: ' + placement.assetId);
+    const width = placement.widthCells, depth = placement.depthCells;
+    if(width !== asset.footprint.widthCells || depth !== asset.footprint.depthCells || width !== 1 || depth !== 1) throw new Error('gallery solid-height footprint mismatch');
+    const x = placement.x, y = placement.y;
+    if(x <= 0 || x >= level.width - 1 || y <= 0 || y >= level.height - 1 || map[y][x] !== 0) throw new Error('invalid gallery environment footprint');
+    const rotation = requestedRotation == null ? crAssetGalleryQuarterRotation(placement.rotation) : requestedRotation;
+    map[y][x] = WALL.CONCRETE;
+    profileGrid[y * level.width + x] = profile.id;
+    rotationGrid[y * level.width + x] = rotation;
+    objects.push(Object.freeze({ id: placement.id, assetId: placement.assetId, x, y, widthCells: width, depthCells: depth, rotation, profileId: profile.id }));
+  }
+  return { objects, profileGrid, rotationGrid };
+}
+
+function crAssetGalleryApplyReviewPose(level, environment){
+  const poseName = new URLSearchParams(location.search).get('gallerypose');
+  const pose = poseName && level.environmentReview && level.environmentReview.poses && level.environmentReview.poses[poseName];
+  if(!pose || !environment.objects.length) return;
+  const block = environment.objects[0];
+  player.x = pose[0]; player.y = pose[1];
+  player.angle = Math.atan2((pose[3] == null ? block.y + 0.5 : pose[3]) - player.y, (pose[2] == null ? block.x + 0.5 : pose[2]) - player.x);
+}
+
 function crAssetGalleryExhibit(id, category, label, object){ return { id, category, label, object }; }
 
 function crInstallAssetGallery(){
@@ -53,6 +94,7 @@ function crInstallAssetGallery(){
   if(!level || level.schema !== 'snc-asset-gallery-level-v1') throw new Error('asset gallery level is unavailable');
   const map = crAssetGalleryBuildMap(level);
   const buildings = crAssetGalleryInstallBuilding(level, map);
+  const environment = crAssetGalleryInstallEnvironment(level, map);
   const exhibits = [];
   const npcs = level.characters.map((placement) => {
     const asset = crAssetGalleryRuntimeRecord(placement.assetId);
@@ -61,6 +103,11 @@ function crInstallAssetGallery(){
     exhibits.push(crAssetGalleryExhibit(placement.id, 'character/' + asset.group, placement.assetId, npc));
     return npc;
   });
+  for(const placement of level.environmentNpcs || []){
+    const asset = crAssetGalleryRuntimeRecord(placement.assetId);
+    if(!asset) throw new Error('gallery environment NPC asset is not registered: ' + placement.assetId);
+    npcs.push({ id: placement.id, assetId: placement.assetId, kind: asset.group, x: placement.x, y: placement.y, need: 99, helped: false, wob: 0, thank: '', galleryStatic: true, galleryEnvironmentFixture: true, heightScale: asset.heightScale });
+  }
   const props = level.props.map((placement) => {
     const prop = Object.assign({ wob: 0 }, placement);
     exhibits.push(crAssetGalleryExhibit(placement.id, 'prop', placement.kind, prop));
@@ -79,6 +126,13 @@ function crInstallAssetGallery(){
       widthCells: building.widthCells, depthCells: building.depthCells
     }));
   }
+  for(const object of environment.objects){
+    const asset = globalThis.SOLID_HEIGHT_ASSET_REGISTRY[object.assetId];
+    exhibits.push(crAssetGalleryExhibit(object.id, 'environment/low-block', asset.displayName, {
+      x: object.x + object.widthCells / 2, y: object.y + object.depthCells / 2,
+      widthCells: object.widthCells, depthCells: object.depthCells, heightScale: CR_HEIGHT_LEVELS[asset.solidTopLevel], rotation: object.rotation
+    }));
+  }
 
   game.seed = 8128;
   game.district = 0;
@@ -88,6 +142,10 @@ function crInstallAssetGallery(){
   game.map = map;
   game.MAP_W = level.width;
   game.MAP_H = level.height;
+  game.verticalProfileWidth = level.width;
+  game.verticalProfileHeight = level.height;
+  game.verticalProfileGrid = environment.profileGrid;
+  game.verticalProfileRotationGrid = environment.rotationGrid;
   game.wallShade = Array.from({ length: level.height }, () => new Array(level.width).fill(0.5));
   game.streetLayoutMeta = null;
   game.buildingRegistry = buildings.registry;
@@ -107,11 +165,12 @@ function crInstallAssetGallery(){
   game.popups = [];
   game.flash = 0;
   game.handoffFx = 0;
-  game.assetGallery = { active: true, levelId: level.id, exhibits, focus: null, deferredTestBays: level.deferredTestBays.slice() };
+  game.assetGallery = { active: true, levelId: level.id, exhibits, focus: null, environmentObjects: environment.objects, environmentNpcCount: (level.environmentNpcs || []).length };
   resetPlayerUpgrades();
   player.x = level.playerStart.x;
   player.y = level.playerStart.y;
   player.angle = level.playerStart.angle;
+  crAssetGalleryApplyReviewPose(level, environment);
   player.cans = 0;
   player.stamina = player.maxStamina;
   game.run = { active: true, startedAt: 0, seedUsed: game.seed, modifierUsed: game.modifier, customLevel: level.id,
