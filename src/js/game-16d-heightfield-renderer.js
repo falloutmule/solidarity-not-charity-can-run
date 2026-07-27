@@ -84,7 +84,7 @@ function crHeightfieldRenderRaisedPlanes(px, py, dirX, dirY, planeX, planeY){
   bctx.drawImage(crHeightfieldPlaneCanvas, 0, 0);
 }
 
-function crHeightfieldDrawSprite(obj, tex, hp, px, py, dirX, dirY, planeX, planeY, now){
+function crHeightfieldDrawSprite(kind, obj, tex, hp, px, py, dirX, dirY, planeX, planeY, now){
   if(!obj || !tex) return;
   const rx = obj.x - px, ry = obj.y - py;
   const invDet = 1 / (planeX * dirY - dirX * planeY);
@@ -92,9 +92,11 @@ function crHeightfieldDrawSprite(obj, tex, hp, px, py, dirX, dirY, planeX, plane
   const hscr = invDet * (dirY * rx - dirX * ry);
   if(!(depth > 0.12)) return;
   const proj = crProjectBillboardSprite(obj, tex, hp, depth, hscr, now);
+  const heightfieldGroundY = crProjectWorldZToScreenY(0, depth, CR_HEIGHTFIELD_CAMERA.eyeZ);
+  const top = proj.topY + (heightfieldGroundY - proj.groundBottomY);
   const startCol = Math.max(0, Math.floor(proj.screenX - proj.screenW / 2));
   const endCol = Math.min(RW, Math.ceil(proj.screenX + proj.screenW / 2));
-  const top = proj.topY, bottom = top + proj.screenH;
+  const bottom = top + proj.screenH;
   for(let col = startCol; col < endCol; col++){
     const u = (col - (proj.screenX - proj.screenW / 2)) / proj.screenW;
     const srcX = Math.max(0, Math.min(tex.width - 1, (u * tex.width) | 0));
@@ -102,11 +104,17 @@ function crHeightfieldDrawSprite(obj, tex, hp, px, py, dirX, dirY, planeX, plane
     let runStart = -1;
     for(let y = y0; y <= y1; y++){
       const visible = y < y1 && depth < worldDepthPixels[y * RW + col];
+      const sourceY = Math.max(0, Math.min(tex.height - 1, ((y - top) / proj.screenH * tex.height) | 0));
+      const opaque = y < y1 && crHeightfieldSpriteOpaqueAt(tex, srcX, sourceY);
       if(visible){
         if(runStart < 0) runStart = y;
         crHeightfieldStats.spriteVisiblePixels++;
+        if(opaque && kind === 'can') crHeightfieldStats.canVisiblePixels++;
+        else if(opaque && kind === 'npc') crHeightfieldStats.npcVisiblePixels++;
       } else {
         if(y < y1) crHeightfieldStats.spriteOccludedPixels++;
+        if(opaque && kind === 'can') crHeightfieldStats.canOccludedPixels++;
+        else if(opaque && kind === 'npc') crHeightfieldStats.npcOccludedPixels++;
         if(runStart >= 0){
           const runHeight = y - runStart;
           const sy = (runStart - top) / proj.screenH * tex.height;
@@ -170,8 +178,8 @@ function crDrawHeightfieldScene(now, renderPose){
     }
   }
   crHeightfieldRenderRaisedPlanes(px, py, dirX, dirY, planeX, planeY);
-  for(const prop of game.props) crHeightfieldDrawSprite(prop, propTex(prop.kind, prop), HEIGHT[prop.kind] || 0.5, px, py, dirX, dirY, planeX, planeY, now);
-  for(const can of game.pickups) if(!can.taken) crHeightfieldDrawSprite(can, TEX.can, HEIGHT.can, px, py, dirX, dirY, planeX, planeY, now);
-  for(const npc of game.npcs) if(!npc.helped) crHeightfieldDrawSprite(npc, npcSpriteTex(npc.kind, npc), npcSpriteHeight(npc), px, py, dirX, dirY, planeX, planeY, now);
-  if(game.exit && game.exit.active) crHeightfieldDrawSprite(game.exit, TEX.exit, HEIGHT.exit, px, py, dirX, dirY, planeX, planeY, now);
+  for(const prop of game.props) crHeightfieldDrawSprite('prop', prop, propTex(prop.kind, prop), HEIGHT[prop.kind] || 0.5, px, py, dirX, dirY, planeX, planeY, now);
+  for(const can of game.pickups) if(!can.taken) crHeightfieldDrawSprite('can', can, TEX.can, HEIGHT.can, px, py, dirX, dirY, planeX, planeY, now);
+  for(const npc of game.npcs) if(!npc.helped) crHeightfieldDrawSprite('npc', npc, npcSpriteTex(npc.kind, npc), npcSpriteHeight(npc), px, py, dirX, dirY, planeX, planeY, now);
+  if(game.exit && game.exit.active) crHeightfieldDrawSprite('exit', game.exit, TEX.exit, HEIGHT.exit, px, py, dirX, dirY, planeX, planeY, now);
 }

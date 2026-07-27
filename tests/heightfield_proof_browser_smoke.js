@@ -31,34 +31,39 @@ async function main(){
     const sentinel = '{"heightfield":"save-isolated"}';
     await page.evaluate((value) => localStorage.setItem('cannedRun.save.v1', value), sentinel);
     const proofCases = [
-      { pose: 'south-far', rotation: 0 }, { pose: 'south-far', rotation: 1 },
-      { pose: 'south-far', rotation: 2 }, { pose: 'south-far', rotation: 3 },
-      { pose: 'south-near', rotation: 1 }, { pose: 'southwest-corner', rotation: 1 },
-      { pose: 'southeast-corner', rotation: 1 }, { pose: 'top-oblique', rotation: 1 }
+      { pose: 'south-far', rotation: 0, target: 'can' }, { pose: 'south-far', rotation: 1, target: 'can' },
+      { pose: 'south-far', rotation: 2, target: 'can' }, { pose: 'south-far', rotation: 3, target: 'can' },
+      { pose: 'south-near', rotation: 1, target: 'can' }, { pose: 'southwest-corner', rotation: 1, target: 'can' },
+      { pose: 'southeast-corner', rotation: 1, target: 'can' }, { pose: 'top-oblique', rotation: 1, target: 'can' },
+      { pose: 'can-side', rotation: 1, target: 'can' }, { pose: 'south-far', rotation: 1, target: 'npc' }
     ];
-    for (const { pose, rotation } of proofCases) {
-      await page.goto(`${result.url}?heightfield=1&hfpose=${pose}&hfrot=${rotation}`, { waitUntil: 'load' });
+    for (const { pose, rotation, target } of proofCases) {
+      await page.goto(`${result.url}?heightfield=1&hfpose=${pose}&hfrot=${rotation}&hftarget=${target}`, { waitUntil: 'load' });
       await page.waitForFunction(() => window.SNCDiagnostics && window.SNCDiagnostics.getSnapshot().runtime.customLevel === 'heightfield_proof');
       await page.waitForTimeout(150);
       const snapshot = await page.evaluate(() => window.SNCDiagnostics.getSnapshot());
-      const screenshot = await page.locator('#view').screenshot({ path: path.join(path.dirname(output), `heightfield-${pose}-r${rotation}.png`) });
-      result.poses.push({ pose, rotation, screenshotSha256: crypto.createHash('sha256').update(screenshot).digest('hex'), heightfield: snapshot.heightfield, player: snapshot.runtime.player });
+      const screenshot = await page.locator('#view').screenshot({ path: path.join(path.dirname(output), `heightfield-${target}-${pose}-r${rotation}.png`) });
+      result.poses.push({ pose, rotation, target, screenshotSha256: crypto.createHash('sha256').update(screenshot).digest('hex'), heightfield: snapshot.heightfield, player: snapshot.runtime.player });
     }
-    const mainPose = result.poses.find((entry) => entry.pose === 'south-far' && entry.rotation === 1);
-    const nearPose = result.poses.find((entry) => entry.pose === 'south-near');
-    const topPose = result.poses.find((entry) => entry.pose === 'top-oblique');
-    const rotationPoses = result.poses.filter((entry) => entry.pose === 'south-far');
-    await page.goto(`${result.url}?heightfield=1&hfpose=south-near&hfrot=1`, { waitUntil: 'load' });
+    const mainPose = result.poses.find((entry) => entry.pose === 'south-far' && entry.rotation === 1 && entry.target === 'can');
+    const nearPose = result.poses.find((entry) => entry.pose === 'south-near' && entry.target === 'can');
+    const topPose = result.poses.find((entry) => entry.pose === 'top-oblique' && entry.target === 'can');
+    const canSidePose = result.poses.find((entry) => entry.pose === 'can-side' && entry.target === 'can');
+    const npcPartialPose = result.poses.find((entry) => entry.pose === 'south-far' && entry.target === 'npc');
+    const rotationPoses = result.poses.filter((entry) => entry.pose === 'south-far' && entry.target === 'can');
+    await page.goto(`${result.url}?heightfield=1&hfpose=south-near&hfrot=1&hftarget=can`, { waitUntil: 'load' });
     await page.waitForFunction(() => window.SNCDiagnostics && window.SNCDiagnostics.getSnapshot().runtime.customLevel === 'heightfield_proof');
     const beforeMove = await page.evaluate(() => window.SNCDiagnostics.getSnapshot().runtime.player);
     await page.keyboard.down('w'); await page.waitForTimeout(2000); await page.keyboard.up('w');
     const afterMove = await page.evaluate(() => ({ snapshot: window.SNCDiagnostics.getSnapshot(), saved: localStorage.getItem('cannedRun.save.v1') }));
     result.checks.queryGate = plainSnapshot.runtime.customLevel !== 'heightfield_proof';
-    result.checks.proof = mainPose.heightfield.enabled === true && mainPose.heightfield.profileCells === 1;
+    result.checks.proof = mainPose.heightfield.enabled === true && mainPose.heightfield.profileCells === 1 && mainPose.heightfield.occlusionSubject === 'can';
     result.checks.depth = mainPose.heightfield.worldDepthLength === 100000 && mainPose.heightfield.worldDepthBytes === 400000 && mainPose.heightfield.worldDepthWrites > 0;
     result.checks.closeRange = nearPose.heightfield.topPixels > mainPose.heightfield.topPixels && nearPose.heightfield.verticalSegments > 0;
     result.checks.topPlane = topPose.heightfield.topPixels > 0;
-    result.checks.spriteOcclusion = mainPose.heightfield.spriteVisiblePixels > 0 && mainPose.heightfield.spriteOccludedPixels > 0;
+    result.checks.canOcclusion = mainPose.heightfield.canVisiblePixels === 0 && mainPose.heightfield.canOccludedPixels > 0;
+    result.checks.canSideVisibility = canSidePose.heightfield.canVisiblePixels > 0;
+    result.checks.npcPartialOcclusion = npcPartialPose.heightfield.occlusionSubject === 'npc' && npcPartialPose.heightfield.npcVisiblePixels > 0 && npcPartialPose.heightfield.npcOccludedPixels > 0;
     result.checks.poses = result.poses.every((entry) => entry.heightfield.verticalSegments > 0);
     result.checks.rotations = rotationPoses.length === 4 && new Set(rotationPoses.map((entry) => entry.screenshotSha256)).size === 4;
     result.checks.collision = beforeMove.y === 8.8 && afterMove.snapshot.runtime.player.y > 8.1;

@@ -137,12 +137,13 @@ function genHeightfieldProof(){
   for(let x = 4; x <= 19; x++){ map[3][x] = WALL.SIGNAGE; shade[3][x] = 0.5; }
   const params = new URLSearchParams(location.search);
   const rotation = Math.max(0, Math.min(3, parseInt(params.get('hfrot') || '0', 10) || 0));
+  const occlusionSubject = params.get('hftarget') === 'npc' ? 'npc' : 'can';
   const block = { x: 11, y: 7, rotation, profileId: CR_VERTICAL_PROFILE_IDS.HALF_DEBUG };
   map[block.y][block.x] = WALL.BRICK;
   game.verticalProfileWidth = GW; game.verticalProfileHeight = GH;
   game.verticalProfileGrid = new Uint16Array(GW * GH);
   game.verticalProfileGrid[block.y * GW + block.x] = block.profileId;
-  game.heightfieldProof = { block, rotation };
+  game.heightfieldProof = { block, rotation, occlusionSubject };
   game.map = map; game.MAP_W = GW; game.MAP_H = GH; game.wallShade = shade;
   game.buildingGrid = null; game.buildingRegistry = null; game.props = [];
   game.modifier = 'clear'; game.scoreMult = 1;
@@ -150,16 +151,21 @@ function genHeightfieldProof(){
   const poses = {
     'south-far': [11.5, 12.5], 'south-near': [11.5, 8.8], 'south-extreme': [11.5, 8.28],
     'southwest-corner': [9.45, 9.45], 'southeast-corner': [13.55, 9.45], 'east-near': [13.35, 7.5],
-    'north-near': [11.5, 5.65], 'west-near': [9.65, 7.5], 'top-oblique': [9.35, 10.35]
+    'north-near': [11.5, 5.65], 'west-near': [9.65, 7.5], 'top-oblique': [9.35, 10.35],
+    'can-side': [14.2, 5.7, 11.5, 5.7]
   };
   const pose = poses[poseName] || poses['south-far'];
-  player.x = pose[0]; player.y = pose[1]; player.angle = Math.atan2(7.5 - player.y, 11.5 - player.x);
-  game.pickups = [{ x: 12.5, y: 5.7, taken: false, amt: 1, wob: 0 }];
-  game.npcs = [{ x: 11.5, y: 5.7, kind: 'hungry', need: 1, helped: false, wob: 0, thank: 'Proof NPC.' }];
+  player.x = pose[0]; player.y = pose[1]; player.angle = Math.atan2((pose[3] == null ? 7.5 : pose[3]) - player.y, (pose[2] == null ? 11.5 : pose[2]) - player.x);
+  const alignedBehindBlock = { x: 11.5, y: 5.7 };
+  const lateralLane = { x: 14.5, y: 9.5 };
+  const canPosition = occlusionSubject === 'can' ? alignedBehindBlock : lateralLane;
+  const npcPosition = occlusionSubject === 'npc' ? alignedBehindBlock : lateralLane;
+  game.pickups = [{ x: canPosition.x, y: canPosition.y, taken: false, amt: 1, wob: 0 }];
+  game.npcs = [{ x: npcPosition.x, y: npcPosition.y, kind: 'hungry', need: 1, helped: false, wob: 0, thank: 'Proof NPC.' }];
   game.quota = 1; game.helped = 0; game.delivered = 0;
   game.exit = { x: 20.5, y: 12.5, active: false }; game.timeLeft = 9999;
   dbg.reachableCells = 0; dbg.cansSpawned = 1; dbg.npcsSpawned = 1; dbg.props = 0;
-  setMsg('HEIGHTFIELD PROOF — 1x1 half block, raised top, NPC and far wall.');
+  setMsg(`HEIGHTFIELD PROOF — ${occlusionSubject.toUpperCase()} aligned behind 1x1 half block.`);
 }
 
 function clearInputState(){

@@ -685,7 +685,7 @@ const inp = {
   lookDeltaRad:0,
   _active:false, // true when any touch is on screen
 };
-var BUILD_ID = 'heightfieldmvp1'; window.BUILD_ID = BUILD_ID;
+var BUILD_ID = 'heightfieldmvp2'; window.BUILD_ID = BUILD_ID;
 const CR_FPV_STREET_MATTE = true;
 /** Building visual reset: smooth, low-noise wall masses with sparse readable cues. */
 const CR_BUILDING_SMOOTH_STYLE = 1;
@@ -9329,12 +9329,13 @@ function genHeightfieldProof(){
   for(let x = 4; x <= 19; x++){ map[3][x] = WALL.SIGNAGE; shade[3][x] = 0.5; }
   const params = new URLSearchParams(location.search);
   const rotation = Math.max(0, Math.min(3, parseInt(params.get('hfrot') || '0', 10) || 0));
+  const occlusionSubject = params.get('hftarget') === 'npc' ? 'npc' : 'can';
   const block = { x: 11, y: 7, rotation, profileId: CR_VERTICAL_PROFILE_IDS.HALF_DEBUG };
   map[block.y][block.x] = WALL.BRICK;
   game.verticalProfileWidth = GW; game.verticalProfileHeight = GH;
   game.verticalProfileGrid = new Uint16Array(GW * GH);
   game.verticalProfileGrid[block.y * GW + block.x] = block.profileId;
-  game.heightfieldProof = { block, rotation };
+  game.heightfieldProof = { block, rotation, occlusionSubject };
   game.map = map; game.MAP_W = GW; game.MAP_H = GH; game.wallShade = shade;
   game.buildingGrid = null; game.buildingRegistry = null; game.props = [];
   game.modifier = 'clear'; game.scoreMult = 1;
@@ -9342,16 +9343,21 @@ function genHeightfieldProof(){
   const poses = {
     'south-far': [11.5, 12.5], 'south-near': [11.5, 8.8], 'south-extreme': [11.5, 8.28],
     'southwest-corner': [9.45, 9.45], 'southeast-corner': [13.55, 9.45], 'east-near': [13.35, 7.5],
-    'north-near': [11.5, 5.65], 'west-near': [9.65, 7.5], 'top-oblique': [9.35, 10.35]
+    'north-near': [11.5, 5.65], 'west-near': [9.65, 7.5], 'top-oblique': [9.35, 10.35],
+    'can-side': [14.2, 5.7, 11.5, 5.7]
   };
   const pose = poses[poseName] || poses['south-far'];
-  player.x = pose[0]; player.y = pose[1]; player.angle = Math.atan2(7.5 - player.y, 11.5 - player.x);
-  game.pickups = [{ x: 12.5, y: 5.7, taken: false, amt: 1, wob: 0 }];
-  game.npcs = [{ x: 11.5, y: 5.7, kind: 'hungry', need: 1, helped: false, wob: 0, thank: 'Proof NPC.' }];
+  player.x = pose[0]; player.y = pose[1]; player.angle = Math.atan2((pose[3] == null ? 7.5 : pose[3]) - player.y, (pose[2] == null ? 11.5 : pose[2]) - player.x);
+  const alignedBehindBlock = { x: 11.5, y: 5.7 };
+  const lateralLane = { x: 14.5, y: 9.5 };
+  const canPosition = occlusionSubject === 'can' ? alignedBehindBlock : lateralLane;
+  const npcPosition = occlusionSubject === 'npc' ? alignedBehindBlock : lateralLane;
+  game.pickups = [{ x: canPosition.x, y: canPosition.y, taken: false, amt: 1, wob: 0 }];
+  game.npcs = [{ x: npcPosition.x, y: npcPosition.y, kind: 'hungry', need: 1, helped: false, wob: 0, thank: 'Proof NPC.' }];
   game.quota = 1; game.helped = 0; game.delivered = 0;
   game.exit = { x: 20.5, y: 12.5, active: false }; game.timeLeft = 9999;
   dbg.reachableCells = 0; dbg.cansSpawned = 1; dbg.npcsSpawned = 1; dbg.props = 0;
-  setMsg('HEIGHTFIELD PROOF — 1x1 half block, raised top, NPC and far wall.');
+  setMsg(`HEIGHTFIELD PROOF — ${occlusionSubject.toUpperCase()} aligned behind 1x1 half block.`);
 }
 
 function clearInputState(){
@@ -11386,9 +11392,11 @@ let crWorldDepthAllocations = 0;
 let crHeightfieldPlaneCanvas = null;
 let crHeightfieldPlaneCtx = null;
 let crHeightfieldPlaneImage = null;
+const crHeightfieldSpriteAlphaMasks = new WeakMap();
 const crHeightfieldStats = {
   enabled: false, cameraZ: CR_HEIGHTFIELD_CAMERA.eyeZ, profileCells: 0, verticalSegments: 0,
   topPixels: 0, worldDepthWrites: 0, spriteVisiblePixels: 0, spriteOccludedPixels: 0,
+  canVisiblePixels: 0, canOccludedPixels: 0, npcVisiblePixels: 0, npcOccludedPixels: 0,
   worldDepthBytes: 0, allocations: 0
 };
 
@@ -11468,6 +11476,19 @@ function crHeightfieldTopColor(localX, localY, rotation){
   const light = ((Math.floor(u * 8) + Math.floor(v * 8)) & 1) === 0;
   return light ? [77, 191, 235] : [31, 112, 179];
 }
+function crHeightfieldSpriteOpaqueAt(tex, sourceX, sourceY){
+  if(!tex || typeof tex.getContext !== 'function') return false;
+  let mask = crHeightfieldSpriteAlphaMasks.get(tex);
+  if(!mask){
+    const textureCtx = tex.getContext('2d', { willReadFrequently: true });
+    const image = textureCtx.getImageData(0, 0, tex.width, tex.height);
+    mask = { width: tex.width, height: tex.height, alpha: image.data };
+    crHeightfieldSpriteAlphaMasks.set(tex, mask);
+  }
+  const x = Math.max(0, Math.min(mask.width - 1, sourceX | 0));
+  const y = Math.max(0, Math.min(mask.height - 1, sourceY | 0));
+  return mask.alpha[(y * mask.width + x) * 4 + 3] > 0;
+}
 function crHeightfieldResetStats(){
   crHeightfieldStats.enabled = crHeightfieldIsActive();
   crHeightfieldStats.cameraZ = CR_HEIGHTFIELD_CAMERA.eyeZ;
@@ -11477,13 +11498,20 @@ function crHeightfieldResetStats(){
   crHeightfieldStats.worldDepthWrites = 0;
   crHeightfieldStats.spriteVisiblePixels = 0;
   crHeightfieldStats.spriteOccludedPixels = 0;
+  crHeightfieldStats.canVisiblePixels = 0;
+  crHeightfieldStats.canOccludedPixels = 0;
+  crHeightfieldStats.npcVisiblePixels = 0;
+  crHeightfieldStats.npcOccludedPixels = 0;
 }
 function crGetHeightfieldDiagnostics(){
   return Object.freeze({
     enabled: crHeightfieldStats.enabled, cameraZ: crHeightfieldStats.cameraZ,
+    occlusionSubject: game.heightfieldProof ? game.heightfieldProof.occlusionSubject : null,
     profileCells: crHeightfieldStats.profileCells, verticalSegments: crHeightfieldStats.verticalSegments,
     topPixels: crHeightfieldStats.topPixels, worldDepthWrites: crHeightfieldStats.worldDepthWrites,
     spriteVisiblePixels: crHeightfieldStats.spriteVisiblePixels, spriteOccludedPixels: crHeightfieldStats.spriteOccludedPixels,
+    canVisiblePixels: crHeightfieldStats.canVisiblePixels, canOccludedPixels: crHeightfieldStats.canOccludedPixels,
+    npcVisiblePixels: crHeightfieldStats.npcVisiblePixels, npcOccludedPixels: crHeightfieldStats.npcOccludedPixels,
     worldDepthBytes: crHeightfieldStats.worldDepthBytes, worldDepthLength: worldDepthPixels.length,
     allocations: crHeightfieldStats.allocations, width: crWorldDepthWidth, height: crWorldDepthHeight
   });
@@ -12418,7 +12446,7 @@ function crHeightfieldRenderRaisedPlanes(px, py, dirX, dirY, planeX, planeY){
   bctx.drawImage(crHeightfieldPlaneCanvas, 0, 0);
 }
 
-function crHeightfieldDrawSprite(obj, tex, hp, px, py, dirX, dirY, planeX, planeY, now){
+function crHeightfieldDrawSprite(kind, obj, tex, hp, px, py, dirX, dirY, planeX, planeY, now){
   if(!obj || !tex) return;
   const rx = obj.x - px, ry = obj.y - py;
   const invDet = 1 / (planeX * dirY - dirX * planeY);
@@ -12426,9 +12454,11 @@ function crHeightfieldDrawSprite(obj, tex, hp, px, py, dirX, dirY, planeX, plane
   const hscr = invDet * (dirY * rx - dirX * ry);
   if(!(depth > 0.12)) return;
   const proj = crProjectBillboardSprite(obj, tex, hp, depth, hscr, now);
+  const heightfieldGroundY = crProjectWorldZToScreenY(0, depth, CR_HEIGHTFIELD_CAMERA.eyeZ);
+  const top = proj.topY + (heightfieldGroundY - proj.groundBottomY);
   const startCol = Math.max(0, Math.floor(proj.screenX - proj.screenW / 2));
   const endCol = Math.min(RW, Math.ceil(proj.screenX + proj.screenW / 2));
-  const top = proj.topY, bottom = top + proj.screenH;
+  const bottom = top + proj.screenH;
   for(let col = startCol; col < endCol; col++){
     const u = (col - (proj.screenX - proj.screenW / 2)) / proj.screenW;
     const srcX = Math.max(0, Math.min(tex.width - 1, (u * tex.width) | 0));
@@ -12436,11 +12466,17 @@ function crHeightfieldDrawSprite(obj, tex, hp, px, py, dirX, dirY, planeX, plane
     let runStart = -1;
     for(let y = y0; y <= y1; y++){
       const visible = y < y1 && depth < worldDepthPixels[y * RW + col];
+      const sourceY = Math.max(0, Math.min(tex.height - 1, ((y - top) / proj.screenH * tex.height) | 0));
+      const opaque = y < y1 && crHeightfieldSpriteOpaqueAt(tex, srcX, sourceY);
       if(visible){
         if(runStart < 0) runStart = y;
         crHeightfieldStats.spriteVisiblePixels++;
+        if(opaque && kind === 'can') crHeightfieldStats.canVisiblePixels++;
+        else if(opaque && kind === 'npc') crHeightfieldStats.npcVisiblePixels++;
       } else {
         if(y < y1) crHeightfieldStats.spriteOccludedPixels++;
+        if(opaque && kind === 'can') crHeightfieldStats.canOccludedPixels++;
+        else if(opaque && kind === 'npc') crHeightfieldStats.npcOccludedPixels++;
         if(runStart >= 0){
           const runHeight = y - runStart;
           const sy = (runStart - top) / proj.screenH * tex.height;
@@ -12504,10 +12540,10 @@ function crDrawHeightfieldScene(now, renderPose){
     }
   }
   crHeightfieldRenderRaisedPlanes(px, py, dirX, dirY, planeX, planeY);
-  for(const prop of game.props) crHeightfieldDrawSprite(prop, propTex(prop.kind, prop), HEIGHT[prop.kind] || 0.5, px, py, dirX, dirY, planeX, planeY, now);
-  for(const can of game.pickups) if(!can.taken) crHeightfieldDrawSprite(can, TEX.can, HEIGHT.can, px, py, dirX, dirY, planeX, planeY, now);
-  for(const npc of game.npcs) if(!npc.helped) crHeightfieldDrawSprite(npc, npcSpriteTex(npc.kind, npc), npcSpriteHeight(npc), px, py, dirX, dirY, planeX, planeY, now);
-  if(game.exit && game.exit.active) crHeightfieldDrawSprite(game.exit, TEX.exit, HEIGHT.exit, px, py, dirX, dirY, planeX, planeY, now);
+  for(const prop of game.props) crHeightfieldDrawSprite('prop', prop, propTex(prop.kind, prop), HEIGHT[prop.kind] || 0.5, px, py, dirX, dirY, planeX, planeY, now);
+  for(const can of game.pickups) if(!can.taken) crHeightfieldDrawSprite('can', can, TEX.can, HEIGHT.can, px, py, dirX, dirY, planeX, planeY, now);
+  for(const npc of game.npcs) if(!npc.helped) crHeightfieldDrawSprite('npc', npc, npcSpriteTex(npc.kind, npc), npcSpriteHeight(npc), px, py, dirX, dirY, planeX, planeY, now);
+  if(game.exit && game.exit.active) crHeightfieldDrawSprite('exit', game.exit, TEX.exit, HEIGHT.exit, px, py, dirX, dirY, planeX, planeY, now);
 }
 // ---------------------------------------------------------------------------
 // SECTION 8 — MINIMAP

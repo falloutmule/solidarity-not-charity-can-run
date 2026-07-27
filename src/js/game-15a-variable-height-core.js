@@ -24,9 +24,11 @@ let crWorldDepthAllocations = 0;
 let crHeightfieldPlaneCanvas = null;
 let crHeightfieldPlaneCtx = null;
 let crHeightfieldPlaneImage = null;
+const crHeightfieldSpriteAlphaMasks = new WeakMap();
 const crHeightfieldStats = {
   enabled: false, cameraZ: CR_HEIGHTFIELD_CAMERA.eyeZ, profileCells: 0, verticalSegments: 0,
   topPixels: 0, worldDepthWrites: 0, spriteVisiblePixels: 0, spriteOccludedPixels: 0,
+  canVisiblePixels: 0, canOccludedPixels: 0, npcVisiblePixels: 0, npcOccludedPixels: 0,
   worldDepthBytes: 0, allocations: 0
 };
 
@@ -106,6 +108,19 @@ function crHeightfieldTopColor(localX, localY, rotation){
   const light = ((Math.floor(u * 8) + Math.floor(v * 8)) & 1) === 0;
   return light ? [77, 191, 235] : [31, 112, 179];
 }
+function crHeightfieldSpriteOpaqueAt(tex, sourceX, sourceY){
+  if(!tex || typeof tex.getContext !== 'function') return false;
+  let mask = crHeightfieldSpriteAlphaMasks.get(tex);
+  if(!mask){
+    const textureCtx = tex.getContext('2d', { willReadFrequently: true });
+    const image = textureCtx.getImageData(0, 0, tex.width, tex.height);
+    mask = { width: tex.width, height: tex.height, alpha: image.data };
+    crHeightfieldSpriteAlphaMasks.set(tex, mask);
+  }
+  const x = Math.max(0, Math.min(mask.width - 1, sourceX | 0));
+  const y = Math.max(0, Math.min(mask.height - 1, sourceY | 0));
+  return mask.alpha[(y * mask.width + x) * 4 + 3] > 0;
+}
 function crHeightfieldResetStats(){
   crHeightfieldStats.enabled = crHeightfieldIsActive();
   crHeightfieldStats.cameraZ = CR_HEIGHTFIELD_CAMERA.eyeZ;
@@ -115,13 +130,20 @@ function crHeightfieldResetStats(){
   crHeightfieldStats.worldDepthWrites = 0;
   crHeightfieldStats.spriteVisiblePixels = 0;
   crHeightfieldStats.spriteOccludedPixels = 0;
+  crHeightfieldStats.canVisiblePixels = 0;
+  crHeightfieldStats.canOccludedPixels = 0;
+  crHeightfieldStats.npcVisiblePixels = 0;
+  crHeightfieldStats.npcOccludedPixels = 0;
 }
 function crGetHeightfieldDiagnostics(){
   return Object.freeze({
     enabled: crHeightfieldStats.enabled, cameraZ: crHeightfieldStats.cameraZ,
+    occlusionSubject: game.heightfieldProof ? game.heightfieldProof.occlusionSubject : null,
     profileCells: crHeightfieldStats.profileCells, verticalSegments: crHeightfieldStats.verticalSegments,
     topPixels: crHeightfieldStats.topPixels, worldDepthWrites: crHeightfieldStats.worldDepthWrites,
     spriteVisiblePixels: crHeightfieldStats.spriteVisiblePixels, spriteOccludedPixels: crHeightfieldStats.spriteOccludedPixels,
+    canVisiblePixels: crHeightfieldStats.canVisiblePixels, canOccludedPixels: crHeightfieldStats.canOccludedPixels,
+    npcVisiblePixels: crHeightfieldStats.npcVisiblePixels, npcOccludedPixels: crHeightfieldStats.npcOccludedPixels,
     worldDepthBytes: crHeightfieldStats.worldDepthBytes, worldDepthLength: worldDepthPixels.length,
     allocations: crHeightfieldStats.allocations, width: crWorldDepthWidth, height: crWorldDepthHeight
   });
