@@ -208,8 +208,8 @@ function crDrawHeightfieldScene(now, renderPose){
     }
   }
   crHeightfieldRenderRaisedPlanes(px, py, dirX, dirY, planeX, planeY);
-  for(const prop of game.props) crHeightfieldDrawSprite('prop', prop, propTex(prop.kind, prop), HEIGHT[prop.kind] || 0.5, px, py, dirX, dirY, planeX, planeY, now);
-  for(const can of game.pickups) if(!can.taken) crHeightfieldDrawSprite('can', can, TEX.can, HEIGHT.can, px, py, dirX, dirY, planeX, planeY, now);
-  for(const npc of game.npcs) if(!npc.helped) crHeightfieldDrawSprite('npc', npc, npcSpriteTex(npc.kind, npc), npcSpriteHeight(npc), px, py, dirX, dirY, planeX, planeY, now);
-  if(game.exit && game.exit.active) crHeightfieldDrawSprite('exit', game.exit, TEX.exit, HEIGHT.exit, px, py, dirX, dirY, planeX, planeY, now);
+  for(const prop of game.props) crHeightfieldDrawSprite('prop', prop, propTex(prop.kind, prop), crHeightfieldSpriteWorldHeight('prop', prop), px, py, dirX, dirY, planeX, planeY, now);
+  for(const can of game.pickups) if(!can.taken) crHeightfieldDrawSprite('can', can, TEX.can, crHeightfieldSpriteWorldHeight('can', can), px, py, dirX, dirY, planeX, planeY, now);
+  for(const npc of game.npcs) if(!npc.helped) crHeightfieldDrawSprite('npc', npc, npcSpriteTex(npc.kind, npc), crHeightfieldSpriteWorldHeight('npc', npc), px, py, dirX, dirY, planeX, planeY, now);
+  if(game.exit && game.exit.active) crHeightfieldDrawSprite('exit', game.exit, TEX.exit, crHeightfieldSpriteWorldHeight('exit', game.exit), px, py, dirX, dirY, planeX, planeY, now);
 }

@@ -685,7 +685,7 @@ const inp = {
   lookDeltaRad:0,
   _active:false, // true when any touch is on screen
 };
-var BUILD_ID = 'heightfieldintegration5'; window.BUILD_ID = BUILD_ID;
+var BUILD_ID = 'heightfieldworldscale1'; window.BUILD_ID = BUILD_ID;
 const CR_FPV_STREET_MATTE = true;
 /** Building visual reset: smooth, low-noise wall masses with sparse readable cues. */
 const CR_BUILDING_SMOOTH_STYLE = 1;
@@ -2732,7 +2732,8 @@ if(typeof Image !== "undefined") {
       "x": 0.5,
       "y": 1.0
     },
-    "heightScale": 0.62,
+    "displayHeightScale": 0.62,
+    "worldHeight": 0.96,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -2756,7 +2757,8 @@ if(typeof Image !== "undefined") {
       "x": 0.5,
       "y": 1.0
     },
-    "heightScale": 0.62,
+    "displayHeightScale": 0.62,
+    "worldHeight": 0.96,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -2780,7 +2782,8 @@ if(typeof Image !== "undefined") {
       "x": 0.5,
       "y": 1.0
     },
-    "heightScale": 0.62,
+    "displayHeightScale": 0.62,
+    "worldHeight": 0.96,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -2804,7 +2807,8 @@ if(typeof Image !== "undefined") {
       "x": 0.5,
       "y": 1.0
     },
-    "heightScale": 0.62,
+    "displayHeightScale": 0.62,
+    "worldHeight": 0.96,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -2828,7 +2832,8 @@ if(typeof Image !== "undefined") {
       "x": 0.5,
       "y": 1.0
     },
-    "heightScale": 0.62,
+    "displayHeightScale": 0.62,
+    "worldHeight": 0.96,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -2852,7 +2857,8 @@ if(typeof Image !== "undefined") {
       "x": 0.5,
       "y": 1.0
     },
-    "heightScale": 0.62,
+    "displayHeightScale": 0.62,
+    "worldHeight": 0.96,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -2876,7 +2882,8 @@ if(typeof Image !== "undefined") {
       "x": 0.5,
       "y": 1.0
     },
-    "heightScale": 0.62,
+    "displayHeightScale": 0.62,
+    "worldHeight": 0.96,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -2900,7 +2907,8 @@ if(typeof Image !== "undefined") {
       "x": 0.5,
       "y": 1.0
     },
-    "heightScale": 0.62,
+    "displayHeightScale": 0.62,
+    "worldHeight": 0.96,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -2924,7 +2932,8 @@ if(typeof Image !== "undefined") {
       "x": 0.5,
       "y": 1.0
     },
-    "heightScale": 0.62,
+    "displayHeightScale": 0.62,
+    "worldHeight": 0.96,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -2948,7 +2957,8 @@ if(typeof Image !== "undefined") {
       "x": 0.5,
       "y": 1.0
     },
-    "heightScale": 0.62,
+    "displayHeightScale": 0.62,
+    "worldHeight": 0.96,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -2972,7 +2982,8 @@ if(typeof Image !== "undefined") {
       "x": 0.5,
       "y": 1.0
     },
-    "heightScale": 0.62,
+    "displayHeightScale": 0.62,
+    "worldHeight": 0.96,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -2996,7 +3007,8 @@ if(typeof Image !== "undefined") {
       "x": 0.5,
       "y": 1.0
     },
-    "heightScale": 0.45,
+    "displayHeightScale": 0.45,
+    "worldHeight": 0.68,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -3020,7 +3032,8 @@ if(typeof Image !== "undefined") {
       "x": 0.5,
       "y": 1.0
     },
-    "heightScale": 0.62,
+    "displayHeightScale": 0.62,
+    "worldHeight": 0.96,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -3044,7 +3057,8 @@ if(typeof Image !== "undefined") {
       "x": 0.5,
       "y": 1.0
     },
-    "heightScale": 0.62,
+    "displayHeightScale": 0.62,
+    "worldHeight": 0.96,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -3068,7 +3082,8 @@ if(typeof Image !== "undefined") {
       "x": 0.5,
       "y": 1.0
     },
-    "heightScale": 0.62,
+    "displayHeightScale": 0.62,
+    "worldHeight": 0.96,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -3092,7 +3107,8 @@ if(typeof Image !== "undefined") {
       "x": 0.5,
       "y": 1.0
     },
-    "heightScale": 0.62,
+    "displayHeightScale": 0.62,
+    "worldHeight": 0.96,
     "alphaBounds": {
       "x": 3,
       "y": 3,
@@ -9351,10 +9367,11 @@ function genHallOfServants(){
 }
 
 function genHeightfieldProof(){
+  const params = new URLSearchParams(location.search);
+  if(params.get('hfcalibration') === '1') return genHeightfieldWorldScaleCalibration(params);
   const GW = 24, GH = 16;
   const {map, shade} = hallFillMap(GW, GH);
   for(let x = 4; x <= 19; x++){ map[3][x] = WALL.SIGNAGE; shade[3][x] = 0.5; }
-  const params = new URLSearchParams(location.search);
   const rotation = Math.max(0, Math.min(3, parseInt(params.get('hfrot') || '0', 10) || 0));
   const occlusionSubject = params.get('hftarget') === 'npc' ? 'npc' : 'can';
   const block = { x: 11, y: 7, rotation, profileId: CR_VERTICAL_PROFILE_IDS.HALF_DEBUG };
@@ -9387,6 +9404,49 @@ function genHeightfieldProof(){
   game.exit = { x: 20.5, y: 12.5, active: false }; game.timeLeft = 9999;
   dbg.reachableCells = 0; dbg.cansSpawned = 1; dbg.npcsSpawned = 1; dbg.props = 0;
   setMsg(`HEIGHTFIELD PROOF — ${occlusionSubject.toUpperCase()} aligned behind 1x1 half block.`);
+}
+
+function genHeightfieldWorldScaleCalibration(params){
+  const GW = 24, GH = 20;
+  const {map, shade} = hallFillMap(GW, GH);
+  const halfBlock = { x: 14, y: 8, profileId: CR_VERTICAL_PROFILE_IDS.AUTHORED_CONCRETE };
+  const fullWall = { x: 16, y: 8, profileId: CR_VERTICAL_PROFILE_IDS.FULL_LEGACY };
+  map[halfBlock.y][halfBlock.x] = WALL.CONCRETE;
+  map[fullWall.y][fullWall.x] = WALL.CONCRETE;
+  game.verticalProfileWidth = GW; game.verticalProfileHeight = GH;
+  game.verticalProfileGrid = new Uint16Array(GW * GH);
+  game.verticalProfileRotationGrid = new Uint8Array(GW * GH);
+  game.verticalProfileGrid[halfBlock.y * GW + halfBlock.x] = halfBlock.profileId;
+  game.verticalProfileGrid[fullWall.y * GW + fullWall.x] = fullWall.profileId;
+  game.heightfieldProof = null;
+  game.map = map; game.MAP_W = GW; game.MAP_H = GH; game.wallShade = shade;
+  game.buildingGrid = null; game.buildingRegistry = null; game.props = [];
+  game.modifier = 'clear'; game.scoreMult = 1;
+  const poseName = params.get('hfcalpose') === 'standing-close' ? 'standing-close' : 'equal-depth';
+  const poses = {
+    'equal-depth': [12.5, 15.0, 12.5, 8.5],
+    'standing-close': [8.5, 10.0, 8.5, 8.5]
+  };
+  const pose = poses[poseName];
+  player.x = pose[0]; player.y = pose[1]; player.angle = Math.atan2(pose[3] - player.y, pose[2] - player.x);
+  const standing = { id: 'calibration-standing', assetId: 'npc_unhoused_work_jacket_001', kind: 'unhoused', x: 8.5, y: 8.5, need: 1, helped: false, wob: 0, thank: 'Calibration standing.' };
+  const slumped = { id: 'calibration-slumped', assetId: 'npc_unhoused_slumped_001', kind: 'unhoused', x: 10.5, y: 8.5, need: 1, helped: false, wob: 0, thank: 'Calibration slumped.' };
+  const can = { x: 12.5, y: 8.5, taken: false, amt: 1, wob: 0 };
+  game.pickups = [can]; game.npcs = [standing, slumped];
+  game.heightfieldCalibration = Object.freeze({
+    pose: poseName,
+    subjects: Object.freeze([
+      Object.freeze({ id: 'standing', kind: 'npc', x: standing.x, y: standing.y, worldHeight: npcSpriteHeight(standing, 'world') }),
+      Object.freeze({ id: 'slumped', kind: 'npc', x: slumped.x, y: slumped.y, worldHeight: npcSpriteHeight(slumped, 'world') }),
+      Object.freeze({ id: 'can', kind: 'can', x: can.x, y: can.y, worldHeight: crHeightfieldSpriteWorldHeight('can', can) }),
+      Object.freeze({ id: 'half-block', kind: 'block', x: halfBlock.x + 0.5, y: halfBlock.y + 0.5, worldHeight: crHeightfieldTopZ(CR_VERTICAL_PROFILES[halfBlock.profileId]) }),
+      Object.freeze({ id: 'full-wall', kind: 'wall', x: fullWall.x + 0.5, y: fullWall.y + 0.5, worldHeight: crHeightfieldTopZ(CR_VERTICAL_PROFILES[fullWall.profileId]) })
+    ])
+  });
+  game.quota = 1; game.helped = 0; game.delivered = 0;
+  game.exit = { x: 21.5, y: 15.5, active: false }; game.timeLeft = 9999;
+  dbg.reachableCells = 0; dbg.cansSpawned = 1; dbg.npcsSpawned = 2; dbg.props = 0;
+  setMsg('HEIGHTFIELD CALIBRATION — ' + poseName.toUpperCase().replace('-', ' ') + '.');
 }
 
 function clearInputState(){
@@ -9524,9 +9584,15 @@ function npcSpriteTex(kind, entity){
   if(asset && asset.image && asset.image.complete && asset.image.naturalWidth > 0) return asset.image;
   return TEX[kind] || TEX.hungry;
 }
-function npcSpriteHeight(entity){
+function npcSpriteHeight(entity, space){
   const asset = entity && entity.assetId && globalThis.SNC_RUNTIME_ASSET_REGISTRY && globalThis.SNC_RUNTIME_ASSET_REGISTRY[entity.assetId];
-  return asset && Number.isFinite(asset.heightScale) ? asset.heightScale : (HEIGHT[entity && entity.kind] || HEIGHT.hungry);
+  const field = space === 'world' ? 'worldHeight' : 'displayHeightScale';
+  return asset && Number.isFinite(asset[field]) ? asset[field] : (HEIGHT[entity && entity.kind] || HEIGHT.hungry);
+}
+function crHeightfieldSpriteWorldHeight(kind, entity){
+  if(kind === 'can') return CR_HEIGHTFIELD_SPRITE_WORLD_HEIGHTS.can;
+  if(kind === 'npc') return npcSpriteHeight(entity, 'world');
+  return HEIGHT[entity && entity.kind] || HEIGHT[kind] || 0.5;
 }
 function pickHallThankLine(npc){
   if(npc && npc.thank) return npc.thank;
@@ -11400,6 +11466,7 @@ function crDebugSpriteProjection(){
 // ---------------------------------------------------------------------------
 const CR_HEIGHTFIELD_QUERY = new URLSearchParams(location.search).get('heightfield') === '1';
 const CR_HEIGHTFIELD_CAMERA = Object.freeze({ eyeZ: 0.68 });
+const CR_HEIGHTFIELD_SPRITE_WORLD_HEIGHTS = Object.freeze({ can: 0.18 });
 const CR_HEIGHT_LEVELS = new Float32Array([0.0, 0.5, 1.0]);
 const CR_VERTICAL_PROFILE_IDS = Object.freeze({ EMPTY: 0, HALF_DEBUG: 1, FULL_LEGACY: 2, AUTHORED_CONCRETE: 3 });
 const CR_HEIGHTFIELD_MATERIAL_IDS = Object.freeze({
@@ -11490,6 +11557,7 @@ function crHeightfieldClearState(){
   game.verticalProfileHeight = 0;
   game.verticalProfileRotationGrid = null;
   game.heightfieldProof = null;
+  game.heightfieldCalibration = null;
 }
 function crHeightfieldProfileIdAt(tx, ty){
   if(tx < 0 || ty < 0 || tx >= game.MAP_W || ty >= game.MAP_H){
@@ -11641,6 +11709,21 @@ function crHeightfieldResetStats(){
   crHeightfieldStats.npcVisiblePixels = 0;
   crHeightfieldStats.npcOccludedPixels = 0;
 }
+function crHeightfieldCalibrationMeasurements(){
+  const calibration = game && game.heightfieldCalibration;
+  if(!calibration || !Array.isArray(calibration.subjects)) return null;
+  const dirX = Math.cos(player.angle), dirY = Math.sin(player.angle);
+  const subjects = calibration.subjects.map((subject) => {
+    const depth = (subject.x - player.x) * dirX + (subject.y - player.y) * dirY;
+    const groundScreenY = crProjectWorldZToScreenY(0, depth, CR_HEIGHTFIELD_CAMERA.eyeZ);
+    const topScreenY = crProjectWorldZToScreenY(subject.worldHeight, depth, CR_HEIGHTFIELD_CAMERA.eyeZ);
+    return Object.freeze({
+      id: subject.id, kind: subject.kind, worldHeight: subject.worldHeight, cameraDepth: depth,
+      projectedPixelHeight: groundScreenY - topScreenY, topScreenY, groundScreenY
+    });
+  });
+  return Object.freeze({ pose: calibration.pose, subjects: Object.freeze(subjects) });
+}
 function crGetHeightfieldDiagnostics(){
   return Object.freeze({
     enabled: crHeightfieldStats.enabled, cameraZ: crHeightfieldStats.cameraZ,
@@ -11651,7 +11734,8 @@ function crGetHeightfieldDiagnostics(){
     canVisiblePixels: crHeightfieldStats.canVisiblePixels, canOccludedPixels: crHeightfieldStats.canOccludedPixels,
     npcVisiblePixels: crHeightfieldStats.npcVisiblePixels, npcOccludedPixels: crHeightfieldStats.npcOccludedPixels,
     worldDepthBytes: crHeightfieldStats.worldDepthBytes, worldDepthLength: worldDepthPixels.length,
-    allocations: crHeightfieldStats.allocations, width: crWorldDepthWidth, height: crWorldDepthHeight
+    allocations: crHeightfieldStats.allocations, width: crWorldDepthWidth, height: crWorldDepthHeight,
+    calibration: crHeightfieldCalibrationMeasurements()
   });
 }
 function crBootHeightfieldProofIfRequested(){
@@ -12708,10 +12792,10 @@ function crDrawHeightfieldScene(now, renderPose){
     }
   }
   crHeightfieldRenderRaisedPlanes(px, py, dirX, dirY, planeX, planeY);
-  for(const prop of game.props) crHeightfieldDrawSprite('prop', prop, propTex(prop.kind, prop), HEIGHT[prop.kind] || 0.5, px, py, dirX, dirY, planeX, planeY, now);
-  for(const can of game.pickups) if(!can.taken) crHeightfieldDrawSprite('can', can, TEX.can, HEIGHT.can, px, py, dirX, dirY, planeX, planeY, now);
-  for(const npc of game.npcs) if(!npc.helped) crHeightfieldDrawSprite('npc', npc, npcSpriteTex(npc.kind, npc), npcSpriteHeight(npc), px, py, dirX, dirY, planeX, planeY, now);
-  if(game.exit && game.exit.active) crHeightfieldDrawSprite('exit', game.exit, TEX.exit, HEIGHT.exit, px, py, dirX, dirY, planeX, planeY, now);
+  for(const prop of game.props) crHeightfieldDrawSprite('prop', prop, propTex(prop.kind, prop), crHeightfieldSpriteWorldHeight('prop', prop), px, py, dirX, dirY, planeX, planeY, now);
+  for(const can of game.pickups) if(!can.taken) crHeightfieldDrawSprite('can', can, TEX.can, crHeightfieldSpriteWorldHeight('can', can), px, py, dirX, dirY, planeX, planeY, now);
+  for(const npc of game.npcs) if(!npc.helped) crHeightfieldDrawSprite('npc', npc, npcSpriteTex(npc.kind, npc), crHeightfieldSpriteWorldHeight('npc', npc), px, py, dirX, dirY, planeX, planeY, now);
+  if(game.exit && game.exit.active) crHeightfieldDrawSprite('exit', game.exit, TEX.exit, crHeightfieldSpriteWorldHeight('exit', game.exit), px, py, dirX, dirY, planeX, planeY, now);
 }
 // ---------------------------------------------------------------------------
 // SECTION 8 — MINIMAP
@@ -14217,14 +14301,14 @@ function crInstallAssetGallery(){
   const npcs = level.characters.map((placement) => {
     const asset = crAssetGalleryRuntimeRecord(placement.assetId);
     if(!asset) throw new Error('gallery character asset is not registered: ' + placement.assetId);
-    const npc = { id: placement.id, assetId: placement.assetId, kind: asset.group, x: placement.x, y: placement.y, need: 99, helped: false, wob: 0, thank: '', galleryStatic: true, heightScale: asset.heightScale };
+    const npc = { id: placement.id, assetId: placement.assetId, kind: asset.group, x: placement.x, y: placement.y, need: 99, helped: false, wob: 0, thank: '', galleryStatic: true };
     exhibits.push(crAssetGalleryExhibit(placement.id, 'character/' + asset.group, placement.assetId, npc));
     return npc;
   });
   for(const placement of level.environmentNpcs || []){
     const asset = crAssetGalleryRuntimeRecord(placement.assetId);
     if(!asset) throw new Error('gallery environment NPC asset is not registered: ' + placement.assetId);
-    npcs.push({ id: placement.id, assetId: placement.assetId, kind: asset.group, x: placement.x, y: placement.y, need: 99, helped: false, wob: 0, thank: '', galleryStatic: true, galleryEnvironmentFixture: true, heightScale: asset.heightScale });
+    npcs.push({ id: placement.id, assetId: placement.assetId, kind: asset.group, x: placement.x, y: placement.y, need: 99, helped: false, wob: 0, thank: '', galleryStatic: true, galleryEnvironmentFixture: true });
   }
   const props = level.props.map((placement) => {
     const prop = Object.assign({ wob: 0 }, placement);

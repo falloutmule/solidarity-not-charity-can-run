@@ -24,28 +24,28 @@ PACKAGES = {
         'sha256': '257acf709f99efff178a38a758fbd5e41fc27d0c006b55015322f7bdc8b52869',
         'manifestFile': 'd-style-package-manifest.json',
         'files': [
-            ('01_elderly_woman.png', 'npc_volunteer_elder_cane_001', 'volunteer', 1.4),
-            ('02_volunteer.png', 'npc_volunteer_tote_001', 'volunteer', 1.4),
-            ('03_miguel.png', 'npc_volunteer_miguel_001', 'volunteer', 1.4),
-            ('04_mother_and_child.png', 'npc_household_parent_child_001', 'household', 1.4),
-            ('05_backpack_youth.png', 'npc_civilian_backpack_youth_001', 'civilian', 1.4),
-            ('06_beanie_person.png', 'npc_civilian_beanie_messenger_001', 'civilian', 1.4),
-            ('07_grocery_carrier.png', 'npc_civilian_grocery_carrier_001', 'civilian', 1.4),
-            ('08_woman_and_dog.png', 'npc_household_dog_walker_001', 'household', 1.4),
+            ('01_elderly_woman.png', 'npc_volunteer_elder_cane_001', 'volunteer', 0.62),
+            ('02_volunteer.png', 'npc_volunteer_tote_001', 'volunteer', 0.62),
+            ('03_miguel.png', 'npc_volunteer_miguel_001', 'volunteer', 0.62),
+            ('04_mother_and_child.png', 'npc_household_parent_child_001', 'household', 0.62),
+            ('05_backpack_youth.png', 'npc_civilian_backpack_youth_001', 'civilian', 0.62),
+            ('06_beanie_person.png', 'npc_civilian_beanie_messenger_001', 'civilian', 0.62),
+            ('07_grocery_carrier.png', 'npc_civilian_grocery_carrier_001', 'civilian', 0.62),
+            ('08_woman_and_dog.png', 'npc_household_dog_walker_001', 'household', 0.62),
         ],
     },
     'unhoused': {
         'sha256': 'd4c3c6d9653c54dffd19b27b9677e141ba9aedaaf32a523586976019a8bc1c62',
         'manifestFile': 'unhoused-package-manifest.json',
         'files': [
-            ('01_top_woman_and_dog.png', 'npc_unhoused_dog_companion_001', 'unhoused', 1.4),
-            ('02_top_bike_traveler.png', 'npc_unhoused_bicycle_001', 'unhoused', 1.4),
-            ('03_top_walker.png', 'npc_unhoused_cane_001', 'unhoused', 1.4),
-            ('04_top_standing_man.png', 'npc_unhoused_work_jacket_001', 'unhoused', 1.4),
-            ('05_bottom_woman.png', 'npc_unhoused_dyed_hair_001', 'unhoused', 1.4),
-            ('06_bottom_man.png', 'npc_unhoused_blanket_wrap_001', 'unhoused', 1.4),
-            ('07_bottom_sitting_person.png', 'npc_unhoused_slumped_001', 'unhoused', 0.96),
-            ('08_bottom_cart_woman.png', 'npc_unhoused_cart_001', 'unhoused', 1.4),
+            ('01_top_woman_and_dog.png', 'npc_unhoused_dog_companion_001', 'unhoused', 0.62),
+            ('02_top_bike_traveler.png', 'npc_unhoused_bicycle_001', 'unhoused', 0.62),
+            ('03_top_walker.png', 'npc_unhoused_cane_001', 'unhoused', 0.62),
+            ('04_top_standing_man.png', 'npc_unhoused_work_jacket_001', 'unhoused', 0.62),
+            ('05_bottom_woman.png', 'npc_unhoused_dyed_hair_001', 'unhoused', 0.62),
+            ('06_bottom_man.png', 'npc_unhoused_blanket_wrap_001', 'unhoused', 0.62),
+            ('07_bottom_sitting_person.png', 'npc_unhoused_slumped_001', 'unhoused', 0.45),
+            ('08_bottom_cart_woman.png', 'npc_unhoused_cart_001', 'unhoused', 0.62),
         ],
     },
 }
@@ -122,7 +122,7 @@ def validate_package(package_key, archive_path):
         if set(source_by_file) != {name for name, _, _, _ in config['files']}:
             raise ValueError(f'{package_key}: package manifest file set differs from approved mapping')
         assets = []
-        for name, asset_id, group, display_height_cells in config['files']:
+        for name, asset_id, group, display_height_scale in config['files']:
             data = archive.read(name)
             source_record = source_by_file[name]
             actual_hash = sha256_bytes(data)
@@ -134,7 +134,8 @@ def validate_package(package_key, archive_path):
                 'package': package_key,
                 'packageFile': name,
                 'group': group,
-                'displayHeightCells': display_height_cells,
+                'displayHeightScale': display_height_scale,
+                'worldHeight': 0.68 if asset_id == 'npc_unhoused_slumped_001' else 0.96,
                 'bytes': data,
                 'sourceSha256': actual_hash,
                 'sourceSize': {'width': details['width'], 'height': details['height']},
@@ -187,7 +188,8 @@ def make_manifest(packages):
                 'runtimeSize': None,
                 'runtimeAlphaBounds': None,
                 'runtimeAlphaHistogram': None,
-                'displayHeightCells': item['displayHeightCells'],
+                'displayHeightScale': item['displayHeightScale'],
+                'worldHeight': item['worldHeight'],
             })
     return {'schema': 'snc-character-assets-v2', 'packages': package_records, 'assets': assets}
 

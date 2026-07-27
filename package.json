@@ -57,6 +57,8 @@
     "test:heightfield-generic-contract": "node tests/heightfield_generic_contract_verify.js",
     "test:heightfield-can-fixture": "node tests/heightfield_can_occlusion_fixture_verify.js",
     "test:heightfield-proof": "node tests/heightfield_proof_browser_smoke.js",
+    "test:world-height-contract": "node tests/world_height_contract_verify.js",
+    "test:world-height-calibration": "node tests/world_height_calibration_browser.js",
     "test:runtime-asset-gallery": "node tests/runtime_asset_gallery_verify.js",
     "test:runtime-asset-gallery-smoke": "node tests/runtime_asset_gallery_smoke.js",
     "test:tiled-d1-roundtrip": "node tests/tiled_d1_roundtrip_verify.js",

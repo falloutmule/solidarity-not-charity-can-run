@@ -94,6 +94,13 @@ def load_manifest():
         raise ValueError('unexpected character asset manifest schema')
     if len(manifest.get('assets', [])) != 16:
         raise ValueError('approved cast requires exactly sixteen assets')
+    for asset in manifest['assets']:
+        display_height = asset.get('displayHeightScale')
+        world_height = asset.get('worldHeight')
+        if not isinstance(display_height, (int, float)) or display_height <= 0:
+            raise ValueError(f"{asset.get('assetId', 'unknown')}: displayHeightScale must be positive")
+        if not isinstance(world_height, (int, float)) or world_height <= 0:
+            raise ValueError(f"{asset.get('assetId', 'unknown')}: worldHeight must be positive")
     return manifest
 
 
@@ -146,7 +153,8 @@ def build(write_runtime):
             'approvalStatus': asset['reviewStatus'],
             'sourceRef': f"{asset['package']}:{asset['packageFile']}",
             'anchor': asset['anchor'],
-            'heightScale': asset['displayHeightCells'],
+            'displayHeightScale': asset['displayHeightScale'],
+            'worldHeight': asset['worldHeight'],
             'alphaBounds': runtime_details['alphaBounds'],
             'width': runtime_details['size']['width'],
             'height': runtime_details['size']['height'],

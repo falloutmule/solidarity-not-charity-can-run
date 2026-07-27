@@ -25,8 +25,12 @@ assert.deepStrictEqual(manifest.assets.reduce((groups, asset) => {
   groups[asset.group] = (groups[asset.group] || 0) + 1;
   return groups;
 }, {}), { volunteer: 3, household: 2, civilian: 3, unhoused: 8 }, 'approved group counts');
-assert.strictEqual(manifest.assets.find((asset) => asset.assetId === 'npc_unhoused_slumped_001').displayHeightCells, 0.45, 'seated asset remains visibly shorter');
-for(const asset of manifest.assets.filter((asset) => asset.assetId !== 'npc_unhoused_slumped_001')) assert.strictEqual(asset.displayHeightCells, 0.62, `${asset.assetId}: compact gallery scale`);
+assert.strictEqual(manifest.assets.find((asset) => asset.assetId === 'npc_unhoused_slumped_001').displayHeightScale, 0.45, 'seated asset remains visibly shorter in the legacy gallery');
+assert.strictEqual(manifest.assets.find((asset) => asset.assetId === 'npc_unhoused_slumped_001').worldHeight, 0.68, 'seated asset has a separate physical height');
+for(const asset of manifest.assets.filter((asset) => asset.assetId !== 'npc_unhoused_slumped_001')){
+  assert.strictEqual(asset.displayHeightScale, 0.62, `${asset.assetId}: compact gallery scale`);
+  assert.strictEqual(asset.worldHeight, 0.96, `${asset.assetId}: physical standing height`);
+}
 for(const asset of manifest.assets){
   assert.strictEqual(asset.reviewStatus, 'candidate', `${asset.assetId}: approved package records stay candidate review art`);
   assert.strictEqual(asset.anchor.y, 1.0, `${asset.assetId}: ground anchor`);
@@ -49,6 +53,8 @@ const dataUris = [...generatedRegistry.matchAll(/data:image\/png;base64,([A-Za-z
 assert.strictEqual(dataUris.length, 16, 'exactly one data URI per approved runtime asset');
 assert.strictEqual(new Set(dataUris).size, 16, 'runtime payloads are unique');
 for(const asset of manifest.assets) assert(generatedRegistry.includes(asset.assetId), `${asset.assetId}: runtime record exists`);
+assert(generatedRegistry.includes('displayHeightScale') && generatedRegistry.includes('worldHeight'), 'runtime records retain distinct display and world heights');
+assert(!generatedRegistry.includes('"heightScale"'), 'runtime records do not retain the ambiguous heightScale field');
 
 const level = load('src/levels/asset-gallery-authored.js');
 assert(level.includes("schema: 'snc-asset-gallery-level-v1'"), 'special authored gallery level');
@@ -83,18 +89,21 @@ while(frontier.length){
 for(const placement of placements) assert(reachable.has(`${Math.floor(placement.x)},${Math.floor(placement.y)}`), `${placement.assetId}: reachable from gallery start`);
 
 const galleryMode = load('src/js/game-21b-asset-gallery-mode.js');
-assert(galleryMode.includes('heightScale: asset.heightScale'), 'registry display scale reaches the existing NPC renderer path');
+assert(!galleryMode.includes('heightScale: asset.heightScale'), 'gallery fixtures do not own a duplicate scale override');
+assert(!galleryMode.includes('worldHeight:'), 'gallery fixtures do not own a world-height override');
 assert(galleryMode.includes('galleryStatic: true'), 'gallery characters stay static');
 assert(galleryMode.includes('crAssetGalleryInstallEnvironment'), 'gallery installs authored low geometry through one bounded adapter');
 assert(galleryMode.includes('crHeightfieldProfileForSolidAsset(asset)'), 'gallery resolves the profile from the generic asset contract');
 assert(galleryMode.includes('game.verticalProfileGrid = environment.profileGrid'), 'gallery installs a map-sized heightfield profile grid');
 assert(galleryMode.includes('map[y][x] = WALL.CONCRETE'), 'low-block collision remains map-authoritative');
 const input = load('src/js/game-20-section-11-update-input.js');
+const legacyRenderer = load('src/js/game-16-section-7-render.js');
 const mobileInput = load('src/js/game-06-section-2b-mobile-touch-input.js');
 const responsiveMenu = load('src/js/game-07-section-2c-responsive-mobile-menu-html-overlay.js');
 const hud = load('src/js/game-18-section-9-hud-reticle-popups.js');
 const mainLoop = load('src/js/game-22-section-13-main-loop.js');
 assert(input.includes('if(!assetGallery) SAVE.save();'), 'keyboard and touch pause saves are gallery-guarded');
+assert(legacyRenderer.includes('npcSpriteHeight(n)'), 'ordinary gallery and legacy rendering retain the display-height path');
 assert(input.includes("if(!assetGallery && !paused && e.code==='KeyR')"), 'gallery cannot restart a campaign from keyboard');
 assert(mobileInput.includes('crAssetGalleryIsActive') && mobileInput.includes('SAVE.save()'), 'mobile pause save is gallery-guarded');
 assert(responsiveMenu.includes("action === 'pause-help' || action === 'pause-restart'"), 'gallery pause menu suppresses mutating actions');

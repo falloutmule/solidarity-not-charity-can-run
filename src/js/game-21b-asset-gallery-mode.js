@@ -99,14 +99,14 @@ function crInstallAssetGallery(){
   const npcs = level.characters.map((placement) => {
     const asset = crAssetGalleryRuntimeRecord(placement.assetId);
     if(!asset) throw new Error('gallery character asset is not registered: ' + placement.assetId);
-    const npc = { id: placement.id, assetId: placement.assetId, kind: asset.group, x: placement.x, y: placement.y, need: 99, helped: false, wob: 0, thank: '', galleryStatic: true, heightScale: asset.heightScale };
+    const npc = { id: placement.id, assetId: placement.assetId, kind: asset.group, x: placement.x, y: placement.y, need: 99, helped: false, wob: 0, thank: '', galleryStatic: true };
     exhibits.push(crAssetGalleryExhibit(placement.id, 'character/' + asset.group, placement.assetId, npc));
     return npc;
   });
   for(const placement of level.environmentNpcs || []){
     const asset = crAssetGalleryRuntimeRecord(placement.assetId);
     if(!asset) throw new Error('gallery environment NPC asset is not registered: ' + placement.assetId);
-    npcs.push({ id: placement.id, assetId: placement.assetId, kind: asset.group, x: placement.x, y: placement.y, need: 99, helped: false, wob: 0, thank: '', galleryStatic: true, galleryEnvironmentFixture: true, heightScale: asset.heightScale });
+    npcs.push({ id: placement.id, assetId: placement.assetId, kind: asset.group, x: placement.x, y: placement.y, need: 99, helped: false, wob: 0, thank: '', galleryStatic: true, galleryEnvironmentFixture: true });
   }
   const props = level.props.map((placement) => {
     const prop = Object.assign({ wob: 0 }, placement);

@@ -3,6 +3,7 @@
 // ---------------------------------------------------------------------------
 const CR_HEIGHTFIELD_QUERY = new URLSearchParams(location.search).get('heightfield') === '1';
 const CR_HEIGHTFIELD_CAMERA = Object.freeze({ eyeZ: 0.68 });
+const CR_HEIGHTFIELD_SPRITE_WORLD_HEIGHTS = Object.freeze({ can: 0.18 });
 const CR_HEIGHT_LEVELS = new Float32Array([0.0, 0.5, 1.0]);
 const CR_VERTICAL_PROFILE_IDS = Object.freeze({ EMPTY: 0, HALF_DEBUG: 1, FULL_LEGACY: 2, AUTHORED_CONCRETE: 3 });
 const CR_HEIGHTFIELD_MATERIAL_IDS = Object.freeze({
@@ -93,6 +94,7 @@ function crHeightfieldClearState(){
   game.verticalProfileHeight = 0;
   game.verticalProfileRotationGrid = null;
   game.heightfieldProof = null;
+  game.heightfieldCalibration = null;
 }
 function crHeightfieldProfileIdAt(tx, ty){
   if(tx < 0 || ty < 0 || tx >= game.MAP_W || ty >= game.MAP_H){
@@ -244,6 +246,21 @@ function crHeightfieldResetStats(){
   crHeightfieldStats.npcVisiblePixels = 0;
   crHeightfieldStats.npcOccludedPixels = 0;
 }
+function crHeightfieldCalibrationMeasurements(){
+  const calibration = game && game.heightfieldCalibration;
+  if(!calibration || !Array.isArray(calibration.subjects)) return null;
+  const dirX = Math.cos(player.angle), dirY = Math.sin(player.angle);
+  const subjects = calibration.subjects.map((subject) => {
+    const depth = (subject.x - player.x) * dirX + (subject.y - player.y) * dirY;
+    const groundScreenY = crProjectWorldZToScreenY(0, depth, CR_HEIGHTFIELD_CAMERA.eyeZ);
+    const topScreenY = crProjectWorldZToScreenY(subject.worldHeight, depth, CR_HEIGHTFIELD_CAMERA.eyeZ);
+    return Object.freeze({
+      id: subject.id, kind: subject.kind, worldHeight: subject.worldHeight, cameraDepth: depth,
+      projectedPixelHeight: groundScreenY - topScreenY, topScreenY, groundScreenY
+    });
+  });
+  return Object.freeze({ pose: calibration.pose, subjects: Object.freeze(subjects) });
+}
 function crGetHeightfieldDiagnostics(){
   return Object.freeze({
     enabled: crHeightfieldStats.enabled, cameraZ: crHeightfieldStats.cameraZ,
@@ -254,7 +271,8 @@ function crGetHeightfieldDiagnostics(){
     canVisiblePixels: crHeightfieldStats.canVisiblePixels, canOccludedPixels: crHeightfieldStats.canOccludedPixels,
     npcVisiblePixels: crHeightfieldStats.npcVisiblePixels, npcOccludedPixels: crHeightfieldStats.npcOccludedPixels,
     worldDepthBytes: crHeightfieldStats.worldDepthBytes, worldDepthLength: worldDepthPixels.length,
-    allocations: crHeightfieldStats.allocations, width: crWorldDepthWidth, height: crWorldDepthHeight
+    allocations: crHeightfieldStats.allocations, width: crWorldDepthWidth, height: crWorldDepthHeight,
+    calibration: crHeightfieldCalibrationMeasurements()
   });
 }
 function crBootHeightfieldProofIfRequested(){
