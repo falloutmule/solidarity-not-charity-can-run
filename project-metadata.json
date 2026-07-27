@@ -5,14 +5,14 @@
     "name": "Solidarity Not Charity Can Run"
   },
   "runtime": {
-    "buildId": "heightfieldintegration2",
+    "buildId": "heightfieldintegration3",
     "sourcePolicy": "build-manifest",
     "releaseArtifact": "index.html"
   },
   "artifact": {
     "path": "index.html",
-    "byteLength": 1655482,
-    "sha256": "247a2237dc3e1b81d1bbd6a91f0385eade50596363bf2f644f76be14a18d915a"
+    "byteLength": 1660157,
+    "sha256": "f57fee832f91263f77db9acabc4a1133d0b3991af883a668fc46620f43535b3e"
   },
   "distribution": {
     "provider": "github-pages",

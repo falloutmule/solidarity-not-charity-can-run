@@ -142,7 +142,9 @@ function genHeightfieldProof(){
   map[block.y][block.x] = WALL.BRICK;
   game.verticalProfileWidth = GW; game.verticalProfileHeight = GH;
   game.verticalProfileGrid = new Uint16Array(GW * GH);
+  game.verticalProfileRotationGrid = new Uint8Array(GW * GH);
   game.verticalProfileGrid[block.y * GW + block.x] = block.profileId;
+  game.verticalProfileRotationGrid[block.y * GW + block.x] = rotation;
   game.heightfieldProof = { block, rotation, occlusionSubject };
   game.map = map; game.MAP_W = GW; game.MAP_H = GH; game.wallShade = shade;
   game.buildingGrid = null; game.buildingRegistry = null; game.props = [];

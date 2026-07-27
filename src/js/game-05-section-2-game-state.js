@@ -10,7 +10,7 @@ const game = {
   seed: 12345, district: 1, totalScore: 0,
   map: null, MAP_W: 0, MAP_H: 0, wallShade: null,
   pickups: [], npcs: [], exit: null, props: [],
-  verticalProfileGrid: null, verticalProfileWidth: 0, verticalProfileHeight: 0, heightfieldProof: null,
+  verticalProfileGrid: null, verticalProfileWidth: 0, verticalProfileHeight: 0, verticalProfileRotationGrid: null, heightfieldProof: null,
   quota: 0, helped: 0, delivered: 0, timeLeft: 0,
   modifier: 'clear', scoreMult: 1,
   msg: '', msgT: 0,

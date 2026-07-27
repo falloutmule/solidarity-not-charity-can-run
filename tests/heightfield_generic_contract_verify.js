@@ -27,5 +27,10 @@ const renderer = source('src/js/game-16d-heightfield-renderer.js');
 assert(renderer.includes('crHeightfieldDrawVerticalSegment'), 'accepted variable-height renderer remains present');
 assert(renderer.includes('crHeightfieldRenderRaisedPlanes'), 'accepted raised-plane renderer remains present');
 assert(renderer.includes('worldDepthPixels'), 'accepted per-pixel depth remains present');
+assert(renderer.includes('crHeightfieldSideMaterialId(profile, face)'), 'vertical segments resolve a generic local-face material');
+assert(renderer.includes('crHeightfieldTopMaterialId(profile)'), 'raised planes resolve a generic top material');
+for (const forbidden of ['heightfieldProof', 'HALF_DEBUG', 'low_block_concrete_001']) {
+  assert(!renderer.includes(forbidden), `renderer hot path must not own ${forbidden}`);
+}
 
 console.log(JSON.stringify({ pass: true, check: 'generic heightfield core contract' }));
