@@ -39,12 +39,20 @@ async function main(){
     await page.waitForFunction(() => Object.values(window.SNC_RUNTIME_ASSET_REGISTRY || {}).every((entry) => entry.image.complete && entry.image.naturalWidth > 0));
     await page.waitForTimeout(160);
     const equal = await page.evaluate(() => window.SNCDiagnostics.getSnapshot());
-    const equalShot = await page.locator('#view').screenshot({ path: path.join(path.dirname(output), 'equal-depth.png') });
+    const equalShot = await page.locator('#view').screenshot({ path: path.join(path.dirname(output), 'lineup-equal-depth.png') });
     await page.goto(`${result.url}?heightfield=1&hfcalibration=1&hfcalpose=standing-close`, { waitUntil: 'load' });
     await page.waitForFunction(() => window.SNCDiagnostics && window.SNCDiagnostics.getSnapshot().heightfield.calibration && window.SNCDiagnostics.getSnapshot().heightfield.calibration.pose === 'standing-close');
     await page.waitForTimeout(160);
     const close = await page.evaluate(() => window.SNCDiagnostics.getSnapshot());
     const closeShot = await page.locator('#view').screenshot({ path: path.join(path.dirname(output), 'standing-close.png') });
+    await page.goto(`${result.url}?heightfield=1&hfcalibration=1&hfcalpose=equal-depth&hfcancomparison=1`, { waitUntil: 'load' });
+    await page.waitForFunction(() => {
+      const calibration = window.SNCDiagnostics && window.SNCDiagnostics.getSnapshot().heightfield.calibration;
+      return calibration && calibration.subjects.some((subject) => subject.id === 'can-024') && calibration.subjects.some((subject) => subject.id === 'can-028');
+    });
+    await page.waitForTimeout(160);
+    const comparison = await page.evaluate(() => window.SNCDiagnostics.getSnapshot());
+    const comparisonShot = await page.locator('#view').screenshot({ path: path.join(path.dirname(output), 'can-size-comparison.png') });
     const calibration = equal.heightfield.calibration;
     const standing = byId(calibration, 'standing');
     const slumped = byId(calibration, 'slumped');
@@ -54,17 +62,31 @@ async function main(){
     const subjects = [standing, slumped, can, halfBlock, fullWall];
     const depths = subjects.map((subject) => subject.cameraDepth);
     const closeStanding = byId(close.heightfield.calibration, 'standing');
+    const comparisonCalibration = comparison.heightfield.calibration;
+    const comparisonCans = ['can-024', 'can-026', 'can-028'].map((id) => byId(comparisonCalibration, id));
     result.measurements.equalDepth = calibration;
     result.measurements.standingClose = close.heightfield.calibration;
+    result.measurements.canComparison = comparisonCalibration;
     result.measurements.screenshots = {
       equalDepthSha256: crypto.createHash('sha256').update(equalShot).digest('hex'),
-      standingCloseSha256: crypto.createHash('sha256').update(closeShot).digest('hex')
+      standingCloseSha256: crypto.createHash('sha256').update(closeShot).digest('hex'),
+      canComparisonSha256: crypto.createHash('sha256').update(comparisonShot).digest('hex')
     };
     result.checks.queryGate = equal.runtime.customLevel === 'heightfield_proof' && calibration.pose === 'equal-depth';
     result.checks.equalDepth = Math.max(...depths) - Math.min(...depths) < 1e-9;
     result.checks.worldOrder = standing.worldHeight > halfBlock.worldHeight && slumped.worldHeight > halfBlock.worldHeight && can.worldHeight < halfBlock.worldHeight && fullWall.worldHeight === 1;
     result.checks.standingAboveEye = standing.topScreenY < 125 && standing.worldHeight > equal.heightfield.cameraZ;
     result.checks.grounded = subjects.every((subject) => Math.abs(subject.groundScreenY - subjects[0].groundScreenY) < 1e-9);
+    result.checks.visibleBounds = [standing, slumped, can].every((subject) => {
+      const bounds = subject.visibleBounds;
+      return bounds && bounds.sourceCanvasWidth > 0 && bounds.sourceCanvasHeight > 0 && bounds.alphaBounds.x >= 0 && bounds.alphaBounds.y >= 0 &&
+        bounds.alphaBounds.x + bounds.alphaBounds.w <= bounds.sourceCanvasWidth && bounds.alphaBounds.y + bounds.alphaBounds.h <= bounds.sourceCanvasHeight &&
+        bounds.groundSourceY === bounds.alphaBounds.y + bounds.alphaBounds.h && bounds.groundSourceY <= bounds.sourceCanvasHeight;
+    });
+    result.checks.visibleGrounding = [standing, slumped, can].every((subject) => subject.visibleBounds && Math.abs(subject.visibleBounds.projectedGroundY - subject.groundScreenY) < 1e-9 && subject.visibleBounds.groundingErrorPixels <= 1);
+    result.checks.canComparison = comparisonCans.every(Boolean) && comparisonCans.map((subject) => subject.worldHeight).join(',') === '0.24,0.26,0.28' &&
+      comparisonCans.every((subject) => subject.visibleBounds && subject.visibleBounds.groundingErrorPixels <= 1) &&
+      comparisonCans[0].projectedPixelHeight < comparisonCans[1].projectedPixelHeight && comparisonCans[1].projectedPixelHeight < comparisonCans[2].projectedPixelHeight;
     result.checks.projectedOrder = standing.projectedPixelHeight > halfBlock.projectedPixelHeight && slumped.projectedPixelHeight > can.projectedPixelHeight && fullWall.projectedPixelHeight > standing.projectedPixelHeight;
     result.checks.closeRange = closeStanding.projectedPixelHeight > standing.projectedPixelHeight * 2 && closeStanding.topScreenY < 125;
     result.checks.heightfield = equal.heightfield.enabled === true && equal.heightfield.worldDepthWrites > 0;

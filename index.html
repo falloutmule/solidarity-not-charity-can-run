@@ -685,7 +685,7 @@ const inp = {
   lookDeltaRad:0,
   _active:false, // true when any touch is on screen
 };
-var BUILD_ID = 'heightfieldworldscale1'; window.BUILD_ID = BUILD_ID;
+var BUILD_ID = 'heightfieldworldscale2'; window.BUILD_ID = BUILD_ID;
 const CR_FPV_STREET_MATTE = true;
 /** Building visual reset: smooth, low-noise wall masses with sparse readable cues. */
 const CR_BUILDING_SMOOTH_STYLE = 1;
@@ -9429,23 +9429,28 @@ function genHeightfieldWorldScaleCalibration(params){
   };
   const pose = poses[poseName];
   player.x = pose[0]; player.y = pose[1]; player.angle = Math.atan2(pose[3] - player.y, pose[2] - player.x);
-  const standing = { id: 'calibration-standing', assetId: 'npc_unhoused_work_jacket_001', kind: 'unhoused', x: 8.5, y: 8.5, need: 1, helped: false, wob: 0, thank: 'Calibration standing.' };
-  const slumped = { id: 'calibration-slumped', assetId: 'npc_unhoused_slumped_001', kind: 'unhoused', x: 10.5, y: 8.5, need: 1, helped: false, wob: 0, thank: 'Calibration slumped.' };
-  const can = { x: 12.5, y: 8.5, taken: false, amt: 1, wob: 0 };
-  game.pickups = [can]; game.npcs = [standing, slumped];
+  const standing = { calibrationId: 'standing', id: 'calibration-standing', assetId: 'npc_unhoused_work_jacket_001', kind: 'unhoused', x: 8.5, y: 8.5, need: 1, helped: false, wob: 0, thank: 'Calibration standing.' };
+  const slumped = { calibrationId: 'slumped', id: 'calibration-slumped', assetId: 'npc_unhoused_slumped_001', kind: 'unhoused', x: 10.5, y: 8.5, need: 1, helped: false, wob: 0, thank: 'Calibration slumped.' };
+  const canComparison = params.get('hfcancomparison') === '1';
+  const cans = canComparison ? [
+    { calibrationId: 'can-024', x: 11.5, y: 8.5, worldHeight: 0.24, taken: false, amt: 1, wob: 0 },
+    { calibrationId: 'can-026', x: 12.5, y: 8.5, worldHeight: 0.26, taken: false, amt: 1, wob: 0 },
+    { calibrationId: 'can-028', x: 13.5, y: 8.5, worldHeight: 0.28, taken: false, amt: 1, wob: 0 }
+  ] : [{ calibrationId: 'can', x: 12.5, y: 8.5, taken: false, amt: 1, wob: 0 }];
+  game.pickups = cans; game.npcs = [standing, slumped];
   game.heightfieldCalibration = Object.freeze({
     pose: poseName,
     subjects: Object.freeze([
       Object.freeze({ id: 'standing', kind: 'npc', x: standing.x, y: standing.y, worldHeight: npcSpriteHeight(standing, 'world') }),
       Object.freeze({ id: 'slumped', kind: 'npc', x: slumped.x, y: slumped.y, worldHeight: npcSpriteHeight(slumped, 'world') }),
-      Object.freeze({ id: 'can', kind: 'can', x: can.x, y: can.y, worldHeight: crHeightfieldSpriteWorldHeight('can', can) }),
+      ...cans.map((can) => Object.freeze({ id: can.calibrationId, kind: 'can', x: can.x, y: can.y, worldHeight: crHeightfieldSpriteWorldHeight('can', can) })),
       Object.freeze({ id: 'half-block', kind: 'block', x: halfBlock.x + 0.5, y: halfBlock.y + 0.5, worldHeight: crHeightfieldTopZ(CR_VERTICAL_PROFILES[halfBlock.profileId]) }),
       Object.freeze({ id: 'full-wall', kind: 'wall', x: fullWall.x + 0.5, y: fullWall.y + 0.5, worldHeight: crHeightfieldTopZ(CR_VERTICAL_PROFILES[fullWall.profileId]) })
     ])
   });
   game.quota = 1; game.helped = 0; game.delivered = 0;
   game.exit = { x: 21.5, y: 15.5, active: false }; game.timeLeft = 9999;
-  dbg.reachableCells = 0; dbg.cansSpawned = 1; dbg.npcsSpawned = 2; dbg.props = 0;
+  dbg.reachableCells = 0; dbg.cansSpawned = cans.length; dbg.npcsSpawned = 2; dbg.props = 0;
   setMsg('HEIGHTFIELD CALIBRATION — ' + poseName.toUpperCase().replace('-', ' ') + '.');
 }
 
@@ -9590,6 +9595,7 @@ function npcSpriteHeight(entity, space){
   return asset && Number.isFinite(asset[field]) ? asset[field] : (HEIGHT[entity && entity.kind] || HEIGHT.hungry);
 }
 function crHeightfieldSpriteWorldHeight(kind, entity){
+  if(entity && Number.isFinite(entity.worldHeight) && entity.worldHeight > 0) return entity.worldHeight;
   if(kind === 'can') return CR_HEIGHTFIELD_SPRITE_WORLD_HEIGHTS.can;
   if(kind === 'npc') return npcSpriteHeight(entity, 'world');
   return HEIGHT[entity && entity.kind] || HEIGHT[kind] || 0.5;
@@ -11466,7 +11472,7 @@ function crDebugSpriteProjection(){
 // ---------------------------------------------------------------------------
 const CR_HEIGHTFIELD_QUERY = new URLSearchParams(location.search).get('heightfield') === '1';
 const CR_HEIGHTFIELD_CAMERA = Object.freeze({ eyeZ: 0.68 });
-const CR_HEIGHTFIELD_SPRITE_WORLD_HEIGHTS = Object.freeze({ can: 0.18 });
+const CR_HEIGHTFIELD_SPRITE_WORLD_HEIGHTS = Object.freeze({ can: 0.26 });
 const CR_HEIGHT_LEVELS = new Float32Array([0.0, 0.5, 1.0]);
 const CR_VERTICAL_PROFILE_IDS = Object.freeze({ EMPTY: 0, HALF_DEBUG: 1, FULL_LEGACY: 2, AUTHORED_CONCRETE: 3 });
 const CR_HEIGHTFIELD_MATERIAL_IDS = Object.freeze({
@@ -11508,7 +11514,7 @@ const crHeightfieldStats = {
   enabled: false, cameraZ: CR_HEIGHTFIELD_CAMERA.eyeZ, profileCells: 0, verticalSegments: 0,
   topPixels: 0, worldDepthWrites: 0, spriteVisiblePixels: 0, spriteOccludedPixels: 0,
   canVisiblePixels: 0, canOccludedPixels: 0, npcVisiblePixels: 0, npcOccludedPixels: 0,
-  worldDepthBytes: 0, allocations: 0
+  worldDepthBytes: 0, allocations: 0, spriteBounds: Object.create(null)
 };
 
 function crHeightfieldMaterialAt(id){
@@ -11670,8 +11676,8 @@ function crHeightfieldMaterialRgb(material, u, v, rotation){
   const offset = (y * cache.width + x) * 4;
   return [cache.pixels[offset], cache.pixels[offset + 1], cache.pixels[offset + 2]];
 }
-function crHeightfieldSpriteOpaqueAt(tex, sourceX, sourceY){
-  if(!tex) return false;
+function crHeightfieldSpriteAlphaMask(tex){
+  if(!tex) return null;
   let mask = crHeightfieldSpriteAlphaMasks.get(tex);
   if(!mask){
     let width = tex.width, height = tex.height, textureCtx;
@@ -11683,14 +11689,78 @@ function crHeightfieldSpriteOpaqueAt(tex, sourceX, sourceY){
       textureCanvas.width = width; textureCanvas.height = height;
       textureCtx = textureCanvas.getContext('2d', { willReadFrequently: true });
       textureCtx.drawImage(tex, 0, 0);
-    } else return false;
+    } else return null;
     const image = textureCtx.getImageData(0, 0, width, height);
-    mask = { width, height, alpha: image.data };
+    let left = width, top = height, right = 0, bottom = 0, found = false;
+    for(let y = 0; y < height; y++) for(let x = 0; x < width; x++){
+      if(image.data[(y * width + x) * 4 + 3] <= 0) continue;
+      found = true;
+      if(x < left) left = x;
+      if(y < top) top = y;
+      if(x + 1 > right) right = x + 1;
+      if(y + 1 > bottom) bottom = y + 1;
+    }
+    const alphaBounds = found ? { x: left, y: top, w: right - left, h: bottom - top } : { x: 0, y: 0, w: width, h: height };
+    mask = { width, height, alpha: image.data, alphaBounds };
     crHeightfieldSpriteAlphaMasks.set(tex, mask);
   }
+  return mask;
+}
+function crHeightfieldSpriteOpaqueAt(tex, sourceX, sourceY){
+  const mask = crHeightfieldSpriteAlphaMask(tex);
+  if(!mask) return false;
   const x = Math.max(0, Math.min(mask.width - 1, sourceX | 0));
   const y = Math.max(0, Math.min(mask.height - 1, sourceY | 0));
   return mask.alpha[(y * mask.width + x) * 4 + 3] > 0;
+}
+function crHeightfieldSpriteRegistryEntry(obj){
+  const registry = globalThis.SNC_RUNTIME_ASSET_REGISTRY;
+  return obj && obj.assetId && registry ? registry[obj.assetId] || null : null;
+}
+function crHeightfieldPhysicalSpriteBounds(kind, obj, tex, worldHeight){
+  const mask = crHeightfieldSpriteAlphaMask(tex);
+  if(!mask) return null;
+  const entry = crHeightfieldSpriteRegistryEntry(obj);
+  const candidate = entry && entry.alphaBounds;
+  const bounds = candidate && candidate.x >= 0 && candidate.y >= 0 && candidate.w > 0 && candidate.h > 0 &&
+    candidate.x + candidate.w <= mask.width && candidate.y + candidate.h <= mask.height ? candidate : mask.alphaBounds;
+  const anchorX = entry && entry.anchor && Number.isFinite(entry.anchor.x) ? entry.anchor.x :
+    (obj && obj.anchor && Number.isFinite(obj.anchor.x) ? obj.anchor.x : 0.5);
+  return {
+    sourceX: bounds.x, sourceY: bounds.y, sourceWidth: bounds.w, sourceHeight: bounds.h,
+    sourceCanvasWidth: mask.width, sourceCanvasHeight: mask.height,
+    anchorX: Math.max(0, Math.min(1, anchorX)), groundSourceY: bounds.y + bounds.h,
+    worldHeight: Number(worldHeight)
+  };
+}
+function crProjectHeightfieldVisibleSprite(obj, tex, worldHeight, depth, hscr, bounds){
+  if(!bounds || !(bounds.worldHeight > 0)) return null;
+  const screenH = bounds.worldHeight * RH / Math.max(0.12, depth);
+  const screenW = screenH * (bounds.sourceWidth / bounds.sourceHeight);
+  const screenX = (RW / 2) * (1 + hscr / depth);
+  const anchorSourceX = bounds.anchorX * bounds.sourceCanvasWidth;
+  const anchorU = Math.max(0, Math.min(1, (anchorSourceX - bounds.sourceX) / bounds.sourceWidth));
+  const groundScreenY = crProjectWorldZToScreenY(0, depth, CR_HEIGHTFIELD_CAMERA.eyeZ);
+  return {
+    screenX, screenW, screenH, screenLeft: screenX - anchorU * screenW,
+    topY: groundScreenY - screenH, bottomY: groundScreenY, groundScreenY,
+    sourceX: bounds.sourceX, sourceY: bounds.sourceY, sourceWidth: bounds.sourceWidth, sourceHeight: bounds.sourceHeight,
+    sourceCanvasWidth: bounds.sourceCanvasWidth, sourceCanvasHeight: bounds.sourceCanvasHeight,
+    anchorX: bounds.anchorX, groundSourceY: bounds.groundSourceY, worldHeight: bounds.worldHeight, depth
+  };
+}
+function crHeightfieldRecordSpriteProjection(kind, obj, proj){
+  if(!obj || !obj.calibrationId || !proj) return;
+  const lowestOpaqueDestinationY = Math.min(RH - 1, Math.ceil(proj.bottomY) - 1);
+  crHeightfieldStats.spriteBounds[obj.calibrationId] = Object.freeze({
+    kind, worldHeight: proj.worldHeight, cameraDepth: proj.depth,
+    sourceCanvasWidth: proj.sourceCanvasWidth, sourceCanvasHeight: proj.sourceCanvasHeight,
+    alphaBounds: Object.freeze({ x: proj.sourceX, y: proj.sourceY, w: proj.sourceWidth, h: proj.sourceHeight }),
+    anchorX: proj.anchorX, groundSourceY: proj.groundSourceY,
+    visibleTopScreenY: proj.topY, projectedGroundY: proj.groundScreenY,
+    lowestOpaqueDestinationY, groundingErrorPixels: Math.abs((lowestOpaqueDestinationY + 1) - proj.groundScreenY),
+    projectedPixelHeight: proj.screenH
+  });
 }
 function crHeightfieldResetStats(){
   crHeightfieldStats.enabled = crHeightfieldIsActive();
@@ -11708,6 +11778,7 @@ function crHeightfieldResetStats(){
   crHeightfieldStats.canOccludedPixels = 0;
   crHeightfieldStats.npcVisiblePixels = 0;
   crHeightfieldStats.npcOccludedPixels = 0;
+  crHeightfieldStats.spriteBounds = Object.create(null);
 }
 function crHeightfieldCalibrationMeasurements(){
   const calibration = game && game.heightfieldCalibration;
@@ -11717,9 +11788,11 @@ function crHeightfieldCalibrationMeasurements(){
     const depth = (subject.x - player.x) * dirX + (subject.y - player.y) * dirY;
     const groundScreenY = crProjectWorldZToScreenY(0, depth, CR_HEIGHTFIELD_CAMERA.eyeZ);
     const topScreenY = crProjectWorldZToScreenY(subject.worldHeight, depth, CR_HEIGHTFIELD_CAMERA.eyeZ);
+    const visibleBounds = crHeightfieldStats.spriteBounds[subject.id] || null;
     return Object.freeze({
       id: subject.id, kind: subject.kind, worldHeight: subject.worldHeight, cameraDepth: depth,
-      projectedPixelHeight: groundScreenY - topScreenY, topScreenY, groundScreenY
+      projectedPixelHeight: groundScreenY - topScreenY, topScreenY, groundScreenY,
+      visibleBounds
     });
   });
   return Object.freeze({ pose: calibration.pose, subjects: Object.freeze(subjects) });
@@ -12705,20 +12778,21 @@ function crHeightfieldDrawSprite(kind, obj, tex, hp, px, py, dirX, dirY, planeX,
   const depth = invDet * (-planeY * rx + planeX * ry);
   const hscr = invDet * (dirY * rx - dirX * ry);
   if(!(depth > 0.12)) return;
-  const proj = crProjectBillboardSprite(obj, tex, hp, depth, hscr, now);
-  const heightfieldGroundY = crProjectWorldZToScreenY(0, depth, CR_HEIGHTFIELD_CAMERA.eyeZ);
-  const top = proj.topY + (heightfieldGroundY - proj.groundBottomY);
-  const startCol = Math.max(0, Math.floor(proj.screenX - proj.screenW / 2));
-  const endCol = Math.min(RW, Math.ceil(proj.screenX + proj.screenW / 2));
-  const bottom = top + proj.screenH;
+  const bounds = crHeightfieldPhysicalSpriteBounds(kind, obj, tex, hp);
+  const proj = crProjectHeightfieldVisibleSprite(obj, tex, hp, depth, hscr, bounds);
+  if(!proj) return;
+  crHeightfieldRecordSpriteProjection(kind, obj, proj);
+  const top = proj.topY, bottom = proj.bottomY;
+  const startCol = Math.max(0, Math.floor(proj.screenLeft));
+  const endCol = Math.min(RW, Math.ceil(proj.screenLeft + proj.screenW));
   for(let col = startCol; col < endCol; col++){
-    const u = (col - (proj.screenX - proj.screenW / 2)) / proj.screenW;
-    const srcX = Math.max(0, Math.min(tex.width - 1, (u * tex.width) | 0));
+    const u = (col - proj.screenLeft) / proj.screenW;
+    const srcX = Math.max(proj.sourceX, Math.min(proj.sourceX + proj.sourceWidth - 1, (proj.sourceX + u * proj.sourceWidth) | 0));
     const y0 = Math.max(0, Math.floor(top)), y1 = Math.min(RH, Math.ceil(bottom));
     let runStart = -1;
     for(let y = y0; y <= y1; y++){
       const visible = y < y1 && depth < worldDepthPixels[y * RW + col];
-      const sourceY = Math.max(0, Math.min(tex.height - 1, ((y - top) / proj.screenH * tex.height) | 0));
+      const sourceY = Math.max(proj.sourceY, Math.min(proj.sourceY + proj.sourceHeight - 1, (proj.sourceY + (y - top) / proj.screenH * proj.sourceHeight) | 0));
       const opaque = y < y1 && crHeightfieldSpriteOpaqueAt(tex, srcX, sourceY);
       if(visible){
         if(runStart < 0) runStart = y;
@@ -12731,8 +12805,8 @@ function crHeightfieldDrawSprite(kind, obj, tex, hp, px, py, dirX, dirY, planeX,
         else if(opaque && kind === 'npc') crHeightfieldStats.npcOccludedPixels++;
         if(runStart >= 0){
           const runHeight = y - runStart;
-          const sy = (runStart - top) / proj.screenH * tex.height;
-          const sh = runHeight / proj.screenH * tex.height;
+          const sy = proj.sourceY + (runStart - top) / proj.screenH * proj.sourceHeight;
+          const sh = runHeight / proj.screenH * proj.sourceHeight;
           bctx.drawImage(tex, srcX, sy, 1, sh, col, runStart, 1, runHeight);
           runStart = -1;
         }

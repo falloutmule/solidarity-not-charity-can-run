@@ -121,20 +121,21 @@ function crHeightfieldDrawSprite(kind, obj, tex, hp, px, py, dirX, dirY, planeX,
   const depth = invDet * (-planeY * rx + planeX * ry);
   const hscr = invDet * (dirY * rx - dirX * ry);
   if(!(depth > 0.12)) return;
-  const proj = crProjectBillboardSprite(obj, tex, hp, depth, hscr, now);
-  const heightfieldGroundY = crProjectWorldZToScreenY(0, depth, CR_HEIGHTFIELD_CAMERA.eyeZ);
-  const top = proj.topY + (heightfieldGroundY - proj.groundBottomY);
-  const startCol = Math.max(0, Math.floor(proj.screenX - proj.screenW / 2));
-  const endCol = Math.min(RW, Math.ceil(proj.screenX + proj.screenW / 2));
-  const bottom = top + proj.screenH;
+  const bounds = crHeightfieldPhysicalSpriteBounds(kind, obj, tex, hp);
+  const proj = crProjectHeightfieldVisibleSprite(obj, tex, hp, depth, hscr, bounds);
+  if(!proj) return;
+  crHeightfieldRecordSpriteProjection(kind, obj, proj);
+  const top = proj.topY, bottom = proj.bottomY;
+  const startCol = Math.max(0, Math.floor(proj.screenLeft));
+  const endCol = Math.min(RW, Math.ceil(proj.screenLeft + proj.screenW));
   for(let col = startCol; col < endCol; col++){
-    const u = (col - (proj.screenX - proj.screenW / 2)) / proj.screenW;
-    const srcX = Math.max(0, Math.min(tex.width - 1, (u * tex.width) | 0));
+    const u = (col - proj.screenLeft) / proj.screenW;
+    const srcX = Math.max(proj.sourceX, Math.min(proj.sourceX + proj.sourceWidth - 1, (proj.sourceX + u * proj.sourceWidth) | 0));
     const y0 = Math.max(0, Math.floor(top)), y1 = Math.min(RH, Math.ceil(bottom));
     let runStart = -1;
     for(let y = y0; y <= y1; y++){
       const visible = y < y1 && depth < worldDepthPixels[y * RW + col];
-      const sourceY = Math.max(0, Math.min(tex.height - 1, ((y - top) / proj.screenH * tex.height) | 0));
+      const sourceY = Math.max(proj.sourceY, Math.min(proj.sourceY + proj.sourceHeight - 1, (proj.sourceY + (y - top) / proj.screenH * proj.sourceHeight) | 0));
       const opaque = y < y1 && crHeightfieldSpriteOpaqueAt(tex, srcX, sourceY);
       if(visible){
         if(runStart < 0) runStart = y;
@@ -147,8 +148,8 @@ function crHeightfieldDrawSprite(kind, obj, tex, hp, px, py, dirX, dirY, planeX,
         else if(opaque && kind === 'npc') crHeightfieldStats.npcOccludedPixels++;
         if(runStart >= 0){
           const runHeight = y - runStart;
-          const sy = (runStart - top) / proj.screenH * tex.height;
-          const sh = runHeight / proj.screenH * tex.height;
+          const sy = proj.sourceY + (runStart - top) / proj.screenH * proj.sourceHeight;
+          const sh = runHeight / proj.screenH * proj.sourceHeight;
           bctx.drawImage(tex, srcX, sy, 1, sh, col, runStart, 1, runHeight);
           runStart = -1;
         }

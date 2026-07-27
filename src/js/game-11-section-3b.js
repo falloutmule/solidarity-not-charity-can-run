@@ -194,23 +194,28 @@ function genHeightfieldWorldScaleCalibration(params){
   };
   const pose = poses[poseName];
   player.x = pose[0]; player.y = pose[1]; player.angle = Math.atan2(pose[3] - player.y, pose[2] - player.x);
-  const standing = { id: 'calibration-standing', assetId: 'npc_unhoused_work_jacket_001', kind: 'unhoused', x: 8.5, y: 8.5, need: 1, helped: false, wob: 0, thank: 'Calibration standing.' };
-  const slumped = { id: 'calibration-slumped', assetId: 'npc_unhoused_slumped_001', kind: 'unhoused', x: 10.5, y: 8.5, need: 1, helped: false, wob: 0, thank: 'Calibration slumped.' };
-  const can = { x: 12.5, y: 8.5, taken: false, amt: 1, wob: 0 };
-  game.pickups = [can]; game.npcs = [standing, slumped];
+  const standing = { calibrationId: 'standing', id: 'calibration-standing', assetId: 'npc_unhoused_work_jacket_001', kind: 'unhoused', x: 8.5, y: 8.5, need: 1, helped: false, wob: 0, thank: 'Calibration standing.' };
+  const slumped = { calibrationId: 'slumped', id: 'calibration-slumped', assetId: 'npc_unhoused_slumped_001', kind: 'unhoused', x: 10.5, y: 8.5, need: 1, helped: false, wob: 0, thank: 'Calibration slumped.' };
+  const canComparison = params.get('hfcancomparison') === '1';
+  const cans = canComparison ? [
+    { calibrationId: 'can-024', x: 11.5, y: 8.5, worldHeight: 0.24, taken: false, amt: 1, wob: 0 },
+    { calibrationId: 'can-026', x: 12.5, y: 8.5, worldHeight: 0.26, taken: false, amt: 1, wob: 0 },
+    { calibrationId: 'can-028', x: 13.5, y: 8.5, worldHeight: 0.28, taken: false, amt: 1, wob: 0 }
+  ] : [{ calibrationId: 'can', x: 12.5, y: 8.5, taken: false, amt: 1, wob: 0 }];
+  game.pickups = cans; game.npcs = [standing, slumped];
   game.heightfieldCalibration = Object.freeze({
     pose: poseName,
     subjects: Object.freeze([
       Object.freeze({ id: 'standing', kind: 'npc', x: standing.x, y: standing.y, worldHeight: npcSpriteHeight(standing, 'world') }),
       Object.freeze({ id: 'slumped', kind: 'npc', x: slumped.x, y: slumped.y, worldHeight: npcSpriteHeight(slumped, 'world') }),
-      Object.freeze({ id: 'can', kind: 'can', x: can.x, y: can.y, worldHeight: crHeightfieldSpriteWorldHeight('can', can) }),
+      ...cans.map((can) => Object.freeze({ id: can.calibrationId, kind: 'can', x: can.x, y: can.y, worldHeight: crHeightfieldSpriteWorldHeight('can', can) })),
       Object.freeze({ id: 'half-block', kind: 'block', x: halfBlock.x + 0.5, y: halfBlock.y + 0.5, worldHeight: crHeightfieldTopZ(CR_VERTICAL_PROFILES[halfBlock.profileId]) }),
       Object.freeze({ id: 'full-wall', kind: 'wall', x: fullWall.x + 0.5, y: fullWall.y + 0.5, worldHeight: crHeightfieldTopZ(CR_VERTICAL_PROFILES[fullWall.profileId]) })
     ])
   });
   game.quota = 1; game.helped = 0; game.delivered = 0;
   game.exit = { x: 21.5, y: 15.5, active: false }; game.timeLeft = 9999;
-  dbg.reachableCells = 0; dbg.cansSpawned = 1; dbg.npcsSpawned = 2; dbg.props = 0;
+  dbg.reachableCells = 0; dbg.cansSpawned = cans.length; dbg.npcsSpawned = 2; dbg.props = 0;
   setMsg('HEIGHTFIELD CALIBRATION — ' + poseName.toUpperCase().replace('-', ' ') + '.');
 }
 
@@ -355,6 +360,7 @@ function npcSpriteHeight(entity, space){
   return asset && Number.isFinite(asset[field]) ? asset[field] : (HEIGHT[entity && entity.kind] || HEIGHT.hungry);
 }
 function crHeightfieldSpriteWorldHeight(kind, entity){
+  if(entity && Number.isFinite(entity.worldHeight) && entity.worldHeight > 0) return entity.worldHeight;
   if(kind === 'can') return CR_HEIGHTFIELD_SPRITE_WORLD_HEIGHTS.can;
   if(kind === 'npc') return npcSpriteHeight(entity, 'world');
   return HEIGHT[entity && entity.kind] || HEIGHT[kind] || 0.5;
