@@ -9,7 +9,11 @@ const { assetModulePath, registerBuildingAsset } = require('./register-building-
 const ROOT = path.resolve(__dirname, '..');
 const SOURCE_SCHEMA = 'snc-building-source-v1';
 const RUNTIME_SCHEMA = 'snc-bitmap-building-asset-v1';
+const SOLID_HEIGHT_SOURCE_SCHEMA = 'snc-solid-height-asset-v1';
+const SOLID_HEIGHT_RUNTIME_SCHEMA = 'snc-solid-height-runtime-v1';
 const COMPILER_VERSION = 'snc-building-asset-compiler-v1';
+const SOLID_HEIGHT_FACE_ORDER = Object.freeze(['north', 'east', 'south', 'west', 'top']);
+const SOLID_HEIGHT_FACE_SIZE = 64;
 
 function sha256(bytes) { return crypto.createHash('sha256').update(bytes).digest('hex'); }
 function stableJson(value) { return JSON.stringify(value); }
@@ -32,9 +36,56 @@ function readPng(filePath, label) {
   return { bytes, png, sha256: sha256(bytes), filePath };
 }
 
+function assertFullyOpaque(face, label) {
+  for (let offset = 3; offset < face.png.data.length; offset += 4) {
+    assert(face.png.data[offset] === 255, `${label} must be fully opaque`);
+  }
+}
+
+function normalizePng(png) {
+  return PNG.sync.write(png, { colorType: 6, inputColorType: 6, inputHasAlpha: true, deflateLevel: 9, deflateStrategy: 3 });
+}
+
+function loadSolidHeightSource(buildingDir, source, manifestPath) {
+  const allowed = new Set([
+    'schema', 'id', 'displayName', 'category', 'renderMode', 'footprint', 'solidTopLevel',
+    'collision', 'faces', 'alphaMode', 'filter', 'rotationMode'
+  ]);
+  for (const key of Object.keys(source)) assert(allowed.has(key), `unknown solid-height building.json property: ${key}`);
+  assert(isSafeId(source.id), 'building.json id must use lowercase letters, digits, and underscores');
+  assert(typeof source.displayName === 'string' && source.displayName.length > 0, 'building.json displayName is required');
+  assert(typeof source.category === 'string' && source.category.length > 0, 'building.json category is required');
+  assert(source.renderMode === 'solidHeightfield', 'renderMode must be solidHeightfield');
+  assert(source.footprint && source.footprint.widthCells === 1 && source.footprint.depthCells === 1, 'solid-height footprint must be exactly 1x1');
+  assert(source.solidTopLevel === 1, 'solidTopLevel must be the accepted half-height level 1');
+  assert(source.collision === 'solid', 'collision must be solid');
+  assert(source.alphaMode === 'opaque', 'alphaMode must be opaque');
+  assert(source.filter === 'nearest', 'filter must be nearest');
+  assert(source.rotationMode === 'quarterTurns', 'rotationMode must be quarterTurns');
+  assert(source.faces && typeof source.faces === 'object', 'building.json faces are required');
+  assert(Object.keys(source.faces).length === SOLID_HEIGHT_FACE_ORDER.length, 'solid-height faces must contain exactly five entries');
+  assert(Object.keys(source.faces).every((name) => SOLID_HEIGHT_FACE_ORDER.includes(name)), 'solid-height faces contain an unknown entry');
+  const paths = [];
+  const faceFiles = {};
+  for (const name of SOLID_HEIGHT_FACE_ORDER) {
+    const relativePath = source.faces[name];
+    assert(typeof relativePath === 'string', `faces.${name} is required`);
+    assert(!path.isAbsolute(relativePath) && !relativePath.includes('..'), `face path escapes building folder: ${name}`);
+    paths.push(relativePath);
+    const face = readPng(path.join(buildingDir, relativePath), `faces.${name}`);
+    assert(face.png.width === SOLID_HEIGHT_FACE_SIZE && face.png.height === SOLID_HEIGHT_FACE_SIZE,
+      `faces.${name} must be ${SOLID_HEIGHT_FACE_SIZE}x${SOLID_HEIGHT_FACE_SIZE}`);
+    assertFullyOpaque(face, `faces.${name}`);
+    faceFiles[name] = face;
+  }
+  assert(new Set(paths).size === SOLID_HEIGHT_FACE_ORDER.length, 'solid-height faces must use five independent source files');
+  return { kind: 'solidHeight', source, manifestPath, faceFiles, pixelsPerCell: SOLID_HEIGHT_FACE_SIZE };
+}
+
 function loadSource(buildingDir) {
   const manifestPath = path.join(buildingDir, 'building.json');
   const source = readJson(manifestPath);
+  if (source.schema === SOLID_HEIGHT_SOURCE_SCHEMA) return loadSolidHeightSource(buildingDir, source, manifestPath);
   assert(source.schema === SOURCE_SCHEMA, `building.json schema must be ${SOURCE_SCHEMA}`);
   assert(isSafeId(source.id), 'building.json id must use lowercase letters, digits, and underscores');
   const footprint = source.footprint || {};
@@ -57,7 +108,7 @@ function loadSource(buildingDir) {
   assert(faceFiles.back.png.width === footprint.widthCells * pixelsPerCell, 'back width must match footprint.widthCells');
   assert(faceFiles.side.png.width === footprint.depthCells * pixelsPerCell, 'side width must match footprint.depthCells');
   if (faceFiles.west) assert(faceFiles.west.png.width === footprint.depthCells * pixelsPerCell, 'west width must match footprint.depthCells');
-  return { source, manifestPath, faceFiles, pixelsPerCell };
+  return { kind: 'bitmapBuilding', source, manifestPath, faceFiles, pixelsPerCell };
 }
 
 function packAtlas(loaded) {
@@ -84,9 +135,57 @@ function faceAsset(role, faceType, spanCells, slice, mirrorSafe) {
   return value;
 }
 
+function compileSolidHeightAsset(loaded) {
+  const { source, faceFiles } = loaded;
+  const sourceHashes = {};
+  const compiledFaces = {};
+  for (const faceName of SOLID_HEIGHT_FACE_ORDER) {
+    const face = faceFiles[faceName];
+    const normalizedBytes = normalizePng(face.png);
+    sourceHashes[faceName] = face.sha256;
+    compiledFaces[faceName] = {
+      stableId: `${source.id}_${faceName}`,
+      face: faceName,
+      width: face.png.width,
+      height: face.png.height,
+      mime: 'image/png',
+      encoding: 'data-uri',
+      byteLength: normalizedBytes.length,
+      sha256: sha256(normalizedBytes),
+      dataUri: `data:image/png;base64,${normalizedBytes.toString('base64')}`,
+      opaque: true,
+      filter: 'nearest'
+    };
+  }
+  const descriptor = {
+    schema: SOLID_HEIGHT_RUNTIME_SCHEMA,
+    schemaVersion: 1,
+    id: source.id,
+    generator: COMPILER_VERSION,
+    displayName: source.displayName,
+    category: source.category,
+    renderMode: source.renderMode,
+    footprint: { widthCells: 1, depthCells: 1 },
+    solidTopLevel: source.solidTopLevel,
+    collision: source.collision,
+    alphaMode: source.alphaMode,
+    filter: source.filter,
+    rotationMode: source.rotationMode,
+    materials: compiledFaces,
+    source: {
+      schema: SOLID_HEIGHT_SOURCE_SCHEMA,
+      manifest: path.relative(ROOT, loaded.manifestPath).replace(/\\/g, '/'),
+      sourceHashes
+    }
+  };
+  const asset = Object.assign(descriptor, { compiledHash: sha256(Buffer.from(stableJson(descriptor), 'utf8')) });
+  return { asset, loaded, outputPath: path.join(ROOT, assetModulePath(asset.id)) };
+}
+
 function compileBuilding(buildingDir) {
   const absoluteDir = path.resolve(buildingDir);
   const loaded = loadSource(absoluteDir);
+  if (loaded.kind === 'solidHeight') return compileSolidHeightAsset(loaded);
   const { source, faceFiles } = loaded;
   const atlas = packAtlas(loaded);
   const id = source.id;
@@ -128,8 +227,34 @@ function compileBuilding(buildingDir) {
   return { asset, atlas, loaded, outputPath: path.join(ROOT, assetModulePath(id)) };
 }
 
+function emitSolidHeightAssetModule(compiled) {
+  const { asset } = compiled;
+  const symbol = toSymbol(asset.id);
+  const assetJson = stableJson(asset);
+  return `// GENERATED by ${COMPILER_VERSION}; source: ${asset.source.manifest}; DO NOT EDIT.\n` +
+`const ${symbol}_MATERIAL_LOAD_STATES = Object.create(null);\n` +
+`const ${symbol} = Object.freeze(Object.assign(${assetJson}, { materialLoadStates: ${symbol}_MATERIAL_LOAD_STATES }));\n` +
+`var SOLID_HEIGHT_ASSET_REGISTRY = (typeof window !== "undefined" && window.SOLID_HEIGHT_ASSET_REGISTRY) || Object.create(null);\n` +
+`SOLID_HEIGHT_ASSET_REGISTRY[${symbol}.id] = ${symbol};\n` +
+`if(typeof window !== "undefined") { window.SOLID_HEIGHT_ASSET_REGISTRY = SOLID_HEIGHT_ASSET_REGISTRY; window.${symbol} = ${symbol}; }\n` +
+`Object.keys(${symbol}.materials).forEach(function(face){\n` +
+`  var material = ${symbol}.materials[face];\n` +
+`  var loadState = ${symbol}_MATERIAL_LOAD_STATES[face] = { status: "pending", error: null, image: null };\n` +
+`  if(typeof Image === "undefined") return;\n` +
+`  var image = new Image();\n` +
+`  loadState.image = image; image.decoding = "async";\n` +
+`  image.onload = function(){\n` +
+`    if(image.naturalWidth !== material.width || image.naturalHeight !== material.height){ loadState.status = "invalid_dimensions"; loadState.error = "material dimensions do not match the asset contract"; return; }\n` +
+`    loadState.status = "loaded"; loadState.error = null;\n` +
+`  };\n` +
+`  image.onerror = function(){ loadState.status = "failed"; loadState.error = "material image failed to load"; };\n` +
+`  image.src = material.dataUri;\n` +
+`});\n`;
+}
+
 function emitAssetModule(compiled) {
   const { asset } = compiled;
+  if (asset.schema === SOLID_HEIGHT_RUNTIME_SCHEMA) return emitSolidHeightAssetModule(compiled);
   const symbol = toSymbol(asset.id);
   const assetJson = stableJson(asset);
   return `// GENERATED by ${COMPILER_VERSION}; source: ${asset.source.manifest}; DO NOT EDIT.\n` +
@@ -168,7 +293,10 @@ function main(argv) {
   const check = argv.includes('--check');
   const result = writeCompiledBuilding(buildingDir, { write: !check });
   if (check && result.changed) throw new Error(`generated asset drift: ${path.relative(ROOT, result.outputPath)}; run building:build`);
-  process.stdout.write(`${JSON.stringify({ pass: true, mode: check ? 'check' : 'build', assetId: result.asset.id, output: path.relative(ROOT, result.outputPath).replace(/\\/g, '/'), atlas: { width: result.atlas.width, height: result.atlas.height, sha256: result.asset.atlas.sha256 }, registered: result.registration ? !result.registration.changed || !check : false })}\n`);
+  const artifact = result.asset.schema === SOLID_HEIGHT_RUNTIME_SCHEMA
+    ? { compiledHash: result.asset.compiledHash, materials: Object.fromEntries(Object.entries(result.asset.materials).map(([face, material]) => [face, material.sha256])) }
+    : { atlas: { width: result.atlas.width, height: result.atlas.height, sha256: result.asset.atlas.sha256 } };
+  process.stdout.write(`${JSON.stringify({ pass: true, mode: check ? 'check' : 'build', assetId: result.asset.id, output: path.relative(ROOT, result.outputPath).replace(/\\/g, '/'), ...artifact, registered: result.registration ? !result.registration.changed || !check : false })}\n`);
 }
 
 if (require.main === module) {
@@ -176,4 +304,4 @@ if (require.main === module) {
   catch (error) { console.error(error.message); process.exitCode = 1; }
 }
 
-module.exports = { COMPILER_VERSION, SOURCE_SCHEMA, RUNTIME_SCHEMA, compileBuilding, emitAssetModule, loadSource, packAtlas, writeCompiledBuilding };
+module.exports = { COMPILER_VERSION, SOURCE_SCHEMA, RUNTIME_SCHEMA, SOLID_HEIGHT_SOURCE_SCHEMA, SOLID_HEIGHT_RUNTIME_SCHEMA, SOLID_HEIGHT_FACE_ORDER, SOLID_HEIGHT_FACE_SIZE, compileBuilding, emitAssetModule, loadSource, packAtlas, writeCompiledBuilding };

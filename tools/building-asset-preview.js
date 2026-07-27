@@ -15,8 +15,15 @@ function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
 }
 
+function solidHeightPreviewHtml(compiled) {
+  const { asset } = compiled;
+  const figures = Object.entries(asset.materials).map(([face, material]) => `<figure><img src="${material.dataUri}" alt="${face}"><figcaption><strong>${escapeHtml(face)}</strong> â€” ${material.width}Ã—${material.height}<br><code>${material.sha256}</code><br>opaque â€¢ nearest</figcaption></figure>`).join('');
+  return `<!doctype html><meta charset="utf-8"><title>${escapeHtml(asset.id)} solid-height review</title><style>body{margin:24px;background:#17130f;color:#eadfc7;font:16px/1.45 system-ui,sans-serif}h1,h2{color:#ffdc71}code{font-size:11px;overflow-wrap:anywhere}figure{display:inline-block;vertical-align:top;margin:8px;max-width:200px}img{image-rendering:pixelated;image-rendering:crisp-edges;border:1px solid #8d7643;background:#24211b;width:160px;height:160px}figcaption{max-width:190px}.grid{display:flex;flex-wrap:wrap;gap:16px}.card{padding:12px;border:1px solid #65583d;background:#24211b;max-width:760px}</style><h1>${escapeHtml(asset.displayName)}</h1><div class="card"><p><strong>${escapeHtml(asset.id)}</strong> â€¢ 1Ã—1 cell â€¢ world Z=0.5 â€¢ solid collision â€¢ quarter turns only</p><p>Compiled hash: <code>${asset.compiledHash}</code></p><p>Each source face is a separately stored, fully opaque 64Ã—64 PNG. This review sheet is local evidence only.</p></div><h2>Independent face materials</h2><div class="grid">${figures}</div>`;
+}
+
 function previewHtml(compiled) {
   const { asset, atlas, loaded } = compiled;
+  if (asset.schema === 'snc-solid-height-runtime-v1') return solidHeightPreviewHtml(compiled);
   const sourceFaces = Object.entries(loaded.faceFiles).map(([name, face]) => `<figure><img src="${dataUri(face.bytes)}" alt="${name}"><figcaption>${escapeHtml(name)} — ${face.png.width}×${face.png.height}<br><code>${face.sha256}</code></figcaption></figure>`).join('');
   const faceRows = Object.entries(asset.faces).map(([side, descriptor]) => `<tr><th>${side}</th><td>${descriptor.assetRef}</td><td>${descriptor.reuse || '—'}</td><td>${descriptor.mirror ? 'yes' : 'no'}</td></tr>`).join('');
   const rotations = [0, 1, 2, 3].map((rotation) => `<section><h3>rotationQ ${rotation}</h3><canvas class="rotation" data-rotation="${rotation}" width="320" height="220"></canvas></section>`).join('');
@@ -30,7 +37,13 @@ function runPreview(buildingDir, outputPath) {
   fs.mkdirSync(path.dirname(target), { recursive: true });
   const html = previewHtml(compiled);
   fs.writeFileSync(target, html, 'utf8');
-  return { assetId: compiled.asset.id, output: target, atlasSha256: compiled.asset.atlas.sha256, bytes: Buffer.byteLength(html) };
+  return {
+    assetId: compiled.asset.id,
+    output: target,
+    atlasSha256: compiled.asset.atlas ? compiled.asset.atlas.sha256 : null,
+    compiledHash: compiled.asset.compiledHash || null,
+    bytes: Buffer.byteLength(html)
+  };
 }
 
 function main(argv) {
