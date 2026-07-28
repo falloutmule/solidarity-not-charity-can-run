@@ -49,15 +49,16 @@ components.sort((a, b) => b.pixels - a.pixels);
 const alphaBounds = asset.runtimeAlphaBounds;
 const selectedRow = asset.groundContactSourceY;
 const alphaBottom = alphaBounds.y + alphaBounds.h;
-const candidates = [176, 180, 184, alphaBottom].map((row) => ({
+const candidates = [173, 181, 182, alphaBottom].map((row) => ({
   row,
   selected: row === selectedRow,
-  role: row === selectedRow ? 'chosen physical-contact boundary below the last intended shoe-contact row' : (row === alphaBottom ? 'old alpha-bound-bottom assumption' : 'reviewed candidate')
+  role: row === selectedRow ? 'chosen physical-contact boundary below the last intended shoe-contact row' : (row === alphaBottom ? 'old alpha-bound-bottom assumption' : 'reviewed shoe-contact marker')
 }));
 const lowerTail = rowOccupancy.filter((entry) => entry.row >= selectedRow && entry.row < alphaBottom);
-assert.strictEqual(selectedRow, 184, 'seated source contact is the reviewed physical-contact boundary');
+assert.strictEqual(selectedRow, 182, 'seated source contact is the reviewed physical-contact boundary');
 assert(alphaBounds.y < selectedRow && selectedRow <= alphaBottom, 'contact row lies within visible source bounds');
-assert(rowOccupancy[selectedRow - 1].opaque > 0, 'chosen boundary follows a visible shoe-contact row');
+assert(rowOccupancy[173].visible > 0 && rowOccupancy[181].visible > 0, 'intended shoe/contact component occupies rows 173 through 181');
+assert(rowOccupancy[selectedRow - 1].opaque > 0, 'chosen boundary follows the final intended shoe-contact row');
 assert(lowerTail.some((entry) => entry.visible > 0), 'authored lower shadow/anti-alias pixels exist below the physical contact');
 assert(rowOccupancy[alphaBottom - 1].opaque === 0, 'old alpha-bound-bottom row is only partial-alpha tail, not a physical contact row');
 
@@ -91,8 +92,8 @@ for(let row = 0; row < png.height; row += 8){
   for(let y = row * scale; y < Math.min(outputImage.height, row * scale + scale); y++) for(let x = png.width * scale; x < png.width * scale + 10; x++) paint(x, y, 220, 220, 220);
 }
 line(alphaBounds.y, [60, 220, 132], 2);
-line(176, [255, 202, 40], 2);
-line(180, [255, 153, 60], 2);
+line(173, [255, 202, 40], 2);
+line(181, [255, 153, 60], 2);
 line(selectedRow, [0, 230, 255], 3);
 line(alphaBottom, [235, 64, 52], 3);
 const outputJson = path.join(outputDir, 'slumped-ground-contact-diagnostic.json');
@@ -105,7 +106,7 @@ fs.writeFileSync(outputJson, JSON.stringify({
   currentAssumedRow: alphaBottom, selectedGroundContactSourceY: selectedRow,
   candidates, rowOccupancy,
   bottomThirdComponents: components.filter((component) => component.maxY >= Math.floor(png.height * 2 / 3)),
-  rationale: 'Row 183 is the final intended shoe-contact row. Rows 184-188 form the lower partial-alpha shadow and anti-alias tail, so the physical contact boundary is row 184; the legacy alpha-bound bottom 189 is not physical ground.'
+  rationale: 'Rows 173 through 181 are the intended shoe/contact component. Rows 182 through 188 are lower shadow, detached, and anti-alias pixels, so row 182 is the physical contact boundary; the legacy alpha-bound bottom 189 is not physical ground.'
 }, null, 2) + '\n');
 fs.writeFileSync(outputPng, PNG.sync.write(outputImage));
 console.log(JSON.stringify({ pass: true, outputJson: path.relative(root, outputJson), outputPng: path.relative(root, outputPng), selectedGroundContactSourceY: selectedRow, alphaBottom }));

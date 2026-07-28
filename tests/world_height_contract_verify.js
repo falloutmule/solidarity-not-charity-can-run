@@ -23,7 +23,7 @@ for(const asset of unclassifiedComposites){
 }
 assert.strictEqual(slumped.displayHeightScale, 0.45, 'slumped legacy display height remains approved');
 assert.strictEqual(slumped.worldHeight, 0.68, 'slumped physical height is calibrated');
-assert.strictEqual(slumped.groundContactSourceY, 184, 'slumped physical contact row is explicit runtime metadata');
+assert.strictEqual(slumped.groundContactSourceY, 182, 'slumped physical contact row is explicit runtime metadata');
 assert.strictEqual(slumped.runtimeSha256, '0124303d47ccc1fbf0c0f4fd729ad9d82f3e0339cf4e21ee6b0c6f5dcd8b8895', 'slumped PNG bytes remain locked');
 
 const core = load('src/js/game-15a-variable-height-core.js');
@@ -40,6 +40,9 @@ assert(core.includes('bounds.y + bounds.h'), 'alpha-bound bottom remains the gen
 assert(core.includes('function crProjectHeightfieldVisibleSprite'), 'heightfield sprite projection owns a visible-bounds path');
 assert(core.includes('sourcePixelsAboveGround'), 'projection scales from visible top to the resolved physical contact row');
 assert(core.includes('projectedTopToGround'), 'worldHeight remains the visible top-to-ground distance');
+assert(core.includes('const screenH = projectedTopToGround;'), 'worldHeight fixes the full visible crop height independently of its contact pivot');
+assert(core.includes('const scalePerSourcePixel = screenH / bounds.sourceHeight;'), 'source scale is derived from the full visible crop rather than pixels above contact');
+assert(core.includes('const topY = groundScreenY - sourcePixelsAboveGround * scalePerSourcePixel;'), 'contact row changes only the vertical pivot');
 assert(core.includes('function crHeightfieldProjectedContactEvidence'), 'grounding diagnostics sample actual projected alpha pixels');
 assert(core.includes('sourceOpaquePixelsBelowContact'), 'grounding diagnostics record authored opaque pixels below the physical contact row');
 assert(!core.includes('Math.ceil(proj.bottomY) - 1'), 'diagnostics do not falsely certify the destination rectangle bottom as contact');
@@ -69,7 +72,7 @@ const runtimeStanding = sandbox.SNC_RUNTIME_ASSET_REGISTRY[selectedStanding.asse
 const runtimeSlumped = sandbox.SNC_RUNTIME_ASSET_REGISTRY[slumped.assetId];
 assert.strictEqual(runtimeStanding.worldHeight, 0.78, 'generated work-jacket runtime record resolves the selected standing height');
 assert.strictEqual(runtimeSlumped.worldHeight, 0.68, 'generated seated runtime record retains physical size');
-assert.strictEqual(runtimeSlumped.groundContactSourceY, 184, 'generated seated runtime record carries generic contact metadata');
+assert.strictEqual(runtimeSlumped.groundContactSourceY, 182, 'generated seated runtime record carries generic contact metadata');
 
 const eyeZ = 0.68, halfBlock = 0.5, can = 0.26;
 assert(selectedStanding.worldHeight > eyeZ, 'selected standing world height exceeds the camera eye');

@@ -277,16 +277,20 @@ function crProjectHeightfieldVisibleSprite(obj, tex, worldHeight, depth, hscr, b
   const projectedTopToGround = bounds.worldHeight * RH / Math.max(0.12, depth);
   const sourcePixelsAboveGround = bounds.groundSourceY - bounds.sourceY;
   if(!(sourcePixelsAboveGround > 0)) return null;
-  const scalePerSourcePixel = projectedTopToGround / sourcePixelsAboveGround;
-  const screenH = bounds.sourceHeight * scalePerSourcePixel;
+  // worldHeight fixes the complete visible crop's perspective scale.  The
+  // physical-contact row is a vertical pivot only: moving it may translate a
+  // sprite, but it must never resize the sprite.
+  const screenH = projectedTopToGround;
+  const scalePerSourcePixel = screenH / bounds.sourceHeight;
   const screenW = bounds.sourceWidth * scalePerSourcePixel;
   const screenX = (RW / 2) * (1 + hscr / depth);
   const anchorSourceX = bounds.anchorX * bounds.sourceCanvasWidth;
   const anchorU = Math.max(0, Math.min(1, (anchorSourceX - bounds.sourceX) / bounds.sourceWidth));
   const groundScreenY = crProjectWorldZToScreenY(0, depth, CR_HEIGHTFIELD_CAMERA.eyeZ);
+  const topY = groundScreenY - sourcePixelsAboveGround * scalePerSourcePixel;
   return {
     screenX, screenW, screenH, screenLeft: screenX - anchorU * screenW,
-    topY: groundScreenY - projectedTopToGround, bottomY: groundScreenY - projectedTopToGround + screenH, groundScreenY,
+    topY, bottomY: topY + screenH, groundScreenY,
     sourceX: bounds.sourceX, sourceY: bounds.sourceY, sourceWidth: bounds.sourceWidth, sourceHeight: bounds.sourceHeight,
     sourceCanvasWidth: bounds.sourceCanvasWidth, sourceCanvasHeight: bounds.sourceCanvasHeight,
     anchorX: bounds.anchorX, groundSourceY: bounds.groundSourceY, worldHeight: bounds.worldHeight, depth,
@@ -294,7 +298,7 @@ function crProjectHeightfieldVisibleSprite(obj, tex, worldHeight, depth, hscr, b
   };
 }
 function crHeightfieldProjectedContactEvidence(tex, proj){
-  let lowestPhysicalContactDestinationY = -1, opaquePixelsBelowContact = 0, physicalContactOpaquePixels = 0;
+  let lowestPhysicalContactDestinationY = -1, lowestPhysicalContactSourceY = -1, opaquePixelsBelowContact = 0, physicalContactOpaquePixels = 0;
   const startCol = Math.max(0, Math.floor(proj.screenLeft));
   const endCol = Math.min(RW, Math.ceil(proj.screenLeft + proj.screenW));
   const y0 = Math.max(0, Math.floor(proj.topY)), y1 = Math.min(RH, Math.ceil(proj.bottomY));
@@ -306,7 +310,10 @@ function crHeightfieldProjectedContactEvidence(tex, proj){
       if(!crHeightfieldSpriteOpaqueAt(tex, sourceX, sourceY)) continue;
       if(sourceY < proj.groundSourceY){
         physicalContactOpaquePixels++;
-        if(y > lowestPhysicalContactDestinationY) lowestPhysicalContactDestinationY = y;
+        if(y > lowestPhysicalContactDestinationY || (y === lowestPhysicalContactDestinationY && sourceY > lowestPhysicalContactSourceY)){
+          lowestPhysicalContactDestinationY = y;
+          lowestPhysicalContactSourceY = sourceY;
+        }
       } else {
         opaquePixelsBelowContact++;
       }
@@ -318,7 +325,7 @@ function crHeightfieldProjectedContactEvidence(tex, proj){
       if(crHeightfieldSpriteOpaqueAt(tex, sourceX, sourceY)) sourceOpaquePixelsBelowContact++;
     }
   }
-  return { lowestPhysicalContactDestinationY, opaquePixelsBelowContact, sourceOpaquePixelsBelowContact, physicalContactOpaquePixels };
+  return { lowestPhysicalContactDestinationY, lowestPhysicalContactSourceY, opaquePixelsBelowContact, sourceOpaquePixelsBelowContact, physicalContactOpaquePixels };
 }
 function crHeightfieldRecordSpriteProjection(kind, obj, tex, proj){
   if(!obj || !obj.calibrationId || !proj) return;
@@ -331,7 +338,7 @@ function crHeightfieldRecordSpriteProjection(kind, obj, tex, proj){
     anchorX: proj.anchorX, groundSourceY: proj.groundSourceY, sourceContactRow: proj.groundSourceY,
     alphaBoundBottomRow: proj.sourceY + proj.sourceHeight,
     visibleTopScreenY: proj.topY, projectedGroundY: proj.groundScreenY, screenBottomY: proj.bottomY,
-    lowestPhysicalContactDestinationY: evidence.lowestPhysicalContactDestinationY, groundingErrorPixels,
+    lowestPhysicalContactDestinationY: evidence.lowestPhysicalContactDestinationY, lowestPhysicalContactSourceY: evidence.lowestPhysicalContactSourceY, groundingErrorPixels,
     opaquePixelsBelowContact: evidence.opaquePixelsBelowContact, sourceOpaquePixelsBelowContact: evidence.sourceOpaquePixelsBelowContact,
     physicalContactOpaquePixels: evidence.physicalContactOpaquePixels,
     projectedTopToGround: proj.projectedTopToGround, scalePerSourcePixel: proj.scalePerSourcePixel,
