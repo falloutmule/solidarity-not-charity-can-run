@@ -1,0 +1,14 @@
+'use strict';
+const { assert, requireSource } = require('./heightfield_test_helpers');
+const { SOLID_HEIGHT_FACE_ORDER, compiledAsset } = require('./solid_height_asset_test_helpers');
+requireSource('src/js/game-15a-variable-height-core.js', ['function crHeightfieldFaceForHit', '(worldFace - quarterTurns + 4) % 4']);
+function face(side, stepX, stepY, rotation) {
+  const world = side === 0 ? (stepX > 0 ? 3 : 1) : (stepY > 0 ? 0 : 2);
+  return ['north', 'east', 'south', 'west'][(world - rotation + 4) % 4];
+}
+assert.deepStrictEqual([face(1, 0, 1, 0), face(0, -1, 0, 0), face(1, 0, -1, 0), face(0, 1, 0, 0)], ['north', 'east', 'south', 'west']);
+assert.strictEqual(face(1, 0, 1, 1), 'west', 'quarter rotation remaps material without mirroring');
+const asset = compiledAsset().asset;
+assert.deepStrictEqual(Object.keys(asset.materials), SOLID_HEIGHT_FACE_ORDER, 'all five authored directions compile independently');
+assert.strictEqual(new Set(Object.values(asset.materials).map((material) => material.stableId)).size, 5, 'no authored material descriptor is reused');
+console.log(JSON.stringify({ pass: true, check: 'directional face mapping' }));

@@ -22,6 +22,10 @@ const CUSTOM_LEVELS = {
       'hall_quiet','hall_kitchen','hall_servant',
     ],
   },
+  heightfield_proof: {
+    id: 'heightfield_proof', title: 'Variable Height Proof', shortTitle: 'Height Proof',
+    generator: genHeightfieldProof, thankLines: ['Proof fixture.'], spriteKinds: ['hungry'],
+  },
 };
 
 function hallFillMap(GW, GH){
@@ -48,6 +52,7 @@ function hallBrickBox(map, x0,y0,x1,y1, doorX, doorY){
 }
 
 function genHallOfServants(){
+  crHeightfieldClearState();
   const GW = 30, GH = 14;
   const {map, shade} = hallFillMap(GW, GH);
   // Pantry (north-west)
@@ -124,6 +129,156 @@ function genHallOfServants(){
   dbg.npcsSpawned = game.npcs.length;
   dbg.props = game.props.length;
   setMsg('SNC Hall Of Servants — fill the hall with care.');
+}
+
+function genHeightfieldProof(){
+  const params = new URLSearchParams(location.search);
+  if(params.get('hfclasssweep') === '1') return genHeightfieldFullCastClassSweep();
+  if(params.get('hfcalibration') === '1') return genHeightfieldMeasurementProof(params);
+  const GW = 24, GH = 16;
+  const {map, shade} = hallFillMap(GW, GH);
+  for(let x = 4; x <= 19; x++){ map[3][x] = WALL.SIGNAGE; shade[3][x] = 0.5; }
+  const rotation = Math.max(0, Math.min(3, parseInt(params.get('hfrot') || '0', 10) || 0));
+  const occlusionSubject = params.get('hftarget') === 'npc' ? 'npc' : 'can';
+  const block = { x: 11, y: 7, rotation, profileId: CR_VERTICAL_PROFILE_IDS.HALF_DEBUG };
+  map[block.y][block.x] = WALL.BRICK;
+  game.verticalProfileWidth = GW; game.verticalProfileHeight = GH;
+  game.verticalProfileGrid = new Uint16Array(GW * GH);
+  game.verticalProfileRotationGrid = new Uint8Array(GW * GH);
+  game.verticalProfileGrid[block.y * GW + block.x] = block.profileId;
+  game.verticalProfileRotationGrid[block.y * GW + block.x] = rotation;
+  game.heightfieldProof = { block, rotation, occlusionSubject };
+  game.map = map; game.MAP_W = GW; game.MAP_H = GH; game.wallShade = shade;
+  game.buildingGrid = null; game.buildingRegistry = null; game.props = [];
+  game.modifier = 'clear'; game.scoreMult = 1;
+  const poseName = params.get('hfpose') || 'south-far';
+  const poses = {
+    'south-far': [11.5, 12.5], 'south-near': [11.5, 8.8], 'south-extreme': [11.5, 8.28],
+    'southwest-corner': [9.45, 9.45], 'southeast-corner': [13.55, 9.45], 'east-near': [13.35, 7.5],
+    'north-near': [11.5, 5.65], 'west-near': [9.65, 7.5], 'top-oblique': [9.35, 10.35],
+    'can-side': [14.2, 5.7, 11.5, 5.7]
+  };
+  const pose = poses[poseName] || poses['south-far'];
+  player.x = pose[0]; player.y = pose[1]; player.angle = Math.atan2((pose[3] == null ? 7.5 : pose[3]) - player.y, (pose[2] == null ? 11.5 : pose[2]) - player.x);
+  const alignedBehindBlock = { x: 11.5, y: 5.7 };
+  const lateralLane = { x: 14.5, y: 9.5 };
+  const canPosition = occlusionSubject === 'can' ? alignedBehindBlock : lateralLane;
+  const npcPosition = occlusionSubject === 'npc' ? alignedBehindBlock : lateralLane;
+  game.pickups = [{ x: canPosition.x, y: canPosition.y, taken: false, amt: 1, wob: 0 }];
+  game.npcs = [{ x: npcPosition.x, y: npcPosition.y, kind: 'hungry', need: 1, helped: false, wob: 0, thank: 'Proof NPC.' }];
+  game.quota = 1; game.helped = 0; game.delivered = 0;
+  game.exit = { x: 20.5, y: 12.5, active: false }; game.timeLeft = 9999;
+  dbg.reachableCells = 0; dbg.cansSpawned = 1; dbg.npcsSpawned = 1; dbg.props = 0;
+  setMsg(`HEIGHTFIELD PROOF — ${occlusionSubject.toUpperCase()} aligned behind 1x1 half block.`);
+}
+
+function crPrepareHeightfieldReviewWorld(GW, GH){
+  const {map, shade} = hallFillMap(GW, GH);
+  game.verticalProfileWidth = GW; game.verticalProfileHeight = GH;
+  game.verticalProfileGrid = new Uint16Array(GW * GH);
+  game.verticalProfileRotationGrid = new Uint8Array(GW * GH);
+  game.heightfieldProof = null;
+  game.map = map; game.MAP_W = GW; game.MAP_H = GH; game.wallShade = shade;
+  game.buildingGrid = null; game.buildingRegistry = null; game.props = [];
+  game.modifier = 'clear'; game.scoreMult = 1;
+  return { map, shade };
+}
+
+function genHeightfieldFullCastClassSweep(){
+  const GW = 44, GH = 34;
+  const {map} = crPrepareHeightfieldReviewWorld(GW, GH);
+  const assets = Object.values(globalThis.SNC_RUNTIME_ASSET_REGISTRY || {})
+    .filter((asset) => asset && asset.kind === 'npc')
+    .sort((a, b) => a.id.localeCompare(b.id));
+  if(assets.length !== 16) throw new Error('internal full-cast class sweep requires the approved sixteen-character registry');
+  const lineupY = 8.5;
+  player.x = 21.0; player.y = 30.5; player.angle = -Math.PI / 2;
+  game.npcs = assets.map((asset, index) => ({
+    calibrationId: asset.id,
+    id: `heightfield-class-sweep-${index + 1}`,
+    assetId: asset.id,
+    kind: 'unhoused',
+    x: 10.0 + index * 1.45,
+    y: lineupY,
+    need: 1,
+    helped: false,
+    wob: 0,
+    thank: 'Internal class sweep.'
+  }));
+  const halfBlock = { x: 19, y: 5, profileId: CR_VERTICAL_PROFILE_IDS.AUTHORED_CONCRETE };
+  const fullWall = { x: 22, y: 5, profileId: CR_VERTICAL_PROFILE_IDS.FULL_LEGACY };
+  map[halfBlock.y][halfBlock.x] = WALL.CONCRETE;
+  map[fullWall.y][fullWall.x] = WALL.CONCRETE;
+  game.verticalProfileGrid[halfBlock.y * GW + halfBlock.x] = halfBlock.profileId;
+  game.verticalProfileGrid[fullWall.y * GW + fullWall.x] = fullWall.profileId;
+  game.pickups = [{ calibrationId: 'can-reference', x: 21.0, y: 6.5, taken: false, amt: 1, wob: 0 }];
+  game.heightfieldCalibration = Object.freeze({
+    mode: 'internal-full-cast-class-sweep',
+    pose: 'equal-depth-overview',
+    references: Object.freeze({ cameraEyeZ: CR_HEIGHTFIELD_CAMERA.eyeZ, halfBlockHeight: 0.5, fullWallHeight: 1.0, canWorldHeight: CR_HEIGHTFIELD_SPRITE_WORLD_HEIGHTS.can }),
+    subjects: Object.freeze([
+      ...game.npcs.map((npc, index) => Object.freeze({
+        id: npc.calibrationId,
+        kind: 'npc',
+        assetId: npc.assetId,
+        worldHeightClass: assets[index].worldHeightClass,
+        x: npc.x,
+        y: npc.y,
+        worldHeight: crHeightfieldSpriteWorldHeight('npc', npc)
+      })),
+      Object.freeze({ id: 'can-reference', kind: 'can', x: game.pickups[0].x, y: game.pickups[0].y, worldHeight: crHeightfieldSpriteWorldHeight('can', game.pickups[0]) })
+    ])
+  });
+  game.quota = game.npcs.length; game.helped = 0; game.delivered = 0;
+  game.exit = { x: 41.5, y: 30.5, active: false }; game.timeLeft = 9999;
+  dbg.reachableCells = 0; dbg.cansSpawned = game.pickups.length; dbg.npcsSpawned = game.npcs.length; dbg.props = 0;
+  setMsg('INTERNAL FULL-CAST CLASS SWEEP.');
+}
+
+function genHeightfieldMeasurementProof(params){
+  const GW = 24, GH = 20;
+  const {map, shade} = hallFillMap(GW, GH);
+  const halfBlock = { x: 14, y: 8, profileId: CR_VERTICAL_PROFILE_IDS.AUTHORED_CONCRETE };
+  const fullWall = { x: 16, y: 8, profileId: CR_VERTICAL_PROFILE_IDS.FULL_LEGACY };
+  map[halfBlock.y][halfBlock.x] = WALL.CONCRETE;
+  map[fullWall.y][fullWall.x] = WALL.CONCRETE;
+  game.verticalProfileWidth = GW; game.verticalProfileHeight = GH;
+  game.verticalProfileGrid = new Uint16Array(GW * GH);
+  game.verticalProfileRotationGrid = new Uint8Array(GW * GH);
+  game.verticalProfileGrid[halfBlock.y * GW + halfBlock.x] = halfBlock.profileId;
+  game.verticalProfileGrid[fullWall.y * GW + fullWall.x] = fullWall.profileId;
+  game.heightfieldProof = null;
+  game.map = map; game.MAP_W = GW; game.MAP_H = GH; game.wallShade = shade;
+  game.buildingGrid = null; game.buildingRegistry = null; game.props = [];
+  game.modifier = 'clear'; game.scoreMult = 1;
+  const poseName = ['standing-close', 'seated-close', 'seated-side'].includes(params.get('hfcalpose')) ? params.get('hfcalpose') : 'equal-depth';
+  const poses = {
+    'equal-depth': [12.5, 15.0, 12.5, 8.5],
+    'standing-close': [8.5, 10.0, 8.5, 8.5],
+    'seated-close': [10.5, 10.0, 10.5, 8.5],
+    'seated-side': [8.5, 10.0, 10.5, 8.5]
+  };
+  const pose = poses[poseName];
+  player.x = pose[0]; player.y = pose[1]; player.angle = Math.atan2(pose[3] - player.y, pose[2] - player.x);
+  const standing = { calibrationId: 'standing', id: 'heightfield-measure-standing', assetId: 'npc_unhoused_work_jacket_001', kind: 'unhoused', x: 8.5, y: 8.5, need: 1, helped: false, wob: 0, thank: 'Proof standing.' };
+  const slumped = { calibrationId: 'slumped', id: 'heightfield-measure-slumped', assetId: 'npc_unhoused_slumped_001', kind: 'unhoused', x: 10.5, y: 8.5, need: 1, helped: false, wob: 0, thank: 'Proof slumped.' };
+  const cans = [{ calibrationId: 'can', x: 12.5, y: 8.5, taken: false, amt: 1, wob: 0 }];
+  game.pickups = cans; game.npcs = [standing, slumped];
+  game.heightfieldCalibration = Object.freeze({
+    mode: 'measurement-proof',
+    pose: poseName,
+    subjects: Object.freeze([
+      Object.freeze({ id: standing.calibrationId, kind: 'npc', assetId: standing.assetId, x: standing.x, y: standing.y, worldHeight: crHeightfieldSpriteWorldHeight('npc', standing) }),
+      Object.freeze({ id: 'slumped', kind: 'npc', x: slumped.x, y: slumped.y, worldHeight: npcSpriteHeight(slumped, 'world') }),
+      ...cans.map((can) => Object.freeze({ id: can.calibrationId, kind: 'can', x: can.x, y: can.y, worldHeight: crHeightfieldSpriteWorldHeight('can', can) })),
+      Object.freeze({ id: 'half-block', kind: 'block', x: halfBlock.x + 0.5, y: halfBlock.y + 0.5, worldHeight: crHeightfieldTopZ(CR_VERTICAL_PROFILES[halfBlock.profileId]) }),
+      Object.freeze({ id: 'full-wall', kind: 'wall', x: fullWall.x + 0.5, y: fullWall.y + 0.5, worldHeight: crHeightfieldTopZ(CR_VERTICAL_PROFILES[fullWall.profileId]) })
+    ])
+  });
+  game.quota = 1; game.helped = 0; game.delivered = 0;
+  game.exit = { x: 21.5, y: 15.5, active: false }; game.timeLeft = 9999;
+  dbg.reachableCells = 0; dbg.cansSpawned = cans.length; dbg.npcsSpawned = game.npcs.length; dbg.props = 0;
+  setMsg('HEIGHTFIELD PROJECTION PROOF — ' + poseName.toUpperCase().replace('-', ' ') + '.');
 }
 
 function clearInputState(){
@@ -223,6 +378,15 @@ function playerStandProbe(px, py){
 function startCustomLevel(id){
   const def = CUSTOM_LEVELS[id];
   if(!def) return;
+  if(id === 'heightfield_proof'){
+    game.seed = 424242; game.district = 1; game.totalScore = 0;
+    resetPlayerUpgrades(); def.generator(); player.cans = 0; player.stamina = player.maxStamina;
+    sharedEnterPlay();
+    game.run = { active: true, startedAt: 0, seedUsed: game.seed, modifierUsed: game.modifier, customLevel: id,
+      cansCollected: 0, cansDelivered: 0, helpedByKind: { hungry: 0, family: 0, elder: 0, volunteer: 0 },
+      upgradesChosen: 0, highestDistrict: 0, runTime: 0, completed: false, leaderboardRank: null, harnessOnly: true };
+    return;
+  }
   SAVE.clear();
   game.seed = 424242;
   game.district = 1;
@@ -252,9 +416,16 @@ function npcSpriteTex(kind, entity){
   if(asset && asset.image && asset.image.complete && asset.image.naturalWidth > 0) return asset.image;
   return TEX[kind] || TEX.hungry;
 }
-function npcSpriteHeight(entity){
+function npcSpriteHeight(entity, space){
   const asset = entity && entity.assetId && globalThis.SNC_RUNTIME_ASSET_REGISTRY && globalThis.SNC_RUNTIME_ASSET_REGISTRY[entity.assetId];
-  return asset && Number.isFinite(asset.heightScale) ? asset.heightScale : (HEIGHT[entity && entity.kind] || HEIGHT.hungry);
+  const field = space === 'world' ? 'worldHeight' : 'displayHeightScale';
+  return asset && Number.isFinite(asset[field]) ? asset[field] : (HEIGHT[entity && entity.kind] || HEIGHT.hungry);
+}
+function crHeightfieldSpriteWorldHeight(kind, entity){
+  if(entity && Number.isFinite(entity.worldHeight) && entity.worldHeight > 0) return entity.worldHeight;
+  if(kind === 'can') return CR_HEIGHTFIELD_SPRITE_WORLD_HEIGHTS.can;
+  if(kind === 'npc') return npcSpriteHeight(entity, 'world');
+  return HEIGHT[entity && entity.kind] || HEIGHT[kind] || 0.5;
 }
 function pickHallThankLine(npc){
   if(npc && npc.thank) return npc.thank;

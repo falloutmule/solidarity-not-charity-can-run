@@ -32,18 +32,26 @@
       { id: 'gallery-prop-mailbox-001', kind: 'mailbox', x: 10.5, y: 16.5 },
       { id: 'gallery-prop-utility-box-001', kind: 'utility_box', x: 15.5, y: 16.5 }
     ],
-    pickups: [{ id: 'gallery-pickup-can-001', x: 20.5, y: 16.5, amt: 1 }],
+    pickups: [{ id: 'gallery-pickup-can-001', x: 26.5, y: 8.2, amt: 1 }],
     exit: { id: 'gallery-marker-portal-001', x: 24.5, y: 16.5, active: true },
     buildings: [{
       id: 'gallery-building-custom-next-001', assetId: 'custom_next_001', x: 29, y: 19,
       rotation: 0, widthCells: 6, depthCells: 3, front: 'south'
     }],
-    deferredTestBays: [{
-      id: 'low-block-height-bays',
-      status: 'deferred',
-      dependency: 'low-block raycaster spike acceptance',
-      heights: [0.4, 0.5, 0.6]
-    }]
+    environmentObjects: [{
+      id: 'gallery-low-block-concrete-001', assetId: 'low_block_concrete_001', x: 26, y: 10,
+      rotation: 0, widthCells: 1, depthCells: 1
+    }],
+    environmentNpcs: [{
+      id: 'gallery-low-block-npc-occlusion-001', assetId: 'npc_unhoused_work_jacket_001', x: 25.8, y: 8.2
+    }],
+    environmentReview: {
+      poses: {
+        'front-far': [26.5, 15.2], 'front-near': [26.5, 12.2], 'front-corner-left': [24.1, 12.7],
+        'front-corner-right': [28.9, 12.7], 'east-near': [28.7, 10.5], 'north-near': [26.5, 6.6],
+        'west-near': [24.3, 10.5], 'top-oblique': [24.3, 13.1], 'can-side': [29.0, 8.2, 26.5, 8.2]
+      }
+    }
   };
   root.SNC_ASSET_GALLERY_LEVEL = Object.freeze(level);
 })(globalThis);

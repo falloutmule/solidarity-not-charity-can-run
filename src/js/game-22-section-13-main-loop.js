@@ -478,6 +478,9 @@ try {
 } catch(_renderProfileInitializationError){}
 crResetFixedStepSimulation();
 try {
+  if(typeof crBootHeightfieldProofIfRequested === 'function' && crBootHeightfieldProofIfRequested()){
+    crResetRenderPoseHistory('heightfield-proof-boot');
+  }
   if(typeof crBootAssetGalleryIfRequested === 'function' && crBootAssetGalleryIfRequested()){
     crResetRenderPoseHistory('asset-gallery-boot');
   }

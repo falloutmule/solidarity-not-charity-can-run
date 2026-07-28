@@ -10,6 +10,8 @@ function getDebugState(){
       active: game.assetGallery.active === true,
       levelId: game.assetGallery.levelId || null,
       exhibitCount: Array.isArray(game.assetGallery.exhibits) ? game.assetGallery.exhibits.length : 0,
+      environmentObjectCount: Array.isArray(game.assetGallery.environmentObjects) ? game.assetGallery.environmentObjects.length : 0,
+      environmentNpcCount: Number(game.assetGallery.environmentNpcCount) || 0,
       focusId: game.assetGallery.focus ? game.assetGallery.focus.id : null
     } : null,
     MAP_W: game.MAP_W, MAP_H: game.MAP_H,
@@ -43,5 +45,6 @@ window.SNCDiagnostics = Object.freeze({
     runtime: Object.freeze(getDebugState()),
     fixedStep: Object.freeze(crGetFixedStepState()),
     performance: typeof crPerfProbeGetReport === 'function' ? crPerfProbeGetReport() : null,
+    heightfield: typeof crGetHeightfieldDiagnostics === 'function' ? crGetHeightfieldDiagnostics() : null,
   }),
 });
