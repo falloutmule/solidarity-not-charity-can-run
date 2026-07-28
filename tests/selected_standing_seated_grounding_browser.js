@@ -32,7 +32,7 @@ async function main(){
     page.on('pageerror', (error) => result.observed.pageErrors.push(String(error.stack || error)));
     page.on('request', (request) => { if(/^https?:/i.test(request.url()) && new URL(request.url()).origin !== origin) result.observed.externalRequests.push(request.url()); });
     const loadPose = async (pose, screenshotName) => {
-      await page.goto(`${result.url}?heightfield=1&hfcalibration=1&hfselectedreview=1&hfgroundline=1&hfcalpose=${pose}`, { waitUntil: 'load' });
+      await page.goto(`${result.url}?heightfield=1&hfcalibration=1&hfcalpose=${pose}`, { waitUntil: 'load' });
       await page.waitForFunction(waitForReview);
       await page.waitForFunction(() => Object.values(window.SNC_RUNTIME_ASSET_REGISTRY || {}).every((entry) => entry.image.complete && entry.image.naturalWidth > 0));
       await page.waitForTimeout(160);
@@ -40,7 +40,7 @@ async function main(){
       const png = await page.locator('#view').screenshot({ path: path.join(path.dirname(output), screenshotName) });
       return { snapshot, sha256: crypto.createHash('sha256').update(png).digest('hex') };
     };
-    const equal = await loadPose('equal-depth', 'selected-equal-depth-groundline.png');
+    const equal = await loadPose('equal-depth', 'canonical-equal-depth.png');
     const standingClose = await loadPose('standing-close', 'selected-standing-close.png');
     const seatedClose = await loadPose('seated-close', 'selected-seated-close.png');
     const seatedSide = await loadPose('seated-side', 'selected-seated-side-low-block.png');
@@ -60,10 +60,10 @@ async function main(){
       return { canonical, alternate };
     });
     result.measurements.pivotInvariant = pivotInvariant;
-    result.checks.queryGate = equal.snapshot.runtime.customLevel === 'heightfield_proof' && equal.snapshot.heightfield.groundLine && equal.snapshot.heightfield.groundLine.enabled === true;
+    result.checks.queryGate = equal.snapshot.runtime.customLevel === 'heightfield_proof' && calibration.pose === 'equal-depth';
     result.checks.selectedValues = standing && standing.worldHeight === 0.78 && slumped && slumped.worldHeight === 0.68;
     result.checks.sameDepth = standing && slumped && Math.abs(standing.cameraDepth - slumped.cameraDepth) < 1e-9;
-    result.checks.noCans = !calibration.subjects.some((candidate) => candidate.kind === 'can') && equal.snapshot.runtime.canStand;
+    result.checks.canonicalCan = calibration.subjects.filter((candidate) => candidate.kind === 'can').length === 1 && subject(calibration, 'can').worldHeight === 0.26;
     result.checks.standingFallback = standingBounds && standingBounds.groundSourceY === standingBounds.alphaBoundBottomRow && Math.abs(standingBounds.screenH - standingBounds.projectedTopToGround) < 1e-9 && Math.abs(standingBounds.visibleTopScreenY - (standingBounds.projectedGroundY - standingBounds.projectedTopToGround)) < 1e-9 && Math.abs(standingBounds.screenBottomY - standingBounds.projectedGroundY) < 1e-9 && standingBounds.groundingErrorPixels <= 1;
     result.checks.seatedContact = slumpedBounds && slumpedBounds.groundSourceY === 182 && slumpedBounds.alphaBoundBottomRow === 189 && slumpedBounds.lowestPhysicalContactSourceY >= 173 && slumpedBounds.lowestPhysicalContactSourceY <= 181 && Math.abs(slumpedBounds.projectedTopToGround - slumped.projectedPixelHeight) < 1e-9 && Math.abs(slumpedBounds.screenH - slumpedBounds.projectedTopToGround) < 1e-9 && Math.abs(slumpedBounds.screenBottomY - slumpedBounds.projectedGroundY) > 0.1 && slumpedBounds.sourceOpaquePixelsBelowContact > 0 && slumpedBounds.groundingErrorPixels <= 1;
     result.checks.independentPivot = pivotInvariant && Math.abs(pivotInvariant.canonical.screenH - pivotInvariant.alternate.screenH) < 1e-12 && Math.abs(pivotInvariant.canonical.screenW - pivotInvariant.alternate.screenW) < 1e-12 && Math.abs(pivotInvariant.canonical.projectedTopToGround - pivotInvariant.alternate.projectedTopToGround) < 1e-12 && Math.abs(pivotInvariant.canonical.topY - pivotInvariant.alternate.topY) > 0.1 && Math.abs(pivotInvariant.canonical.bottomY - pivotInvariant.alternate.bottomY) > 0.1;

@@ -45,14 +45,6 @@ async function main(){
     await page.waitForTimeout(160);
     const close = await page.evaluate(() => window.SNCDiagnostics.getSnapshot());
     const closeShot = await page.locator('#view').screenshot({ path: path.join(path.dirname(output), 'standing-close.png') });
-    await page.goto(`${result.url}?heightfield=1&hfcalibration=1&hfcalpose=equal-depth&hfcancomparison=1`, { waitUntil: 'load' });
-    await page.waitForFunction(() => {
-      const calibration = window.SNCDiagnostics && window.SNCDiagnostics.getSnapshot().heightfield.calibration;
-      return calibration && calibration.subjects.some((subject) => subject.id === 'can-024') && calibration.subjects.some((subject) => subject.id === 'can-028');
-    });
-    await page.waitForTimeout(160);
-    const comparison = await page.evaluate(() => window.SNCDiagnostics.getSnapshot());
-    const comparisonShot = await page.locator('#view').screenshot({ path: path.join(path.dirname(output), 'can-size-comparison.png') });
     const calibration = equal.heightfield.calibration;
     const standing = byId(calibration, 'standing');
     const slumped = byId(calibration, 'slumped');
@@ -62,15 +54,11 @@ async function main(){
     const subjects = [standing, slumped, can, halfBlock, fullWall];
     const depths = subjects.map((subject) => subject.cameraDepth);
     const closeStanding = byId(close.heightfield.calibration, 'standing');
-    const comparisonCalibration = comparison.heightfield.calibration;
-    const comparisonCans = ['can-024', 'can-026', 'can-028'].map((id) => byId(comparisonCalibration, id));
     result.measurements.equalDepth = calibration;
     result.measurements.standingClose = close.heightfield.calibration;
-    result.measurements.canComparison = comparisonCalibration;
     result.measurements.screenshots = {
       equalDepthSha256: crypto.createHash('sha256').update(equalShot).digest('hex'),
-      standingCloseSha256: crypto.createHash('sha256').update(closeShot).digest('hex'),
-      canComparisonSha256: crypto.createHash('sha256').update(comparisonShot).digest('hex')
+      standingCloseSha256: crypto.createHash('sha256').update(closeShot).digest('hex')
     };
     result.checks.queryGate = equal.runtime.customLevel === 'heightfield_proof' && calibration.pose === 'equal-depth';
     result.checks.equalDepth = Math.max(...depths) - Math.min(...depths) < 1e-9;
@@ -82,12 +70,10 @@ async function main(){
       return bounds && bounds.sourceCanvasWidth > 0 && bounds.sourceCanvasHeight > 0 && bounds.alphaBounds.x >= 0 && bounds.alphaBounds.y >= 0 &&
         bounds.alphaBounds.x + bounds.alphaBounds.w <= bounds.sourceCanvasWidth && bounds.alphaBounds.y + bounds.alphaBounds.h <= bounds.sourceCanvasHeight &&
         bounds.groundSourceY <= bounds.alphaBounds.y + bounds.alphaBounds.h && bounds.groundSourceY > bounds.alphaBounds.y &&
-        (subject.id !== 'slumped' || bounds.groundSourceY === 184);
+        (subject.id !== 'slumped' || bounds.groundSourceY === 182);
     });
     result.checks.visibleGrounding = [standing, slumped, can].every((subject) => subject.visibleBounds && Math.abs(subject.visibleBounds.projectedGroundY - subject.groundScreenY) < 1e-9 && subject.visibleBounds.groundingErrorPixels <= 1);
-    result.checks.canComparison = comparisonCans.every(Boolean) && comparisonCans.map((subject) => subject.worldHeight).join(',') === '0.24,0.26,0.28' &&
-      comparisonCans.every((subject) => subject.visibleBounds && subject.visibleBounds.groundingErrorPixels <= 1) &&
-      comparisonCans[0].projectedPixelHeight < comparisonCans[1].projectedPixelHeight && comparisonCans[1].projectedPixelHeight < comparisonCans[2].projectedPixelHeight;
+    result.checks.canonicalCan = can && can.id === 'can' && can.worldHeight === 0.26 && can.visibleBounds && can.visibleBounds.groundingErrorPixels <= 1;
     result.checks.projectedOrder = standing.projectedPixelHeight > halfBlock.projectedPixelHeight && slumped.projectedPixelHeight > can.projectedPixelHeight && fullWall.projectedPixelHeight > standing.projectedPixelHeight;
     result.checks.closeRange = closeStanding.projectedPixelHeight > standing.projectedPixelHeight * 2 && closeStanding.topScreenY < 125;
     result.checks.heightfield = equal.heightfield.enabled === true && equal.heightfield.worldDepthWrites > 0;

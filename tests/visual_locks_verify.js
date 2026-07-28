@@ -11,7 +11,7 @@ const lock = JSON.parse(fs.readFileSync(path.join(root, 'docs/development/SNC-VI
 const sha256 = (value) => crypto.createHash('sha256').update(value).digest('hex');
 const fileHash = (relativePath) => sha256(fs.readFileSync(path.join(root, relativePath)));
 
-assert.strictEqual(lock.baseCommit, '42ae5341827ad092ced4659834bcf5b78da2a23d', 'visual lock must name the accepted baseline');
+assert.strictEqual(lock.baseCommit, '7a8a931a1479c991d5aed32012a9d1f9c1fe6e8a', 'visual lock must name the Samsung-accepted source');
 for(const [relativePath, expectedHash] of Object.entries(lock.protectedFiles)){
   assert.strictEqual(fileHash(relativePath), expectedHash, `${relativePath}: protected file hash changed`);
 }
@@ -46,6 +46,7 @@ assert.strictEqual(sha256(JSON.stringify(runtimeSlumpedMetadata)), lock.protecte
 
 const core = fs.readFileSync(path.join(root, 'src/js/game-15a-variable-height-core.js'), 'utf8');
 assert(core.includes('Object.freeze({ eyeZ: 0.68 })'), 'camera eye lock changed');
+assert(core.includes(`CR_HEIGHTFIELD_SPRITE_WORLD_HEIGHTS = Object.freeze({ can: ${lock.locks.canWorldHeight} })`), 'locked can physical height changed');
 assert(core.includes('new Float32Array([0.0, 0.5, 1.0])'), 'height table lock changed');
 const lowBlock = JSON.parse(fs.readFileSync(path.join(root, 'authoring/buildings/low_block_concrete_001/building.json'), 'utf8'));
 assert.strictEqual(lowBlock.solidTopLevel, 1, 'half-block top level changed');

@@ -209,10 +209,6 @@ function crDrawHeightfieldScene(now, renderPose){
     }
   }
   crHeightfieldRenderRaisedPlanes(px, py, dirX, dirY, planeX, planeY);
-  if(game.heightfieldCalibration && game.heightfieldCalibration.showGroundLine){
-    const groundLineY = Math.round(crProjectWorldZToScreenY(0, game.heightfieldCalibration.groundLineDepth, CR_HEIGHTFIELD_CAMERA.eyeZ));
-    bctx.fillStyle = '#00eaff'; bctx.fillRect(0, groundLineY, RW, 1);
-  }
   for(const prop of game.props) crHeightfieldDrawSprite('prop', prop, propTex(prop.kind, prop), crHeightfieldSpriteWorldHeight('prop', prop), px, py, dirX, dirY, planeX, planeY, now);
   for(const can of game.pickups) if(!can.taken) crHeightfieldDrawSprite('can', can, TEX.can, crHeightfieldSpriteWorldHeight('can', can), px, py, dirX, dirY, planeX, planeY, now);
   for(const npc of game.npcs) if(!npc.helped) crHeightfieldDrawSprite('npc', npc, npcSpriteTex(npc.kind, npc), crHeightfieldSpriteWorldHeight('npc', npc), px, py, dirX, dirY, planeX, planeY, now);

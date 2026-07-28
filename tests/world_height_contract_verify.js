@@ -62,7 +62,10 @@ assert(!renderer.includes('HEIGHT.can'), 'heightfield can rendering does not use
 assert(!gallery.includes('worldHeight:'), 'no Gallery environment fixture owns a physical-height override');
 assert(sprites.includes("params.get('hfcalibration') === '1'"), 'calibration scene is query gated');
 assert(sprites.includes("id: 'half-block'") && sprites.includes("id: 'full-wall'"), 'calibration scene includes both geometry references');
-assert(sprites.includes("params.get('hfselectedreview') === '1'"), 'selected standing and seated review remains query gated');
+for(const temporaryRoute of ['hfselectedreview', 'hfstandingcomparison', 'hfcancomparison', 'hfgroundline']){
+  assert(!sprites.includes(temporaryRoute), `${temporaryRoute}: temporary calibration presentation route is removed`);
+}
+assert(!renderer.includes('showGroundLine'), 'temporary ground-marker overlay is absent from the renderer');
 
 class MockImage { set src(value){ this._src = value; this.complete = true; this.naturalWidth = 1; } get src(){ return this._src; } }
 const runtimeSource = load('src/imported-handoff-assets/runtime-character-gallery-assets.js');
@@ -87,7 +90,7 @@ for(const asset of manifest.assets){
   assert(bounds.y + bounds.h <= size.height, `${asset.assetId}: visible alpha bottom is a valid physical ground line`);
   if(asset.groundContactSourceY !== undefined) assert(bounds.y < asset.groundContactSourceY && asset.groundContactSourceY <= bounds.y + bounds.h, `${asset.assetId}: explicit contact row remains inside visible source bounds`);
 }
-assert(sprites.includes("params.get('hfcancomparison') === '1'"), 'one artifact exposes the three-can calibration comparison');
-assert(sprites.includes("worldHeight: 0.24") && sprites.includes("worldHeight: 0.26") && sprites.includes("worldHeight: 0.28"), 'comparison has the requested explicit physical heights');
+assert(sprites.includes("const cans = [{ calibrationId: 'can'"), 'one canonical can remains in the measurement proof');
+assert(!sprites.includes("worldHeight: 0.24") && !sprites.includes("worldHeight: 0.28"), 'temporary can calibration values are absent');
 
 console.log(JSON.stringify({ pass: true, standingWorldHeight: selectedStanding.worldHeight, slumpedWorldHeight: slumped.worldHeight, canWorldHeight: can, cameraEyeZ: eyeZ }));

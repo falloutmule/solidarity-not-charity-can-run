@@ -393,9 +393,6 @@ function crGetHeightfieldDiagnostics(){
     npcVisiblePixels: crHeightfieldStats.npcVisiblePixels, npcOccludedPixels: crHeightfieldStats.npcOccludedPixels,
     worldDepthBytes: crHeightfieldStats.worldDepthBytes, worldDepthLength: worldDepthPixels.length,
     allocations: crHeightfieldStats.allocations, width: crWorldDepthWidth, height: crWorldDepthHeight,
-    groundLine: calibration && calibration.showGroundLine ? Object.freeze({
-      enabled: true, depth: calibration.groundLineDepth
-    }) : null,
     calibration: crHeightfieldCalibrationMeasurements()
   });
 }
