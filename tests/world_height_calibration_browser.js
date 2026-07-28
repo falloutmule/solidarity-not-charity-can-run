@@ -73,7 +73,7 @@ async function main(){
         (subject.id !== 'slumped' || bounds.groundSourceY === 182);
     });
     result.checks.visibleGrounding = [standing, slumped, can].every((subject) => subject.visibleBounds && Math.abs(subject.visibleBounds.projectedGroundY - subject.groundScreenY) < 1e-9 && subject.visibleBounds.groundingErrorPixels <= 1);
-    result.checks.canonicalCan = can && can.id === 'can' && can.worldHeight === 0.26 && can.visibleBounds && can.visibleBounds.groundingErrorPixels <= 1;
+    result.checks.canonicalCan = can && can.id === 'can' && can.worldHeight === 0.40 && can.visibleBounds && can.visibleBounds.groundingErrorPixels <= 1;
     result.checks.projectedOrder = standing.projectedPixelHeight > halfBlock.projectedPixelHeight && slumped.projectedPixelHeight > can.projectedPixelHeight && fullWall.projectedPixelHeight > standing.projectedPixelHeight;
     result.checks.closeRange = closeStanding.projectedPixelHeight > standing.projectedPixelHeight * 2 && closeStanding.topScreenY < 125;
     result.checks.heightfield = equal.heightfield.enabled === true && equal.heightfield.worldDepthWrites > 0;

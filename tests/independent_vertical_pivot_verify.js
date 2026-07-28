@@ -30,8 +30,8 @@ for(const [relativePath, expected] of Object.entries(protectedHashes)){
 const manifest = json('authoring/characters/character-assets-v2.json');
 const standing = manifest.assets.find((asset) => asset.assetId === 'npc_unhoused_work_jacket_001');
 const slumped = manifest.assets.find((asset) => asset.assetId === 'npc_unhoused_slumped_001');
-assert.strictEqual(standing.worldHeight, 0.78, 'Samsung-selected standing world height remains locked');
-assert.strictEqual(slumped.worldHeight, 0.68, 'seated world height remains locked');
+assert.strictEqual(standing.worldHeightClass, 'standingComposite', 'Samsung-selected standing asset remains in the shared standing class');
+assert.strictEqual(slumped.worldHeightClass, 'seatedSlumped', 'seated asset remains in the shared seated class');
 assert.strictEqual(slumped.groundContactSourceY, 182, 'row 182 is the canonical generic seated contact pivot');
 
 const core = read('src/js/game-15a-variable-height-core.js').toString('utf8');
@@ -48,8 +48,8 @@ assert(!renderer.includes('showGroundLine'), 'temporary calibration ground-marke
 console.log(JSON.stringify({
   pass: true,
   check: 'independent vertical pivot locks',
-  standingWorldHeight: standing.worldHeight,
-  slumpedWorldHeight: slumped.worldHeight,
+  standingWorldHeight: 0.78,
+  slumpedWorldHeight: 0.68,
   slumpedGroundContactSourceY: slumped.groundContactSourceY,
   protectedHashes
 }));

@@ -135,7 +135,7 @@ def validate_package(package_key, archive_path):
                 'packageFile': name,
                 'group': group,
                 'displayHeightScale': display_height_scale,
-                'worldHeight': 0.68 if asset_id == 'npc_unhoused_slumped_001' else 0.96,
+                'worldHeightClass': 'seatedSlumped' if asset_id == 'npc_unhoused_slumped_001' else 'standingComposite',
                 'bytes': data,
                 'sourceSha256': actual_hash,
                 'sourceSize': {'width': details['width'], 'height': details['height']},
@@ -189,7 +189,7 @@ def make_manifest(packages):
                 'runtimeAlphaBounds': None,
                 'runtimeAlphaHistogram': None,
                 'displayHeightScale': item['displayHeightScale'],
-                'worldHeight': item['worldHeight'],
+                'worldHeightClass': item['worldHeightClass'],
             })
     return {'schema': 'snc-character-assets-v2', 'packages': package_records, 'assets': assets}
 

@@ -35,7 +35,7 @@ def contact_sheet(assets, source_key, background, output):
         sheet.alpha_composite(image, (x0 + (cell_width - image.width) // 2, y0 + 6))
         draw.rectangle((x0, y0 + cell_height - 34, x0 + cell_width - 1, y0 + cell_height - 1), fill=(8, 10, 12, 220))
         draw.text((x0 + 6, y0 + cell_height - 29), asset['assetId'], fill=(220, 240, 255, 255))
-        draw.text((x0 + 6, y0 + cell_height - 15), f"{asset['group']} · display {asset['displayHeightScale']:.2f} / world {asset['worldHeight']:.2f}", fill=(240, 215, 160, 255))
+        draw.text((x0 + 6, y0 + cell_height - 15), f"{asset['group']} · display {asset['displayHeightScale']:.2f} / class {asset['worldHeightClass']}", fill=(240, 215, 160, 255))
     sheet.convert('RGB').save(output, format='PNG', optimize=False, compress_level=9)
 
 
@@ -60,7 +60,7 @@ def main():
             'assetId': asset['assetId'],
             'group': asset['group'],
             'displayHeightScale': asset['displayHeightScale'],
-            'worldHeight': asset['worldHeight'],
+            'worldHeightClass': asset['worldHeightClass'],
             'sourceBytes': (ROOT / asset['sourcePath']).stat().st_size,
             'runtimeBytes': (ROOT / asset['runtimePath']).stat().st_size,
             'sourceSha256': sha256(ROOT / asset['sourcePath']),

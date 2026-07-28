@@ -67,7 +67,7 @@
         "opaque": 5417
       },
       "displayHeightScale": 0.62,
-      "worldHeight": 0.96
+      "worldHeightClass": "standingComposite"
     },
     {
       "assetId": "npc_volunteer_tote_001",
@@ -117,7 +117,7 @@
         "opaque": 4171
       },
       "displayHeightScale": 0.62,
-      "worldHeight": 0.96
+      "worldHeightClass": "standingComposite"
     },
     {
       "assetId": "npc_volunteer_miguel_001",
@@ -167,7 +167,7 @@
         "opaque": 5238
       },
       "displayHeightScale": 0.62,
-      "worldHeight": 0.96
+      "worldHeightClass": "standingComposite"
     },
     {
       "assetId": "npc_household_parent_child_001",
@@ -217,7 +217,7 @@
         "opaque": 4317
       },
       "displayHeightScale": 0.62,
-      "worldHeight": 0.96
+      "worldHeightClass": "standingComposite"
     },
     {
       "assetId": "npc_civilian_backpack_youth_001",
@@ -267,7 +267,7 @@
         "opaque": 4494
       },
       "displayHeightScale": 0.62,
-      "worldHeight": 0.96
+      "worldHeightClass": "standingComposite"
     },
     {
       "assetId": "npc_civilian_beanie_messenger_001",
@@ -317,7 +317,7 @@
         "opaque": 4229
       },
       "displayHeightScale": 0.62,
-      "worldHeight": 0.96
+      "worldHeightClass": "standingComposite"
     },
     {
       "assetId": "npc_civilian_grocery_carrier_001",
@@ -367,7 +367,7 @@
         "opaque": 6449
       },
       "displayHeightScale": 0.62,
-      "worldHeight": 0.96
+      "worldHeightClass": "standingComposite"
     },
     {
       "assetId": "npc_household_dog_walker_001",
@@ -417,7 +417,7 @@
         "opaque": 4539
       },
       "displayHeightScale": 0.62,
-      "worldHeight": 0.96
+      "worldHeightClass": "standingComposite"
     },
     {
       "assetId": "npc_unhoused_dog_companion_001",
@@ -467,7 +467,7 @@
         "opaque": 10829
       },
       "displayHeightScale": 0.62,
-      "worldHeight": 0.96
+      "worldHeightClass": "standingComposite"
     },
     {
       "assetId": "npc_unhoused_bicycle_001",
@@ -517,7 +517,7 @@
         "opaque": 17844
       },
       "displayHeightScale": 0.62,
-      "worldHeight": 0.96
+      "worldHeightClass": "standingComposite"
     },
     {
       "assetId": "npc_unhoused_cane_001",
@@ -567,7 +567,7 @@
         "opaque": 11285
       },
       "displayHeightScale": 0.62,
-      "worldHeight": 0.96
+      "worldHeightClass": "standingComposite"
     },
     {
       "assetId": "npc_unhoused_work_jacket_001",
@@ -617,7 +617,7 @@
         "opaque": 7519
       },
       "displayHeightScale": 0.62,
-      "worldHeight": 0.78
+      "worldHeightClass": "standingComposite"
     },
     {
       "assetId": "npc_unhoused_dyed_hair_001",
@@ -667,7 +667,7 @@
         "opaque": 8301
       },
       "displayHeightScale": 0.62,
-      "worldHeight": 0.96
+      "worldHeightClass": "standingComposite"
     },
     {
       "assetId": "npc_unhoused_blanket_wrap_001",
@@ -717,7 +717,7 @@
         "opaque": 10550
       },
       "displayHeightScale": 0.62,
-      "worldHeight": 0.96
+      "worldHeightClass": "standingComposite"
     },
     {
       "assetId": "npc_unhoused_slumped_001",
@@ -767,7 +767,7 @@
         "opaque": 18844
       },
       "displayHeightScale": 0.45,
-      "worldHeight": 0.68,
+      "worldHeightClass": "seatedSlumped",
       "groundContactSourceY": 182
     },
     {
@@ -818,7 +818,7 @@
         "opaque": 17199
       },
       "displayHeightScale": 0.62,
-      "worldHeight": 0.96
+      "worldHeightClass": "standingComposite"
     }
   ]
 }

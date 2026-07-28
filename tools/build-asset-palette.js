@@ -22,7 +22,7 @@ function main(){
     previewPath: asset.runtimePath,
     sha256: asset.runtimeSha256,
     displayHeightScale: asset.displayHeightScale,
-    worldHeight: asset.worldHeight,
+    worldHeightClass: asset.worldHeightClass,
     allowedLevelLayers: ['NPCs', 'Gallery']
   })).sort((a, b) => a.assetId.localeCompare(b.assetId));
   if(assets.length !== 16) throw new Error('approved cast palette must contain exactly sixteen assets');

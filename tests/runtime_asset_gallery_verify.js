@@ -26,14 +26,15 @@ assert.deepStrictEqual(manifest.assets.reduce((groups, asset) => {
   return groups;
 }, {}), { volunteer: 3, household: 2, civilian: 3, unhoused: 8 }, 'approved group counts');
 assert.strictEqual(manifest.assets.find((asset) => asset.assetId === 'npc_unhoused_slumped_001').displayHeightScale, 0.45, 'seated asset remains visibly shorter in the legacy gallery');
-assert.strictEqual(manifest.assets.find((asset) => asset.assetId === 'npc_unhoused_slumped_001').worldHeight, 0.68, 'seated asset has a separate physical height');
-const selectedStanding = manifest.assets.find((asset) => asset.assetId === 'npc_unhoused_work_jacket_001');
-assert.strictEqual(selectedStanding.displayHeightScale, 0.62, 'Samsung-selected standing asset retains its Gallery presentation scale');
-assert.strictEqual(selectedStanding.worldHeight, 0.78, 'Samsung-selected standing asset uses its approved physical height');
-for(const asset of manifest.assets.filter((asset) => asset.assetId !== 'npc_unhoused_slumped_001' && asset.assetId !== selectedStanding.assetId)){
+const seated = manifest.assets.find((asset) => asset.assetId === 'npc_unhoused_slumped_001');
+assert.strictEqual(seated.worldHeightClass, 'seatedSlumped', 'seated asset uses the accepted special physical-height class');
+assert.strictEqual(seated.groundContactSourceY, 182, 'seated asset retains its accepted physical contact row');
+for(const asset of manifest.assets.filter((asset) => asset.worldHeightClass === 'standingComposite')){
   assert.strictEqual(asset.displayHeightScale, 0.62, `${asset.assetId}: compact gallery scale`);
-  assert.strictEqual(asset.worldHeight, 0.96, `${asset.assetId}: unclassified physical height remains unchanged`);
+  assert.strictEqual(Object.hasOwn(asset, 'worldHeight'), false, `${asset.assetId}: source uses the shared class rather than a per-asset height`);
 }
+assert.strictEqual(manifest.assets.filter((asset) => asset.worldHeightClass === 'standingComposite').length, 15, 'all standing and composite assets share one physical-height class');
+assert.strictEqual(manifest.assets.filter((asset) => asset.worldHeightClass === 'seatedSlumped').length, 1, 'exactly one seated physical-height class member');
 for(const asset of manifest.assets){
   assert.strictEqual(asset.reviewStatus, 'candidate', `${asset.assetId}: approved package records stay candidate review art`);
   assert.strictEqual(asset.anchor.y, 1.0, `${asset.assetId}: ground anchor`);
@@ -56,7 +57,7 @@ const dataUris = [...generatedRegistry.matchAll(/data:image\/png;base64,([A-Za-z
 assert.strictEqual(dataUris.length, 16, 'exactly one data URI per approved runtime asset');
 assert.strictEqual(new Set(dataUris).size, 16, 'runtime payloads are unique');
 for(const asset of manifest.assets) assert(generatedRegistry.includes(asset.assetId), `${asset.assetId}: runtime record exists`);
-assert(generatedRegistry.includes('displayHeightScale') && generatedRegistry.includes('worldHeight'), 'runtime records retain distinct display and world heights');
+assert(generatedRegistry.includes('displayHeightScale') && generatedRegistry.includes('worldHeight') && generatedRegistry.includes('worldHeightClass'), 'runtime records retain distinct display, class, and resolved world heights');
 assert(!generatedRegistry.includes('"heightScale"'), 'runtime records do not retain the ambiguous heightScale field');
 
 const level = load('src/levels/asset-gallery-authored.js');

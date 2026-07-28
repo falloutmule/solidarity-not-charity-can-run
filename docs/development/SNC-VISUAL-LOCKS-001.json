@@ -5,12 +5,9 @@
     "slumpedAssetId": "npc_unhoused_slumped_001",
     "slumpedWorldHeight": 0.68,
     "slumpedGroundContactSourceY": 182,
-    "standingSelection": {
-      "assetId": "npc_unhoused_work_jacket_001",
-      "worldHeight": 0.78,
-      "authority": "Samsung accepted at source commit 7a8a931a1479c991d5aed32012a9d1f9c1fe6e8a"
-    },
-    "canWorldHeight": 0.26,
+    "standingCompositeReferenceAssetId": "npc_unhoused_work_jacket_001",
+    "standingCompositeWorldHeight": 0.78,
+    "canWorldHeight": 0.4,
     "halfBlockHeight": 0.5,
     "cameraEyeZ": 0.68,
     "fullWallHeight": 1.0,
@@ -29,14 +26,14 @@
   },
   "candidateArtifact": {
     "path": "index.html",
-    "byteLength": 1685600,
-    "sha256": "53fe4170f2eff0bcad426789889e4f076b8405af7808cb96ffcd97dca2e3765f",
-    "buildId": "castscalereview1"
+    "byteLength": 1683106,
+    "sha256": "7ed374bc79835199800cbaa3b86e94fba66c969fd5fd325477ca2aed24368cc6",
+    "buildId": "authoredlowblockclassfinal1"
   },
   "protectedFiles": {
-    "src/js/game-15a-variable-height-core.js": "99cd7ce2abdd927f75f7578aa90dadebcc9b277f17aef8501adacd2ab222df69",
+    "src/js/game-15a-variable-height-core.js": "4a47d1b4b7f2b0fb90b914e4b612b2a9196bb33d03c5d235fef2ee7dc83bac09",
     "src/js/game-16d-heightfield-renderer.js": "9c17a03108ea23deb892119f2f15c82c7d18089d4df38fc8464a763edbae1014",
-    "src/js/game-11-section-3b.js": "53f2cbc5f289c293cd9e723533f4ad1792d3b120b4191bb25a1076bcf1a0ad7e",
+    "src/js/game-11-section-3b.js": "49ed3ee72dcb64a950c9e9022b2de37c0a17bd7d3d6001fcb5f4ca3fcec84123",
     "src/js/game-16-section-7-render.js": "4d174fe082f7ab34837c179e86582f7ae82f2fa1d1e199a853fe3469f0ede6ea",
     "src/js/game-12-section-4-collision-walk-helpers.js": "af9f3c27b2d2ff7c19aeb8bbb079da84a637abee7f57bbd4148b77485e577270",
     "authoring/characters/runtime/npc_unhoused_slumped_001.png": "0124303d47ccc1fbf0c0f4fd729ad9d82f3e0339cf4e21ee6b0c6f5dcd8b8895",
@@ -45,17 +42,17 @@
     "authoring/buildings/low_block_concrete_001/source/north.png": "5397ee4252e0301eb25e1d02b6f092fffbf5b356c82cc53e5124f0b10295e01e",
     "authoring/buildings/low_block_concrete_001/source/west.png": "49f154437fd58e3be6afb82f67f50a3ea9ea127b6cbf70265d27cc2ae57e47d5",
     "authoring/buildings/low_block_concrete_001/source/top.png": "e0c9dd6822036d2139c2a7b96984fcd6651bd510c3b3aa2596e326e9c6fa6f4b",
-    "authoring/characters/character-assets-v2.json": "09eb8c2c9443c18ba0530afc160c7461fec8357880515cd0e810999f979ef023",
-    "src/imported-handoff-assets/runtime-character-gallery-assets.js": "4638fb2dba62a22b24dac3ac1e8962e3432acc990baee641b4b11097af99ad32",
+    "authoring/characters/character-assets-v2.json": "26f7886a48d7e132b87ca2782074d19c03b4467a7c22ef285021032908043b01",
+    "src/imported-handoff-assets/runtime-character-gallery-assets.js": "46b3b52d907fc417150ef36d452884804295ba479c633cfcecfa3688c8ef8c39",
     "src/levels/asset-gallery-authored.js": "22c356d7d50e39772354130bd9cf96a5d630f5ebd6571431f6eb505cc1d3ec76",
-    "project-metadata.json": "863c9e2d7d0de3d72daa67e078ca869c7b607c846e3fdaccf80adf0d4f336155",
-    "tools/build-runtime-character-assets.py": "cf794e770a544589d581f694af4744aa5062ceb0c3a4cad8fae2bea91d5d823e",
-    "tests/world_height_contract_verify.js": "276b7ecf696f32421fcf2ee073e721a06ad4b816202b7355d6b3824f31b44333",
-    "tests/world_height_calibration_browser.js": "5311bca720217da63d3cf1da542cc81a4cbf7466307641b634d640999f122768",
-    "tests/independent_vertical_pivot_verify.js": "06724d26bac5127cee08b47a63c666089a12d6b88c23125690ff2a284e577cdb"
+    "project-metadata.json": "e54e383361dbdb81b353245aa1167d2c94087da003653a253ad2ae5eeb2c2a37",
+    "tools/build-runtime-character-assets.py": "0e5f007c0ad2fcbfe32bcdfe4e6d2b4a8946194c10a0856ef1880005713d045c",
+    "tests/world_height_contract_verify.js": "26b2d9142190a012073b04ee884395a7109ab776c09d25f1cd4f9f162993b33e",
+    "tests/world_height_calibration_browser.js": "5edb3e13e10dea6d28a140a6c0a9277cd389aa78473495d7b362906f63b51cc4",
+    "tests/independent_vertical_pivot_verify.js": "6092d0ea403af590fa2d36e3c5595fab11ecc4d868b9173e4fbd5184a9beb4f4"
   },
   "protectedRecords": {
-    "slumpedManifestRecordSha256": "75f0c00a8b7040acef84a6a6ed93921f565f0f2496ef335415999e6c13b330d0",
-    "slumpedRuntimeRecordSha256": "7385fed55d5bcfbed5fbe825ae3ac3be5757829272ac13f22f81699dfa19dd0e"
+    "slumpedManifestRecordSha256": "98bdf5e393b70b3c599770e147756c070f8742910692396722f2e041efd1ab68",
+    "slumpedRuntimeRecordSha256": "7f845114b050a145b55df9205603bfe064433a2b176958a27e8a155ab4d2e368"
   }
 }

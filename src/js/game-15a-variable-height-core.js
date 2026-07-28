@@ -3,7 +3,7 @@
 // ---------------------------------------------------------------------------
 const CR_HEIGHTFIELD_QUERY = new URLSearchParams(location.search).get('heightfield') === '1';
 const CR_HEIGHTFIELD_CAMERA = Object.freeze({ eyeZ: 0.68 });
-const CR_HEIGHTFIELD_SPRITE_WORLD_HEIGHTS = Object.freeze({ can: 0.26 });
+const CR_HEIGHTFIELD_SPRITE_WORLD_HEIGHTS = Object.freeze({ can: 0.40 });
 const CR_HEIGHT_LEVELS = new Float32Array([0.0, 0.5, 1.0]);
 const CR_VERTICAL_PROFILE_IDS = Object.freeze({ EMPTY: 0, HALF_DEBUG: 1, FULL_LEGACY: 2, AUTHORED_CONCRETE: 3 });
 const CR_HEIGHTFIELD_MATERIAL_IDS = Object.freeze({
@@ -374,12 +374,13 @@ function crHeightfieldCalibrationMeasurements(){
     const topScreenY = crProjectWorldZToScreenY(subject.worldHeight, depth, CR_HEIGHTFIELD_CAMERA.eyeZ);
     const visibleBounds = crHeightfieldStats.spriteBounds[subject.id] || null;
     return Object.freeze({
-      id: subject.id, kind: subject.kind, worldHeight: subject.worldHeight, cameraDepth: depth,
+      id: subject.id, kind: subject.kind, assetId: subject.assetId || null, worldHeightClass: subject.worldHeightClass || null,
+      worldHeight: subject.worldHeight, cameraDepth: depth,
       projectedPixelHeight: groundScreenY - topScreenY, topScreenY, groundScreenY,
       visibleBounds
     });
   });
-  return Object.freeze({ pose: calibration.pose, subjects: Object.freeze(subjects) });
+  return Object.freeze({ mode: calibration.mode || null, pose: calibration.pose, references: calibration.references || null, subjects: Object.freeze(subjects) });
 }
 function crGetHeightfieldDiagnostics(){
   const calibration = game && game.heightfieldCalibration;
