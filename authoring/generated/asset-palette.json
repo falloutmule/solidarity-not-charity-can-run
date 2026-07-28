@@ -204,7 +204,7 @@
       "previewPath": "authoring/characters/runtime/npc_unhoused_work_jacket_001.png",
       "sha256": "f74ec97987b0969d54b9108598b8bce0d55081b13762f806980bf0e88505ff61",
       "displayHeightScale": 0.62,
-      "worldHeight": 0.96,
+      "worldHeight": 0.78,
       "allowedLevelLayers": [
         "NPCs",
         "Gallery"

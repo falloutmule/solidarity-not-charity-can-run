@@ -767,7 +767,8 @@
         "opaque": 18844
       },
       "displayHeightScale": 0.45,
-      "worldHeight": 0.68
+      "worldHeight": 0.68,
+      "groundContactSourceY": 184
     },
     {
       "assetId": "npc_unhoused_cart_001",

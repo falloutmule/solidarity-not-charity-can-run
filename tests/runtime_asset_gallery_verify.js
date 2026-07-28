@@ -27,9 +27,12 @@ assert.deepStrictEqual(manifest.assets.reduce((groups, asset) => {
 }, {}), { volunteer: 3, household: 2, civilian: 3, unhoused: 8 }, 'approved group counts');
 assert.strictEqual(manifest.assets.find((asset) => asset.assetId === 'npc_unhoused_slumped_001').displayHeightScale, 0.45, 'seated asset remains visibly shorter in the legacy gallery');
 assert.strictEqual(manifest.assets.find((asset) => asset.assetId === 'npc_unhoused_slumped_001').worldHeight, 0.68, 'seated asset has a separate physical height');
-for(const asset of manifest.assets.filter((asset) => asset.assetId !== 'npc_unhoused_slumped_001')){
+const selectedStanding = manifest.assets.find((asset) => asset.assetId === 'npc_unhoused_work_jacket_001');
+assert.strictEqual(selectedStanding.displayHeightScale, 0.62, 'Samsung-selected standing asset retains its Gallery presentation scale');
+assert.strictEqual(selectedStanding.worldHeight, 0.78, 'Samsung-selected standing asset uses its approved physical height');
+for(const asset of manifest.assets.filter((asset) => asset.assetId !== 'npc_unhoused_slumped_001' && asset.assetId !== selectedStanding.assetId)){
   assert.strictEqual(asset.displayHeightScale, 0.62, `${asset.assetId}: compact gallery scale`);
-  assert.strictEqual(asset.worldHeight, 0.96, `${asset.assetId}: physical standing height`);
+  assert.strictEqual(asset.worldHeight, 0.96, `${asset.assetId}: unclassified physical height remains unchanged`);
 }
 for(const asset of manifest.assets){
   assert.strictEqual(asset.reviewStatus, 'candidate', `${asset.assetId}: approved package records stay candidate review art`);

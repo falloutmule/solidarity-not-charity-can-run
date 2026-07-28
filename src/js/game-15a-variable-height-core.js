@@ -248,6 +248,13 @@ function crHeightfieldSpriteRegistryEntry(obj){
   const registry = globalThis.SNC_RUNTIME_ASSET_REGISTRY;
   return obj && obj.assetId && registry ? registry[obj.assetId] || null : null;
 }
+function crHeightfieldGroundContactSourceY(entry, obj, bounds){
+  const explicitAssetRow = entry && Number.isInteger(entry.groundContactSourceY) ? entry.groundContactSourceY : null;
+  const explicitInstanceRow = obj && Number.isInteger(obj.groundContactSourceY) ? obj.groundContactSourceY : null;
+  const groundSourceY = explicitAssetRow === null ? (explicitInstanceRow === null ? bounds.y + bounds.h : explicitInstanceRow) : explicitAssetRow;
+  if(!(bounds.y < groundSourceY && groundSourceY <= bounds.y + bounds.h)) throw new Error('heightfield sprite ground contact row is outside its visible source bounds');
+  return groundSourceY;
+}
 function crHeightfieldPhysicalSpriteBounds(kind, obj, tex, worldHeight){
   const mask = crHeightfieldSpriteAlphaMask(tex);
   if(!mask) return null;
@@ -257,40 +264,79 @@ function crHeightfieldPhysicalSpriteBounds(kind, obj, tex, worldHeight){
     candidate.x + candidate.w <= mask.width && candidate.y + candidate.h <= mask.height ? candidate : mask.alphaBounds;
   const anchorX = entry && entry.anchor && Number.isFinite(entry.anchor.x) ? entry.anchor.x :
     (obj && obj.anchor && Number.isFinite(obj.anchor.x) ? obj.anchor.x : 0.5);
+  const groundSourceY = crHeightfieldGroundContactSourceY(entry, obj, bounds);
   return {
     sourceX: bounds.x, sourceY: bounds.y, sourceWidth: bounds.w, sourceHeight: bounds.h,
     sourceCanvasWidth: mask.width, sourceCanvasHeight: mask.height,
-    anchorX: Math.max(0, Math.min(1, anchorX)), groundSourceY: bounds.y + bounds.h,
+    anchorX: Math.max(0, Math.min(1, anchorX)), groundSourceY,
     worldHeight: Number(worldHeight)
   };
 }
 function crProjectHeightfieldVisibleSprite(obj, tex, worldHeight, depth, hscr, bounds){
   if(!bounds || !(bounds.worldHeight > 0)) return null;
-  const screenH = bounds.worldHeight * RH / Math.max(0.12, depth);
-  const screenW = screenH * (bounds.sourceWidth / bounds.sourceHeight);
+  const projectedTopToGround = bounds.worldHeight * RH / Math.max(0.12, depth);
+  const sourcePixelsAboveGround = bounds.groundSourceY - bounds.sourceY;
+  if(!(sourcePixelsAboveGround > 0)) return null;
+  const scalePerSourcePixel = projectedTopToGround / sourcePixelsAboveGround;
+  const screenH = bounds.sourceHeight * scalePerSourcePixel;
+  const screenW = bounds.sourceWidth * scalePerSourcePixel;
   const screenX = (RW / 2) * (1 + hscr / depth);
   const anchorSourceX = bounds.anchorX * bounds.sourceCanvasWidth;
   const anchorU = Math.max(0, Math.min(1, (anchorSourceX - bounds.sourceX) / bounds.sourceWidth));
   const groundScreenY = crProjectWorldZToScreenY(0, depth, CR_HEIGHTFIELD_CAMERA.eyeZ);
   return {
     screenX, screenW, screenH, screenLeft: screenX - anchorU * screenW,
-    topY: groundScreenY - screenH, bottomY: groundScreenY, groundScreenY,
+    topY: groundScreenY - projectedTopToGround, bottomY: groundScreenY - projectedTopToGround + screenH, groundScreenY,
     sourceX: bounds.sourceX, sourceY: bounds.sourceY, sourceWidth: bounds.sourceWidth, sourceHeight: bounds.sourceHeight,
     sourceCanvasWidth: bounds.sourceCanvasWidth, sourceCanvasHeight: bounds.sourceCanvasHeight,
-    anchorX: bounds.anchorX, groundSourceY: bounds.groundSourceY, worldHeight: bounds.worldHeight, depth
+    anchorX: bounds.anchorX, groundSourceY: bounds.groundSourceY, worldHeight: bounds.worldHeight, depth,
+    projectedTopToGround, sourcePixelsAboveGround, scalePerSourcePixel
   };
 }
-function crHeightfieldRecordSpriteProjection(kind, obj, proj){
+function crHeightfieldProjectedContactEvidence(tex, proj){
+  let lowestPhysicalContactDestinationY = -1, opaquePixelsBelowContact = 0, physicalContactOpaquePixels = 0;
+  const startCol = Math.max(0, Math.floor(proj.screenLeft));
+  const endCol = Math.min(RW, Math.ceil(proj.screenLeft + proj.screenW));
+  const y0 = Math.max(0, Math.floor(proj.topY)), y1 = Math.min(RH, Math.ceil(proj.bottomY));
+  for(let col = startCol; col < endCol; col++){
+    const u = (col - proj.screenLeft) / proj.screenW;
+    const sourceX = Math.max(proj.sourceX, Math.min(proj.sourceX + proj.sourceWidth - 1, (proj.sourceX + u * proj.sourceWidth) | 0));
+    for(let y = y0; y < y1; y++){
+      const sourceY = Math.max(proj.sourceY, Math.min(proj.sourceY + proj.sourceHeight - 1, (proj.sourceY + (y - proj.topY) / proj.screenH * proj.sourceHeight) | 0));
+      if(!crHeightfieldSpriteOpaqueAt(tex, sourceX, sourceY)) continue;
+      if(sourceY < proj.groundSourceY){
+        physicalContactOpaquePixels++;
+        if(y > lowestPhysicalContactDestinationY) lowestPhysicalContactDestinationY = y;
+      } else {
+        opaquePixelsBelowContact++;
+      }
+    }
+  }
+  let sourceOpaquePixelsBelowContact = 0;
+  for(let sourceY = proj.groundSourceY; sourceY < proj.sourceY + proj.sourceHeight; sourceY++){
+    for(let sourceX = proj.sourceX; sourceX < proj.sourceX + proj.sourceWidth; sourceX++){
+      if(crHeightfieldSpriteOpaqueAt(tex, sourceX, sourceY)) sourceOpaquePixelsBelowContact++;
+    }
+  }
+  return { lowestPhysicalContactDestinationY, opaquePixelsBelowContact, sourceOpaquePixelsBelowContact, physicalContactOpaquePixels };
+}
+function crHeightfieldRecordSpriteProjection(kind, obj, tex, proj){
   if(!obj || !obj.calibrationId || !proj) return;
-  const lowestOpaqueDestinationY = Math.min(RH - 1, Math.ceil(proj.bottomY) - 1);
+  const evidence = crHeightfieldProjectedContactEvidence(tex, proj);
+  const groundingErrorPixels = evidence.lowestPhysicalContactDestinationY < 0 ? Infinity : Math.abs((evidence.lowestPhysicalContactDestinationY + 1) - proj.groundScreenY);
   crHeightfieldStats.spriteBounds[obj.calibrationId] = Object.freeze({
     kind, worldHeight: proj.worldHeight, cameraDepth: proj.depth,
     sourceCanvasWidth: proj.sourceCanvasWidth, sourceCanvasHeight: proj.sourceCanvasHeight,
     alphaBounds: Object.freeze({ x: proj.sourceX, y: proj.sourceY, w: proj.sourceWidth, h: proj.sourceHeight }),
-    anchorX: proj.anchorX, groundSourceY: proj.groundSourceY,
-    visibleTopScreenY: proj.topY, projectedGroundY: proj.groundScreenY,
-    lowestOpaqueDestinationY, groundingErrorPixels: Math.abs((lowestOpaqueDestinationY + 1) - proj.groundScreenY),
-    projectedPixelHeight: proj.screenH
+    anchorX: proj.anchorX, groundSourceY: proj.groundSourceY, sourceContactRow: proj.groundSourceY,
+    alphaBoundBottomRow: proj.sourceY + proj.sourceHeight,
+    visibleTopScreenY: proj.topY, projectedGroundY: proj.groundScreenY, screenBottomY: proj.bottomY,
+    lowestPhysicalContactDestinationY: evidence.lowestPhysicalContactDestinationY, groundingErrorPixels,
+    opaquePixelsBelowContact: evidence.opaquePixelsBelowContact, sourceOpaquePixelsBelowContact: evidence.sourceOpaquePixelsBelowContact,
+    physicalContactOpaquePixels: evidence.physicalContactOpaquePixels,
+    projectedTopToGround: proj.projectedTopToGround, scalePerSourcePixel: proj.scalePerSourcePixel,
+    sourcePixelsAboveGround: proj.sourcePixelsAboveGround, projectedPixelHeight: proj.projectedTopToGround,
+    screenH: proj.screenH
   });
 }
 function crHeightfieldResetStats(){
@@ -329,6 +375,7 @@ function crHeightfieldCalibrationMeasurements(){
   return Object.freeze({ pose: calibration.pose, subjects: Object.freeze(subjects) });
 }
 function crGetHeightfieldDiagnostics(){
+  const calibration = game && game.heightfieldCalibration;
   return Object.freeze({
     enabled: crHeightfieldStats.enabled, cameraZ: crHeightfieldStats.cameraZ,
     occlusionSubject: game.heightfieldProof ? game.heightfieldProof.occlusionSubject : null,
@@ -339,6 +386,9 @@ function crGetHeightfieldDiagnostics(){
     npcVisiblePixels: crHeightfieldStats.npcVisiblePixels, npcOccludedPixels: crHeightfieldStats.npcOccludedPixels,
     worldDepthBytes: crHeightfieldStats.worldDepthBytes, worldDepthLength: worldDepthPixels.length,
     allocations: crHeightfieldStats.allocations, width: crWorldDepthWidth, height: crWorldDepthHeight,
+    groundLine: calibration && calibration.showGroundLine ? Object.freeze({
+      enabled: true, depth: calibration.groundLineDepth
+    }) : null,
     calibration: crHeightfieldCalibrationMeasurements()
   });
 }

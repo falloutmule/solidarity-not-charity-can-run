@@ -101,6 +101,9 @@ def load_manifest():
             raise ValueError(f"{asset.get('assetId', 'unknown')}: displayHeightScale must be positive")
         if not isinstance(world_height, (int, float)) or world_height <= 0:
             raise ValueError(f"{asset.get('assetId', 'unknown')}: worldHeight must be positive")
+        contact_row = asset.get('groundContactSourceY')
+        if contact_row is not None and (not isinstance(contact_row, int) or isinstance(contact_row, bool)):
+            raise ValueError(f"{asset.get('assetId', 'unknown')}: groundContactSourceY must be an integer runtime source row")
     return manifest
 
 
@@ -129,6 +132,11 @@ def build(write_runtime):
         runtime_details = inspect(runtime_image)
         if runtime_details['alphaHistogram']['partial'] == 0:
             raise ValueError(f'{asset_id}: runtime derivative lost partial alpha')
+        contact_row = asset.get('groundContactSourceY')
+        if contact_row is not None:
+            alpha_bounds = runtime_details['alphaBounds']
+            if not (alpha_bounds['y'] < contact_row <= alpha_bounds['y'] + alpha_bounds['h']):
+                raise ValueError(f'{asset_id}: groundContactSourceY must lie after alpha top and at or before alpha bottom')
         runtime_path = ROOT / asset['runtimePath']
         if write_runtime:
             runtime_path.parent.mkdir(parents=True, exist_ok=True)
@@ -144,7 +152,7 @@ def build(write_runtime):
         if any(asset.get(key) != value for key, value in expected_fields.items()):
             asset.update(expected_fields)
             changed_manifest = True
-        records.append({
+        record = {
             'id': asset_id,
             'kind': 'npc',
             'group': asset['group'],
@@ -160,7 +168,10 @@ def build(write_runtime):
             'height': runtime_details['size']['height'],
             'sha256': runtime_sha,
             'dataUri': 'data:image/png;base64,' + base64.b64encode(runtime_bytes).decode('ascii'),
-        })
+        }
+        if contact_row is not None:
+            record['groundContactSourceY'] = contact_row
+        records.append(record)
     records.sort(key=lambda record: record['id'])
     if len(records) != 16:
         raise ValueError('runtime registry must contain exactly sixteen approved records')

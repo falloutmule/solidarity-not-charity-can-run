@@ -4,6 +4,7 @@
   "locks": {
     "slumpedAssetId": "npc_unhoused_slumped_001",
     "slumpedWorldHeight": 0.68,
+    "slumpedGroundContactSourceY": 184,
     "standingSelection": {
       "assetId": "npc_unhoused_work_jacket_001",
       "worldHeight": 0.78,
@@ -28,9 +29,16 @@
     "sha256": "a3a41db8891738ff1dadaa782633b9866a0f7466707c63037fa03a93ae6b2e52",
     "gitBlob": "487407480c285e57bd7386687319b3d037f2e379"
   },
+  "candidateArtifact": {
+    "path": "index.html",
+    "byteLength": 1681377,
+    "sha256": "85d1729933f1cd1265d06ba7d3c5a66afea151d6414d9e7be5a38d0fe563c7fe",
+    "buildId": "heightfieldseatedground1"
+  },
   "protectedFiles": {
-    "src/js/game-15a-variable-height-core.js": "ac6951e8f127852dada2a369a8fae205ba586c188d2dc2d29e018c59eebed960",
-    "src/js/game-16d-heightfield-renderer.js": "12005ca138a5b8d7b431c0b299ff0dc224b4a8102e16b68d961af4e722208cbe",
+    "src/js/game-15a-variable-height-core.js": "91915a9a3a0d9a1501ea2ec15e0b15bd4850fa06f0d4f487bc703aa97f32bb56",
+    "src/js/game-16d-heightfield-renderer.js": "46d82eadfe83062ddca08d0f3cafaf04538122ea2b6abebbc54ea4446ec71e2d",
+    "src/js/game-11-section-3b.js": "6c93f57c538b28de08872810cabee55ace3ea5da35f0bae6f4d56bcce77d0ec9",
     "src/js/game-16-section-7-render.js": "4d174fe082f7ab34837c179e86582f7ae82f2fa1d1e199a853fe3469f0ede6ea",
     "src/js/game-12-section-4-collision-walk-helpers.js": "af9f3c27b2d2ff7c19aeb8bbb079da84a637abee7f57bbd4148b77485e577270",
     "authoring/characters/runtime/npc_unhoused_slumped_001.png": "0124303d47ccc1fbf0c0f4fd729ad9d82f3e0339cf4e21ee6b0c6f5dcd8b8895",
@@ -39,15 +47,16 @@
     "authoring/buildings/low_block_concrete_001/source/north.png": "5397ee4252e0301eb25e1d02b6f092fffbf5b356c82cc53e5124f0b10295e01e",
     "authoring/buildings/low_block_concrete_001/source/west.png": "49f154437fd58e3be6afb82f67f50a3ea9ea127b6cbf70265d27cc2ae57e47d5",
     "authoring/buildings/low_block_concrete_001/source/top.png": "e0c9dd6822036d2139c2a7b96984fcd6651bd510c3b3aa2596e326e9c6fa6f4b",
-    "authoring/characters/character-assets-v2.json": "40dafbfc2d9131f2e9bc94c29332cf03ebcd493bd25f1c29fe73511b116fd571",
-    "src/imported-handoff-assets/runtime-character-gallery-assets.js": "ccc9b85f60860f82a4210774e2a170cae8cde6e8f313f0e555ef146848f566a2",
+    "authoring/characters/character-assets-v2.json": "382cec6ba8c8335250208e39d283bbe0a2c6650ff39f172634270458729e2147",
+    "src/imported-handoff-assets/runtime-character-gallery-assets.js": "83b2c11d5a608300585d8bb2bd7630287312110c9a26994758c57fd2cb15a922",
     "src/levels/asset-gallery-authored.js": "22c356d7d50e39772354130bd9cf96a5d630f5ebd6571431f6eb505cc1d3ec76",
-    "project-metadata.json": "baacdd2ba71917a34835f6b431ca05fcee3f40079f833e69a76df81659200643",
-    "tests/world_height_contract_verify.js": "bd233d08acd9bea4ad2e0bea774df73404e259f65aa153f90076298c1af2750e",
-    "tests/world_height_calibration_browser.js": "de4a3722455e92af9cfcea6db20bb1e621be3b7acd38a045b41bd3872096d5c5"
+    "project-metadata.json": "d56cf4b2bae2c39fdf04fe83d2df635089efbb09c8d70c3bd30d3d6f991357c5",
+    "tools/build-runtime-character-assets.py": "cf794e770a544589d581f694af4744aa5062ceb0c3a4cad8fae2bea91d5d823e",
+    "tests/world_height_contract_verify.js": "aad0f089e5565dd122b6b07494fb7684f551103af4610693af241ce4a7992be3",
+    "tests/world_height_calibration_browser.js": "3e76da4adb895fdd4f209c7c2aed41e4bf549bf81a961ce6c4975e75a0c6e030"
   },
   "protectedRecords": {
-    "slumpedManifestRecordSha256": "707fde3ba9aad7f908010bd201da8bf9f8b587b512e39a05fd40da5d8d60a8eb",
-    "slumpedRuntimeRecordSha256": "a5d60be0d8b6dea9d858adc21a9fc4b104c0de3be3c9409f96e681abb11ba521"
+    "slumpedManifestRecordSha256": "47e6278462d59484a7c4d02e0c497dce96cbd85db82507e0992505a91f7041fc",
+    "slumpedRuntimeRecordSha256": "b7616ac3cd4cfcd2ddd1cd82e747ee7cea81865f44557e63060cd864610d7817"
   }
 }

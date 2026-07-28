@@ -174,8 +174,9 @@ function genHeightfieldProof(){
 function genHeightfieldWorldScaleCalibration(params){
   const GW = 24, GH = 20;
   const {map, shade} = hallFillMap(GW, GH);
-  const halfBlock = { x: 14, y: 8, profileId: CR_VERTICAL_PROFILE_IDS.AUTHORED_CONCRETE };
-  const fullWall = { x: 16, y: 8, profileId: CR_VERTICAL_PROFILE_IDS.FULL_LEGACY };
+  const selectedReview = params.get('hfselectedreview') === '1';
+  const halfBlock = selectedReview ? { x: 16, y: 8, profileId: CR_VERTICAL_PROFILE_IDS.AUTHORED_CONCRETE } : { x: 14, y: 8, profileId: CR_VERTICAL_PROFILE_IDS.AUTHORED_CONCRETE };
+  const fullWall = selectedReview ? { x: 19, y: 8, profileId: CR_VERTICAL_PROFILE_IDS.FULL_LEGACY } : { x: 16, y: 8, profileId: CR_VERTICAL_PROFILE_IDS.FULL_LEGACY };
   map[halfBlock.y][halfBlock.x] = WALL.CONCRETE;
   map[fullWall.y][fullWall.x] = WALL.CONCRETE;
   game.verticalProfileWidth = GW; game.verticalProfileHeight = GH;
@@ -187,17 +188,24 @@ function genHeightfieldWorldScaleCalibration(params){
   game.map = map; game.MAP_W = GW; game.MAP_H = GH; game.wallShade = shade;
   game.buildingGrid = null; game.buildingRegistry = null; game.props = [];
   game.modifier = 'clear'; game.scoreMult = 1;
-  const poseName = params.get('hfcalpose') === 'standing-close' ? 'standing-close' : 'equal-depth';
-  const poses = {
+  const poseName = ['standing-close', 'seated-close', 'seated-side'].includes(params.get('hfcalpose')) ? params.get('hfcalpose') : 'equal-depth';
+  const poses = selectedReview ? {
     'equal-depth': [12.5, 15.0, 12.5, 8.5],
-    'standing-close': [8.5, 10.0, 8.5, 8.5]
+    'standing-close': [10.5, 10.0, 10.5, 8.5],
+    'seated-close': [14.5, 10.0, 14.5, 8.5],
+    'seated-side': [11.5, 10.0, 14.5, 8.5]
+  } : {
+    'equal-depth': [12.5, 15.0, 12.5, 8.5],
+    'standing-close': [8.5, 10.0, 8.5, 8.5],
+    'seated-close': [10.5, 10.0, 10.5, 8.5],
+    'seated-side': [8.5, 10.0, 10.5, 8.5]
   };
   const pose = poses[poseName];
   player.x = pose[0]; player.y = pose[1]; player.angle = Math.atan2(pose[3] - player.y, pose[2] - player.x);
   const standingComparison = params.get('hfstandingcomparison') === '1';
-  const standing = { calibrationId: 'standing', id: 'calibration-standing', assetId: 'npc_unhoused_work_jacket_001', kind: 'unhoused', x: 8.5, y: 8.5, need: 1, helped: false, wob: 0, thank: 'Calibration standing.' };
-  const slumped = { calibrationId: 'slumped', id: 'calibration-slumped', assetId: 'npc_unhoused_slumped_001', kind: 'unhoused', x: 10.5, y: 8.5, need: 1, helped: false, wob: 0, thank: 'Calibration slumped.' };
-  const standingCandidates = standingComparison ? [
+  const standing = { calibrationId: 'standing', id: 'calibration-standing', assetId: 'npc_unhoused_work_jacket_001', kind: 'unhoused', x: selectedReview ? 10.5 : 8.5, y: 8.5, need: 1, helped: false, wob: 0, thank: 'Calibration standing.' };
+  const slumped = { calibrationId: 'slumped', id: 'calibration-slumped', assetId: 'npc_unhoused_slumped_001', kind: 'unhoused', x: selectedReview ? 14.5 : 10.5, y: 8.5, need: 1, helped: false, wob: 0, thank: 'Calibration slumped.' };
+  const standingCandidates = selectedReview ? [standing] : standingComparison ? [
     { calibrationId: 'standing-078', id: 'calibration-standing-078', assetId: standing.assetId, kind: standing.kind, x: 7.5, y: 8.5, worldHeight: 0.78, need: 1, helped: false, wob: 0, thank: 'Standing calibration 0.78.' },
     { calibrationId: 'standing-082', id: 'calibration-standing-082', assetId: standing.assetId, kind: standing.kind, x: 9.5, y: 8.5, worldHeight: 0.82, need: 1, helped: false, wob: 0, thank: 'Standing calibration 0.82.' },
     { calibrationId: 'standing-086', id: 'calibration-standing-086', assetId: standing.assetId, kind: standing.kind, x: 11.5, y: 8.5, worldHeight: 0.86, need: 1, helped: false, wob: 0, thank: 'Standing calibration 0.86.' }
@@ -207,16 +215,18 @@ function genHeightfieldWorldScaleCalibration(params){
     slumped.id = 'calibration-slumped-locked';
   }
   const canComparison = params.get('hfcancomparison') === '1';
-  const cans = standingComparison ? [] : canComparison ? [
+  const cans = selectedReview || standingComparison ? [] : canComparison ? [
     { calibrationId: 'can-024', x: 11.5, y: 8.5, worldHeight: 0.24, taken: false, amt: 1, wob: 0 },
     { calibrationId: 'can-026', x: 12.5, y: 8.5, worldHeight: 0.26, taken: false, amt: 1, wob: 0 },
     { calibrationId: 'can-028', x: 13.5, y: 8.5, worldHeight: 0.28, taken: false, amt: 1, wob: 0 }
   ] : [{ calibrationId: 'can', x: 12.5, y: 8.5, taken: false, amt: 1, wob: 0 }];
   game.pickups = cans; game.npcs = [...standingCandidates, slumped];
   game.heightfieldCalibration = Object.freeze({
-    mode: standingComparison ? 'standing-comparison' : 'baseline',
-    calibrationBuildId: 'pr29-scale-lock-005-standing',
+    mode: selectedReview ? 'selected-standing-seated-review' : (standingComparison ? 'standing-comparison' : 'baseline'),
+    calibrationBuildId: selectedReview ? 'pr29-scale-lock-006-seated-ground' : 'pr29-scale-lock-005-standing',
     pose: poseName,
+    showGroundLine: selectedReview && params.get('hfgroundline') === '1',
+    groundLineDepth: 6.5,
     subjects: Object.freeze([
       ...standingCandidates.map((candidate) => Object.freeze({ id: candidate.calibrationId, kind: 'npc', assetId: candidate.assetId, x: candidate.x, y: candidate.y, worldHeight: crHeightfieldSpriteWorldHeight('npc', candidate) })),
       Object.freeze({ id: 'slumped', kind: 'npc', x: slumped.x, y: slumped.y, worldHeight: npcSpriteHeight(slumped, 'world') }),
@@ -228,6 +238,7 @@ function genHeightfieldWorldScaleCalibration(params){
   game.quota = 1; game.helped = 0; game.delivered = 0;
   game.exit = { x: 21.5, y: 15.5, active: false }; game.timeLeft = 9999;
   dbg.reachableCells = 0; dbg.cansSpawned = cans.length; dbg.npcsSpawned = game.npcs.length; dbg.props = 0;
+  if(selectedReview){ setMsg('SELECTED STANDING 0.78 — SEATED GROUND-CONTACT REVIEW.'); return; }
   if(standingComparison){ setMsg('STANDING SCALE COMPARISON: 0.78 / 0.82 / 0.86; seated reference locked.'); return; }
   setMsg('HEIGHTFIELD CALIBRATION — ' + poseName.toUpperCase().replace('-', ' ') + '.');
 }

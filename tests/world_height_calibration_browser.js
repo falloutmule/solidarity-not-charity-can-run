@@ -81,7 +81,8 @@ async function main(){
       const bounds = subject.visibleBounds;
       return bounds && bounds.sourceCanvasWidth > 0 && bounds.sourceCanvasHeight > 0 && bounds.alphaBounds.x >= 0 && bounds.alphaBounds.y >= 0 &&
         bounds.alphaBounds.x + bounds.alphaBounds.w <= bounds.sourceCanvasWidth && bounds.alphaBounds.y + bounds.alphaBounds.h <= bounds.sourceCanvasHeight &&
-        bounds.groundSourceY === bounds.alphaBounds.y + bounds.alphaBounds.h && bounds.groundSourceY <= bounds.sourceCanvasHeight;
+        bounds.groundSourceY <= bounds.alphaBounds.y + bounds.alphaBounds.h && bounds.groundSourceY > bounds.alphaBounds.y &&
+        (subject.id !== 'slumped' || bounds.groundSourceY === 184);
     });
     result.checks.visibleGrounding = [standing, slumped, can].every((subject) => subject.visibleBounds && Math.abs(subject.visibleBounds.projectedGroundY - subject.groundScreenY) < 1e-9 && subject.visibleBounds.groundingErrorPixels <= 1);
     result.checks.canComparison = comparisonCans.every(Boolean) && comparisonCans.map((subject) => subject.worldHeight).join(',') === '0.24,0.26,0.28' &&
