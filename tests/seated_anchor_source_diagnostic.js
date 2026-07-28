@@ -8,7 +8,7 @@ const { PNG } = require('pngjs');
 
 const root = path.resolve(__dirname, '..');
 const outputArg = process.argv.find((arg) => arg.startsWith('--output-dir='));
-const outputDir = path.resolve(root, outputArg ? outputArg.slice('--output-dir='.length) : path.join('test-results', 'pr29-seated-anchor-calibration-007', 'source-diagnostic'));
+const outputDir = path.resolve(root, outputArg ? outputArg.slice('--output-dir='.length) : path.join('test-results', 'pr29-seated-anchor-display-delta-008', 'source-diagnostic'));
 assert(outputDir.startsWith(path.join(root, 'test-results') + path.sep), 'diagnostic output remains ignored');
 const manifest = JSON.parse(fs.readFileSync(path.join(root, 'authoring/characters/character-assets-v2.json'), 'utf8'));
 const asset = manifest.assets.find((candidate) => candidate.assetId === 'npc_unhoused_slumped_001');
@@ -54,7 +54,35 @@ const alphaBounds = asset.runtimeAlphaBounds;
 const shoeRows = rowStats.filter((entry) => entry.row >= lowerThirdStart && entry.longestSpan >= 80 && entry.opaquePixels / Math.max(1, entry.visiblePixels) >= 0.7);
 const detectedShoeContactPixelRow = Math.max(...shoeRows.map((entry) => entry.row));
 const detectedFootContactSourceY = detectedShoeContactPixelRow + 1;
-const comparisonRows = Object.freeze({ A: detectedFootContactSourceY, B: detectedFootContactSourceY - 4, C: detectedFootContactSourceY - 8 });
+const displayDeltaProjection = Object.freeze({ cameraDepth: 6.5, renderHeight: 250, sourceTop: alphaBounds.y, visibleSourceHeight: alphaBounds.h });
+const projectedVisibleHeight = asset.worldHeight * displayDeltaProjection.renderHeight / displayDeltaProjection.cameraDepth;
+const internalPixelsPerSourcePixel = projectedVisibleHeight / displayDeltaProjection.visibleSourceHeight;
+const targetInternalPixelDeltas = Object.freeze([0, 4, 8]);
+const firstOrderRequiredSourceDeltas = Object.freeze(targetInternalPixelDeltas.map((target) => Math.round(target / internalPixelsPerSourcePixel)));
+const rasterizedShoePixel = (contactRow) => {
+  const screenH = displayDeltaProjection.visibleSourceHeight * projectedVisibleHeight / (contactRow - displayDeltaProjection.sourceTop);
+  let lowest = -1;
+  for(let y = Math.floor(displayDeltaProjection.renderHeight * 0.5); y < Math.ceil(displayDeltaProjection.renderHeight * 0.5 + screenH); y++){
+    const sourceY = Math.max(displayDeltaProjection.sourceTop, Math.min(displayDeltaProjection.sourceTop + displayDeltaProjection.visibleSourceHeight - 1, (displayDeltaProjection.sourceTop + (y - displayDeltaProjection.renderHeight * 0.5) / screenH * displayDeltaProjection.visibleSourceHeight) | 0));
+    if(sourceY >= detectedShoeContactPixelRow - 8 && sourceY <= detectedShoeContactPixelRow) lowest = y;
+  }
+  return lowest;
+};
+const baseRasterizedShoePixel = rasterizedShoePixel(detectedFootContactSourceY);
+const exactContactRow = (target) => {
+  if(target === 0) return detectedFootContactSourceY;
+  for(let row = detectedFootContactSourceY - 1; row > displayDeltaProjection.sourceTop; row--){
+    if(rasterizedShoePixel(row) - baseRasterizedShoePixel === target) return row;
+  }
+  throw new Error(`could not resolve a source row for +${target} internal pixels`);
+};
+const comparisonRows = Object.freeze({ A: exactContactRow(0), B: exactContactRow(4), C: exactContactRow(8) });
+const sourceDeltas = Object.freeze({ A: 0, B: comparisonRows.A - comparisonRows.B, C: comparisonRows.A - comparisonRows.C });
+const measuredInternalPixelDeltas = Object.freeze({
+  A: rasterizedShoePixel(comparisonRows.A) - baseRasterizedShoePixel,
+  B: rasterizedShoePixel(comparisonRows.B) - baseRasterizedShoePixel,
+  C: rasterizedShoePixel(comparisonRows.C) - baseRasterizedShoePixel
+});
 const detachedOrShadowComponents = lowerThirdComponents.filter((component) => component.minY >= detectedFootContactSourceY || component.maxY >= detectedFootContactSourceY);
 const lowerTailRows = rowStats.filter((entry) => entry.row >= detectedFootContactSourceY && entry.row < alphaBounds.y + alphaBounds.h && entry.visiblePixels > 0);
 
@@ -63,7 +91,12 @@ assert.strictEqual(asset.displayHeightScale, 0.45, 'canonical seated display sca
 assert.strictEqual(asset.groundContactSourceY, 184, 'canonical seated contact row is not changed by comparison work');
 assert.strictEqual(crypto.createHash('sha256').update(sourceBytes).digest('hex'), '0124303d47ccc1fbf0c0f4fd729ad9d82f3e0339cf4e21ee6b0c6f5dcd8b8895', 'source PNG remains byte-locked');
 assert.strictEqual(detectedShoeContactPixelRow, 181, 'the last continuous opaque shoe-sole row is detected from artwork');
-assert.deepStrictEqual(comparisonRows, { A: 182, B: 178, C: 174 }, 'query-only rows derive from the detected shoe-contact boundary');
+assert.strictEqual(projectedVisibleHeight, 26.153846153846153, 'equal-depth projected seated height matches the calibration lane');
+assert(Math.abs(internalPixelsPerSourcePixel - 0.14061207609594706) < 1e-12, 'source-to-internal scale is derived from current projection');
+assert.deepStrictEqual(firstOrderRequiredSourceDeltas, [0, 28, 57], 'first-order source deltas use round(targetInternalPixelDelta / internalPixelsPerSourcePixel)');
+assert.deepStrictEqual(comparisonRows, { A: 182, B: 159, C: 140 }, 'exact source rows resolve the actual 4 px and 8 px shoe targets after renderer source-row rasterization');
+assert.deepStrictEqual(sourceDeltas, { A: 0, B: 23, C: 42 }, 'resolved candidates report their source-row displacement from A');
+assert.deepStrictEqual(measuredInternalPixelDeltas, { A: 0, B: 4, C: 8 }, 'resolved candidates remain distinguishable after internal-pixel rounding');
 assert(lowerTailRows.length > 0, 'artwork contains lower shadow or detached tail pixels after the detected shoe contact');
 assert(detachedOrShadowComponents.some((component) => component.maxY >= 188), 'lower-third analysis retains the detached shadow or stray-pixel evidence');
 
@@ -137,9 +170,13 @@ fs.writeFileSync(outputJson, JSON.stringify({
     method: 'last lower-third row with a contiguous 80-pixel shoe span and at least 70% fully opaque pixels',
     rationale: 'Rows 182-188 are fragmented lower-tail, detached-shadow, and anti-alias evidence rather than the continuous shoe sole.'
   },
+  displayDeltaProjection: {
+    ...displayDeltaProjection, projectedVisibleHeight, internalPixelsPerSourcePixel,
+    targetInternalPixelDeltas, firstOrderRequiredSourceDeltas, sourceDeltas, measuredInternalPixelDeltas
+  },
   comparisonRows, rowOccupancy: rowStats, lowerThirdComponents, detachedOrShadowComponents, lowerTailRows,
   annotations: {
-    cyan: 'alpha bounds and candidate A boundary', orange: 'candidate B boundary', magenta: 'candidate C boundary and lower shadow/tail pixels',
+    cyan: 'alpha bounds and candidate A boundary', orange: 'candidate B boundary (+4 internal pixels)', magenta: 'candidate C boundary (+8 internal pixels) and lower shadow/tail pixels',
     yellow: 'detected continuous shoe sole', white: 'current canonical source row 184', rightPanel: 'row occupancy bars: blue visible pixels; yellow fully opaque pixels'
   }
 }, null, 2) + '\n');

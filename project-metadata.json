@@ -5,14 +5,14 @@
     "name": "Solidarity Not Charity Can Run"
   },
   "runtime": {
-    "buildId": "heightfieldseatedanchor1",
+    "buildId": "heightfieldseatedanchordelta1",
     "sourcePolicy": "build-manifest",
     "releaseArtifact": "index.html"
   },
   "artifact": {
     "path": "index.html",
-    "byteLength": 1686496,
-    "sha256": "ba9267eb997dc79b228433fe344fbd3a91d80898e9e1032aa0bd4e33569c9933"
+    "byteLength": 1693463,
+    "sha256": "735973764b1ec56dead043d3f8d29c82c6b924f90da30f7794c0405fd65e93ca"
   },
   "distribution": {
     "provider": "github-pages",
