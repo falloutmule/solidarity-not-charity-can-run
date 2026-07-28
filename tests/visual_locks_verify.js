@@ -21,8 +21,11 @@ assert.strictEqual(sha256(artifact), lock.acceptedArtifact.sha256, 'accepted roo
 
 const characterManifest = JSON.parse(fs.readFileSync(path.join(root, 'authoring/characters/character-assets-v2.json'), 'utf8'));
 const slumped = characterManifest.assets.find((asset) => asset.assetId === lock.locks.slumpedAssetId);
+const selectedStanding = characterManifest.assets.find((asset) => asset.assetId === lock.locks.standingSelection.assetId);
 assert(slumped, 'locked seated asset exists');
+assert(selectedStanding, 'Samsung-selected standing asset exists');
 assert.strictEqual(slumped.worldHeight, lock.locks.slumpedWorldHeight, 'locked seated physical height changed');
+assert.strictEqual(selectedStanding.worldHeight, lock.locks.standingSelection.worldHeight, 'Samsung-selected standing physical height changed');
 assert.strictEqual(sha256(JSON.stringify(slumped)), lock.protectedRecords.slumpedManifestRecordSha256, 'locked seated manifest record changed');
 
 class MockImage {
@@ -33,8 +36,10 @@ const runtimeSource = fs.readFileSync(path.join(root, 'src/imported-handoff-asse
 const sandbox = { Image: MockImage }; sandbox.globalThis = sandbox;
 vm.runInNewContext(runtimeSource, sandbox);
 const runtimeSlumped = sandbox.SNC_RUNTIME_ASSET_REGISTRY[lock.locks.slumpedAssetId];
+const runtimeSelectedStanding = sandbox.SNC_RUNTIME_ASSET_REGISTRY[lock.locks.standingSelection.assetId];
 const { image, ...runtimeSlumpedMetadata } = runtimeSlumped;
 assert.strictEqual(runtimeSlumpedMetadata.worldHeight, lock.locks.slumpedWorldHeight, 'locked seated runtime height changed');
+assert.strictEqual(runtimeSelectedStanding.worldHeight, lock.locks.standingSelection.worldHeight, 'Samsung-selected standing runtime height changed');
 assert.strictEqual(sha256(JSON.stringify(runtimeSlumpedMetadata)), lock.protectedRecords.slumpedRuntimeRecordSha256, 'locked seated runtime record changed');
 
 const core = fs.readFileSync(path.join(root, 'src/js/game-15a-variable-height-core.js'), 'utf8');

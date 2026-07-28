@@ -7,13 +7,17 @@ const path = require('path');
 const root = path.resolve(__dirname, '..');
 const load = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 const manifest = JSON.parse(load('authoring/characters/character-assets-v2.json'));
-const standing = manifest.assets.filter((asset) => asset.assetId !== 'npc_unhoused_slumped_001');
+const selectedStanding = manifest.assets.find((asset) => asset.assetId === 'npc_unhoused_work_jacket_001');
 const slumped = manifest.assets.find((asset) => asset.assetId === 'npc_unhoused_slumped_001');
+const unclassifiedComposites = manifest.assets.filter((asset) => asset.assetId !== 'npc_unhoused_work_jacket_001' && asset.assetId !== 'npc_unhoused_slumped_001');
 
-assert(standing.length === 15 && slumped, 'approved cast remains complete');
-for(const asset of standing){
+assert(selectedStanding && slumped && unclassifiedComposites.length === 14, 'approved cast remains complete');
+assert.strictEqual(selectedStanding.displayHeightScale, 0.62, 'selected standing legacy display height remains approved');
+assert.strictEqual(selectedStanding.worldHeight, 0.78, 'Samsung-selected work-jacket standing height is locked');
+assert.notStrictEqual(selectedStanding.displayHeightScale, selectedStanding.worldHeight, 'selected standing display and world heights remain distinct');
+for(const asset of unclassifiedComposites){
   assert.strictEqual(asset.displayHeightScale, 0.62, `${asset.assetId}: legacy display height remains approved`);
-  assert.strictEqual(asset.worldHeight, 0.96, `${asset.assetId}: standing world height is calibrated`);
+  assert.strictEqual(asset.worldHeight, 0.96, `${asset.assetId}: unclassified composite height remains unchanged`);
   assert.notStrictEqual(asset.displayHeightScale, asset.worldHeight, `${asset.assetId}: display and world heights are distinct`);
 }
 assert.strictEqual(slumped.displayHeightScale, 0.45, 'slumped legacy display height remains approved');
@@ -45,9 +49,9 @@ assert(sprites.includes("params.get('hfcalibration') === '1'"), 'calibration sce
 assert(sprites.includes("id: 'half-block'") && sprites.includes("id: 'full-wall'"), 'calibration scene includes both geometry references');
 
 const eyeZ = 0.68, halfBlock = 0.5, can = 0.26;
-assert(standing[0].worldHeight > eyeZ, 'standing world height exceeds the camera eye');
+assert(selectedStanding.worldHeight > eyeZ, 'selected standing world height exceeds the camera eye');
 assert(can < halfBlock, 'can remains shorter than the half block');
-assert(slumped.worldHeight > halfBlock && slumped.worldHeight < standing[0].worldHeight, 'slumped person is physically between block and standing heights');
+assert(slumped.worldHeight > halfBlock && slumped.worldHeight < selectedStanding.worldHeight, 'slumped person is physically between block and selected standing heights');
 
 for(const asset of manifest.assets){
   const bounds = asset.runtimeAlphaBounds, size = asset.runtimeSize;
@@ -59,4 +63,4 @@ for(const asset of manifest.assets){
 assert(sprites.includes("params.get('hfcancomparison') === '1'"), 'one artifact exposes the three-can calibration comparison');
 assert(sprites.includes("worldHeight: 0.24") && sprites.includes("worldHeight: 0.26") && sprites.includes("worldHeight: 0.28"), 'comparison has the requested explicit physical heights');
 
-console.log(JSON.stringify({ pass: true, standingWorldHeight: standing[0].worldHeight, slumpedWorldHeight: slumped.worldHeight, canWorldHeight: can, cameraEyeZ: eyeZ }));
+console.log(JSON.stringify({ pass: true, standingWorldHeight: selectedStanding.worldHeight, slumpedWorldHeight: slumped.worldHeight, canWorldHeight: can, cameraEyeZ: eyeZ }));

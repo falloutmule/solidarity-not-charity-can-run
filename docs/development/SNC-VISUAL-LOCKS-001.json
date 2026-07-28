@@ -4,6 +4,11 @@
   "locks": {
     "slumpedAssetId": "npc_unhoused_slumped_001",
     "slumpedWorldHeight": 0.68,
+    "standingSelection": {
+      "assetId": "npc_unhoused_work_jacket_001",
+      "worldHeight": 0.78,
+      "authority": "Samsung selected; 0.82 and 0.86 rejected"
+    },
     "halfBlockHeight": 0.5,
     "cameraEyeZ": 0.68,
     "fullWallHeight": 1.0,
@@ -14,7 +19,7 @@
     "collision": "locked"
   },
   "unresolved": {
-    "standingWorldHeight": true,
+    "standingWorldHeight": false,
     "canWorldHeight": true
   },
   "acceptedArtifact": {
@@ -34,11 +39,11 @@
     "authoring/buildings/low_block_concrete_001/source/north.png": "5397ee4252e0301eb25e1d02b6f092fffbf5b356c82cc53e5124f0b10295e01e",
     "authoring/buildings/low_block_concrete_001/source/west.png": "49f154437fd58e3be6afb82f67f50a3ea9ea127b6cbf70265d27cc2ae57e47d5",
     "authoring/buildings/low_block_concrete_001/source/top.png": "e0c9dd6822036d2139c2a7b96984fcd6651bd510c3b3aa2596e326e9c6fa6f4b",
-    "authoring/characters/character-assets-v2.json": "3cb314b0a3576a3ff193c828d77cb2b9e19b19f83f05647ba8898d861adf2ceb",
-    "src/imported-handoff-assets/runtime-character-gallery-assets.js": "9fe1ed97be3491eb7280c678a00845252390cf6c0ba91cee3a183cf4db599fa6",
+    "authoring/characters/character-assets-v2.json": "40dafbfc2d9131f2e9bc94c29332cf03ebcd493bd25f1c29fe73511b116fd571",
+    "src/imported-handoff-assets/runtime-character-gallery-assets.js": "ccc9b85f60860f82a4210774e2a170cae8cde6e8f313f0e555ef146848f566a2",
     "src/levels/asset-gallery-authored.js": "22c356d7d50e39772354130bd9cf96a5d630f5ebd6571431f6eb505cc1d3ec76",
     "project-metadata.json": "baacdd2ba71917a34835f6b431ca05fcee3f40079f833e69a76df81659200643",
-    "tests/world_height_contract_verify.js": "4c301f18597e697b1c4d653b76fdda633bbd20faa2620b997e9b93c33d422a80",
+    "tests/world_height_contract_verify.js": "bd233d08acd9bea4ad2e0bea774df73404e259f65aa153f90076298c1af2750e",
     "tests/world_height_calibration_browser.js": "de4a3722455e92af9cfcea6db20bb1e621be3b7acd38a045b41bd3872096d5c5"
   },
   "protectedRecords": {
