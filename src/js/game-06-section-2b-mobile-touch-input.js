@@ -848,7 +848,9 @@ function syncPortraitMenuLabel(){
   const galleryLabel = typeof crAssetGalleryIsActive === 'function' && crAssetGalleryIsActive();
   const want = galleryLabel
     ? '<span class="mportmenu-t">MENU</span><span class="mportmenu-b">GALLERY</span>'
-    : `<span class="mportmenu-t">MENU</span><span class="mportmenu-b">${BUILD_ID}</span>`;
+    : (typeof DEBUG !== 'undefined' && DEBUG)
+      ? `<span class="mportmenu-t">MENU</span><span class="mportmenu-b">${BUILD_ID}</span>`
+      : '<span class="mportmenu-t">MENU</span>';
   crWriteHtml(mportmenu, want);
 }
 function isMobilePortrait(){

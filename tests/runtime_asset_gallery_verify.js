@@ -113,7 +113,7 @@ assert(mobileInput.includes('crAssetGalleryIsActive') && mobileInput.includes('S
 assert(responsiveMenu.includes("action === 'pause-help' || action === 'pause-restart'"), 'gallery pause menu suppresses mutating actions');
 assert(hud.includes('function crGalleryHudActive()'), 'HUD owns one gallery-mode predicate');
 assert(hud.includes('function drawAssetGalleryHUD()') && hud.includes('crDrawAssetGalleryOverlay()'), 'gallery HUD retains exhibit focus copy');
-assert(mainLoop.includes("if(!crGalleryHudActive()){\n    ctx.font = 'bold 9px monospace';"), 'portrait chrome hides normal build copy in gallery mode');
+assert(mainLoop.includes("if(!crGalleryHudActive()){\n    if(typeof DEBUG !== 'undefined' && DEBUG){\n      ctx.font = 'bold 9px monospace';"), 'portrait chrome hides normal build copy in gallery mode and production play');
 assert(mobileInput.includes("? '<span class=\"mportmenu-t\">MENU</span><span class=\"mportmenu-b\">GALLERY</span>'"), 'portrait menu uses a gallery-neutral label');
 
 const buildManifest = JSON.parse(load('src/build-manifest.json'));

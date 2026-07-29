@@ -50,8 +50,16 @@ function exportToTiled(level) {
   const socketMode = Array.isArray(level.canSockets);
   const pickupSource = socketMode ? level.canSockets : level.pickups;
   const pickupObjects = pickupSource.map((item, index) => makeObject(id++, socketMode ? item.id : `pickup-${String(index).padStart(2, '0')}`, 'pickup', item.x * TILE_SIZE, item.y * TILE_SIZE, socketMode ? { amt: 1, socketId: item.id } : { amt: item.amt }));
-  const npcObjects = level.npcs.map((item, index) => makeObject(id++, `npc-${String(index).padStart(2, '0')}`, 'npc', item.x * TILE_SIZE, item.y * TILE_SIZE, { kind: item.kind, need: item.need }));
-  const propObjects = level.props.map((item, index) => makeObject(id++, `prop-${String(index).padStart(2, '0')}`, 'prop', item.x * TILE_SIZE, item.y * TILE_SIZE, { kind: item.kind }));
+  const npcObjects = level.npcs.map((item, index) => {
+    const values = { kind: item.kind, need: item.need };
+    if(item.assetId) values.assetId = item.assetId;
+    return makeObject(id++, `npc-${String(index).padStart(2, '0')}`, 'npc', item.x * TILE_SIZE, item.y * TILE_SIZE, values);
+  });
+  const propObjects = level.props.map((item, index) => {
+    const values = { kind: item.kind };
+    if(item.label) values.label = item.label;
+    return makeObject(id++, `prop-${String(index).padStart(2, '0')}`, 'prop', item.x * TILE_SIZE, item.y * TILE_SIZE, values);
+  });
   const player = makeObject(id++, 'player-start', 'player-start', level.playerStart.x * TILE_SIZE, level.playerStart.y * TILE_SIZE, { angleRadians: level.playerStart.angleRadians, faces: level.playerStart.faces });
   const exit = makeObject(id++, 'exit', 'exit', level.exit.x * TILE_SIZE, level.exit.y * TILE_SIZE, { active: level.exit.active });
   const metadata = makeObject(id++, 'metadata', 'metadata', 0, 0, { levelId: level.id, district: level.district, quota: level.quota, timeLeftPolicy: level.timeLeftPolicy, scoreMultiplierPolicy: level.scoreMultiplierPolicy, staticSchema: level.staticSchema });
@@ -109,8 +117,16 @@ function fromTiled(map, baseline) {
     assert(importedPickupRows.every(row => row.amt === 1 && row.socketId === row.id), 'can socket pickups must retain their stable IDs');
     imported.canSockets = importedPickupRows.map(row => ({ id: row.id, x: row.x, y: row.y }));
   } else imported.pickups = importedPickupRows.map(row => ({ x: row.x, y: row.y, amt: row.amt }));
-  imported.npcs = pointItems('NPCs', 'npc', (object) => ({ x: object.x / TILE_SIZE, y: object.y / TILE_SIZE, kind: required(object, 'kind'), need: Number(required(object, 'need')) }));
-  imported.props = pointItems('Props', 'prop', (object) => ({ x: object.x / TILE_SIZE, y: object.y / TILE_SIZE, kind: required(object, 'kind') }));
+  imported.npcs = pointItems('NPCs', 'npc', (object) => {
+    const row = { x: object.x / TILE_SIZE, y: object.y / TILE_SIZE, kind: required(object, 'kind'), need: Number(required(object, 'need')) };
+    const assetId = valueOf(object, 'assetId'); if(assetId) row.assetId = assetId;
+    return row;
+  });
+  imported.props = pointItems('Props', 'prop', (object) => {
+    const row = { x: object.x / TILE_SIZE, y: object.y / TILE_SIZE, kind: required(object, 'kind') };
+    const label = valueOf(object, 'label'); if(label) row.label = label;
+    return row;
+  });
   imported.playerStart = { x: player[0].x / TILE_SIZE, y: player[0].y / TILE_SIZE, angleRadians: Number(required(player[0], 'angleRadians')), faces: required(player[0], 'faces') };
   imported.exit = { x: exits[0].x / TILE_SIZE, y: exits[0].y / TILE_SIZE, active: Boolean(required(exits[0], 'active')) };
   for (const [name, expected] of Object.entries({ levelId: baseline.id, district: baseline.district, staticSchema: baseline.staticSchema, timeLeftPolicy: baseline.timeLeftPolicy, scoreMultiplierPolicy: baseline.scoreMultiplierPolicy })) assert(required(metadata[0], name) === expected, `Metadata ${name} does not match District 1 authority`);

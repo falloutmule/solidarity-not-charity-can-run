@@ -29,7 +29,7 @@
     if(!source.grid || source.grid.width !== 40 || source.grid.height !== 20) errors.push('grid dimensions mismatch');
     if(!Array.isArray(source.mapRows) || source.mapRows.length !== 20 || source.mapRows.some(row => typeof row !== 'string' || row.length !== 40 || /[^0128]/.test(row))) errors.push('map rows invalid');
     if(!source.mapEncoding || source.mapEncoding['2'] !== 'solid half-height concrete planter block') errors.push('low-block map encoding mismatch');
-    if(!Array.isArray(source.buildings) || source.buildings.length !== 1 || !Array.isArray(source.environmentObjects) || source.environmentObjects.length < 6) errors.push('authored geometry mismatch');
+    if(!Array.isArray(source.buildings) || source.buildings.length !== 2 || !Array.isArray(source.environmentObjects) || source.environmentObjects.length !== 6) errors.push('authored geometry mismatch');
     if(!Array.isArray(source.canSockets) || source.canSockets.length !== 9 || source.pickupCount !== 5) errors.push('can socket contract mismatch');
     if(!Array.isArray(source.npcs) || source.npcs.length !== 3 || source.quota !== 3 || source.requiredCans !== 5 || source.carryingCapacity !== 3) errors.push('objective contract mismatch');
     if(source.timerExpiryPolicy !== 'continue') errors.push('timer must not end The Stand');

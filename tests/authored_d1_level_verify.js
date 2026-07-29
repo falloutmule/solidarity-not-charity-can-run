@@ -11,6 +11,9 @@ const levelPath = path.join(root, 'src/levels/district-01-authored.js');
 const runtimePath = path.join(root, 'src/js/game-09a-authored-level-runtime.js');
 const actionPath = path.join(root, 'src/js/game-19-section-10-gameplay-actions.js');
 const updatePath = path.join(root, 'src/js/game-20-section-11-update-input.js');
+const mobileInputPath = path.join(root, 'src/js/game-06-section-2b-mobile-touch-input.js');
+const mobileMenuPath = path.join(root, 'src/js/game-07-section-2c-responsive-mobile-menu-html-overlay.js');
+const mainLoopPath = path.join(root, 'src/js/game-22-section-13-main-loop.js');
 
 function loadWorld(){
   const sandbox = {
@@ -51,12 +54,19 @@ assert.strictEqual(definition.requiredCans, 5);
 assert.strictEqual(definition.carryingCapacity, 3);
 assert.strictEqual(definition.timerExpiryPolicy, 'continue');
 assert(fs.readFileSync(updatePath, 'utf8').includes("if(game.timerExpiryPolicy === 'continue') game.timeLeft = 0;"), 'expired The Stand timer clamps without ending the run');
+assert(fs.readFileSync(mobileInputPath, 'utf8').includes("typeof DEBUG !== 'undefined' && DEBUG"), 'normal portrait menu hides the build identifier outside debug mode');
+assert(fs.readFileSync(mobileMenuPath, 'utf8').includes("typeof DEBUG !== 'undefined' && DEBUG ? `<div class=\"rclose\""), 'title build identifier remains debug-only');
+assert(fs.readFileSync(mainLoopPath, 'utf8').includes("if(!crGalleryHudActive()){\n    if(typeof DEBUG !== 'undefined' && DEBUG){") && fs.readFileSync(mainLoopPath, 'utf8').includes("if(typeof DEBUG !== 'undefined' && DEBUG){\n    ctx.fillStyle = '#4a4035';"), 'portrait dashboard build identifiers remain debug-only');
 assert.strictEqual(definition.environmentObjects.length, 6, 'two three-block planter clusters are authored');
 assert(definition.environmentObjects.every(row => row.assetId === 'low_block_concrete_001'), 'accepted low-block asset is used');
+assert.deepStrictEqual(Array.from(definition.buildings, row => row.assetId), ['custom_next_001', 'strip_mall_001'], 'stand and outer-route market use supported bitmap buildings');
+assert.strictEqual(definition.props.filter(row => row.kind === 'signboard' && row.label === 'SNC\nCAN STAND').length, 1, 'stand has a first-person landmark sign');
+assert(definition.props.filter(row => row.kind === 'signboard' && /CAN/.test(row.label || '')).length >= 5, 'delivery and route landmarks are authored');
+assert.deepStrictEqual(Array.from(definition.environmentObjects, row => `${row.x},${row.y}`), ['10,10', '10,12', '12,10', '28,12', '30,12', '30,14'], 'planter clusters preserve open gaps between their visible ends');
 
 const canonical = sandbox.sncCanonicalizeAuthoredStatic(sandbox.sncBuildLockedStaticLevel(definition));
-assert.strictEqual(Buffer.byteLength(canonical), 3768, 'static byte identity is locked');
-assert.strictEqual(crypto.createHash('sha256').update(canonical).digest('hex'), '803ed8dba1f272fac12b053e1811c47f7c402e45372c0aecd32ddae239d2c729', 'static hash identity is locked');
+assert.strictEqual(Buffer.byteLength(canonical), 5183, 'static byte identity is locked');
+assert.strictEqual(crypto.createHash('sha256').update(canonical).digest('hex'), '2e67ca1a75b83e513bf1e17298409a4db6d617cb6714cc111ed1863875aad529', 'static hash identity is locked');
 assert.deepStrictEqual(JSON.parse(JSON.stringify(sandbox.sncValidateAuthoredLevelDefinition(definition))), { pass: true, errors: [] });
 
 for(const seed of [1, 2468, 717, 9001]){

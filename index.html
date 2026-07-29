@@ -1525,7 +1525,9 @@ function syncPortraitMenuLabel(){
   const galleryLabel = typeof crAssetGalleryIsActive === 'function' && crAssetGalleryIsActive();
   const want = galleryLabel
     ? '<span class="mportmenu-t">MENU</span><span class="mportmenu-b">GALLERY</span>'
-    : `<span class="mportmenu-t">MENU</span><span class="mportmenu-b">${BUILD_ID}</span>`;
+    : (typeof DEBUG !== 'undefined' && DEBUG)
+      ? `<span class="mportmenu-t">MENU</span><span class="mportmenu-b">${BUILD_ID}</span>`
+      : '<span class="mportmenu-t">MENU</span>';
   crWriteHtml(mportmenu, want);
 }
 function isMobilePortrait(){
@@ -2507,7 +2509,7 @@ function drawMobileMenu(){
       ${fileOriginMenuNoteHTML()}
       ${buildTitleRmenuBody()}
       <div class="rclose" style="margin-top:16px;">↑↓ navigate · tap to activate</div>
-      <div class="rclose" style="margin-top:6px;color:#5a4a3a;">build ${BUILD_ID}</div>
+      ${typeof DEBUG !== 'undefined' && DEBUG ? `<div class="rclose" style="margin-top:6px;color:#5a4a3a;">build ${BUILD_ID}</div>` : ''}
     `);
     return;
   }
@@ -2579,7 +2581,7 @@ function drawMobileMenu(){
     rmenuHTML(`
       <div class="options-scroll-body">
       <div class="rpantit">OPTIONS</div>
-      <div class="rdesc" style="margin-bottom:8px;color:#6a5a4a;">build ${BUILD_ID}</div>
+      ${typeof DEBUG !== 'undefined' && DEBUG ? `<div class="rdesc" style="margin-bottom:8px;color:#6a5a4a;">build ${BUILD_ID}</div>` : ''}
       <div class="options-section-hdr">CONTROLS</div>
       <div class="rit" data-action="option-edit-controls">EDIT CONTROLS</div>
       <div class="rit" data-action="option-reset-controls">RESET CONTROLS</div>
@@ -3177,8 +3179,8 @@ Object.keys(LOW_BLOCK_CONCRETE_001.materials).forEach(function(face){
 
   const SNC_AUTHORED_LEVEL_ID = 'district-1-authored-v1';
   const SNC_AUTHORED_LEVEL_SCHEMA = 'snc-authored-level-static-v2';
-  const SNC_AUTHORED_LEVEL_STATIC_BYTES = 3768;
-  const SNC_AUTHORED_LEVEL_STATIC_SHA256 = '803ed8dba1f272fac12b053e1811c47f7c402e45372c0aecd32ddae239d2c729';
+  const SNC_AUTHORED_LEVEL_STATIC_BYTES = 5183;
+  const SNC_AUTHORED_LEVEL_STATIC_SHA256 = '2e67ca1a75b83e513bf1e17298409a4db6d617cb6714cc111ed1863875aad529';
   const SNC_AUTHORED_SAVE_SCHEMA = 'snc-authored-save-overlay-v2';
 
   function deepFreeze(value){
@@ -3190,8 +3192,12 @@ Object.keys(LOW_BLOCK_CONCRETE_001.materials).forEach(function(face){
   function makeTheStandMapRows(){
     const width = 40, height = 20;
     const cells = Array.from({ length: height }, (_, y) => Array.from({ length: width }, (_, x) => (x === 0 || y === 0 || x === width - 1 || y === height - 1) ? '8' : '0'));
+    // The stand is the central anchor. The smaller street-edge building gives the
+    // outer sprint loop a different silhouette without cutting either route off.
     for(let y = 7; y <= 9; y++) for(let x = 17; x <= 22; x++) cells[y][x] = '1';
-    for(const [x, y] of [[14,5], [15,5], [14,6], [26,13], [27,13], [27,14]]) cells[y][x] = '2';
+    for(let y = 2; y <= 4; y++) for(let x = 30; x <= 35; x++) cells[y][x] = '1';
+    // Two deliberately broken planter clusters: every block has a visible end and walkable gap.
+    for(const [x, y] of [[10,10], [12,10], [10,12], [28,12], [30,12], [30,14]]) cells[y][x] = '2';
     return cells.map(row => row.join(''));
   }
 
@@ -3260,36 +3266,56 @@ Object.keys(LOW_BLOCK_CONCRETE_001.materials).forEach(function(face){
     wallShade: { width: 40, height: 20, fill: 0.5 },
     streetLayoutMeta: { topology: 'figure-eight', centralLoop: 'short-turning', outerLoop: 'sprint', GW: 40, GH: 20 },
     playerStart: { x: 20.5, y: 14.5, angleRadians: -1.5707963267948966, faces: 'north_toward_the_stand' },
-    buildings: [{ id: 'snc-stand', assetId: 'custom_next_001', x: 17, y: 7, rotation: 0, widthCells: 6, depthCells: 3, front: 'south' }],
+    buildings: [
+      { id: 'snc-stand', assetId: 'custom_next_001', x: 17, y: 7, rotation: 0, widthCells: 6, depthCells: 3, front: 'south' },
+      { id: 'outer-street-market', assetId: 'strip_mall_001', x: 30, y: 2, rotation: 0, widthCells: 6, depthCells: 3, front: 'south' }
+    ],
     environmentObjects: [
-      { id: 'north-planter-00', assetId: 'low_block_concrete_001', x: 14, y: 5, rotation: 0, widthCells: 1, depthCells: 1 },
-      { id: 'north-planter-01', assetId: 'low_block_concrete_001', x: 15, y: 5, rotation: 0, widthCells: 1, depthCells: 1 },
-      { id: 'north-planter-02', assetId: 'low_block_concrete_001', x: 14, y: 6, rotation: 0, widthCells: 1, depthCells: 1 },
-      { id: 'southeast-planter-00', assetId: 'low_block_concrete_001', x: 26, y: 13, rotation: 1, widthCells: 1, depthCells: 1 },
-      { id: 'southeast-planter-01', assetId: 'low_block_concrete_001', x: 27, y: 13, rotation: 1, widthCells: 1, depthCells: 1 },
-      { id: 'southeast-planter-02', assetId: 'low_block_concrete_001', x: 27, y: 14, rotation: 1, widthCells: 1, depthCells: 1 }
+      { id: 'central-planter-00', assetId: 'low_block_concrete_001', x: 10, y: 10, rotation: 0, widthCells: 1, depthCells: 1 },
+      { id: 'central-planter-01', assetId: 'low_block_concrete_001', x: 10, y: 12, rotation: 0, widthCells: 1, depthCells: 1 },
+      { id: 'central-planter-02', assetId: 'low_block_concrete_001', x: 12, y: 10, rotation: 1, widthCells: 1, depthCells: 1 },
+      { id: 'outer-planter-00', assetId: 'low_block_concrete_001', x: 28, y: 12, rotation: 2, widthCells: 1, depthCells: 1 },
+      { id: 'outer-planter-01', assetId: 'low_block_concrete_001', x: 30, y: 12, rotation: 2, widthCells: 1, depthCells: 1 },
+      { id: 'outer-planter-02', assetId: 'low_block_concrete_001', x: 30, y: 14, rotation: 3, widthCells: 1, depthCells: 1 }
     ],
     canSockets: [
       { id: 'can-socket-00', x: 15.5, y: 12.5 }, { id: 'can-socket-01', x: 24.5, y: 12.5 },
-      { id: 'can-socket-02', x: 10.5, y: 10.5 }, { id: 'can-socket-03', x: 5.5, y: 5.5 },
+      { id: 'can-socket-02', x: 13.5, y: 12.5 }, { id: 'can-socket-03', x: 5.5, y: 5.5 },
       { id: 'can-socket-04', x: 7.5, y: 15.5 }, { id: 'can-socket-05', x: 15.5, y: 4.5 },
       { id: 'can-socket-06', x: 29.5, y: 10.5 }, { id: 'can-socket-07', x: 34.5, y: 5.5 },
       { id: 'can-socket-08', x: 33.5, y: 15.5 }
     ],
     pickupCount: 5,
     npcs: [
-      { x: 11.5, y: 8.5, kind: 'hungry', need: 1 },
-      { x: 20.5, y: 4.5, kind: 'family', need: 3 },
-      { x: 29.5, y: 12.5, kind: 'elder', need: 1 }
+      { x: 8.5, y: 8.5, kind: 'hungry', assetId: 'npc_unhoused_work_jacket_001', need: 1 },
+      { x: 20.5, y: 4.5, kind: 'family', assetId: 'npc_household_parent_child_001', need: 3 },
+      { x: 32.5, y: 12.5, kind: 'elder', assetId: 'npc_volunteer_elder_cane_001', need: 1 }
     ],
     quota: 3,
     requiredCans: 5,
     carryingCapacity: 3,
     props: [
-      { x: 12.5, y: 12.5, kind: 'bench' }, { x: 24.5, y: 14.5, kind: 'bench' },
-      { x: 16.0, y: 11.5, kind: 'signboard' }, { x: 24.0, y: 10.5, kind: 'crate_stack' },
-      { x: 8.5, y: 7.5, kind: 'mailbox' }, { x: 31.5, y: 7.5, kind: 'utility_box' },
-      { x: 5.5, y: 12.5, kind: 'scrub_bush' }, { x: 34.5, y: 12.5, kind: 'agave' }
+      // Stand forecourt: two labeled signs, pantry crates, and a cooler make the
+      // central building readable at the starting pose and keep the portal grounded here.
+      { x: 18.2, y: 10.6, kind: 'signboard', label: 'SNC\nCAN STAND' },
+      { x: 21.8, y: 10.6, kind: 'signboard', label: 'DROP OFF\nCANS' },
+      { x: 17.2, y: 10.9, kind: 'crate_stack' }, { x: 22.8, y: 10.9, kind: 'cooler' },
+      { x: 18.0, y: 11.9, kind: 'bench' }, { x: 22.0, y: 11.9, kind: 'bench' },
+      // Central park loop: a broken planter cluster and a one-can neighborhood stop.
+      { x: 9.0, y: 8.1, kind: 'signboard', label: 'NEIGHBOR\n1 CAN' },
+      { x: 7.2, y: 9.5, kind: 'bench' }, { x: 9.4, y: 10.9, kind: 'scrub_bush' },
+      { x: 11.1, y: 9.4, kind: 'agave' }, { x: 12.9, y: 11.0, kind: 'scrub_bush' },
+      // North crossover is the family stop and clear link between the two loops.
+      { x: 18.0, y: 5.1, kind: 'signboard', label: 'FAMILY\n3 CANS' },
+      { x: 22.7, y: 5.1, kind: 'shopping_cart' }, { x: 20.5, y: 5.6, kind: 'cooler' },
+      // Outer sprint loop: the market facade, split planter cluster, and elder stop.
+      { x: 29.0, y: 10.8, kind: 'signboard', label: 'OUTER LOOP\nMARKET' },
+      { x: 31.0, y: 11.1, kind: 'bench' }, { x: 28.4, y: 13.5, kind: 'agave' },
+      { x: 31.4, y: 13.8, kind: 'scrub_bush' }, { x: 33.0, y: 11.0, kind: 'signboard', label: 'ELDER\n1 CAN' },
+      { x: 34.2, y: 13.0, kind: 'mailbox' }, { x: 26.5, y: 15.5, kind: 'utility_box' },
+      // Sparse edge cues guide the longer route without walling it off.
+      { x: 5.5, y: 5.5, kind: 'mural_panel' }, { x: 6.5, y: 15.5, kind: 'bench' },
+      { x: 34.5, y: 5.5, kind: 'mural_panel' }, { x: 35.0, y: 15.5, kind: 'mailbox' }
     ],
     exit: { x: 20.5, y: 10.7, active: false },
     timeLeftPolicy: 'count down from cfg.baseTime; timer measures completion only',
@@ -7319,7 +7345,7 @@ function genCity(seed, district, modifier){
     if(!source.grid || source.grid.width !== 40 || source.grid.height !== 20) errors.push('grid dimensions mismatch');
     if(!Array.isArray(source.mapRows) || source.mapRows.length !== 20 || source.mapRows.some(row => typeof row !== 'string' || row.length !== 40 || /[^0128]/.test(row))) errors.push('map rows invalid');
     if(!source.mapEncoding || source.mapEncoding['2'] !== 'solid half-height concrete planter block') errors.push('low-block map encoding mismatch');
-    if(!Array.isArray(source.buildings) || source.buildings.length !== 1 || !Array.isArray(source.environmentObjects) || source.environmentObjects.length < 6) errors.push('authored geometry mismatch');
+    if(!Array.isArray(source.buildings) || source.buildings.length !== 2 || !Array.isArray(source.environmentObjects) || source.environmentObjects.length !== 6) errors.push('authored geometry mismatch');
     if(!Array.isArray(source.canSockets) || source.canSockets.length !== 9 || source.pickupCount !== 5) errors.push('can socket contract mismatch');
     if(!Array.isArray(source.npcs) || source.npcs.length !== 3 || source.quota !== 3 || source.requiredCans !== 5 || source.carryingCapacity !== 3) errors.push('objective contract mismatch');
     if(source.timerExpiryPolicy !== 'continue') errors.push('timer must not end The Stand');
@@ -15807,9 +15833,11 @@ function drawPortraitDashboardChrome(){
     ctx.beginPath(); ctx.moveTo(0, yy); ctx.lineTo(view.width, yy); ctx.stroke();
   });
   if(!crGalleryHudActive()){
-    ctx.font = 'bold 9px monospace';
-    ctx.fillStyle = 'rgba(210,170,110,0.92)';
-    ctx.fillText('build ' + BUILD_ID, L.menuRect.left, L.menuRect.top + L.menuRect.height + 11);
+    if(typeof DEBUG !== 'undefined' && DEBUG){
+      ctx.font = 'bold 9px monospace';
+      ctx.fillStyle = 'rgba(210,170,110,0.92)';
+      ctx.fillText('build ' + BUILD_ID, L.menuRect.left, L.menuRect.top + L.menuRect.height + 11);
+    }
   }
 }
 function drawPortraitStatsPanel(){
@@ -15841,9 +15869,11 @@ function drawPortraitStatsPanel(){
   const meta = 'D' + game.district + ' [' + game.modifier.toUpperCase() + '] x' + game.scoreMult +
     '   SEED ' + game.seed + '   SCORE ' + game.totalScore;
   ctx.fillText(meta, r.x + 10, r.y + 54);
-  ctx.fillStyle = '#4a4035';
-  ctx.font = '10px monospace';
-  ctx.fillText('build ' + BUILD_ID, r.x + r.w - 88, r.y + r.h - 8);
+  if(typeof DEBUG !== 'undefined' && DEBUG){
+    ctx.fillStyle = '#4a4035';
+    ctx.font = '10px monospace';
+    ctx.fillText('build ' + BUILD_ID, r.x + r.w - 88, r.y + r.h - 8);
+  }
 }
 function drawPortraitFpvOverlay(now){
   const L = portraitLayout();
