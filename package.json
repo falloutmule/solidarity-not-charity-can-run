@@ -67,6 +67,7 @@
     "test:renderer-static-regression": "node tests/renderer_static_regression_verify.js",
     "test:custom-next": "node tests/custom_next_001_face_reuse_runtime_verify.js",
     "test:authored-d1": "node tests/authored_d1_level_verify.js",
+    "test:world-1-level-1": "node tests/authored_d1_level_verify.js",
     "test:authored-d1-save": "node tests/authored_d1_save_load_verify.js",
     "test:perf-probe-v2": "node tests/perf_probe_v2_verify.js",
     "test:chrome-pointer-path": "node tests/chrome_pointer_path_verify.js",

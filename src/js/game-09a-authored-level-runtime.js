@@ -5,292 +5,172 @@
   const lockedDefinition = root.sncGetAuthoredLevelDefinition(root.SNC_AUTHORED_LEVEL_ID);
   const lockedCanonical = root.sncCanonicalizeAuthoredStatic(root.sncBuildLockedStaticLevel(lockedDefinition));
 
-  function runtimeGame(){
-    if(typeof game !== 'undefined') return game;
-    return root.game || null;
-  }
-
-  function runtimePlayer(){
-    if(typeof player !== 'undefined') return player;
-    return root.player || null;
-  }
-
-  function runtimeCfg(){
-    if(typeof cfg !== 'undefined') return cfg;
-    return root.cfg || null;
-  }
-
+  function runtimeGame(){ return typeof game !== 'undefined' ? game : root.game || null; }
+  function runtimePlayer(){ return typeof player !== 'undefined' ? player : root.player || null; }
+  function runtimeCfg(){ return typeof cfg !== 'undefined' ? cfg : root.cfg || null; }
   function clone(value){
     if(Array.isArray(value)) return value.map(clone);
-    if(value && typeof value === 'object'){
-      const out = {};
-      for(const key of Object.keys(value)) out[key] = clone(value[key]);
-      return out;
-    }
+    if(value && typeof value === 'object'){ const out = {}; for(const key of Object.keys(value)) out[key] = clone(value[key]); return out; }
     return value;
   }
-
-  function isFiniteNumber(value){
-    return typeof value === 'number' && Number.isFinite(value);
-  }
-
+  function isFiniteNumber(value){ return typeof value === 'number' && Number.isFinite(value); }
   function hasExactKeys(value, expected){
     if(!value || typeof value !== 'object' || Array.isArray(value)) return false;
-    const actual = Object.keys(value).sort();
-    const wanted = expected.slice().sort();
+    const actual = Object.keys(value).sort(), wanted = expected.slice().sort();
     return actual.length === wanted.length && actual.every((key, index) => key === wanted[index]);
   }
 
   function sncValidateAuthoredLevelDefinition(source){
     const errors = [];
     if(!source || typeof source !== 'object') return { pass: false, errors: ['definition must be an object'] };
-    if(source.id !== root.SNC_AUTHORED_LEVEL_ID) errors.push('level ID mismatch');
-    if(source.schemaVersion !== 1) errors.push('schema version mismatch');
-    if(source.staticSchema !== root.SNC_AUTHORED_LEVEL_SCHEMA) errors.push('static schema mismatch');
+    if(source.id !== root.SNC_AUTHORED_LEVEL_ID || source.district !== 1) errors.push('D1 identity mismatch');
+    if(source.schemaVersion !== 2 || source.staticSchema !== root.SNC_AUTHORED_LEVEL_SCHEMA) errors.push('static schema mismatch');
     if(source.staticHashAlgorithm !== 'sha256-canonical-json-lexicographic-v1') errors.push('static hash algorithm mismatch');
-    if(source.staticByteLength !== root.SNC_AUTHORED_LEVEL_STATIC_BYTES) errors.push('static byte length mismatch');
-    if(source.staticSha256 !== root.SNC_AUTHORED_LEVEL_STATIC_SHA256) errors.push('static SHA-256 mismatch');
-    if(source.district !== 1) errors.push('district mismatch');
     if(!source.grid || source.grid.width !== 40 || source.grid.height !== 20) errors.push('grid dimensions mismatch');
-    if(!Array.isArray(source.mapRows) || source.mapRows.length !== 20 || source.mapRows.some(row => typeof row !== 'string' || row.length !== 40 || /[^018]/.test(row))) errors.push('map rows invalid');
-    if(!source.mapEncoding || source.mapEncoding['0'] !== 'walkable asphalt/open space' || source.mapEncoding['1'] !== 'custom bitmap building footprint' || source.mapEncoding['8'] !== 'concrete map boundary') errors.push('map encoding mismatch');
-    if(!source.wallShade || source.wallShade.width !== 40 || source.wallShade.height !== 20 || source.wallShade.fill !== 0.5) errors.push('wall shade policy mismatch');
-    if(!source.streetLayoutMeta || source.streetLayoutMeta.roadY0 !== 8 || source.streetLayoutMeta.roadY1 !== 11 || source.streetLayoutMeta.GW !== 40 || source.streetLayoutMeta.GH !== 20) errors.push('street compatibility metadata mismatch');
-    if(source.timeLeftPolicy !== 'preserve cfg.baseTime + (district-1)*8') errors.push('time policy mismatch');
-    if(source.scoreMultiplierPolicy !== 'preserve modifier rules') errors.push('score policy mismatch');
+    if(!Array.isArray(source.mapRows) || source.mapRows.length !== 20 || source.mapRows.some(row => typeof row !== 'string' || row.length !== 40 || /[^0128]/.test(row))) errors.push('map rows invalid');
+    if(!source.mapEncoding || source.mapEncoding['2'] !== 'solid half-height concrete planter block') errors.push('low-block map encoding mismatch');
+    if(!Array.isArray(source.buildings) || source.buildings.length !== 1 || !Array.isArray(source.environmentObjects) || source.environmentObjects.length < 6) errors.push('authored geometry mismatch');
+    if(!Array.isArray(source.canSockets) || source.canSockets.length !== 9 || source.pickupCount !== 5) errors.push('can socket contract mismatch');
+    if(!Array.isArray(source.npcs) || source.npcs.length !== 3 || source.quota !== 3 || source.requiredCans !== 5 || source.carryingCapacity !== 3) errors.push('objective contract mismatch');
+    if(source.timerExpiryPolicy !== 'continue') errors.push('timer must not end The Stand');
     try {
       const canonical = root.sncCanonicalizeAuthoredStatic(root.sncBuildLockedStaticLevel(source));
       if(canonical !== lockedCanonical) errors.push('canonical static level drift');
-      if(canonical.length !== root.SNC_AUTHORED_LEVEL_STATIC_BYTES) errors.push('canonical preimage byte length mismatch');
-    } catch(error){
-      errors.push('static builder failed: ' + String(error && error.message ? error.message : error));
-    }
+      const bytes = typeof TextEncoder === 'function' ? new TextEncoder().encode(canonical).length : canonical.length;
+      if(bytes !== root.SNC_AUTHORED_LEVEL_STATIC_BYTES) errors.push('canonical preimage byte length mismatch');
+    } catch(error){ errors.push('static builder failed: ' + String(error && error.message ? error.message : error)); }
     return { pass: errors.length === 0, errors };
   }
 
   function decodeMap(source){
     const buildingWall = (typeof WALL !== 'undefined' && WALL && WALL.BUILDING) || 1;
     const concreteWall = (typeof WALL !== 'undefined' && WALL && WALL.CONCRETE) || 8;
-    return source.mapRows.map(row => Array.from(row, char => char === '0' ? 0 : (char === '1' ? buildingWall : concreteWall)));
+    return source.mapRows.map(row => Array.from(row, char => char === '0' ? 0 : char === '1' ? buildingWall : concreteWall));
   }
 
   function buildRegistryAndGrid(level){
     const grid = Array.from({ length: level.height }, () => new Array(level.width).fill(null));
-    const b = level.building;
-    const entry = {
-      bid: 1,
-      id: b.id,
-      assetId: b.assetId,
-      renderMode: b.renderMode,
-      x: b.x,
-      y: b.y,
-      x0: b.x,
-      y0: b.y,
-      rotation: b.rotation,
-      widthCells: b.widthCells,
-      depthCells: b.depthCells,
-      w: b.widthCells,
-      h: b.depthCells,
-      footprint: { widthCells: b.widthCells, depthCells: b.depthCells },
-      front: b.front
-    };
-    for(let ly = 0; ly < b.depthCells; ly++){
-      for(let lx = 0; lx < b.widthCells; lx++) grid[b.y + ly][b.x + lx] = { bid: 1, lx, ly };
+    const registry = {};
+    let bid = 1;
+    for(const building of level.buildings){
+      const entry = { bid, id: building.id, assetId: building.assetId, renderMode: 'importedWholeFaceAsset', x: building.x, y: building.y, x0: building.x, y0: building.y, rotation: building.rotation, widthCells: building.widthCells, depthCells: building.depthCells, w: building.widthCells, h: building.depthCells, footprint: { widthCells: building.widthCells, depthCells: building.depthCells }, front: building.front };
+      registry[bid] = entry;
+      for(let ly = 0; ly < building.depthCells; ly++) for(let lx = 0; lx < building.widthCells; lx++) grid[building.y + ly][building.x + lx] = { bid, lx, ly };
+      bid++;
     }
-    return { registry: { 1: entry }, grid };
+    return { registry, grid, nextBid: bid };
+  }
+
+  function deterministicRandom(seed){
+    if(typeof root.mulberry32 === 'function') return root.mulberry32((seed ^ 0x51a7d11) >>> 0);
+    let value = (seed ^ 0x51a7d11) >>> 0;
+    return () => { value = (value * 1664525 + 1013904223) >>> 0; return value / 4294967296; };
+  }
+  function sncSelectedCanSockets(levelId, seed){
+    const source = root.sncGetAuthoredLevelDefinition(levelId);
+    if(!source || !isFiniteNumber(seed)) return null;
+    const sockets = source.canSockets.map(clone);
+    const random = deterministicRandom(seed);
+    for(let i = sockets.length - 1; i > 0; i--){ const j = Math.floor(random() * (i + 1)); const t = sockets[i]; sockets[i] = sockets[j]; sockets[j] = t; }
+    return sockets.slice(0, source.pickupCount).map(socket => ({ id: socket.id, x: socket.x, y: socket.y, amt: 1, taken: false, wob: 0 }));
+  }
+
+  function buildEnvironment(level, source, map){
+    const ids = typeof CR_VERTICAL_PROFILE_IDS !== 'undefined' ? CR_VERTICAL_PROFILE_IDS : root.CR_VERTICAL_PROFILE_IDS;
+    const profileForAsset = typeof crHeightfieldProfileForSolidAsset === 'function' ? crHeightfieldProfileForSolidAsset : root.crHeightfieldProfileForSolidAsset;
+    const assetRegistry = typeof SOLID_HEIGHT_ASSET_REGISTRY !== 'undefined' ? SOLID_HEIGHT_ASSET_REGISTRY : root.SOLID_HEIGHT_ASSET_REGISTRY;
+    const hasHeightfield = ids && typeof profileForAsset === 'function' && assetRegistry;
+    if(!hasHeightfield) return { objects: clone(source.environmentObjects), profileGrid: null, rotationGrid: null };
+    const profileGrid = new Uint16Array(level.width * level.height), rotationGrid = new Uint8Array(level.width * level.height);
+    for(let y = 0; y < level.height; y++) for(let x = 0; x < level.width; x++) if(map[y][x] !== 0) profileGrid[y * level.width + x] = ids.FULL_LEGACY;
+    const objects = [];
+    for(const placement of source.environmentObjects){
+      const asset = assetRegistry[placement.assetId];
+      const profile = asset && profileForAsset(asset);
+      if(!asset || !profile || placement.widthCells !== 1 || placement.depthCells !== 1) throw new Error('invalid authored solid-height placement: ' + placement.id);
+      const x = placement.x, y = placement.y;
+      if(map[y][x] === 0) throw new Error('low block must occupy a solid collision cell: ' + placement.id);
+      profileGrid[y * level.width + x] = profile.id;
+      rotationGrid[y * level.width + x] = ((placement.rotation % 4) + 4) % 4;
+      objects.push(Object.freeze(Object.assign({}, placement, { profileId: profile.id })));
+    }
+    return { objects, profileGrid, rotationGrid };
   }
 
   function sncPrepareAuthoredLevelState(levelId, options){
-    const source = root.sncGetAuthoredLevelDefinition(levelId);
-    const validation = sncValidateAuthoredLevelDefinition(source);
+    const source = root.sncGetAuthoredLevelDefinition(levelId), validation = sncValidateAuthoredLevelDefinition(source);
     if(!validation.pass) return null;
     options = options || {};
     if(!isFiniteNumber(options.seed) || typeof options.modifier !== 'string') return null;
-    const staticLevel = root.sncBuildLockedStaticLevel(source);
-    const ownership = buildRegistryAndGrid(staticLevel);
     const config = runtimeCfg();
     if(!config || !isFiniteNumber(config.baseTime)) return null;
+    const staticLevel = root.sncBuildLockedStaticLevel(source), map = decodeMap(source), ownership = buildRegistryAndGrid(staticLevel);
+    const selected = sncSelectedCanSockets(levelId, options.seed);
+    if(!selected || selected.length !== source.pickupCount || new Set(selected.map(row => row.id)).size !== selected.length) return null;
+    const environment = buildEnvironment(staticLevel, source, map);
     const modifier = options.modifier || '';
     const prepared = {
-      validated: true,
-      levelId,
-      authoredLevelSchema: root.SNC_AUTHORED_LEVEL_SCHEMA,
-      authoredStaticSha256: root.SNC_AUTHORED_LEVEL_STATIC_SHA256,
-      seed: options.seed,
-      district: 1,
-      modifier,
-      scoreMult: modifier === 'shortage' ? 1.5 : 1,
-      map: decodeMap(source),
-      MAP_W: 40,
-      MAP_H: 20,
-      wallShade: Array.from({ length: 20 }, () => Array(40).fill(0.5)),
-      streetLayoutMeta: clone(staticLevel.streetLayoutMeta),
-      buildingRegistry: ownership.registry,
-      buildingGrid: ownership.grid,
-      buildingMaterialGrid: Array.from({ length: 20 }, () => new Array(40).fill(null)),
-      buildingMaterialComponents: {},
-      nextBuildingId: 2,
-      playerStart: { x: staticLevel.playerStart.x, y: staticLevel.playerStart.y, angle: staticLevel.playerStart.angleRadians },
-      pickups: clone(staticLevel.pickups),
-      npcs: clone(staticLevel.npcs),
-      props: clone(staticLevel.props),
-      quota: staticLevel.quota,
-      helped: 0,
-      delivered: 0,
-      exit: clone(staticLevel.exit),
-      timeLeft: config.baseTime
+      validated: true, levelId, authoredLevelSchema: root.SNC_AUTHORED_LEVEL_SCHEMA, authoredStaticSha256: root.SNC_AUTHORED_LEVEL_STATIC_SHA256,
+      seed: options.seed, district: 1, modifier, scoreMult: modifier === 'shortage' ? 1.5 : 1,
+      map, MAP_W: 40, MAP_H: 20, wallShade: Array.from({ length: 20 }, () => Array(40).fill(0.5)), streetLayoutMeta: clone(staticLevel.streetLayoutMeta),
+      buildingRegistry: ownership.registry, buildingGrid: ownership.grid, buildingMaterialGrid: Array.from({ length: 20 }, () => new Array(40).fill(null)), buildingMaterialComponents: {}, nextBuildingId: ownership.nextBid,
+      verticalProfileGrid: environment.profileGrid, verticalProfileRotationGrid: environment.rotationGrid, environmentObjects: environment.objects,
+      playerStart: { x: staticLevel.playerStart.x, y: staticLevel.playerStart.y, angle: staticLevel.playerStart.angleRadians }, pickups: selected,
+      npcs: clone(staticLevel.npcs), props: clone(staticLevel.props), quota: staticLevel.quota, requiredCans: staticLevel.requiredCans, carryingCapacity: staticLevel.carryingCapacity,
+      helped: 0, delivered: 0, exit: clone(staticLevel.exit), timeLeft: config.baseTime, timerExpiryPolicy: staticLevel.timerExpiryPolicy
     };
-    preparedStates.add(prepared);
-    return prepared;
+    preparedStates.add(prepared); return prepared;
   }
 
   function sncCommitAuthoredLevelState(prepared){
-    const g = runtimeGame();
-    const p = runtimePlayer();
+    const g = runtimeGame(), p = runtimePlayer();
     if(!g || !p || !prepared || !preparedStates.has(prepared) || prepared.validated !== true) return false;
-    g.authoredLevelId = prepared.levelId;
-    g.authoredLevelSchema = prepared.authoredLevelSchema;
-    g.authoredStaticSha256 = prepared.authoredStaticSha256;
-    g.seed = prepared.seed;
-    g.district = prepared.district;
-    g.modifier = prepared.modifier;
-    g.scoreMult = prepared.scoreMult;
-    g.map = prepared.map;
-    g.MAP_W = prepared.MAP_W;
-    g.MAP_H = prepared.MAP_H;
-    g.wallShade = prepared.wallShade;
-    g.streetLayoutMeta = prepared.streetLayoutMeta;
-    g.buildingRegistry = prepared.buildingRegistry;
-    g.buildingGrid = prepared.buildingGrid;
-    g.buildingMaterialGrid = prepared.buildingMaterialGrid;
-    g.buildingMaterialComponents = prepared.buildingMaterialComponents;
-    g._nextBuildingId = prepared.nextBuildingId;
-    g.pickups = prepared.pickups;
-    g.npcs = prepared.npcs;
-    g.props = prepared.props;
-    g.quota = prepared.quota;
-    g.helped = prepared.helped;
-    g.delivered = prepared.delivered;
-    g.exit = prepared.exit;
-    g.timeLeft = prepared.timeLeft;
-    g.d1ParkLandmark = null;
-    g.d1CustomBuildingRegistry = null;
-    g.customBuildingRegistry = null;
-    g.d1CustomBuildingSlots = [];
-    g.d1CustomBuildingViewer = null;
-    g.d1CustomProofZone = null;
-    g.d1CustomProofZoneCellMap = null;
-    g.d1ProofIllegalHits = [];
-    g.d1ProofZoneCellAudit = null;
-    g.__stripMallProofPlacement = null;
-    p.x = prepared.playerStart.x;
-    p.y = prepared.playerStart.y;
-    p.angle = prepared.playerStart.angle;
-    preparedStates.delete(prepared);
-    return true;
+    Object.assign(g, {
+      authoredLevelId: prepared.levelId, authoredLevelSchema: prepared.authoredLevelSchema, authoredStaticSha256: prepared.authoredStaticSha256,
+      seed: prepared.seed, district: prepared.district, modifier: prepared.modifier, scoreMult: prepared.scoreMult, map: prepared.map, MAP_W: prepared.MAP_W, MAP_H: prepared.MAP_H,
+      wallShade: prepared.wallShade, streetLayoutMeta: prepared.streetLayoutMeta, buildingRegistry: prepared.buildingRegistry, buildingGrid: prepared.buildingGrid,
+      buildingMaterialGrid: prepared.buildingMaterialGrid, buildingMaterialComponents: prepared.buildingMaterialComponents, _nextBuildingId: prepared.nextBuildingId,
+      verticalProfileWidth: prepared.verticalProfileGrid ? prepared.MAP_W : 0, verticalProfileHeight: prepared.verticalProfileGrid ? prepared.MAP_H : 0,
+      verticalProfileGrid: prepared.verticalProfileGrid, verticalProfileRotationGrid: prepared.verticalProfileRotationGrid, authoredEnvironmentObjects: prepared.environmentObjects,
+      pickups: prepared.pickups, npcs: prepared.npcs, props: prepared.props, quota: prepared.quota, requiredCans: prepared.requiredCans, carryingCapacity: prepared.carryingCapacity,
+      helped: prepared.helped, delivered: prepared.delivered, exit: prepared.exit, timeLeft: prepared.timeLeft, timerExpiryPolicy: prepared.timerExpiryPolicy
+    });
+    p.x = prepared.playerStart.x; p.y = prepared.playerStart.y; p.angle = prepared.playerStart.angle; p.maxCans = prepared.carryingCapacity; p.cans = Math.min(p.cans || 0, p.maxCans);
+    preparedStates.delete(prepared); return true;
   }
+  function sncInstallAuthoredLevel(levelId, options){ const prepared = sncPrepareAuthoredLevelState(levelId, options); return prepared ? sncCommitAuthoredLevelState(prepared) : false; }
 
-  function sncInstallAuthoredLevel(levelId, options){
-    const prepared = sncPrepareAuthoredLevelState(levelId, options);
-    return prepared ? sncCommitAuthoredLevelState(prepared) : false;
-  }
-
+  function expectedPickups(levelId, seed){ return sncSelectedCanSockets(levelId, seed); }
   function sncCaptureAuthoredMutableOverlay(levelId){
-    const g = runtimeGame();
-    if(!g || g.authoredLevelId !== levelId || levelId !== root.SNC_AUTHORED_LEVEL_ID) return null;
-    const source = root.sncGetAuthoredLevelDefinition(levelId);
-    if(!source) return null;
-    const baseline = root.sncBuildLockedStaticLevel(source);
-    if(!Array.isArray(g.pickups) || g.pickups.length !== baseline.pickups.length) return null;
-    const pickupById = new Map();
-    for(const row of g.pickups){
-      if(!row || pickupById.has(row.id)) return null;
-      pickupById.set(row.id, row);
-    }
-    const pickups = [];
-    for(const expected of baseline.pickups){
-      const row = pickupById.get(expected.id);
-      if(!row) return null;
-      pickups.push({ id: expected.id, taken: row.taken === true || row.amt <= 0, amt: expected.amt });
-    }
-    return {
-      schema: root.SNC_AUTHORED_SAVE_SCHEMA,
-      pickups,
-      npcs: g.npcs.map(row => ({ id: row.id, helped: row.helped === true })),
-      exit: { active: !!(g.exit && g.exit.active) }
-    };
+    const g = runtimeGame(); if(!g || g.authoredLevelId !== levelId) return null;
+    const baseline = expectedPickups(levelId, g.seed); if(!baseline || !Array.isArray(g.pickups) || g.pickups.length !== baseline.length) return null;
+    const byId = new Map(g.pickups.map(row => [row && row.id, row])); if(byId.size !== baseline.length) return null;
+    const pickups = baseline.map(expected => { const row = byId.get(expected.id); return row ? { id: expected.id, taken: row.taken === true || row.amt <= 0, amt: expected.amt } : null; });
+    if(pickups.some(row => !row) || !Array.isArray(g.npcs) || g.npcs.length !== 3) return null;
+    return { schema: root.SNC_AUTHORED_SAVE_SCHEMA, pickups, npcs: g.npcs.map(row => ({ id: row.id, helped: row.helped === true })), exit: { active: !!(g.exit && g.exit.active) } };
   }
-
-  function sncValidateAuthoredMutableOverlay(levelId, overlay){
-    const errors = [];
-    const source = root.sncGetAuthoredLevelDefinition(levelId);
-    if(!source) return { pass: false, errors: ['unknown authored level'], value: null };
-    const baseline = root.sncBuildLockedStaticLevel(source);
-    if(!overlay || typeof overlay !== 'object' || Array.isArray(overlay)) errors.push('overlay must be an object');
-    if(!errors.length && !hasExactKeys(overlay, ['schema', 'pickups', 'npcs', 'exit'])) errors.push('overlay fields mismatch');
-    if(!errors.length && overlay.schema !== root.SNC_AUTHORED_SAVE_SCHEMA) errors.push('overlay schema mismatch');
-    const pickupRows = !errors.length && Array.isArray(overlay.pickups) ? overlay.pickups : [];
-    const npcRows = !errors.length && Array.isArray(overlay.npcs) ? overlay.npcs : [];
-    if(!Array.isArray(overlay && overlay.pickups) || pickupRows.length !== baseline.pickups.length) errors.push('pickup cardinality mismatch');
-    if(!Array.isArray(overlay && overlay.npcs) || npcRows.length !== baseline.npcs.length) errors.push('NPC cardinality mismatch');
-    const pickupIds = new Set();
-    for(let i = 0; i < pickupRows.length; i++){
-      const row = pickupRows[i];
-      const expected = baseline.pickups[i];
-      if(!row || typeof row !== 'object') { errors.push('pickup record invalid at ' + i); continue; }
-      if(!hasExactKeys(row, ['id', 'taken', 'amt'])) errors.push('pickup fields mismatch at ' + i);
-      if(row.id !== expected.id) errors.push('pickup ID sequence mismatch at ' + i);
-      if(pickupIds.has(row.id)) errors.push('duplicate pickup ID ' + row.id);
-      pickupIds.add(row.id);
-      if(typeof row.taken !== 'boolean') errors.push('pickup taken must be Boolean at ' + i);
-      if(!isFiniteNumber(row.amt) || row.amt !== expected.amt) errors.push('pickup amount mismatch at ' + i);
-    }
-    const npcIds = new Set();
-    for(let i = 0; i < npcRows.length; i++){
-      const row = npcRows[i];
-      const expected = baseline.npcs[i];
-      if(!row || typeof row !== 'object') { errors.push('NPC record invalid at ' + i); continue; }
-      if(!hasExactKeys(row, ['id', 'helped'])) errors.push('NPC fields mismatch at ' + i);
-      if(row.id !== expected.id) errors.push('NPC ID sequence mismatch at ' + i);
-      if(npcIds.has(row.id)) errors.push('duplicate NPC ID ' + row.id);
-      npcIds.add(row.id);
-      if(typeof row.helped !== 'boolean') errors.push('NPC helped must be Boolean at ' + i);
-    }
+  function sncValidateAuthoredMutableOverlay(levelId, overlay, seed){
+    const g = runtimeGame(), useSeed = isFiniteNumber(seed) ? seed : (g && g.seed);
+    const baseline = expectedPickups(levelId, useSeed), source = root.sncGetAuthoredLevelDefinition(levelId), errors = [];
+    if(!baseline || !source) return { pass: false, errors: ['unknown authored level or seed'], value: null };
+    if(!overlay || !hasExactKeys(overlay, ['schema', 'pickups', 'npcs', 'exit']) || overlay.schema !== root.SNC_AUTHORED_SAVE_SCHEMA) errors.push('overlay fields mismatch');
+    const pickups = overlay && overlay.pickups, npcs = overlay && overlay.npcs;
+    if(!Array.isArray(pickups) || pickups.length !== baseline.length) errors.push('pickup cardinality mismatch');
+    if(!Array.isArray(npcs) || npcs.length !== source.npcs.length) errors.push('NPC cardinality mismatch');
+    if(Array.isArray(pickups)) pickups.forEach((row, i) => { const expected = baseline[i]; if(!row || !hasExactKeys(row, ['id','taken','amt']) || row.id !== expected.id || typeof row.taken !== 'boolean' || row.amt !== 1) errors.push('pickup mismatch at ' + i); });
+    if(Array.isArray(npcs)) npcs.forEach((row, i) => { if(!row || !hasExactKeys(row, ['id','helped']) || row.id !== `npc-${String(i).padStart(2, '0')}` || typeof row.helped !== 'boolean') errors.push('NPC mismatch at ' + i); });
     if(!overlay || !hasExactKeys(overlay.exit, ['active']) || typeof overlay.exit.active !== 'boolean') errors.push('exit overlay invalid');
     if(errors.length) return { pass: false, errors, value: null };
-    return {
-      pass: true,
-      errors: [],
-      value: {
-        schema: root.SNC_AUTHORED_SAVE_SCHEMA,
-        pickups: pickupRows.map(row => ({ id: row.id, taken: row.taken, amt: row.amt })),
-        npcs: npcRows.map(row => ({ id: row.id, helped: row.helped })),
-        exit: { active: overlay.exit.active }
-      }
-    };
+    return { pass: true, errors: [], value: { schema: root.SNC_AUTHORED_SAVE_SCHEMA, pickups: pickups.map(clone), npcs: npcs.map(clone), exit: { active: overlay.exit.active } } };
+  }
+  function sncApplyAuthoredMutableOverlay(levelId, validatedOverlay, seed){
+    const g = runtimeGame(); if(!g || g.authoredLevelId !== levelId) return false;
+    const checked = sncValidateAuthoredMutableOverlay(levelId, validatedOverlay, seed); if(!checked.pass) return false;
+    const pickupById = new Map(g.pickups.map(row => [row.id, row])); const npcById = new Map(g.npcs.map(row => [row.id, row]));
+    for(const saved of checked.value.pickups){ const row = pickupById.get(saved.id); if(!row) return false; row.taken = saved.taken; row.amt = saved.taken ? 0 : saved.amt; }
+    for(const saved of checked.value.npcs){ const row = npcById.get(saved.id); if(!row) return false; row.helped = saved.helped; }
+    g.exit.active = checked.value.exit.active; return true;
   }
 
-  function sncApplyAuthoredMutableOverlay(levelId, validatedOverlay){
-    const g = runtimeGame();
-    if(!g || g.authoredLevelId !== levelId) return false;
-    const check = sncValidateAuthoredMutableOverlay(levelId, validatedOverlay);
-    if(!check.pass) return false;
-    const value = check.value;
-    const pickupById = new Map(g.pickups.map(row => [row.id, row]));
-    const npcById = new Map(g.npcs.map(row => [row.id, row]));
-    for(const row of value.pickups) pickupById.get(row.id).taken = row.taken;
-    for(const row of value.npcs) npcById.get(row.id).helped = row.helped;
-    g.exit.active = value.exit.active;
-    return true;
-  }
-
-  Object.assign(root, {
-    sncValidateAuthoredLevelDefinition,
-    sncPrepareAuthoredLevelState,
-    sncCommitAuthoredLevelState,
-    sncInstallAuthoredLevel,
-    sncCaptureAuthoredMutableOverlay,
-    sncValidateAuthoredMutableOverlay,
-    sncApplyAuthoredMutableOverlay
-  });
+  Object.assign(root, { sncValidateAuthoredLevelDefinition, sncSelectedCanSockets, sncPrepareAuthoredLevelState, sncCommitAuthoredLevelState, sncInstallAuthoredLevel, sncCaptureAuthoredMutableOverlay, sncValidateAuthoredMutableOverlay, sncApplyAuthoredMutableOverlay });
 })(globalThis);

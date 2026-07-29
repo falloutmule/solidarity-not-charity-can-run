@@ -420,7 +420,10 @@ function update(dt){
     player.radarPingT -= dt;
     if(player.radarPingT<=0){ player.radarPingT=3; player.radarRingT=1; setMsg('* radar ping *'); }
   }
-  if(!assetGallery && game.timeLeft<=0){ endRun(); return; }
+  if(!assetGallery && game.timeLeft<=0){
+    if(game.timerExpiryPolicy === 'continue') game.timeLeft = 0;
+    else { endRun(); return; }
+  }
 
   // sync mobile joystick to inp abstraction (keyboard fallback)
   if(joy.active) syncInpFromJoy();

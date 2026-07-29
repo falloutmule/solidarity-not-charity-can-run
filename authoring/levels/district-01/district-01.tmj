@@ -221,54 +221,14 @@
         0,
         0,
         0,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
         0,
         0,
         0,
         0,
         0,
         0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        2,
-        2,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        0,
-        0,
+        3,
+        3,
         0,
         0,
         0,
@@ -301,13 +261,13 @@
         0,
         0,
         0,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
         0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        3,
         0,
         0,
         0,
@@ -350,52 +310,12 @@
         0,
         0,
         0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        2,
-        2,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
         0,
         0,
         0,
@@ -430,12 +350,52 @@
         0,
         0,
         0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
         0,
         0,
         0,
         0,
         0,
         0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        2,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
         0,
         0,
         0,
@@ -599,8 +559,48 @@
         0,
         0,
         0,
+        3,
+        3,
         0,
         0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        2,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        3,
         0,
         0,
         0,
@@ -818,7 +818,7 @@
         {
           "name": "sncEncoding",
           "type": "string",
-          "value": "0=walkable,1=building,2=concrete"
+          "value": "0=walkable,1=building,2=concrete,3=low-block"
         }
       ]
     },
@@ -836,10 +836,10 @@
       "objects": [
         {
           "id": 1,
-          "name": "district-1-main-landmark",
+          "name": "snc-stand",
           "type": "building",
-          "x": 256,
-          "y": 160,
+          "x": 544,
+          "y": 224,
           "width": 192,
           "height": 96,
           "rotation": 0,
@@ -877,6 +877,224 @@
     },
     {
       "id": 0,
+      "name": "Environment",
+      "type": "objectgroup",
+      "visible": true,
+      "opacity": 1,
+      "x": 0,
+      "y": 0,
+      "offsetx": 0,
+      "offsety": 0,
+      "draworder": "topdown",
+      "objects": [
+        {
+          "id": 2,
+          "name": "north-planter-00",
+          "type": "solid-height",
+          "x": 448,
+          "y": 160,
+          "width": 32,
+          "height": 32,
+          "rotation": 0,
+          "visible": true,
+          "point": false,
+          "properties": [
+            {
+              "name": "assetId",
+              "type": "string",
+              "value": "low_block_concrete_001"
+            },
+            {
+              "name": "rotationQ",
+              "type": "float",
+              "value": 0
+            },
+            {
+              "name": "widthCells",
+              "type": "float",
+              "value": 1
+            },
+            {
+              "name": "depthCells",
+              "type": "float",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "name": "north-planter-01",
+          "type": "solid-height",
+          "x": 480,
+          "y": 160,
+          "width": 32,
+          "height": 32,
+          "rotation": 0,
+          "visible": true,
+          "point": false,
+          "properties": [
+            {
+              "name": "assetId",
+              "type": "string",
+              "value": "low_block_concrete_001"
+            },
+            {
+              "name": "rotationQ",
+              "type": "float",
+              "value": 0
+            },
+            {
+              "name": "widthCells",
+              "type": "float",
+              "value": 1
+            },
+            {
+              "name": "depthCells",
+              "type": "float",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "name": "north-planter-02",
+          "type": "solid-height",
+          "x": 448,
+          "y": 192,
+          "width": 32,
+          "height": 32,
+          "rotation": 0,
+          "visible": true,
+          "point": false,
+          "properties": [
+            {
+              "name": "assetId",
+              "type": "string",
+              "value": "low_block_concrete_001"
+            },
+            {
+              "name": "rotationQ",
+              "type": "float",
+              "value": 0
+            },
+            {
+              "name": "widthCells",
+              "type": "float",
+              "value": 1
+            },
+            {
+              "name": "depthCells",
+              "type": "float",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "name": "southeast-planter-00",
+          "type": "solid-height",
+          "x": 832,
+          "y": 416,
+          "width": 32,
+          "height": 32,
+          "rotation": 90,
+          "visible": true,
+          "point": false,
+          "properties": [
+            {
+              "name": "assetId",
+              "type": "string",
+              "value": "low_block_concrete_001"
+            },
+            {
+              "name": "rotationQ",
+              "type": "float",
+              "value": 1
+            },
+            {
+              "name": "widthCells",
+              "type": "float",
+              "value": 1
+            },
+            {
+              "name": "depthCells",
+              "type": "float",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "id": 6,
+          "name": "southeast-planter-01",
+          "type": "solid-height",
+          "x": 864,
+          "y": 416,
+          "width": 32,
+          "height": 32,
+          "rotation": 90,
+          "visible": true,
+          "point": false,
+          "properties": [
+            {
+              "name": "assetId",
+              "type": "string",
+              "value": "low_block_concrete_001"
+            },
+            {
+              "name": "rotationQ",
+              "type": "float",
+              "value": 1
+            },
+            {
+              "name": "widthCells",
+              "type": "float",
+              "value": 1
+            },
+            {
+              "name": "depthCells",
+              "type": "float",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "id": 7,
+          "name": "southeast-planter-02",
+          "type": "solid-height",
+          "x": 864,
+          "y": 448,
+          "width": 32,
+          "height": 32,
+          "rotation": 90,
+          "visible": true,
+          "point": false,
+          "properties": [
+            {
+              "name": "assetId",
+              "type": "string",
+              "value": "low_block_concrete_001"
+            },
+            {
+              "name": "rotationQ",
+              "type": "float",
+              "value": 1
+            },
+            {
+              "name": "widthCells",
+              "type": "float",
+              "value": 1
+            },
+            {
+              "name": "depthCells",
+              "type": "float",
+              "value": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 0,
       "name": "PlayerStart",
       "type": "objectgroup",
       "visible": true,
@@ -888,11 +1106,11 @@
       "draworder": "topdown",
       "objects": [
         {
-          "id": 30,
+          "id": 28,
           "name": "player-start",
           "type": "player-start",
-          "x": 352,
-          "y": 336,
+          "x": 656,
+          "y": 464,
           "width": 0,
           "height": 0,
           "rotation": 0,
@@ -907,7 +1125,7 @@
             {
               "name": "faces",
               "type": "string",
-              "value": "north_toward_building_south_front"
+              "value": "north_toward_the_stand"
             }
           ]
         }
@@ -926,125 +1144,11 @@
       "draworder": "topdown",
       "objects": [
         {
-          "id": 2,
-          "name": "pickup-00",
-          "type": "pickup",
-          "x": 144,
-          "y": 336,
-          "width": 0,
-          "height": 0,
-          "rotation": 0,
-          "visible": true,
-          "point": true,
-          "properties": [
-            {
-              "name": "amt",
-              "type": "float",
-              "value": 1
-            }
-          ]
-        },
-        {
-          "id": 3,
-          "name": "pickup-01",
-          "type": "pickup",
-          "x": 176,
-          "y": 496,
-          "width": 0,
-          "height": 0,
-          "rotation": 0,
-          "visible": true,
-          "point": true,
-          "properties": [
-            {
-              "name": "amt",
-              "type": "float",
-              "value": 2
-            }
-          ]
-        },
-        {
-          "id": 4,
-          "name": "pickup-02",
-          "type": "pickup",
-          "x": 336,
-          "y": 496,
-          "width": 0,
-          "height": 0,
-          "rotation": 0,
-          "visible": true,
-          "point": true,
-          "properties": [
-            {
-              "name": "amt",
-              "type": "float",
-              "value": 1
-            }
-          ]
-        },
-        {
-          "id": 5,
-          "name": "pickup-03",
-          "type": "pickup",
-          "x": 528,
-          "y": 336,
-          "width": 0,
-          "height": 0,
-          "rotation": 0,
-          "visible": true,
-          "point": true,
-          "properties": [
-            {
-              "name": "amt",
-              "type": "float",
-              "value": 2
-            }
-          ]
-        },
-        {
-          "id": 6,
-          "name": "pickup-04",
-          "type": "pickup",
-          "x": 592,
-          "y": 144,
-          "width": 0,
-          "height": 0,
-          "rotation": 0,
-          "visible": true,
-          "point": true,
-          "properties": [
-            {
-              "name": "amt",
-              "type": "float",
-              "value": 1
-            }
-          ]
-        },
-        {
-          "id": 7,
-          "name": "pickup-05",
-          "type": "pickup",
-          "x": 720,
-          "y": 464,
-          "width": 0,
-          "height": 0,
-          "rotation": 0,
-          "visible": true,
-          "point": true,
-          "properties": [
-            {
-              "name": "amt",
-              "type": "float",
-              "value": 2
-            }
-          ]
-        },
-        {
           "id": 8,
-          "name": "pickup-06",
+          "name": "can-socket-00",
           "type": "pickup",
-          "x": 848,
-          "y": 208,
+          "x": 496,
+          "y": 400,
           "width": 0,
           "height": 0,
           "rotation": 0,
@@ -1055,15 +1159,20 @@
               "name": "amt",
               "type": "float",
               "value": 1
+            },
+            {
+              "name": "socketId",
+              "type": "string",
+              "value": "can-socket-00"
             }
           ]
         },
         {
           "id": 9,
-          "name": "pickup-07",
+          "name": "can-socket-01",
           "type": "pickup",
-          "x": 976,
-          "y": 368,
+          "x": 784,
+          "y": 400,
           "width": 0,
           "height": 0,
           "rotation": 0,
@@ -1074,14 +1183,91 @@
               "name": "amt",
               "type": "float",
               "value": 1
+            },
+            {
+              "name": "socketId",
+              "type": "string",
+              "value": "can-socket-01"
             }
           ]
         },
         {
           "id": 10,
-          "name": "pickup-08",
+          "name": "can-socket-02",
           "type": "pickup",
-          "x": 1104,
+          "x": 336,
+          "y": 336,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "point": true,
+          "properties": [
+            {
+              "name": "amt",
+              "type": "float",
+              "value": 1
+            },
+            {
+              "name": "socketId",
+              "type": "string",
+              "value": "can-socket-02"
+            }
+          ]
+        },
+        {
+          "id": 11,
+          "name": "can-socket-03",
+          "type": "pickup",
+          "x": 176,
+          "y": 176,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "point": true,
+          "properties": [
+            {
+              "name": "amt",
+              "type": "float",
+              "value": 1
+            },
+            {
+              "name": "socketId",
+              "type": "string",
+              "value": "can-socket-03"
+            }
+          ]
+        },
+        {
+          "id": 12,
+          "name": "can-socket-04",
+          "type": "pickup",
+          "x": 240,
+          "y": 496,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "point": true,
+          "properties": [
+            {
+              "name": "amt",
+              "type": "float",
+              "value": 1
+            },
+            {
+              "name": "socketId",
+              "type": "string",
+              "value": "can-socket-04"
+            }
+          ]
+        },
+        {
+          "id": 13,
+          "name": "can-socket-05",
+          "type": "pickup",
+          "x": 496,
           "y": 144,
           "width": 0,
           "height": 0,
@@ -1092,16 +1278,21 @@
             {
               "name": "amt",
               "type": "float",
-              "value": 2
+              "value": 1
+            },
+            {
+              "name": "socketId",
+              "type": "string",
+              "value": "can-socket-05"
             }
           ]
         },
         {
-          "id": 11,
-          "name": "pickup-09",
+          "id": 14,
+          "name": "can-socket-06",
           "type": "pickup",
-          "x": 1136,
-          "y": 528,
+          "x": 944,
+          "y": 336,
           "width": 0,
           "height": 0,
           "rotation": 0,
@@ -1112,6 +1303,59 @@
               "name": "amt",
               "type": "float",
               "value": 1
+            },
+            {
+              "name": "socketId",
+              "type": "string",
+              "value": "can-socket-06"
+            }
+          ]
+        },
+        {
+          "id": 15,
+          "name": "can-socket-07",
+          "type": "pickup",
+          "x": 1104,
+          "y": 176,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "point": true,
+          "properties": [
+            {
+              "name": "amt",
+              "type": "float",
+              "value": 1
+            },
+            {
+              "name": "socketId",
+              "type": "string",
+              "value": "can-socket-07"
+            }
+          ]
+        },
+        {
+          "id": 16,
+          "name": "can-socket-08",
+          "type": "pickup",
+          "x": 1072,
+          "y": 496,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "point": true,
+          "properties": [
+            {
+              "name": "amt",
+              "type": "float",
+              "value": 1
+            },
+            {
+              "name": "socketId",
+              "type": "string",
+              "value": "can-socket-08"
             }
           ]
         }
@@ -1130,11 +1374,11 @@
       "draworder": "topdown",
       "objects": [
         {
-          "id": 12,
+          "id": 17,
           "name": "npc-00",
           "type": "npc",
-          "x": 144,
-          "y": 176,
+          "x": 368,
+          "y": 272,
           "width": 0,
           "height": 0,
           "rotation": 0,
@@ -1154,11 +1398,11 @@
           ]
         },
         {
-          "id": 13,
+          "id": 18,
           "name": "npc-01",
           "type": "npc",
-          "x": 592,
-          "y": 272,
+          "x": 656,
+          "y": 144,
           "width": 0,
           "height": 0,
           "rotation": 0,
@@ -1178,11 +1422,11 @@
           ]
         },
         {
-          "id": 14,
+          "id": 19,
           "name": "npc-02",
           "type": "npc",
-          "x": 752,
-          "y": 144,
+          "x": 944,
+          "y": 400,
           "width": 0,
           "height": 0,
           "rotation": 0,
@@ -1198,78 +1442,6 @@
               "name": "need",
               "type": "float",
               "value": 1
-            }
-          ]
-        },
-        {
-          "id": 15,
-          "name": "npc-03",
-          "type": "npc",
-          "x": 880,
-          "y": 464,
-          "width": 0,
-          "height": 0,
-          "rotation": 0,
-          "visible": true,
-          "point": true,
-          "properties": [
-            {
-              "name": "kind",
-              "type": "string",
-              "value": "volunteer"
-            },
-            {
-              "name": "need",
-              "type": "float",
-              "value": 1
-            }
-          ]
-        },
-        {
-          "id": 16,
-          "name": "npc-04",
-          "type": "npc",
-          "x": 1072,
-          "y": 272,
-          "width": 0,
-          "height": 0,
-          "rotation": 0,
-          "visible": true,
-          "point": true,
-          "properties": [
-            {
-              "name": "kind",
-              "type": "string",
-              "value": "hungry"
-            },
-            {
-              "name": "need",
-              "type": "float",
-              "value": 1
-            }
-          ]
-        },
-        {
-          "id": 17,
-          "name": "npc-05",
-          "type": "npc",
-          "x": 1040,
-          "y": 496,
-          "width": 0,
-          "height": 0,
-          "rotation": 0,
-          "visible": true,
-          "point": true,
-          "properties": [
-            {
-              "name": "kind",
-              "type": "string",
-              "value": "family"
-            },
-            {
-              "name": "need",
-              "type": "float",
-              "value": 3
             }
           ]
         }
@@ -1288,11 +1460,11 @@
       "draworder": "topdown",
       "objects": [
         {
-          "id": 18,
+          "id": 20,
           "name": "prop-00",
           "type": "prop",
-          "x": 176,
-          "y": 288,
+          "x": 400,
+          "y": 400,
           "width": 0,
           "height": 0,
           "rotation": 0,
@@ -1307,11 +1479,11 @@
           ]
         },
         {
-          "id": 19,
+          "id": 21,
           "name": "prop-01",
           "type": "prop",
-          "x": 512,
-          "y": 160,
+          "x": 784,
+          "y": 464,
           "width": 0,
           "height": 0,
           "rotation": 0,
@@ -1321,168 +1493,16 @@
             {
               "name": "kind",
               "type": "string",
-              "value": "mural_panel"
-            }
-          ]
-        },
-        {
-          "id": 20,
-          "name": "prop-02",
-          "type": "prop",
-          "x": 512,
-          "y": 272,
-          "width": 0,
-          "height": 0,
-          "rotation": 0,
-          "visible": true,
-          "point": true,
-          "properties": [
-            {
-              "name": "kind",
-              "type": "string",
-              "value": "utility_box"
-            }
-          ]
-        },
-        {
-          "id": 21,
-          "name": "prop-03",
-          "type": "prop",
-          "x": 176,
-          "y": 112,
-          "width": 0,
-          "height": 0,
-          "rotation": 0,
-          "visible": true,
-          "point": true,
-          "properties": [
-            {
-              "name": "kind",
-              "type": "string",
-              "value": "scrub_bush"
+              "value": "bench"
             }
           ]
         },
         {
           "id": 22,
-          "name": "prop-04",
+          "name": "prop-02",
           "type": "prop",
-          "x": 528,
-          "y": 96,
-          "width": 0,
-          "height": 0,
-          "rotation": 0,
-          "visible": true,
-          "point": true,
-          "properties": [
-            {
-              "name": "kind",
-              "type": "string",
-              "value": "agave"
-            }
-          ]
-        },
-        {
-          "id": 23,
-          "name": "prop-05",
-          "type": "prop",
-          "x": 208,
-          "y": 448,
-          "width": 0,
-          "height": 0,
-          "rotation": 0,
-          "visible": true,
-          "point": true,
-          "properties": [
-            {
-              "name": "kind",
-              "type": "string",
-              "value": "cooler"
-            }
-          ]
-        },
-        {
-          "id": 24,
-          "name": "prop-06",
-          "type": "prop",
-          "x": 576,
-          "y": 400,
-          "width": 0,
-          "height": 0,
-          "rotation": 0,
-          "visible": true,
-          "point": true,
-          "properties": [
-            {
-              "name": "kind",
-              "type": "string",
-              "value": "crate_stack"
-            }
-          ]
-        },
-        {
-          "id": 25,
-          "name": "prop-07",
-          "type": "prop",
-          "x": 768,
-          "y": 320,
-          "width": 0,
-          "height": 0,
-          "rotation": 0,
-          "visible": true,
-          "point": true,
-          "properties": [
-            {
-              "name": "kind",
-              "type": "string",
-              "value": "shopping_cart"
-            }
-          ]
-        },
-        {
-          "id": 26,
-          "name": "prop-08",
-          "type": "prop",
-          "x": 960,
-          "y": 128,
-          "width": 0,
-          "height": 0,
-          "rotation": 0,
-          "visible": true,
-          "point": true,
-          "properties": [
-            {
-              "name": "kind",
-              "type": "string",
-              "value": "mailbox"
-            }
-          ]
-        },
-        {
-          "id": 27,
-          "name": "prop-09",
-          "type": "prop",
-          "x": 1088,
-          "y": 416,
-          "width": 0,
-          "height": 0,
-          "rotation": 0,
-          "visible": true,
-          "point": true,
-          "properties": [
-            {
-              "name": "kind",
-              "type": "string",
-              "value": "tarp_bundle"
-            }
-          ]
-        },
-        {
-          "id": 28,
-          "name": "prop-10",
-          "type": "prop",
-          "x": 672,
-          "y": 544,
+          "x": 512,
+          "y": 368,
           "width": 0,
           "height": 0,
           "rotation": 0,
@@ -1497,11 +1517,11 @@
           ]
         },
         {
-          "id": 29,
-          "name": "prop-11",
+          "id": 23,
+          "name": "prop-03",
           "type": "prop",
-          "x": 896,
-          "y": 544,
+          "x": 768,
+          "y": 336,
           "width": 0,
           "height": 0,
           "rotation": 0,
@@ -1511,7 +1531,83 @@
             {
               "name": "kind",
               "type": "string",
-              "value": "sleeping_bag_pile"
+              "value": "crate_stack"
+            }
+          ]
+        },
+        {
+          "id": 24,
+          "name": "prop-04",
+          "type": "prop",
+          "x": 272,
+          "y": 240,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "point": true,
+          "properties": [
+            {
+              "name": "kind",
+              "type": "string",
+              "value": "mailbox"
+            }
+          ]
+        },
+        {
+          "id": 25,
+          "name": "prop-05",
+          "type": "prop",
+          "x": 1008,
+          "y": 240,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "point": true,
+          "properties": [
+            {
+              "name": "kind",
+              "type": "string",
+              "value": "utility_box"
+            }
+          ]
+        },
+        {
+          "id": 26,
+          "name": "prop-06",
+          "type": "prop",
+          "x": 176,
+          "y": 400,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "point": true,
+          "properties": [
+            {
+              "name": "kind",
+              "type": "string",
+              "value": "scrub_bush"
+            }
+          ]
+        },
+        {
+          "id": 27,
+          "name": "prop-07",
+          "type": "prop",
+          "x": 1104,
+          "y": 400,
+          "width": 0,
+          "height": 0,
+          "rotation": 0,
+          "visible": true,
+          "point": true,
+          "properties": [
+            {
+              "name": "kind",
+              "type": "string",
+              "value": "agave"
             }
           ]
         }
@@ -1530,11 +1626,11 @@
       "draworder": "topdown",
       "objects": [
         {
-          "id": 31,
+          "id": 29,
           "name": "exit",
           "type": "exit",
-          "x": 1168,
-          "y": 544,
+          "x": 656,
+          "y": 342.4,
           "width": 0,
           "height": 0,
           "rotation": 0,
@@ -1563,7 +1659,7 @@
       "draworder": "topdown",
       "objects": [
         {
-          "id": 32,
+          "id": 30,
           "name": "metadata",
           "type": "metadata",
           "x": 0,
@@ -1587,12 +1683,12 @@
             {
               "name": "quota",
               "type": "float",
-              "value": 4
+              "value": 3
             },
             {
               "name": "timeLeftPolicy",
               "type": "string",
-              "value": "preserve cfg.baseTime + (district-1)*8"
+              "value": "count down from cfg.baseTime; timer measures completion only"
             },
             {
               "name": "scoreMultiplierPolicy",
@@ -1602,15 +1698,15 @@
             {
               "name": "staticSchema",
               "type": "string",
-              "value": "snc-authored-level-static-v1"
+              "value": "snc-authored-level-static-v2"
             }
           ]
         }
       ]
     }
   ],
-  "nextlayerid": 9,
-  "nextobjectid": 33,
+  "nextlayerid": 10,
+  "nextobjectid": 31,
   "orientation": "orthogonal",
   "renderorder": "right-down",
   "tiledversion": "1.11",
