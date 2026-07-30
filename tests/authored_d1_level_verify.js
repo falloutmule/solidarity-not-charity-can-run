@@ -60,13 +60,17 @@ assert(fs.readFileSync(mainLoopPath, 'utf8').includes("if(!crGalleryHudActive())
 assert.strictEqual(definition.environmentObjects.length, 6, 'two three-block planter clusters are authored');
 assert(definition.environmentObjects.every(row => row.assetId === 'low_block_concrete_001'), 'accepted low-block asset is used');
 assert.deepStrictEqual(Array.from(definition.buildings, row => row.assetId), ['custom_next_001', 'strip_mall_001'], 'stand and outer-route market use supported bitmap buildings');
-assert.strictEqual(definition.props.filter(row => row.kind === 'signboard' && row.label === 'SNC\nCAN STAND').length, 1, 'stand has a first-person landmark sign');
-assert(definition.props.filter(row => row.kind === 'signboard' && /CAN/.test(row.label || '')).length >= 5, 'delivery and route landmarks are authored');
+const signboards = definition.props.filter(row => row.kind === 'signboard');
+assert.deepStrictEqual(JSON.parse(JSON.stringify(signboards.map(row => [row.assetId, row.signSizeClass]))), [
+  ['sign_snc_can_station_001', 'landmark'], ['sign_drop_off_cans_001', 'tall'], ['sign_neighbor_1_can_001', 'standard'],
+  ['sign_family_3_cans_001', 'standard'], ['sign_summer_loop_market_001', 'landmark'], ['sign_neighbor_1_can_001', 'standard']
+], 'all authored signboards map to the supplied runtime art and data-level size classes');
+assert.strictEqual(signboards.filter(row => row.assetId === 'sign_neighbor_1_can_001').length, 2, 'one-can sign serves both individual recipient stops');
 assert.deepStrictEqual(Array.from(definition.environmentObjects, row => `${row.x},${row.y}`), ['10,10', '10,12', '12,10', '28,12', '30,12', '30,14'], 'planter clusters preserve open gaps between their visible ends');
 
 const canonical = sandbox.sncCanonicalizeAuthoredStatic(sandbox.sncBuildLockedStaticLevel(definition));
-assert.strictEqual(Buffer.byteLength(canonical), 5183, 'static byte identity is locked');
-assert.strictEqual(crypto.createHash('sha256').update(canonical).digest('hex'), '2e67ca1a75b83e513bf1e17298409a4db6d617cb6714cc111ed1863875aad529', 'static hash identity is locked');
+assert.strictEqual(Buffer.byteLength(canonical), 5563, 'static byte identity is locked');
+assert.strictEqual(crypto.createHash('sha256').update(canonical).digest('hex'), '57af17f6d0f40f0db16eb1194da5aaeabc9e00b3863e14c6c947539c511fbe80', 'static hash identity is locked');
 assert.deepStrictEqual(JSON.parse(JSON.stringify(sandbox.sncValidateAuthoredLevelDefinition(definition))), { pass: true, errors: [] });
 
 for(const seed of [1, 2468, 717, 9001]){
