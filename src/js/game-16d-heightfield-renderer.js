@@ -134,16 +134,19 @@ function crHeightfieldDrawSprite(kind, obj, tex, hp, px, py, dirX, dirY, planeX,
     const y0 = Math.max(0, Math.floor(top)), y1 = Math.min(RH, Math.ceil(bottom));
     let runStart = -1;
     for(let y = y0; y <= y1; y++){
-      const visible = y < y1 && depth < worldDepthPixels[y * RW + col];
       const sourceY = Math.max(proj.sourceY, Math.min(proj.sourceY + proj.sourceHeight - 1, (proj.sourceY + (y - top) / proj.screenH * proj.sourceHeight) | 0));
       const opaque = y < y1 && crHeightfieldSpriteOpaqueAt(tex, srcX, sourceY);
+      const pixelIndex = y * RW + col;
+      const visible = opaque && depth < worldDepthPixels[pixelIndex];
       if(visible){
         if(runStart < 0) runStart = y;
+        worldDepthPixels[pixelIndex] = depth;
+        crHeightfieldStats.spriteDepthWrites++;
         crHeightfieldStats.spriteVisiblePixels++;
         if(opaque && kind === 'can') crHeightfieldStats.canVisiblePixels++;
         else if(opaque && kind === 'npc') crHeightfieldStats.npcVisiblePixels++;
       } else {
-        if(y < y1) crHeightfieldStats.spriteOccludedPixels++;
+        if(y < y1 && opaque) crHeightfieldStats.spriteOccludedPixels++;
         if(opaque && kind === 'can') crHeightfieldStats.canOccludedPixels++;
         else if(opaque && kind === 'npc') crHeightfieldStats.npcOccludedPixels++;
         if(runStart >= 0){

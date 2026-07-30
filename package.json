@@ -29,6 +29,7 @@
     "test:runtime-sign-alpha": "py -3 tests/runtime_sign_alpha_verify.py",
     "test:runtime-sign-assets": "node tests/runtime_sign_assets_verify.js",
     "test:world1-sign-pack": "node tests/world1_sign_pack_capture.js",
+    "test:billboard-opacity-occlusion": "node tests/billboard_opacity_occlusion_browser.js",
     "test:runtime-character-alpha": "py -3 tests/runtime_character_alpha_verify.py",
     "assets:build-palette": "node tools/build-asset-palette.js",
     "assets:check-palette": "node tools/build-asset-palette.js --check",

@@ -16,8 +16,8 @@ def inspect(path, require_zero_rgb):
             raise AssertionError(f'{path}: expected RGBA, got {image.mode}')
         rgba = image.copy()
     histogram = rgba.getchannel('A').histogram()
-    if histogram[0] == 0 or sum(histogram[1:255]) == 0 or histogram[255] == 0:
-        raise AssertionError(f'{path}: must retain transparent, partial, and opaque alpha')
+    if histogram[0] == 0 or histogram[255] == 0:
+        raise AssertionError(f'{path}: must retain transparent and opaque alpha')
     if require_zero_rgb:
         hidden = sum(1 for red, green, blue, opacity in rgba.get_flattened_data() if opacity == 0 and (red or green or blue))
         if hidden:
@@ -39,6 +39,9 @@ for asset in manifest['assets']:
     assert hashlib.sha256(source.read_bytes()).hexdigest() == asset['sourceSha256'], f"{asset['assetId']}: source hash drift"
     source_alpha = inspect(source, False)
     runtime_alpha = inspect(runtime, True)
+    assert source_alpha['partial'] > 0, f"{asset['assetId']}: source proof must record supplied partial alpha"
+    assert runtime_alpha['partial'] == 0, f"{asset['assetId']}: runtime visible pixels must be fully opaque"
+    assert runtime_alpha['opaque'] == source_alpha['partial'] + source_alpha['opaque'], f"{asset['assetId']}: runtime opacity must preserve every visible source pixel"
     assert hashlib.sha256(runtime.read_bytes()).hexdigest() == asset['runtimeSha256'], f"{asset['assetId']}: runtime hash drift"
     assert asset['runtimeSize']['width'] < Image.open(source).width and asset['runtimeSize']['height'] < Image.open(source).height, f"{asset['assetId']}: transparent source margin was not cropped"
     assert asset['runtimeAlphaBounds'] == {'x': 0, 'y': 0, 'w': asset['runtimeSize']['width'], 'h': asset['runtimeSize']['height']}, f"{asset['assetId']}: runtime crop must be tightly grounded"

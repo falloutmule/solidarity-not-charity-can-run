@@ -43,7 +43,7 @@ const crHeightfieldSpriteAlphaMasks = new WeakMap();
 const crHeightfieldMaterialPixelCaches = new WeakMap();
 const crHeightfieldStats = {
   enabled: false, cameraZ: CR_HEIGHTFIELD_CAMERA.eyeZ, profileCells: 0, verticalSegments: 0,
-  topPixels: 0, worldDepthWrites: 0, spriteVisiblePixels: 0, spriteOccludedPixels: 0,
+  topPixels: 0, worldDepthWrites: 0, spriteDepthWrites: 0, spriteVisiblePixels: 0, spriteOccludedPixels: 0,
   canVisiblePixels: 0, canOccludedPixels: 0, npcVisiblePixels: 0, npcOccludedPixels: 0,
   worldDepthBytes: 0, allocations: 0, spriteBounds: Object.create(null)
 };
@@ -358,6 +358,7 @@ function crHeightfieldResetStats(){
   crHeightfieldStats.verticalSegments = 0;
   crHeightfieldStats.topPixels = 0;
   crHeightfieldStats.worldDepthWrites = 0;
+  crHeightfieldStats.spriteDepthWrites = 0;
   crHeightfieldStats.spriteVisiblePixels = 0;
   crHeightfieldStats.spriteOccludedPixels = 0;
   crHeightfieldStats.canVisiblePixels = 0;
@@ -390,7 +391,7 @@ function crGetHeightfieldDiagnostics(){
     enabled: crHeightfieldStats.enabled, cameraZ: crHeightfieldStats.cameraZ,
     occlusionSubject: game.heightfieldProof ? game.heightfieldProof.occlusionSubject : null,
     profileCells: crHeightfieldStats.profileCells, verticalSegments: crHeightfieldStats.verticalSegments,
-    topPixels: crHeightfieldStats.topPixels, worldDepthWrites: crHeightfieldStats.worldDepthWrites,
+    topPixels: crHeightfieldStats.topPixels, worldDepthWrites: crHeightfieldStats.worldDepthWrites, spriteDepthWrites: crHeightfieldStats.spriteDepthWrites,
     spriteVisiblePixels: crHeightfieldStats.spriteVisiblePixels, spriteOccludedPixels: crHeightfieldStats.spriteOccludedPixels,
     canVisiblePixels: crHeightfieldStats.canVisiblePixels, canOccludedPixels: crHeightfieldStats.canOccludedPixels,
     npcVisiblePixels: crHeightfieldStats.npcVisiblePixels, npcOccludedPixels: crHeightfieldStats.npcOccludedPixels,

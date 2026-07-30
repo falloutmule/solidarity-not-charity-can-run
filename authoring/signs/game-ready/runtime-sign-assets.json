@@ -25,7 +25,7 @@
       "sourceSha256": "1fd67753e17a7f36116a6775ae1d1b5e1d47dede9aa9a12321c347996239a3a4",
       "runtimePath": "authoring/signs/game-ready/runtime/neighbor_1_can.png",
       "defaultDisplayClass": "standard",
-      "runtimeSha256": "3d63a55232fdb0a87aa94f9673824c57674c4393a02cc59fa18f7e108addc3d9",
+      "runtimeSha256": "443d07640aedc862c8bf6292bdbbe55aab4180328d6ef9e8eb1be0b476158061",
       "runtimeSize": {
         "width": 583,
         "height": 557
@@ -38,8 +38,8 @@
       },
       "runtimeAlphaHistogram": {
         "zero": 123855,
-        "partial": 2725,
-        "opaque": 198151
+        "partial": 0,
+        "opaque": 200876
       }
     },
     {
@@ -49,7 +49,7 @@
       "sourceSha256": "4b8e63ff419af82f7577413dce3702147ba2631b1d914b6623c06449091a9c21",
       "runtimePath": "authoring/signs/game-ready/runtime/family_3_cans.png",
       "defaultDisplayClass": "standard",
-      "runtimeSha256": "4378c3b0a36d256330141e14b0958fa37a10f70bd6f6bed084030e4d4713deb9",
+      "runtimeSha256": "5376ca6fbcc0f587494842a24aa19e40639ce0f1b5d476636233c997ae436123",
       "runtimeSize": {
         "width": 590,
         "height": 579
@@ -62,8 +62,8 @@
       },
       "runtimeAlphaHistogram": {
         "zero": 137909,
-        "partial": 7753,
-        "opaque": 195948
+        "partial": 0,
+        "opaque": 203701
       }
     },
     {
@@ -73,7 +73,7 @@
       "sourceSha256": "3f986696be09be7db1b766dd6da8ca79d12503b028b1d4e9b1ee6c9509ba7883",
       "runtimePath": "authoring/signs/game-ready/runtime/summer_loop_market.png",
       "defaultDisplayClass": "landmark",
-      "runtimeSha256": "de22ebb9f327341714a4fd951edfed723c16a3f3f90967540628376eea33513a",
+      "runtimeSha256": "0f8cf64e5494ca18d21a37e11faf3c333747c188ca69bde65ab8ac1a30847e6f",
       "runtimeSize": {
         "width": 627,
         "height": 599
@@ -86,8 +86,8 @@
       },
       "runtimeAlphaHistogram": {
         "zero": 142509,
-        "partial": 6306,
-        "opaque": 226758
+        "partial": 0,
+        "opaque": 233064
       }
     },
     {
@@ -97,7 +97,7 @@
       "sourceSha256": "e2c2c41465da33cf4dbe781b5163e94312037ebfbfc0ba7318982b45e5fc3ee1",
       "runtimePath": "authoring/signs/game-ready/runtime/drop_off_cans.png",
       "defaultDisplayClass": "tall",
-      "runtimeSha256": "0c5e6b12d87f75d9896267f229fdaea8d6f4d056dec75f730fe016e954f011a2",
+      "runtimeSha256": "3fb7c3410f2d87ac0438bd6ffc8689eb2598363e26a0fed93f19f8d590188c2a",
       "runtimeSize": {
         "width": 649,
         "height": 1029
@@ -110,8 +110,8 @@
       },
       "runtimeAlphaHistogram": {
         "zero": 290958,
-        "partial": 10256,
-        "opaque": 366607
+        "partial": 0,
+        "opaque": 376863
       }
     },
     {
@@ -121,7 +121,7 @@
       "sourceSha256": "2919a087168ebc5039b0f0ac45eb69d966bf76d487951a5a63372771a7836402",
       "runtimePath": "authoring/signs/game-ready/runtime/snc_can_station.png",
       "defaultDisplayClass": "landmark",
-      "runtimeSha256": "492f90b7cec98577264a73bdedeadf31ad2365882942fa0ab35251c00e3d168f",
+      "runtimeSha256": "640413c3f2b4b9c977ad8753e6658fd88bce9400934154cdda878bf50154c3c7",
       "runtimeSize": {
         "width": 668,
         "height": 695
@@ -134,8 +134,8 @@
       },
       "runtimeAlphaHistogram": {
         "zero": 212449,
-        "partial": 1563,
-        "opaque": 250248
+        "partial": 0,
+        "opaque": 251811
       }
     }
   ]

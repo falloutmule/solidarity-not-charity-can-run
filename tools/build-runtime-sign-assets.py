@@ -55,6 +55,11 @@ def crop_runtime(source):
             red, green, blue, opacity = pixels[x, y]
             if opacity == 0:
                 pixels[x, y] = (0, 0, 0, 0)
+            else:
+                # Billboard depth is a binary silhouette contract: every
+                # visible sign pixel occludes objects behind it. Preserve the
+                # supplied RGB artwork while removing interior translucency.
+                pixels[x, y] = (red, green, blue, 255)
     return cropped
 
 
@@ -92,8 +97,8 @@ def build(write_runtime):
             runtime_image = crop_runtime(image)
         runtime_bytes = png_bytes(runtime_image)
         runtime_details = inspect(runtime_image)
-        if runtime_details['alphaHistogram']['partial'] == 0:
-            raise ValueError(f"{asset['assetId']}: partial alpha was lost")
+        if runtime_details['alphaHistogram']['partial'] != 0:
+            raise ValueError(f"{asset['assetId']}: runtime sign alpha must be binary")
         runtime_path = ROOT / asset['runtimePath']
         if write_runtime:
             runtime_path.parent.mkdir(parents=True, exist_ok=True)
