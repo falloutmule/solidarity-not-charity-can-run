@@ -228,7 +228,7 @@ function drawScene(now, renderPose){
     sprites.push({obj,tex,hp,depth,hscr});
   }
   // decor first (ground-level), then pickups, then npcs, then exit
-  for(const p of game.props)   pushSp(p, propTex(p.kind, p), HEIGHT[p.kind]||0.5);
+  for(const p of game.props)   pushSp(p, propTex(p.kind, p), crHeightfieldSpriteWorldHeight('prop', p));
   for(const c of game.pickups) if(!c.taken) pushSp(c, TEX.can, HEIGHT.can);
   for(const n of game.npcs)    if(!n.helped) pushSp(n, npcSpriteTex(n.kind, n), npcSpriteHeight(n));
   if(game.exit && game.exit.active) pushSp(game.exit, TEX.exit, HEIGHT.exit);

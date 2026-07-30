@@ -1,0 +1,142 @@
+{
+  "schema": "snc-runtime-sign-assets-v1",
+  "package": {
+    "archiveName": "game_ready_signs.zip",
+    "sourceManifest": "authoring/signs/game-ready/source-manifest.json",
+    "sourceManifestSha256": "3d1be88eca5435e78ddd95b0d9d1d5f4646cf7c2f909a2206b542ae8699d7f34",
+    "sourceMarginPixels": 24
+  },
+  "displayClasses": {
+    "standard": {
+      "worldHeight": 0.62
+    },
+    "landmark": {
+      "worldHeight": 0.82
+    },
+    "tall": {
+      "worldHeight": 0.9
+    }
+  },
+  "assets": [
+    {
+      "assetId": "sign_neighbor_1_can_001",
+      "sourceFile": "neighbor_1_can.png",
+      "sourcePath": "authoring/signs/game-ready/masters/neighbor_1_can.png",
+      "sourceSha256": "1fd67753e17a7f36116a6775ae1d1b5e1d47dede9aa9a12321c347996239a3a4",
+      "runtimePath": "authoring/signs/game-ready/runtime/neighbor_1_can.png",
+      "defaultDisplayClass": "standard",
+      "runtimeSha256": "3d63a55232fdb0a87aa94f9673824c57674c4393a02cc59fa18f7e108addc3d9",
+      "runtimeSize": {
+        "width": 583,
+        "height": 557
+      },
+      "runtimeAlphaBounds": {
+        "x": 0,
+        "y": 0,
+        "w": 583,
+        "h": 557
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 123855,
+        "partial": 2725,
+        "opaque": 198151
+      }
+    },
+    {
+      "assetId": "sign_family_3_cans_001",
+      "sourceFile": "family_3_cans.png",
+      "sourcePath": "authoring/signs/game-ready/masters/family_3_cans.png",
+      "sourceSha256": "4b8e63ff419af82f7577413dce3702147ba2631b1d914b6623c06449091a9c21",
+      "runtimePath": "authoring/signs/game-ready/runtime/family_3_cans.png",
+      "defaultDisplayClass": "standard",
+      "runtimeSha256": "4378c3b0a36d256330141e14b0958fa37a10f70bd6f6bed084030e4d4713deb9",
+      "runtimeSize": {
+        "width": 590,
+        "height": 579
+      },
+      "runtimeAlphaBounds": {
+        "x": 0,
+        "y": 0,
+        "w": 590,
+        "h": 579
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 137909,
+        "partial": 7753,
+        "opaque": 195948
+      }
+    },
+    {
+      "assetId": "sign_summer_loop_market_001",
+      "sourceFile": "summer_loop_market.png",
+      "sourcePath": "authoring/signs/game-ready/masters/summer_loop_market.png",
+      "sourceSha256": "3f986696be09be7db1b766dd6da8ca79d12503b028b1d4e9b1ee6c9509ba7883",
+      "runtimePath": "authoring/signs/game-ready/runtime/summer_loop_market.png",
+      "defaultDisplayClass": "landmark",
+      "runtimeSha256": "de22ebb9f327341714a4fd951edfed723c16a3f3f90967540628376eea33513a",
+      "runtimeSize": {
+        "width": 627,
+        "height": 599
+      },
+      "runtimeAlphaBounds": {
+        "x": 0,
+        "y": 0,
+        "w": 627,
+        "h": 599
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 142509,
+        "partial": 6306,
+        "opaque": 226758
+      }
+    },
+    {
+      "assetId": "sign_drop_off_cans_001",
+      "sourceFile": "drop_off_cans.png",
+      "sourcePath": "authoring/signs/game-ready/masters/drop_off_cans.png",
+      "sourceSha256": "e2c2c41465da33cf4dbe781b5163e94312037ebfbfc0ba7318982b45e5fc3ee1",
+      "runtimePath": "authoring/signs/game-ready/runtime/drop_off_cans.png",
+      "defaultDisplayClass": "tall",
+      "runtimeSha256": "0c5e6b12d87f75d9896267f229fdaea8d6f4d056dec75f730fe016e954f011a2",
+      "runtimeSize": {
+        "width": 649,
+        "height": 1029
+      },
+      "runtimeAlphaBounds": {
+        "x": 0,
+        "y": 0,
+        "w": 649,
+        "h": 1029
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 290958,
+        "partial": 10256,
+        "opaque": 366607
+      }
+    },
+    {
+      "assetId": "sign_snc_can_station_001",
+      "sourceFile": "snc_can_station.png",
+      "sourcePath": "authoring/signs/game-ready/masters/snc_can_station.png",
+      "sourceSha256": "2919a087168ebc5039b0f0ac45eb69d966bf76d487951a5a63372771a7836402",
+      "runtimePath": "authoring/signs/game-ready/runtime/snc_can_station.png",
+      "defaultDisplayClass": "landmark",
+      "runtimeSha256": "492f90b7cec98577264a73bdedeadf31ad2365882942fa0ab35251c00e3d168f",
+      "runtimeSize": {
+        "width": 668,
+        "height": 695
+      },
+      "runtimeAlphaBounds": {
+        "x": 0,
+        "y": 0,
+        "w": 668,
+        "h": 695
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 212449,
+        "partial": 1563,
+        "opaque": 250248
+      }
+    }
+  ]
+}

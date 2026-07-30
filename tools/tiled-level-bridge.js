@@ -58,6 +58,8 @@ function exportToTiled(level) {
   const propObjects = level.props.map((item, index) => {
     const values = { kind: item.kind };
     if(item.label) values.label = item.label;
+    if(item.assetId) values.assetId = item.assetId;
+    if(item.signSizeClass) values.signSizeClass = item.signSizeClass;
     return makeObject(id++, `prop-${String(index).padStart(2, '0')}`, 'prop', item.x * TILE_SIZE, item.y * TILE_SIZE, values);
   });
   const player = makeObject(id++, 'player-start', 'player-start', level.playerStart.x * TILE_SIZE, level.playerStart.y * TILE_SIZE, { angleRadians: level.playerStart.angleRadians, faces: level.playerStart.faces });
@@ -125,6 +127,8 @@ function fromTiled(map, baseline) {
   imported.props = pointItems('Props', 'prop', (object) => {
     const row = { x: object.x / TILE_SIZE, y: object.y / TILE_SIZE, kind: required(object, 'kind') };
     const label = valueOf(object, 'label'); if(label) row.label = label;
+    const assetId = valueOf(object, 'assetId'); if(assetId) row.assetId = assetId;
+    const signSizeClass = valueOf(object, 'signSizeClass'); if(signSizeClass) row.signSizeClass = signSizeClass;
     return row;
   });
   imported.playerStart = { x: player[0].x / TILE_SIZE, y: player[0].y / TILE_SIZE, angleRadians: Number(required(player[0], 'angleRadians')), faces: required(player[0], 'faces') };

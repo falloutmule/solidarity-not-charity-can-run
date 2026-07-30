@@ -3,8 +3,8 @@
 
   const SNC_AUTHORED_LEVEL_ID = 'district-1-authored-v1';
   const SNC_AUTHORED_LEVEL_SCHEMA = 'snc-authored-level-static-v2';
-  const SNC_AUTHORED_LEVEL_STATIC_BYTES = 5183;
-  const SNC_AUTHORED_LEVEL_STATIC_SHA256 = '2e67ca1a75b83e513bf1e17298409a4db6d617cb6714cc111ed1863875aad529';
+  const SNC_AUTHORED_LEVEL_STATIC_BYTES = 5563;
+  const SNC_AUTHORED_LEVEL_STATIC_SHA256 = '57af17f6d0f40f0db16eb1194da5aaeabc9e00b3863e14c6c947539c511fbe80';
   const SNC_AUTHORED_SAVE_SCHEMA = 'snc-authored-save-overlay-v2';
 
   function deepFreeze(value){
@@ -121,21 +121,21 @@
     props: [
       // Stand forecourt: two labeled signs, pantry crates, and a cooler make the
       // central building readable at the starting pose and keep the portal grounded here.
-      { x: 18.2, y: 10.6, kind: 'signboard', label: 'SNC\nCAN STAND' },
-      { x: 21.8, y: 10.6, kind: 'signboard', label: 'DROP OFF\nCANS' },
+      { x: 19.2, y: 10.6, kind: 'signboard', label: 'SNC\nCAN STAND', assetId: 'sign_snc_can_station_001', signSizeClass: 'landmark' },
+      { x: 21.8, y: 10.6, kind: 'signboard', label: 'DROP OFF\nCANS', assetId: 'sign_drop_off_cans_001', signSizeClass: 'tall' },
       { x: 17.2, y: 10.9, kind: 'crate_stack' }, { x: 22.8, y: 10.9, kind: 'cooler' },
       { x: 18.0, y: 11.9, kind: 'bench' }, { x: 22.0, y: 11.9, kind: 'bench' },
       // Central park loop: a broken planter cluster and a one-can neighborhood stop.
-      { x: 9.0, y: 8.1, kind: 'signboard', label: 'NEIGHBOR\n1 CAN' },
+      { x: 9.0, y: 8.1, kind: 'signboard', label: 'NEIGHBOR\n1 CAN', assetId: 'sign_neighbor_1_can_001', signSizeClass: 'standard' },
       { x: 7.2, y: 9.5, kind: 'bench' }, { x: 9.4, y: 10.9, kind: 'scrub_bush' },
       { x: 11.1, y: 9.4, kind: 'agave' }, { x: 12.9, y: 11.0, kind: 'scrub_bush' },
       // North crossover is the family stop and clear link between the two loops.
-      { x: 18.0, y: 5.1, kind: 'signboard', label: 'FAMILY\n3 CANS' },
+      { x: 18.0, y: 5.1, kind: 'signboard', label: 'FAMILY\n3 CANS', assetId: 'sign_family_3_cans_001', signSizeClass: 'standard' },
       { x: 22.7, y: 5.1, kind: 'shopping_cart' }, { x: 20.5, y: 5.6, kind: 'cooler' },
       // Outer sprint loop: the market facade, split planter cluster, and elder stop.
-      { x: 29.0, y: 10.8, kind: 'signboard', label: 'OUTER LOOP\nMARKET' },
+      { x: 29.0, y: 10.8, kind: 'signboard', label: 'OUTER LOOP\nMARKET', assetId: 'sign_summer_loop_market_001', signSizeClass: 'landmark' },
       { x: 31.0, y: 11.1, kind: 'bench' }, { x: 28.4, y: 13.5, kind: 'agave' },
-      { x: 31.4, y: 13.8, kind: 'scrub_bush' }, { x: 33.0, y: 11.0, kind: 'signboard', label: 'ELDER\n1 CAN' },
+      { x: 31.4, y: 13.8, kind: 'scrub_bush' }, { x: 33.0, y: 11.0, kind: 'signboard', label: 'NEIGHBOR\n1 CAN', assetId: 'sign_neighbor_1_can_001', signSizeClass: 'standard' },
       { x: 34.2, y: 13.0, kind: 'mailbox' }, { x: 26.5, y: 15.5, kind: 'utility_box' },
       // Sparse edge cues guide the longer route without walling it off.
       { x: 5.5, y: 5.5, kind: 'mural_panel' }, { x: 6.5, y: 15.5, kind: 'bench' },

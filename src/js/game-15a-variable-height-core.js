@@ -245,8 +245,10 @@ function crHeightfieldSpriteOpaqueAt(tex, sourceX, sourceY){
   return mask.alpha[(y * mask.width + x) * 4 + 3] > 0;
 }
 function crHeightfieldSpriteRegistryEntry(obj){
+  if(!obj || !obj.assetId) return null;
   const registry = globalThis.SNC_RUNTIME_ASSET_REGISTRY;
-  return obj && obj.assetId && registry ? registry[obj.assetId] || null : null;
+  const signRegistry = globalThis.SNC_RUNTIME_SIGN_ASSET_REGISTRY;
+  return (registry && registry[obj.assetId]) || (signRegistry && signRegistry[obj.assetId]) || null;
 }
 function crHeightfieldGroundContactSourceY(entry, obj, bounds){
   const explicitAssetRow = entry && Number.isInteger(entry.groundContactSourceY) ? entry.groundContactSourceY : null;
