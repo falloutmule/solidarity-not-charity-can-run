@@ -248,7 +248,8 @@ function crHeightfieldSpriteRegistryEntry(obj){
   if(!obj || !obj.assetId) return null;
   const registry = globalThis.SNC_RUNTIME_ASSET_REGISTRY;
   const signRegistry = globalThis.SNC_RUNTIME_SIGN_ASSET_REGISTRY;
-  return (registry && registry[obj.assetId]) || (signRegistry && signRegistry[obj.assetId]) || null;
+  const foliageRegistry = globalThis.SNC_RUNTIME_FOLIAGE_ASSET_REGISTRY;
+  return (registry && registry[obj.assetId]) || (signRegistry && signRegistry[obj.assetId]) || (foliageRegistry && foliageRegistry[obj.assetId]) || null;
 }
 function crHeightfieldGroundContactSourceY(entry, obj, bounds){
   const explicitAssetRow = entry && Number.isInteger(entry.groundContactSourceY) ? entry.groundContactSourceY : null;

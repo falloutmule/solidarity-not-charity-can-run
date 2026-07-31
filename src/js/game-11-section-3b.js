@@ -425,7 +425,7 @@ function crHeightfieldSpriteWorldHeight(kind, entity){
   if(entity && Number.isFinite(entity.worldHeight) && entity.worldHeight > 0) return entity.worldHeight;
   const asset = entity && typeof crHeightfieldSpriteRegistryEntry === 'function' ? crHeightfieldSpriteRegistryEntry(entity) : null;
   if(asset){
-    const displayClass = entity.signSizeClass || asset.defaultDisplayClass;
+    const displayClass = entity.displaySizeClass || entity.signSizeClass || asset.defaultDisplayClass;
     const classData = asset.displayClasses && asset.displayClasses[displayClass];
     if(classData && Number.isFinite(classData.worldHeight) && classData.worldHeight > 0) return classData.worldHeight;
     if(Number.isFinite(asset.worldHeight) && asset.worldHeight > 0) return asset.worldHeight;

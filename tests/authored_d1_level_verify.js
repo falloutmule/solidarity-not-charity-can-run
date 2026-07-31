@@ -67,10 +67,18 @@ assert.deepStrictEqual(JSON.parse(JSON.stringify(signboards.map(row => [row.asse
 ], 'all authored signboards map to the supplied runtime art and data-level size classes');
 assert.strictEqual(signboards.filter(row => row.assetId === 'sign_neighbor_1_can_001').length, 2, 'one-can sign serves both individual recipient stops');
 assert.deepStrictEqual(Array.from(definition.environmentObjects, row => `${row.x},${row.y}`), ['10,10', '10,12', '12,10', '28,12', '30,12', '30,14'], 'planter clusters preserve open gaps between their visible ends');
+const foliage = definition.props.filter(row => row.assetId && row.assetId.startsWith('foliage_'));
+assert.strictEqual(foliage.length, 17, 'The Stand uses a restrained authored foliage set');
+assert.deepStrictEqual(Array.from(new Set(foliage.map(row => row.assetId))).sort(), [
+  'foliage_bush_low_001', 'foliage_grass_patch_long_001', 'foliage_grass_tuft_medium_001', 'foliage_groundcover_wide_001',
+  'foliage_tree_low_canopy_001', 'foliage_tree_round_large_001', 'foliage_tree_slender_001'
+], 'authored foliage maps only to the selected runtime assets');
+assert.strictEqual(foliage.filter(row => row.assetId.startsWith('foliage_tree_')).length, 4, 'four trees create route landmarks without a forest');
+assert(foliage.every(row => definition.mapRows[Math.floor(row.y)][Math.floor(row.x)] === '0'), 'decorative foliage never claims a collision cell');
 
 const canonical = sandbox.sncCanonicalizeAuthoredStatic(sandbox.sncBuildLockedStaticLevel(definition));
-assert.strictEqual(Buffer.byteLength(canonical), 5563, 'static byte identity is locked');
-assert.strictEqual(crypto.createHash('sha256').update(canonical).digest('hex'), '57af17f6d0f40f0db16eb1194da5aaeabc9e00b3863e14c6c947539c511fbe80', 'static hash identity is locked');
+assert.strictEqual(Buffer.byteLength(canonical), 6937, 'static byte identity is locked');
+assert.strictEqual(crypto.createHash('sha256').update(canonical).digest('hex'), 'c0b10dd27ac969ce3209556839fc0d8048a8820f36c46c051bb97ae84fc863fb', 'static hash identity is locked');
 assert.deepStrictEqual(JSON.parse(JSON.stringify(sandbox.sncValidateAuthoredLevelDefinition(definition))), { pass: true, errors: [] });
 
 for(const seed of [1, 2468, 717, 9001]){

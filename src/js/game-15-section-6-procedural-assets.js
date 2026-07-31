@@ -952,8 +952,8 @@ const HEIGHT = { hungry:0.86, family:1.0, elder:0.84, volunteer:0.92,
                  cooler:0.40, tarp_bundle:0.35, scrub_bush:0.22, agave:0.55, utility_box:0.45,
                  signboard:0.62, mural_panel:0.58 };
 function propTex(kind, prop){
-  const signAsset = prop && prop.assetId && globalThis.SNC_RUNTIME_SIGN_ASSET_REGISTRY && globalThis.SNC_RUNTIME_SIGN_ASSET_REGISTRY[prop.assetId];
-  if(signAsset && signAsset.image && signAsset.image.complete && signAsset.image.naturalWidth > 0) return signAsset.image;
+  const importedAsset = prop && typeof crHeightfieldSpriteRegistryEntry === 'function' ? crHeightfieldSpriteRegistryEntry(prop) : null;
+  if(importedAsset && importedAsset.image && importedAsset.image.complete && importedAsset.image.naturalWidth > 0) return importedAsset.image;
   if(DECOR_PROP_REQUIRED.indexOf(kind) >= 0){
     const v = prop ? decorPropVariantFromProp(prop) : 0;
     return bakeDecorPropTexture(kind, v, prop && prop.label);

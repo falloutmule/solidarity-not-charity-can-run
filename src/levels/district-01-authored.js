@@ -3,8 +3,8 @@
 
   const SNC_AUTHORED_LEVEL_ID = 'district-1-authored-v1';
   const SNC_AUTHORED_LEVEL_SCHEMA = 'snc-authored-level-static-v2';
-  const SNC_AUTHORED_LEVEL_STATIC_BYTES = 5563;
-  const SNC_AUTHORED_LEVEL_STATIC_SHA256 = '57af17f6d0f40f0db16eb1194da5aaeabc9e00b3863e14c6c947539c511fbe80';
+  const SNC_AUTHORED_LEVEL_STATIC_BYTES = 6937;
+  const SNC_AUTHORED_LEVEL_STATIC_SHA256 = 'c0b10dd27ac969ce3209556839fc0d8048a8820f36c46c051bb97ae84fc863fb';
   const SNC_AUTHORED_SAVE_SCHEMA = 'snc-authored-save-overlay-v2';
 
   function deepFreeze(value){
@@ -125,20 +125,26 @@
       { x: 21.8, y: 10.6, kind: 'signboard', label: 'DROP OFF\nCANS', assetId: 'sign_drop_off_cans_001', signSizeClass: 'tall' },
       { x: 17.2, y: 10.9, kind: 'crate_stack' }, { x: 22.8, y: 10.9, kind: 'cooler' },
       { x: 18.0, y: 11.9, kind: 'bench' }, { x: 22.0, y: 11.9, kind: 'bench' },
+      { x: 15.8, y: 12.9, kind: 'foliage', assetId: 'foliage_groundcover_wide_001' }, { x: 24.2, y: 13.2, kind: 'foliage', assetId: 'foliage_grass_tuft_medium_001' },
       // Central park loop: a broken planter cluster and a one-can neighborhood stop.
       { x: 9.0, y: 8.1, kind: 'signboard', label: 'NEIGHBOR\n1 CAN', assetId: 'sign_neighbor_1_can_001', signSizeClass: 'standard' },
-      { x: 7.2, y: 9.5, kind: 'bench' }, { x: 9.4, y: 10.9, kind: 'scrub_bush' },
-      { x: 11.1, y: 9.4, kind: 'agave' }, { x: 12.9, y: 11.0, kind: 'scrub_bush' },
+      { x: 7.2, y: 9.5, kind: 'bench' }, { x: 9.4, y: 10.9, kind: 'foliage', assetId: 'foliage_bush_low_001' },
+      { x: 11.1, y: 9.4, kind: 'foliage', assetId: 'foliage_grass_patch_long_001' }, { x: 12.9, y: 11.0, kind: 'foliage', assetId: 'foliage_bush_low_001' },
+      { x: 7.0, y: 11.4, kind: 'foliage', assetId: 'foliage_groundcover_wide_001' }, { x: 12.7, y: 12.9, kind: 'foliage', assetId: 'foliage_grass_tuft_medium_001' },
       // North crossover is the family stop and clear link between the two loops.
       { x: 18.0, y: 5.1, kind: 'signboard', label: 'FAMILY\n3 CANS', assetId: 'sign_family_3_cans_001', signSizeClass: 'standard' },
       { x: 22.7, y: 5.1, kind: 'shopping_cart' }, { x: 20.5, y: 5.6, kind: 'cooler' },
+      { x: 13.1, y: 5.8, kind: 'foliage', assetId: 'foliage_tree_low_canopy_001' }, { x: 15.2, y: 3.2, kind: 'foliage', assetId: 'foliage_grass_patch_long_001' },
       // Outer sprint loop: the market facade, split planter cluster, and elder stop.
       { x: 29.0, y: 10.8, kind: 'signboard', label: 'OUTER LOOP\nMARKET', assetId: 'sign_summer_loop_market_001', signSizeClass: 'landmark' },
-      { x: 31.0, y: 11.1, kind: 'bench' }, { x: 28.4, y: 13.5, kind: 'agave' },
-      { x: 31.4, y: 13.8, kind: 'scrub_bush' }, { x: 33.0, y: 11.0, kind: 'signboard', label: 'NEIGHBOR\n1 CAN', assetId: 'sign_neighbor_1_can_001', signSizeClass: 'standard' },
+      { x: 31.0, y: 11.1, kind: 'bench' }, { x: 28.4, y: 13.5, kind: 'foliage', assetId: 'foliage_grass_patch_long_001' },
+      { x: 31.4, y: 13.8, kind: 'foliage', assetId: 'foliage_bush_low_001' }, { x: 33.0, y: 11.0, kind: 'signboard', label: 'NEIGHBOR\n1 CAN', assetId: 'sign_neighbor_1_can_001', signSizeClass: 'standard' },
+      { x: 26.4, y: 16.0, kind: 'foliage', assetId: 'foliage_tree_round_large_001' }, { x: 35.3, y: 7.7, kind: 'foliage', assetId: 'foliage_tree_low_canopy_001' },
+      { x: 29.6, y: 15.8, kind: 'foliage', assetId: 'foliage_groundcover_wide_001' }, { x: 32.2, y: 15.0, kind: 'foliage', assetId: 'foliage_grass_tuft_medium_001' },
       { x: 34.2, y: 13.0, kind: 'mailbox' }, { x: 26.5, y: 15.5, kind: 'utility_box' },
       // Sparse edge cues guide the longer route without walling it off.
       { x: 5.5, y: 5.5, kind: 'mural_panel' }, { x: 6.5, y: 15.5, kind: 'bench' },
+      { x: 5.2, y: 13.4, kind: 'foliage', assetId: 'foliage_tree_slender_001' }, { x: 8.1, y: 14.2, kind: 'foliage', assetId: 'foliage_grass_tuft_medium_001' },
       { x: 34.5, y: 5.5, kind: 'mural_panel' }, { x: 35.0, y: 15.5, kind: 'mailbox' }
     ],
     exit: { x: 20.5, y: 10.7, active: false },
