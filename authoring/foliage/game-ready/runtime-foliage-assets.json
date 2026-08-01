@@ -86,7 +86,7 @@
       "sourceSha256": "5c8e5085183f31a6ac59ab7783e85cee362be29060f5fa090d47332deae5b482",
       "runtimePath": "authoring/foliage/game-ready/runtime/grass_patch_long.png",
       "defaultDisplayClass": "grassPatch",
-      "runtimeSha256": "63aa929143871c927727bcf2a712f4c00a03872e2e51c3bf4a3df5458be179bf",
+      "runtimeSha256": "6d42c437f3d6088f149397976fc1191a4ca3550ca5b5f9866d4603bd0f443adf",
       "runtimeSize": {
         "width": 87,
         "height": 59
@@ -182,7 +182,7 @@
       "sourceSha256": "e98408d97fe71593a880c4628300f969a931304b96755f4366a609fd0b0da6d4",
       "runtimePath": "authoring/foliage/game-ready/runtime/grass_tuft_medium.png",
       "defaultDisplayClass": "grassTuft",
-      "runtimeSha256": "08a97894f8ef5f4c6552811ecd465c37dc203e225b5e3153a7e4487d8f558d31",
+      "runtimeSha256": "2713bf953775d9e87d4c26a83c73418c994c319197c361c486cf47cf746c018d",
       "runtimeSize": {
         "width": 84,
         "height": 48

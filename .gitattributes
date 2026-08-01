@@ -6,3 +6,6 @@
 *.gif binary
 *.webp binary
 
+# Package source manifests are hashed as Git's canonical LF text.
+authoring/paths/game-ready/source-manifest.json text eol=lf
+authoring/signs/game-ready/source-manifest.json text eol=lf
