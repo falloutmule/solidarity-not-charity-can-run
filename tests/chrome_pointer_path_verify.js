@@ -149,7 +149,8 @@ async function main(){
       for(const target of ['#ml', '#mlookpad']) for(const type of ['pointerdown', 'pointermove', 'pointerup', 'pointercancel']) assert(has(registrations, target, type), `${target} missing ${type} in Pointer Event mode`);
       const targets = new Set(['document', '#ml', '#mr', '#mlookpad', '#mg', '#ms', '#mm', '#mp', '#mportmenu', '#fsbtn', '#rmenu']);
       const touchListeners = registrations.filter((row) => targets.has(row.target) && row.type.startsWith('touch'));
-      assert(!touchListeners.length, `Pointer Event mode must not install legacy control Touch listeners: ${JSON.stringify(touchListeners)}`);
+      const allowedGiveFallback = new Set(['touchstart','touchend','touchcancel']);
+      assert(touchListeners.every((row) => row.target === '#mg' && allowedGiveFallback.has(row.type) && row.passive === false), `Pointer Event mode may only install the guarded local GIVE Touch fallback: ${JSON.stringify(touchListeners)}`);
       assert(!registrations.some((row) => row.target === 'document' && row.type === 'touchmove' && !row.passive), 'Pointer Event mode installed non-passive document touchmove');
       await startPlay(pointer.page);
       const styles = await pointer.page.evaluate(() => {
