@@ -1,0 +1,266 @@
+{
+  "source": "_cast_soft_clean.png",
+  "asset_count": 8,
+  "title_footer_decorations_included": false,
+  "transparent_rgb_normalized_to_zero": true,
+  "antialiasing_preserved": true,
+  "margin_pixels": 24,
+  "assets": [
+    {
+      "id": 1,
+      "name": "01_top_woman_and_dog",
+      "file": "01_top_woman_and_dog.png",
+      "source_region": [
+        0,
+        0,
+        320,
+        435
+      ],
+      "source_bbox": [
+        25,
+        41,
+        291,
+        429
+      ],
+      "size": [
+        314,
+        436
+      ],
+      "margins": {
+        "left": 24,
+        "right": 24,
+        "top": 24,
+        "bottom": 24
+      },
+      "transparent": 82098,
+      "partial_alpha": 5005,
+      "opaque": 49801,
+      "hidden_rgb_nonzero_under_alpha_zero": 0,
+      "sha256": "b372adbf13bf8dc17cf71ccb4f9a624c5af14e0e0b06aaacaac85d2b74ec95b4"
+    },
+    {
+      "id": 2,
+      "name": "02_top_bike_traveler",
+      "file": "02_top_bike_traveler.png",
+      "source_region": [
+        320,
+        0,
+        660,
+        435
+      ],
+      "source_bbox": [
+        324,
+        35,
+        646,
+        416
+      ],
+      "size": [
+        370,
+        429
+      ],
+      "margins": {
+        "left": 24,
+        "right": 24,
+        "top": 24,
+        "bottom": 24
+      },
+      "transparent": 76938,
+      "partial_alpha": 4212,
+      "opaque": 77580,
+      "hidden_rgb_nonzero_under_alpha_zero": 0,
+      "sha256": "eaf36df3237d3583c5fd32e3ade483ade4c6e291143913752fbe479cce198a70"
+    },
+    {
+      "id": 3,
+      "name": "03_top_walker",
+      "file": "03_top_walker.png",
+      "source_region": [
+        660,
+        0,
+        970,
+        435
+      ],
+      "source_bbox": [
+        715,
+        41,
+        951,
+        417
+      ],
+      "size": [
+        284,
+        424
+      ],
+      "margins": {
+        "left": 24,
+        "right": 24,
+        "top": 24,
+        "bottom": 24
+      },
+      "transparent": 68504,
+      "partial_alpha": 3829,
+      "opaque": 48083,
+      "hidden_rgb_nonzero_under_alpha_zero": 0,
+      "sha256": "3aa5c27872c4b04b46e98a2896d727e947d8e6116544822bbdaa05c34aaa1acb"
+    },
+    {
+      "id": 4,
+      "name": "04_top_standing_man",
+      "file": "04_top_standing_man.png",
+      "source_region": [
+        970,
+        0,
+        1280,
+        435
+      ],
+      "source_bbox": [
+        1000,
+        19,
+        1163,
+        427
+      ],
+      "size": [
+        211,
+        456
+      ],
+      "margins": {
+        "left": 24,
+        "right": 24,
+        "top": 24,
+        "bottom": 24
+      },
+      "transparent": 54346,
+      "partial_alpha": 3005,
+      "opaque": 38865,
+      "hidden_rgb_nonzero_under_alpha_zero": 0,
+      "sha256": "35d62bf50f00c6848bf36d934c7e7cf2f75429d0dd3992e4c96394ce520b9b47"
+    },
+    {
+      "id": 5,
+      "name": "05_bottom_woman",
+      "file": "05_bottom_woman.png",
+      "source_region": [
+        0,
+        430,
+        320,
+        853
+      ],
+      "source_bbox": [
+        92,
+        439,
+        278,
+        825
+      ],
+      "size": [
+        234,
+        434
+      ],
+      "margins": {
+        "left": 24,
+        "right": 24,
+        "top": 24,
+        "bottom": 24
+      },
+      "transparent": 60255,
+      "partial_alpha": 3785,
+      "opaque": 37516,
+      "hidden_rgb_nonzero_under_alpha_zero": 0,
+      "sha256": "26bb67409e966998a946985e4e55928b7511fa56e6fe77d783334c5ca87b50be"
+    },
+    {
+      "id": 6,
+      "name": "06_bottom_man",
+      "file": "06_bottom_man.png",
+      "source_region": [
+        320,
+        430,
+        650,
+        853
+      ],
+      "source_bbox": [
+        380,
+        435,
+        588,
+        823
+      ],
+      "size": [
+        256,
+        436
+      ],
+      "margins": {
+        "left": 24,
+        "right": 24,
+        "top": 24,
+        "bottom": 24
+      },
+      "transparent": 60679,
+      "partial_alpha": 3367,
+      "opaque": 47570,
+      "hidden_rgb_nonzero_under_alpha_zero": 0,
+      "sha256": "8ca28219c55e46bd593db3bddbb940ce1279e4fb638683a3c4875154cd7a7ba1"
+    },
+    {
+      "id": 7,
+      "name": "07_bottom_sitting_person",
+      "file": "07_bottom_sitting_person.png",
+      "source_region": [
+        620,
+        430,
+        900,
+        853
+      ],
+      "source_bbox": [
+        642,
+        557,
+        869,
+        820
+      ],
+      "size": [
+        275,
+        311
+      ],
+      "margins": {
+        "left": 24,
+        "right": 24,
+        "top": 24,
+        "bottom": 24
+      },
+      "transparent": 44610,
+      "partial_alpha": 2736,
+      "opaque": 38179,
+      "hidden_rgb_nonzero_under_alpha_zero": 0,
+      "sha256": "d7e2baac8df5f028c3a6532a15958698c3884b22e1b7bcf3bcad6a37e91dd1ce"
+    },
+    {
+      "id": 8,
+      "name": "08_bottom_cart_woman",
+      "file": "08_bottom_cart_woman.png",
+      "source_region": [
+        880,
+        430,
+        1280,
+        853
+      ],
+      "source_bbox": [
+        887,
+        445,
+        1195,
+        820
+      ],
+      "size": [
+        356,
+        423
+      ],
+      "margins": {
+        "left": 24,
+        "right": 24,
+        "top": 24,
+        "bottom": 24
+      },
+      "transparent": 75046,
+      "partial_alpha": 4202,
+      "opaque": 71340,
+      "hidden_rgb_nonzero_under_alpha_zero": 0,
+      "sha256": "fba093cc02253f9a3e3a3011a889268088cc7e54c6af7afed4c443d9e1f7487e"
+    }
+  ]
+}

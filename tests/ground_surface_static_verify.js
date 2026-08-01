@@ -1,0 +1,15 @@
+'use strict';
+const assert = require('assert'), fs = require('fs'), path = require('path');
+const root = path.resolve(__dirname, '..');
+const source = fs.readFileSync(path.join(root, 'src/js/game-16c-ground-surface.js'), 'utf8');
+const renderer = fs.readFileSync(path.join(root, 'src/js/game-16d-heightfield-renderer.js'), 'utf8');
+assert(source.includes('const CR_GROUND_ATLAS_SCALE = 16'), 'ground atlas has a fixed world scale');
+assert(source.includes('function crGroundBuildAtlas(surface)'), 'grass and broad dirt are cached into an atlas');
+assert(source.includes('function crDrawAuthoredGroundSurface'), 'ground plane is projected from world coordinates');
+assert(source.includes('const noise = crGroundHash(px, py, seed ^ 0x1b873593) & 31;'), 'dirt variation uses full-resolution deterministic coordinates instead of a repeated cell grid');
+assert(source.includes('const palette = [[126,94,55], [132,99,58], [138,104,62]];'), 'base dirt palette keeps a warm-brown minimum with restrained contrast');
+assert(!source.includes('Math.random'), 'ground output has no per-frame randomness');
+assert(source.includes('frameBufferAllocations'), 'ground frame buffer allocation is observable');
+assert(renderer.includes('crDrawAuthoredGroundSurface(px, py, dirX, dirY, planeX, planeY)'), 'heightfield renderer invokes ground before walls and sprites');
+assert(source.includes("'ground-plane-decal'") === false, 'renderer owns no path asset ID or renderer-mode branch');
+console.log(JSON.stringify({ pass: true, check: 'cached deterministic authored ground surface' }));

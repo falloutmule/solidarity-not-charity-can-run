@@ -1,0 +1,862 @@
+{
+  "package": "paths-game-ready",
+  "source_archive": "doc_170b9fc23211_Paths.zip",
+  "asset_count": 57,
+  "assets": [
+    {
+      "file": "organic-path_01.png",
+      "kind": "path-segment",
+      "dimensions": [
+        438,
+        290
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 83346,
+        "partial": 28582,
+        "opaque": 15092
+      },
+      "sha256": "dbf09f3cecf0ae788017609d0f25124c2e344f34148e0a25f5e2b8c4aa7ddb74"
+    },
+    {
+      "file": "organic-path_02.png",
+      "kind": "path-segment",
+      "dimensions": [
+        399,
+        289
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 80142,
+        "partial": 23806,
+        "opaque": 11363
+      },
+      "sha256": "bd1e71620f93d9801dd13d3e739d358136c6df3cd6711a3e52ab87ccf7b158ab"
+    },
+    {
+      "file": "organic-path_03.png",
+      "kind": "path-segment",
+      "dimensions": [
+        357,
+        287
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 67457,
+        "partial": 23423,
+        "opaque": 11579
+      },
+      "sha256": "efe58d1086d5d1f01b228ad76efa824929b595cc294a0dcf71eece40ee7027fb"
+    },
+    {
+      "file": "organic-path_04.png",
+      "kind": "path-segment",
+      "dimensions": [
+        515,
+        177
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 60038,
+        "partial": 15931,
+        "opaque": 15186
+      },
+      "sha256": "45486f4f2e3c863664f4502ecf898683455a9b811bec4fdfa956b04bf127e963"
+    },
+    {
+      "file": "organic-path_05.png",
+      "kind": "path-segment",
+      "dimensions": [
+        538,
+        319
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 114544,
+        "partial": 31616,
+        "opaque": 25462
+      },
+      "sha256": "d0eae12263a8a50e02f7ef60c302bfdd8b45321a819929dbd25f08d0d0c2aa2b"
+    },
+    {
+      "file": "organic-path_06.png",
+      "kind": "path-segment",
+      "dimensions": [
+        574,
+        180
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 65818,
+        "partial": 22766,
+        "opaque": 14736
+      },
+      "sha256": "8ca00ad21c8af2fbab7021f9caccac46aad4298070353e18bc33649580149bc3"
+    },
+    {
+      "file": "organic-path_07.png",
+      "kind": "path-segment",
+      "dimensions": [
+        345,
+        236
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 58416,
+        "partial": 11949,
+        "opaque": 11055
+      },
+      "sha256": "768b04bc5136393684c9305dc817e5e12129deb05b79df7004d9eea2200e148a"
+    },
+    {
+      "file": "organic-path_08.png",
+      "kind": "path-segment",
+      "dimensions": [
+        382,
+        238
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 64686,
+        "partial": 13710,
+        "opaque": 12520
+      },
+      "sha256": "e1614b4e8b43c34895dcfd29de478de5e35a47b79e92d3a15629b9da2ba3dea0"
+    },
+    {
+      "file": "organic-path_09.png",
+      "kind": "path-segment",
+      "dimensions": [
+        377,
+        237
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 62937,
+        "partial": 13613,
+        "opaque": 12799
+      },
+      "sha256": "23fc870349796542bf285c19eee8dfdc89f43573efb8533c576026f32b63e70b"
+    },
+    {
+      "file": "organic-path_10.png",
+      "kind": "path-segment",
+      "dimensions": [
+        405,
+        204
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 57591,
+        "partial": 11581,
+        "opaque": 13448
+      },
+      "sha256": "5b8aeac329151a7ceacd02785523fdefac5dac0eba9e82f03c4629fb5dcc9422"
+    },
+    {
+      "file": "organic-path_11.png",
+      "kind": "path-segment",
+      "dimensions": [
+        318,
+        189
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 45013,
+        "partial": 7579,
+        "opaque": 7510
+      },
+      "sha256": "c5212656077737fbe7ea36130564723c1389935e7a0d9358be5a1f530fe1ede6"
+    },
+    {
+      "file": "organic-path_12.png",
+      "kind": "path-segment",
+      "dimensions": [
+        241,
+        174
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 33251,
+        "partial": 4450,
+        "opaque": 4233
+      },
+      "sha256": "6eba254777b52613094af1ec0b36243bfde10cb49f433d8ccefd5a7fdf547e2f"
+    },
+    {
+      "file": "organic-path_13.png",
+      "kind": "path-segment",
+      "dimensions": [
+        215,
+        156
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 27108,
+        "partial": 3537,
+        "opaque": 2895
+      },
+      "sha256": "f53100ddde571a1988638615899b5d2b492ea5ca741ffb140ae198b6bbd5cf22"
+    },
+    {
+      "file": "organic-path_14.png",
+      "kind": "path-segment",
+      "dimensions": [
+        456,
+        241
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 67197,
+        "partial": 28448,
+        "opaque": 14251
+      },
+      "sha256": "432d3ba910c0fb4ba89df3c12fd77e76c0c234876906d1c6885a29b8c00b155b"
+    },
+    {
+      "file": "organic-path_15.png",
+      "kind": "path-segment",
+      "dimensions": [
+        417,
+        238
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 62424,
+        "partial": 24450,
+        "opaque": 12372
+      },
+      "sha256": "adce90e94890f8f62f18d1a4b951ddd0c6a79df972349a0793a28966f2444a47"
+    },
+    {
+      "file": "organic-path_16.png",
+      "kind": "path-segment",
+      "dimensions": [
+        286,
+        191
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 40292,
+        "partial": 9751,
+        "opaque": 4583
+      },
+      "sha256": "ea362a77082525500c98c6b2f2f99191de8ccb0474d81837928a7459055c277c"
+    },
+    {
+      "file": "organic-path_17.png",
+      "kind": "path-segment",
+      "dimensions": [
+        337,
+        227
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 52391,
+        "partial": 13980,
+        "opaque": 10128
+      },
+      "sha256": "d261fc962d28cbc9409936203be8a77c07324efe25906f7940d2bb7929374f5a"
+    },
+    {
+      "file": "organic-path_18.png",
+      "kind": "path-segment",
+      "dimensions": [
+        295,
+        196
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 43064,
+        "partial": 8720,
+        "opaque": 6036
+      },
+      "sha256": "9333ae027c16fadaa2a180e91cca8ff44776aa60bdb141d04bc6b62ace9a23b8"
+    },
+    {
+      "file": "organic-path_19.png",
+      "kind": "path-segment",
+      "dimensions": [
+        240,
+        179
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 33119,
+        "partial": 6194,
+        "opaque": 3647
+      },
+      "sha256": "b554828d2935972a635c27f261e20384d8c32ec96b8f87c78f1d637a22d3dca6"
+    },
+    {
+      "file": "organic-path_20.png",
+      "kind": "path-segment",
+      "dimensions": [
+        314,
+        245
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 51166,
+        "partial": 14815,
+        "opaque": 10949
+      },
+      "sha256": "be0cacfb395bbe45746a13881ac2fabeef367f76f160bf394e2d657528f7e480"
+    },
+    {
+      "file": "organic-path_21.png",
+      "kind": "path-segment",
+      "dimensions": [
+        328,
+        238
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 52171,
+        "partial": 18903,
+        "opaque": 6990
+      },
+      "sha256": "67bcfdd01b72a75cd0df55208d3e18adc7f727475b358e2e69165e46e22010e2"
+    },
+    {
+      "file": "organic-path_22.png",
+      "kind": "path-segment",
+      "dimensions": [
+        466,
+        208
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 63213,
+        "partial": 24258,
+        "opaque": 9457
+      },
+      "sha256": "f9b4384e5712240da9912b1b23518787c88b77c383452035fa3729622a5d2007"
+    },
+    {
+      "file": "organic-path_23.png",
+      "kind": "path-segment",
+      "dimensions": [
+        297,
+        155
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 37161,
+        "partial": 6848,
+        "opaque": 2026
+      },
+      "sha256": "d62b302f38287d7298789a52e33e195733329fe9b5251edcd9b915c0b4aacfea"
+    },
+    {
+      "file": "modular-path_01.png",
+      "kind": "path-segment",
+      "dimensions": [
+        552,
+        191
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 65042,
+        "partial": 27153,
+        "opaque": 13237
+      },
+      "sha256": "e82828d3ba1717688dbe294c82ce0cd039105fe8e2b01eac5b36efeeebb05039"
+    },
+    {
+      "file": "modular-path_02.png",
+      "kind": "path-segment",
+      "dimensions": [
+        558,
+        191
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 65478,
+        "partial": 28032,
+        "opaque": 13068
+      },
+      "sha256": "7b37a669b7984ef20d4f09b8486909d86d5f20f1d6417d055ef2a44af6ec0b57"
+    },
+    {
+      "file": "modular-path_03.png",
+      "kind": "path-segment",
+      "dimensions": [
+        553,
+        185
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 63644,
+        "partial": 18679,
+        "opaque": 19982
+      },
+      "sha256": "efe4fe13bb1b9c0e8a906bca0d07689277ff833ccb3be23021762ed1cd2052a2"
+    },
+    {
+      "file": "modular-path_04.png",
+      "kind": "path-segment",
+      "dimensions": [
+        290,
+        184
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 37435,
+        "partial": 8054,
+        "opaque": 7871
+      },
+      "sha256": "86a6748eedd4b0290f8eeb10f3739c2e97d6901db7d459eb685933f27d834155"
+    },
+    {
+      "file": "modular-path_05.png",
+      "kind": "path-segment",
+      "dimensions": [
+        323,
+        314
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 69341,
+        "partial": 15590,
+        "opaque": 16491
+      },
+      "sha256": "8b69f0c5b35e024e96a2dd6a57f2c306ec4ca127a78c7b582f9d735050e9ea54"
+    },
+    {
+      "file": "modular-path_06.png",
+      "kind": "path-segment",
+      "dimensions": [
+        552,
+        188
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 64080,
+        "partial": 18618,
+        "opaque": 21078
+      },
+      "sha256": "13925486026665a0118206ed47c80f5fa7655898737119a7b588daed249b75f4"
+    },
+    {
+      "file": "modular-path_07.png",
+      "kind": "path-segment",
+      "dimensions": [
+        291,
+        187
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 37781,
+        "partial": 8234,
+        "opaque": 8402
+      },
+      "sha256": "72dd6eb4588a053e4dea743a0b4ced37f492ba0b41ea4efb736b1f828157c7a9"
+    },
+    {
+      "file": "modular-path_08.png",
+      "kind": "path-segment",
+      "dimensions": [
+        186,
+        184
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 26604,
+        "partial": 3984,
+        "opaque": 3636
+      },
+      "sha256": "9a8998394a3359cea3fffd7f0230cd1612d700627f1461e75e95b59b68ead69c"
+    },
+    {
+      "file": "modular-path_09.png",
+      "kind": "path-segment",
+      "dimensions": [
+        293,
+        324
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 66034,
+        "partial": 16145,
+        "opaque": 12753
+      },
+      "sha256": "384c2c49a28baf0e337683812ec4499862ac7503bdc989d4926097fb5257df83"
+    },
+    {
+      "file": "modular-path_10.png",
+      "kind": "path-segment",
+      "dimensions": [
+        219,
+        215
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 34981,
+        "partial": 7234,
+        "opaque": 4870
+      },
+      "sha256": "8bcf28a0c9bc13366439e9285c28130c06f76f78a054065ca1f84bbd4054fe46"
+    },
+    {
+      "file": "modular-path_11.png",
+      "kind": "path-segment",
+      "dimensions": [
+        208,
+        212
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 33281,
+        "partial": 6657,
+        "opaque": 4158
+      },
+      "sha256": "c363f29b44e4bf380bf0657c7c8a5a8979167d7ed9f8c062521380545e6db064"
+    },
+    {
+      "file": "modular-path_12.png",
+      "kind": "path-segment",
+      "dimensions": [
+        189,
+        600
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 69400,
+        "partial": 20152,
+        "opaque": 23848
+      },
+      "sha256": "63993c71ec6133bd8ff03593ebdf2e93d965a3f47b6c8e42acfd5e84d7b5f9c6"
+    },
+    {
+      "file": "modular-path_13.png",
+      "kind": "path-segment",
+      "dimensions": [
+        200,
+        348
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 44290,
+        "partial": 12683,
+        "opaque": 12627
+      },
+      "sha256": "6064ab2a650de93d34940d300744d393fab3d53d228a85cbe44044361701586c"
+    },
+    {
+      "file": "modular-path_14.png",
+      "kind": "path-segment",
+      "dimensions": [
+        230,
+        212
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 36252,
+        "partial": 7344,
+        "opaque": 5164
+      },
+      "sha256": "9ed3e20b53040b28d89401d106d7f364bc7c4f3dc7d91562f521e590424770b5"
+    },
+    {
+      "file": "modular-path_15.png",
+      "kind": "path-segment",
+      "dimensions": [
+        217,
+        202
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 31792,
+        "partial": 5401,
+        "opaque": 6641
+      },
+      "sha256": "ab7727f9695e77ca514ec18d0cdbe25be5e041bb33011464bdd7ae76345c70e6"
+    },
+    {
+      "file": "modular-path_16.png",
+      "kind": "path-segment",
+      "dimensions": [
+        252,
+        276
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 49480,
+        "partial": 8058,
+        "opaque": 12014
+      },
+      "sha256": "01147209ae4905eb7a4c19102907d30ad52df428681552d5915b19337efc74a6"
+    },
+    {
+      "file": "modular-path_17.png",
+      "kind": "path-segment",
+      "dimensions": [
+        204,
+        200
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 29907,
+        "partial": 5169,
+        "opaque": 5724
+      },
+      "sha256": "6ca6b809ae03cd3935e202024bca6da1700a88ba3ebe9babdcfbfc92d3ab4e14"
+    },
+    {
+      "file": "modular-path_18.png",
+      "kind": "path-segment",
+      "dimensions": [
+        565,
+        275
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 105403,
+        "partial": 18259,
+        "opaque": 31713
+      },
+      "sha256": "ba2124c95b168af8bdf075dd33eeb8a344a8c442429a8e6b03e211f0320d4296"
+    },
+    {
+      "file": "modular-path_19.png",
+      "kind": "path-segment",
+      "dimensions": [
+        207,
+        307
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 41987,
+        "partial": 9053,
+        "opaque": 12509
+      },
+      "sha256": "31df6ec50307121a8cd281c788b2dde5d1ddef1b77d08cfefbb9aa0b9b8f0b0c"
+    },
+    {
+      "file": "modular-path_20.png",
+      "kind": "path-segment",
+      "dimensions": [
+        258,
+        239
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 45170,
+        "partial": 8389,
+        "opaque": 8103
+      },
+      "sha256": "eff2559faadc7c161e37eda67c45a649d39612225b0c16670d44e7dd0ec4340a"
+    },
+    {
+      "file": "modular-path_21.png",
+      "kind": "path-segment",
+      "dimensions": [
+        252,
+        192
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 36210,
+        "partial": 6863,
+        "opaque": 5311
+      },
+      "sha256": "6f4c052dd55a31993596d966f8de5a2e8019acd802d5b4d385e8176901f3e849"
+    },
+    {
+      "file": "modular-path_22.png",
+      "kind": "path-segment",
+      "dimensions": [
+        245,
+        193
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 35401,
+        "partial": 6896,
+        "opaque": 4988
+      },
+      "sha256": "4808268dae8af795588f86df17ad19e1d718bd3aceb418e21d75daf77594a194"
+    },
+    {
+      "file": "modular-path_23.png",
+      "kind": "path-segment",
+      "dimensions": [
+        188,
+        145
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 23182,
+        "partial": 2962,
+        "opaque": 1116
+      },
+      "sha256": "fd61086ddfbc438dc851648bf46c7ef951de1baf5ec67a09169a6849b04826c0"
+    },
+    {
+      "file": "modular-path_24.png",
+      "kind": "path-segment",
+      "dimensions": [
+        440,
+        183
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 51853,
+        "partial": 16854,
+        "opaque": 11813
+      },
+      "sha256": "cc17ec02d66e858b6d680c7d8135aa37204e5fc7c01f0954bc1faee4af42d595"
+    },
+    {
+      "file": "modular-path_25.png",
+      "kind": "path-segment",
+      "dimensions": [
+        337,
+        311
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 75903,
+        "partial": 16334,
+        "opaque": 12570
+      },
+      "sha256": "b51a4d65eb39c864186ee2fd041a9738d8eb2c8a31af5a52b688408608c30bd5"
+    },
+    {
+      "file": "modular-path_26.png",
+      "kind": "path-segment",
+      "dimensions": [
+        212,
+        199
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 33107,
+        "partial": 5662,
+        "opaque": 3419
+      },
+      "sha256": "d9b767fc27986faaf265bde721f839e7e852f00e8f8a02ae4483b737127944d7"
+    },
+    {
+      "file": "modular-path_27.png",
+      "kind": "path-segment",
+      "dimensions": [
+        219,
+        145
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 26072,
+        "partial": 4049,
+        "opaque": 1634
+      },
+      "sha256": "35e10597c2dd5f65926cd58eb6c9d6ea767b57931840abe7d60e2fba52fa1d81"
+    },
+    {
+      "file": "modular-path_28.png",
+      "kind": "path-segment",
+      "dimensions": [
+        223,
+        137
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 25487,
+        "partial": 3221,
+        "opaque": 1843
+      },
+      "sha256": "8cf2f86d7688bd0d9e8670b75e621ca634b1b0831f79b9045e7be02ae82edd1b"
+    },
+    {
+      "file": "modular-path_29.png",
+      "kind": "path-segment",
+      "dimensions": [
+        443,
+        185
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 52458,
+        "partial": 15255,
+        "opaque": 14242
+      },
+      "sha256": "0c101cc95ed2f58d875b62fb292351deaf9ed12389e664bfd32bb96a253737df"
+    },
+    {
+      "file": "modular-path_30.png",
+      "kind": "path-segment",
+      "dimensions": [
+        232,
+        184
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 32574,
+        "partial": 5635,
+        "opaque": 4479
+      },
+      "sha256": "b47a0c44c35789aaeb717eda94aa91c23f643a30794d00b6fe809a4e4200b993"
+    },
+    {
+      "file": "modular-path_31.png",
+      "kind": "path-segment",
+      "dimensions": [
+        209,
+        149
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 25488,
+        "partial": 3597,
+        "opaque": 2056
+      },
+      "sha256": "0f2b7ab42e8834061469e52cd51a022fa77c85a706e57bacf6b0ac8b9b51ad1e"
+    },
+    {
+      "file": "modular-path_32.png",
+      "kind": "path-segment",
+      "dimensions": [
+        222,
+        193
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 34520,
+        "partial": 4656,
+        "opaque": 3670
+      },
+      "sha256": "aee87cf1b146ef43cc9bede3dcd8c1a6034f06283dd89388b47d8b8c1c1be4a1"
+    },
+    {
+      "file": "modular-path_33.png",
+      "kind": "path-segment",
+      "dimensions": [
+        336,
+        209
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 46459,
+        "partial": 13486,
+        "opaque": 10279
+      },
+      "sha256": "71a660b6b3c8e7058598a203ee61a8dea863839c26b96beeffe83e7da34530ba"
+    },
+    {
+      "file": "modular-path_34.png",
+      "kind": "path-segment",
+      "dimensions": [
+        755,
+        184
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 82524,
+        "partial": 30818,
+        "opaque": 25578
+      },
+      "sha256": "6afa03e8a768376ad91076b8d365328c41cec19f13c7e2ac2927e435e0522fde"
+    }
+  ]
+}

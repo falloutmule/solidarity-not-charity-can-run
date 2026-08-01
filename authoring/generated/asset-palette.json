@@ -1,0 +1,262 @@
+{
+  "schema": "snc-asset-palette-v1",
+  "generatedFrom": "authoring/characters/character-assets-v2.json",
+  "assets": [
+    {
+      "assetId": "npc_civilian_backpack_youth_001",
+      "category": "character.civilian",
+      "displayLabel": "npc_civilian_backpack_youth_001",
+      "approvalStatus": "candidate",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "previewPath": "authoring/characters/runtime/npc_civilian_backpack_youth_001.png",
+      "sha256": "3d7d06f6747c19b625c9e125d4998485ae434e7f71b9f840a684a96eb2717bcc",
+      "displayHeightScale": 0.62,
+      "worldHeightClass": "standingComposite",
+      "allowedLevelLayers": [
+        "NPCs",
+        "Gallery"
+      ]
+    },
+    {
+      "assetId": "npc_civilian_beanie_messenger_001",
+      "category": "character.civilian",
+      "displayLabel": "npc_civilian_beanie_messenger_001",
+      "approvalStatus": "candidate",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "previewPath": "authoring/characters/runtime/npc_civilian_beanie_messenger_001.png",
+      "sha256": "465d2e98f974da32f4b30eed687e9990af968c3aa1f045a1c2b0f8d299cc3f80",
+      "displayHeightScale": 0.62,
+      "worldHeightClass": "standingComposite",
+      "allowedLevelLayers": [
+        "NPCs",
+        "Gallery"
+      ]
+    },
+    {
+      "assetId": "npc_civilian_grocery_carrier_001",
+      "category": "character.civilian",
+      "displayLabel": "npc_civilian_grocery_carrier_001",
+      "approvalStatus": "candidate",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "previewPath": "authoring/characters/runtime/npc_civilian_grocery_carrier_001.png",
+      "sha256": "051114eba6211f3d52e7d2784c9d99466d94394cccde44beecff9f9abe648a69",
+      "displayHeightScale": 0.62,
+      "worldHeightClass": "standingComposite",
+      "allowedLevelLayers": [
+        "NPCs",
+        "Gallery"
+      ]
+    },
+    {
+      "assetId": "npc_household_dog_walker_001",
+      "category": "character.household",
+      "displayLabel": "npc_household_dog_walker_001",
+      "approvalStatus": "candidate",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "previewPath": "authoring/characters/runtime/npc_household_dog_walker_001.png",
+      "sha256": "5a831036f800fcab8818ac093899408fe574fb24590612f8bb0f0d86b51a4554",
+      "displayHeightScale": 0.62,
+      "worldHeightClass": "standingComposite",
+      "allowedLevelLayers": [
+        "NPCs",
+        "Gallery"
+      ]
+    },
+    {
+      "assetId": "npc_household_parent_child_001",
+      "category": "character.household",
+      "displayLabel": "npc_household_parent_child_001",
+      "approvalStatus": "candidate",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "previewPath": "authoring/characters/runtime/npc_household_parent_child_001.png",
+      "sha256": "54eb982e75b96f26e10c97b78315088e27ebffeccbb9c9b90e38898e17513994",
+      "displayHeightScale": 0.62,
+      "worldHeightClass": "standingComposite",
+      "allowedLevelLayers": [
+        "NPCs",
+        "Gallery"
+      ]
+    },
+    {
+      "assetId": "npc_unhoused_bicycle_001",
+      "category": "character.unhoused",
+      "displayLabel": "npc_unhoused_bicycle_001",
+      "approvalStatus": "candidate",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "previewPath": "authoring/characters/runtime/npc_unhoused_bicycle_001.png",
+      "sha256": "a94077b7e027e71ab3e0596e45ababf6d1c55b11ef5eaafca5a31a99dbc47e28",
+      "displayHeightScale": 0.62,
+      "worldHeightClass": "standingComposite",
+      "allowedLevelLayers": [
+        "NPCs",
+        "Gallery"
+      ]
+    },
+    {
+      "assetId": "npc_unhoused_blanket_wrap_001",
+      "category": "character.unhoused",
+      "displayLabel": "npc_unhoused_blanket_wrap_001",
+      "approvalStatus": "candidate",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "previewPath": "authoring/characters/runtime/npc_unhoused_blanket_wrap_001.png",
+      "sha256": "58a6b52a2511b285c62118060f0aec9975ccc9bbd4fe9f60f54bcd701f21fcb3",
+      "displayHeightScale": 0.62,
+      "worldHeightClass": "standingComposite",
+      "allowedLevelLayers": [
+        "NPCs",
+        "Gallery"
+      ]
+    },
+    {
+      "assetId": "npc_unhoused_cane_001",
+      "category": "character.unhoused",
+      "displayLabel": "npc_unhoused_cane_001",
+      "approvalStatus": "candidate",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "previewPath": "authoring/characters/runtime/npc_unhoused_cane_001.png",
+      "sha256": "7d2be5f2b1a405a28730b6ef243675f7bc89e4ef9548407788e851bb3b15348a",
+      "displayHeightScale": 0.62,
+      "worldHeightClass": "standingComposite",
+      "allowedLevelLayers": [
+        "NPCs",
+        "Gallery"
+      ]
+    },
+    {
+      "assetId": "npc_unhoused_cart_001",
+      "category": "character.unhoused",
+      "displayLabel": "npc_unhoused_cart_001",
+      "approvalStatus": "candidate",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "previewPath": "authoring/characters/runtime/npc_unhoused_cart_001.png",
+      "sha256": "9c24e3a91d86a5aa7269c674baa329c2e282904ebcba886a1d09402ef1ace8c5",
+      "displayHeightScale": 0.62,
+      "worldHeightClass": "standingComposite",
+      "allowedLevelLayers": [
+        "NPCs",
+        "Gallery"
+      ]
+    },
+    {
+      "assetId": "npc_unhoused_dog_companion_001",
+      "category": "character.unhoused",
+      "displayLabel": "npc_unhoused_dog_companion_001",
+      "approvalStatus": "candidate",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "previewPath": "authoring/characters/runtime/npc_unhoused_dog_companion_001.png",
+      "sha256": "69c663e71d0de0cfaa2acba9b1ba942128407721e65747a64eb254d359d632d0",
+      "displayHeightScale": 0.62,
+      "worldHeightClass": "standingComposite",
+      "allowedLevelLayers": [
+        "NPCs",
+        "Gallery"
+      ]
+    },
+    {
+      "assetId": "npc_unhoused_dyed_hair_001",
+      "category": "character.unhoused",
+      "displayLabel": "npc_unhoused_dyed_hair_001",
+      "approvalStatus": "candidate",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "previewPath": "authoring/characters/runtime/npc_unhoused_dyed_hair_001.png",
+      "sha256": "5e49674511f4f79efcefaff461f0fe166855e13d81f8085a5224cf8c1550e4a4",
+      "displayHeightScale": 0.62,
+      "worldHeightClass": "standingComposite",
+      "allowedLevelLayers": [
+        "NPCs",
+        "Gallery"
+      ]
+    },
+    {
+      "assetId": "npc_unhoused_slumped_001",
+      "category": "character.unhoused",
+      "displayLabel": "npc_unhoused_slumped_001",
+      "approvalStatus": "candidate",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "previewPath": "authoring/characters/runtime/npc_unhoused_slumped_001.png",
+      "sha256": "0124303d47ccc1fbf0c0f4fd729ad9d82f3e0339cf4e21ee6b0c6f5dcd8b8895",
+      "displayHeightScale": 0.45,
+      "worldHeightClass": "seatedSlumped",
+      "allowedLevelLayers": [
+        "NPCs",
+        "Gallery"
+      ]
+    },
+    {
+      "assetId": "npc_unhoused_work_jacket_001",
+      "category": "character.unhoused",
+      "displayLabel": "npc_unhoused_work_jacket_001",
+      "approvalStatus": "candidate",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "previewPath": "authoring/characters/runtime/npc_unhoused_work_jacket_001.png",
+      "sha256": "f74ec97987b0969d54b9108598b8bce0d55081b13762f806980bf0e88505ff61",
+      "displayHeightScale": 0.62,
+      "worldHeightClass": "standingComposite",
+      "allowedLevelLayers": [
+        "NPCs",
+        "Gallery"
+      ]
+    },
+    {
+      "assetId": "npc_volunteer_elder_cane_001",
+      "category": "character.volunteer",
+      "displayLabel": "npc_volunteer_elder_cane_001",
+      "approvalStatus": "candidate",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "previewPath": "authoring/characters/runtime/npc_volunteer_elder_cane_001.png",
+      "sha256": "be393cd4b8f0740c56274b6462ac7a39ffe10cf8caea34ac175df01c6ae3770f",
+      "displayHeightScale": 0.62,
+      "worldHeightClass": "standingComposite",
+      "allowedLevelLayers": [
+        "NPCs",
+        "Gallery"
+      ]
+    },
+    {
+      "assetId": "npc_volunteer_miguel_001",
+      "category": "character.volunteer",
+      "displayLabel": "npc_volunteer_miguel_001",
+      "approvalStatus": "candidate",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "previewPath": "authoring/characters/runtime/npc_volunteer_miguel_001.png",
+      "sha256": "210f3088eb27d100c47e6067eac672fe048769f44fd18b9f19f09ee730ef8e45",
+      "displayHeightScale": 0.62,
+      "worldHeightClass": "standingComposite",
+      "allowedLevelLayers": [
+        "NPCs",
+        "Gallery"
+      ]
+    },
+    {
+      "assetId": "npc_volunteer_tote_001",
+      "category": "character.volunteer",
+      "displayLabel": "npc_volunteer_tote_001",
+      "approvalStatus": "candidate",
+      "renderMode": "billboard-single",
+      "collision": "none",
+      "previewPath": "authoring/characters/runtime/npc_volunteer_tote_001.png",
+      "sha256": "c86a24f5159073e4db8e3773d24eedee638e88b9a69d3ff039620b58918c5e0d",
+      "displayHeightScale": 0.62,
+      "worldHeightClass": "standingComposite",
+      "allowedLevelLayers": [
+        "NPCs",
+        "Gallery"
+      ]
+    }
+  ]
+}

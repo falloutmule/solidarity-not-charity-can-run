@@ -1,0 +1,203 @@
+{
+  "schema": "snc-runtime-foliage-assets-v1",
+  "package": {
+    "archiveName": "game_ready_foliage_sprites_fixed.zip",
+    "sourceManifest": "authoring/foliage/game-ready/source-manifest.json",
+    "sourceManifestSha256": "a52cefd053b9ad6aed4004f83f6dacff6d31a7e08281ea4707f8a0b87fd5aa36",
+    "sourceMarginPixels": 24,
+    "alphaPolicy": "preserve supplied soft alpha; alpha-zero RGB normalized"
+  },
+  "displayClasses": {
+    "treeLarge": {
+      "worldHeight": 1.55
+    },
+    "treeMedium": {
+      "worldHeight": 1.36
+    },
+    "treeLow": {
+      "worldHeight": 1.14
+    },
+    "bush": {
+      "worldHeight": 0.38
+    },
+    "groundCover": {
+      "worldHeight": 0.18
+    },
+    "grassPatch": {
+      "worldHeight": 0.22
+    },
+    "grassTuft": {
+      "worldHeight": 0.16
+    }
+  },
+  "assets": [
+    {
+      "assetId": "foliage_tree_round_large_001",
+      "sourceFile": "tree_round_large.png",
+      "sourcePath": "authoring/foliage/game-ready/masters/tree_round_large.png",
+      "sourceSha256": "7da387094bb42059c9d6754fa004ce5858fa960a24f58847e702a3fb10f70ffa",
+      "runtimePath": "authoring/foliage/game-ready/runtime/tree_round_large.png",
+      "defaultDisplayClass": "treeLarge",
+      "runtimeSha256": "2b83ec5835a7ad402dac6a2e7b38ab11468a14fea401aa8c5c4dd90f9d605e2a",
+      "runtimeSize": {
+        "width": 337,
+        "height": 352
+      },
+      "runtimeAlphaBounds": {
+        "x": 0,
+        "y": 0,
+        "w": 337,
+        "h": 352
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 43532,
+        "partial": 2271,
+        "opaque": 72821
+      }
+    },
+    {
+      "assetId": "foliage_bush_low_001",
+      "sourceFile": "bush_low.png",
+      "sourcePath": "authoring/foliage/game-ready/masters/bush_low.png",
+      "sourceSha256": "a3370b3b85283eeb1aa4e2e1b247af0f03daabf0fb0db42a4e64c14d04df48f2",
+      "runtimePath": "authoring/foliage/game-ready/runtime/bush_low.png",
+      "defaultDisplayClass": "bush",
+      "runtimeSha256": "b93253efe0c672557230f73403c6b4d8a9d167ccdb2dea9c0de5800ea999bec7",
+      "runtimeSize": {
+        "width": 170,
+        "height": 101
+      },
+      "runtimeAlphaBounds": {
+        "x": 0,
+        "y": 0,
+        "w": 170,
+        "h": 101
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 4506,
+        "partial": 418,
+        "opaque": 12246
+      }
+    },
+    {
+      "assetId": "foliage_grass_patch_long_001",
+      "sourceFile": "grass_patch_long.png",
+      "sourcePath": "authoring/foliage/game-ready/masters/grass_patch_long.png",
+      "sourceSha256": "5c8e5085183f31a6ac59ab7783e85cee362be29060f5fa090d47332deae5b482",
+      "runtimePath": "authoring/foliage/game-ready/runtime/grass_patch_long.png",
+      "defaultDisplayClass": "grassPatch",
+      "runtimeSha256": "6d42c437f3d6088f149397976fc1191a4ca3550ca5b5f9866d4603bd0f443adf",
+      "runtimeSize": {
+        "width": 87,
+        "height": 59
+      },
+      "runtimeAlphaBounds": {
+        "x": 0,
+        "y": 0,
+        "w": 87,
+        "h": 59
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 1593,
+        "partial": 235,
+        "opaque": 3305
+      }
+    },
+    {
+      "assetId": "foliage_tree_slender_001",
+      "sourceFile": "tree_slender.png",
+      "sourcePath": "authoring/foliage/game-ready/masters/tree_slender.png",
+      "sourceSha256": "a5696f987ca475807ce2a0a59c6a8ce88e69ac596e42009040d5467bdef3b860",
+      "runtimePath": "authoring/foliage/game-ready/runtime/tree_slender.png",
+      "defaultDisplayClass": "treeMedium",
+      "runtimeSha256": "16cceca77e17261a98db23911fa74977537664839264ce5f069c13ec8f8e1944",
+      "runtimeSize": {
+        "width": 176,
+        "height": 266
+      },
+      "runtimeAlphaBounds": {
+        "x": 0,
+        "y": 0,
+        "w": 176,
+        "h": 266
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 16533,
+        "partial": 1331,
+        "opaque": 28952
+      }
+    },
+    {
+      "assetId": "foliage_tree_low_canopy_001",
+      "sourceFile": "tree_low_canopy.png",
+      "sourcePath": "authoring/foliage/game-ready/masters/tree_low_canopy.png",
+      "sourceSha256": "e1b7bca768cef171f0b5fb0a6f507ee6fe138a168435b109d865c4a8aa69c887",
+      "runtimePath": "authoring/foliage/game-ready/runtime/tree_low_canopy.png",
+      "defaultDisplayClass": "treeLow",
+      "runtimeSha256": "295f0117c826e95d40e3f3bf6c837ae77204a90a0e8c63186abcf10fcb645ab6",
+      "runtimeSize": {
+        "width": 204,
+        "height": 187
+      },
+      "runtimeAlphaBounds": {
+        "x": 0,
+        "y": 0,
+        "w": 204,
+        "h": 187
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 9801,
+        "partial": 1130,
+        "opaque": 27217
+      }
+    },
+    {
+      "assetId": "foliage_groundcover_wide_001",
+      "sourceFile": "groundcover_wide.png",
+      "sourcePath": "authoring/foliage/game-ready/masters/groundcover_wide.png",
+      "sourceSha256": "a69293960ba0f15d76832a614a08c87523c793ef33805c694e10be6b4083ab7f",
+      "runtimePath": "authoring/foliage/game-ready/runtime/groundcover_wide.png",
+      "defaultDisplayClass": "groundCover",
+      "runtimeSha256": "c722aff02e8f9cfb2e228c22ef5d5b624a3e16e35bb6885111f835e237603cb5",
+      "runtimeSize": {
+        "width": 440,
+        "height": 144
+      },
+      "runtimeAlphaBounds": {
+        "x": 0,
+        "y": 0,
+        "w": 440,
+        "h": 144
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 18725,
+        "partial": 1140,
+        "opaque": 43495
+      }
+    },
+    {
+      "assetId": "foliage_grass_tuft_medium_001",
+      "sourceFile": "grass_tuft_medium.png",
+      "sourcePath": "authoring/foliage/game-ready/masters/grass_tuft_medium.png",
+      "sourceSha256": "e98408d97fe71593a880c4628300f969a931304b96755f4366a609fd0b0da6d4",
+      "runtimePath": "authoring/foliage/game-ready/runtime/grass_tuft_medium.png",
+      "defaultDisplayClass": "grassTuft",
+      "runtimeSha256": "2713bf953775d9e87d4c26a83c73418c994c319197c361c486cf47cf746c018d",
+      "runtimeSize": {
+        "width": 84,
+        "height": 48
+      },
+      "runtimeAlphaBounds": {
+        "x": 0,
+        "y": 0,
+        "w": 84,
+        "h": 48
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 1693,
+        "partial": 192,
+        "opaque": 2147
+      }
+    }
+  ]
+}

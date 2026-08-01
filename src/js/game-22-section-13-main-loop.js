@@ -134,9 +134,13 @@ function drawPortraitDashboardChrome(){
   [L.minimapRect.y, L.controlsRect.y, L.statsRect.y].forEach(yy=>{
     ctx.beginPath(); ctx.moveTo(0, yy); ctx.lineTo(view.width, yy); ctx.stroke();
   });
-  ctx.font = 'bold 9px monospace';
-  ctx.fillStyle = 'rgba(210,170,110,0.92)';
-  ctx.fillText('build ' + BUILD_ID, L.menuRect.left, L.menuRect.top + L.menuRect.height + 11);
+  if(!crGalleryHudActive()){
+    if(typeof DEBUG !== 'undefined' && DEBUG){
+      ctx.font = 'bold 9px monospace';
+      ctx.fillStyle = 'rgba(210,170,110,0.92)';
+      ctx.fillText('build ' + BUILD_ID, L.menuRect.left, L.menuRect.top + L.menuRect.height + 11);
+    }
+  }
 }
 function drawPortraitStatsPanel(){
   const L = portraitLayout();
@@ -167,9 +171,11 @@ function drawPortraitStatsPanel(){
   const meta = 'D' + game.district + ' [' + game.modifier.toUpperCase() + '] x' + game.scoreMult +
     '   SEED ' + game.seed + '   SCORE ' + game.totalScore;
   ctx.fillText(meta, r.x + 10, r.y + 54);
-  ctx.fillStyle = '#4a4035';
-  ctx.font = '10px monospace';
-  ctx.fillText('build ' + BUILD_ID, r.x + r.w - 88, r.y + r.h - 8);
+  if(typeof DEBUG !== 'undefined' && DEBUG){
+    ctx.fillStyle = '#4a4035';
+    ctx.font = '10px monospace';
+    ctx.fillText('build ' + BUILD_ID, r.x + r.w - 88, r.y + r.h - 8);
+  }
 }
 function drawPortraitFpvOverlay(now){
   const L = portraitLayout();
@@ -475,6 +481,16 @@ try {
   }
 } catch(_renderProfileInitializationError){}
 crResetFixedStepSimulation();
+try {
+  if(typeof crBootHeightfieldProofIfRequested === 'function' && crBootHeightfieldProofIfRequested()){
+    crResetRenderPoseHistory('heightfield-proof-boot');
+  }
+  if(typeof crBootAssetGalleryIfRequested === 'function' && crBootAssetGalleryIfRequested()){
+    crResetRenderPoseHistory('asset-gallery-boot');
+  }
+} catch(_assetGalleryBootError){
+  console.error(_assetGalleryBootError);
+}
 requestAnimationFrame(frame);
 
 function updateSeed(newSeed){

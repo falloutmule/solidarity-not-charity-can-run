@@ -62,6 +62,8 @@ function rmenuHTML(html){
 function rmenuSel(len){ _rmSel = Math.max(0, Math.min(len-1, _rmSel||0)); return _rmSel; }
 
 function rmenuAction(action){
+  const assetGallery = typeof crAssetGalleryIsActive === 'function' && crAssetGalleryIsActive();
+  if(assetGallery && (action === 'pause-help' || action === 'pause-restart')) return;
   if(action && action !== 'noop') crMarkMobileUiDirty(action);
   if(action && action.indexOf('option-') === 0){
     _optionsMenuStamp++;
@@ -141,7 +143,9 @@ function rmenuAction(action){
     case 'pause-help': showOnboardingHelp({ fromPause: true }); break;
     case 'show-onboarding': showOnboardingHelp({}); break;
     case 'pause-restart': paused=false; rmenuHide(); SAVE.clear(); restartRun(false); break;
-    case 'pause-title': paused=false; rmenuHide(); state=STATE.TITLE; _rmSel=0; break;
+    case 'pause-title':
+      if(assetGallery) { location.href = location.pathname; break; }
+      paused=false; rmenuHide(); state=STATE.TITLE; _rmSel=0; break;
     case 'upgrade-0': chooseUpgrade(0); break;
     case 'upgrade-1': chooseUpgrade(1); break;
     case 'upgrade-2': chooseUpgrade(2); break;
@@ -253,7 +257,7 @@ function drawMobileMenu(){
       ${fileOriginMenuNoteHTML()}
       ${buildTitleRmenuBody()}
       <div class="rclose" style="margin-top:16px;">↑↓ navigate · tap to activate</div>
-      <div class="rclose" style="margin-top:6px;color:#5a4a3a;">build ${BUILD_ID}</div>
+      ${typeof DEBUG !== 'undefined' && DEBUG ? `<div class="rclose" style="margin-top:6px;color:#5a4a3a;">build ${BUILD_ID}</div>` : ''}
     `);
     return;
   }
@@ -325,7 +329,7 @@ function drawMobileMenu(){
     rmenuHTML(`
       <div class="options-scroll-body">
       <div class="rpantit">OPTIONS</div>
-      <div class="rdesc" style="margin-bottom:8px;color:#6a5a4a;">build ${BUILD_ID}</div>
+      ${typeof DEBUG !== 'undefined' && DEBUG ? `<div class="rdesc" style="margin-bottom:8px;color:#6a5a4a;">build ${BUILD_ID}</div>` : ''}
       <div class="options-section-hdr">CONTROLS</div>
       <div class="rit" data-action="option-edit-controls">EDIT CONTROLS</div>
       <div class="rit" data-action="option-reset-controls">RESET CONTROLS</div>
@@ -386,6 +390,14 @@ function drawMobileMenu(){
   // ── PAUSED ──
   if(paused && state===STATE.PLAY){
     rmenuShow();
+    if(typeof crAssetGalleryIsActive === 'function' && crAssetGalleryIsActive()){
+      rmenuHTML(`
+        <div class="rpantit">ASSET GALLERY</div>
+        <div class="rit sel" data-action="pause-resume">RESUME</div>
+        <div class="rit" data-action="pause-title" style="margin-top:6px;">EXIT GALLERY</div>
+        <div class="rdesc" style="margin-top:14px;">Saves and progression are disabled.</div>
+      `); return;
+    }
     rmenuHTML(`
       <div class="rpantit">PAUSED</div>
       <div class="rit sel" data-action="pause-resume">RESUME</div>

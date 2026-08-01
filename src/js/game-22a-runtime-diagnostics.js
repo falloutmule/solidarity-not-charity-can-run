@@ -6,6 +6,14 @@ function getDebugState(){
     state, paused, mobileMode, mobileInputActive:mobileInputActive(), mobileAuto:isMobile(),
     customLevel: game.run && game.run.customLevel || null,
     levelType: game.run && game.run.customLevel ? 'custom' : 'procedural',
+    assetGallery: game.assetGallery ? {
+      active: game.assetGallery.active === true,
+      levelId: game.assetGallery.levelId || null,
+      exhibitCount: Array.isArray(game.assetGallery.exhibits) ? game.assetGallery.exhibits.length : 0,
+      environmentObjectCount: Array.isArray(game.assetGallery.environmentObjects) ? game.assetGallery.environmentObjects.length : 0,
+      environmentNpcCount: Number(game.assetGallery.environmentNpcCount) || 0,
+      focusId: game.assetGallery.focus ? game.assetGallery.focus.id : null
+    } : null,
     MAP_W: game.MAP_W, MAP_H: game.MAP_H,
     mapAspect: game.MAP_W && game.MAP_H ? +(game.MAP_W / game.MAP_H).toFixed(3) : null,
     seed:game.seed, district:game.district, score:game.totalScore,
@@ -37,5 +45,6 @@ window.SNCDiagnostics = Object.freeze({
     runtime: Object.freeze(getDebugState()),
     fixedStep: Object.freeze(crGetFixedStepState()),
     performance: typeof crPerfProbeGetReport === 'function' ? crPerfProbeGetReport() : null,
+    heightfield: typeof crGetHeightfieldDiagnostics === 'function' ? crGetHeightfieldDiagnostics() : null,
   }),
 });

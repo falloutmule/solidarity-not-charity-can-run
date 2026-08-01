@@ -1,0 +1,23 @@
+{
+  "schema": "snc-solid-height-asset-v1",
+  "id": "low_block_concrete_001",
+  "displayName": "Low Concrete Block",
+  "category": "environment-low-block",
+  "renderMode": "solidHeightfield",
+  "footprint": {
+    "widthCells": 1,
+    "depthCells": 1
+  },
+  "solidTopLevel": 1,
+  "collision": "solid",
+  "faces": {
+    "north": "source/north.png",
+    "east": "source/east.png",
+    "south": "source/south.png",
+    "west": "source/west.png",
+    "top": "source/top.png"
+  },
+  "alphaMode": "opaque",
+  "filter": "nearest",
+  "rotationMode": "quarterTurns"
+}

@@ -7,6 +7,7 @@ Run the smallest listed owner test for a changed path, then run `npm.cmd run bui
 | `tools/build-single-file.js`, `src/build-manifest.json`, `project-metadata.json` | `test:metadata-truth`, `test:build-proof-routing` |
 | `tools/building-asset-*`, `tools/register-building-asset.js`, `authoring/buildings/` | `test:building-asset-compiler`, `test:building-asset-preview`; `build`, `build:check` when a runtime asset is registered |
 | `tools/tiled-level-*`, `authoring/levels/` | `test:tiled-d1-roundtrip`; `test:authored-d1` when a production authored level is generated |
+| Runtime asset-gallery candidates, registry, level, or query-gated gallery boot | `characters:check`, `characters:check-runtime`, `assets:check-palette`, `test:runtime-asset-gallery`, `test:runtime-asset-gallery-smoke`, ordinary production smoke; `test:chrome-pointer-path` when `game-06` changes |
 | Dead harness boundaries in `game-22`, source CSS/body, or build assembly | `test:dead-harness-boundaries` |
 | Retired inert harness adapter and its former caller seams | `test:inert-adapter-retirement`; affected owner checks |
 | Retired query diagnostics in mobile input, portrait layout, CSS, or markup | `test:unowned-diagnostics-retirement`, `test:chrome-pointer-path` |
@@ -18,6 +19,7 @@ Run the smallest listed owner test for a changed path, then run `npm.cmd run bui
 | Render pose or frame loop | `test:render-interpolation`, `test:farfield-angle` |
 | Runtime diagnostics boundary | `test:runtime-diagnostics-boundary`, `test:render-interpolation`, `test:farfield-angle`, `test:farfield-final-smoke` |
 | Render profile selection boundary | `test:render-profile-selection-boundary`, `test:farfield-resolution`, `test:farfield-final-smoke` |
+| Variable-height proof renderer | `test:vertical-projection`, `test:vertical-profiles`, `test:multi-height-dda`, `test:raised-plane`, `test:solid-height-assets`, `test:heightfield-can-fixture`, `test:heightfield-proof`; then gallery, authored D1, interpolation, far-field, pointer-path, build, and build-parity gates |
 | Far-field resolution or projection | matching `test:farfield-resolution`, `test:farfield-angle`, or `test:farfield-projection` |
 | Bitmap building renderer or facade data | `test:custom-next` and `tests/bitmap_building_renderer_verify.js` |
 | Authored District 1 data or save behavior | `test:authored-d1`, `test:authored-d1-save`, and `test:custom-next` when bitmap identity changes |

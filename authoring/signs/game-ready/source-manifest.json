@@ -1,0 +1,76 @@
+{
+  "margin_px": 24,
+  "alpha_policy": "soft threshold against black matte; foreground silhouette hole-filled; alpha-zero RGB normalized",
+  "assets": [
+    {
+      "file": "family_3_cans.png",
+      "dimensions_px": [
+        638,
+        627
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 196325,
+        "partial": 7753,
+        "opaque": 195948
+      },
+      "sha256": "4b8e63ff419af82f7577413dce3702147ba2631b1d914b6623c06449091a9c21"
+    },
+    {
+      "file": "neighbor_1_can.png",
+      "dimensions_px": [
+        631,
+        605
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 180879,
+        "partial": 2725,
+        "opaque": 198151
+      },
+      "sha256": "1fd67753e17a7f36116a6775ae1d1b5e1d47dede9aa9a12321c347996239a3a4"
+    },
+    {
+      "file": "summer_loop_market.png",
+      "dimensions_px": [
+        675,
+        647
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 203661,
+        "partial": 6306,
+        "opaque": 226758
+      },
+      "sha256": "3f986696be09be7db1b766dd6da8ca79d12503b028b1d4e9b1ee6c9509ba7883"
+    },
+    {
+      "file": "drop_off_cans.png",
+      "dimensions_px": [
+        697,
+        1077
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 373806,
+        "partial": 10256,
+        "opaque": 366607
+      },
+      "sha256": "e2c2c41465da33cf4dbe781b5163e94312037ebfbfc0ba7318982b45e5fc3ee1"
+    },
+    {
+      "file": "snc_can_station.png",
+      "dimensions_px": [
+        716,
+        743
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 280177,
+        "partial": 1563,
+        "opaque": 250248
+      },
+      "sha256": "2919a087168ebc5039b0f0ac45eb69d966bf76d487951a5a63372771a7836402"
+    }
+  ]
+}

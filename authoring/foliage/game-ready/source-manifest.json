@@ -1,0 +1,487 @@
+{
+  "source": "img_5ad76ec5722b.jpg",
+  "export_policy": "soft alpha from near-black JPEG matte; alpha-zero RGB normalized",
+  "asset_count": 24,
+  "assets": [
+    {
+      "file": "foliage_sprites/tree_round_large.png",
+      "source_bounds": [
+        60,
+        135,
+        397,
+        487
+      ],
+      "dimensions": [
+        385,
+        400
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 78908,
+        "partial": 2271,
+        "opaque": 72821
+      },
+      "sha256": "7da387094bb42059c9d6754fa004ce5858fa960a24f58847e702a3fb10f70ffa"
+    },
+    {
+      "file": "foliage_sprites/tree_slender.png",
+      "source_bounds": [
+        421,
+        201,
+        597,
+        467
+      ],
+      "dimensions": [
+        224,
+        314
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 40053,
+        "partial": 1331,
+        "opaque": 28952
+      },
+      "sha256": "a5696f987ca475807ce2a0a59c6a8ce88e69ac596e42009040d5467bdef3b860"
+    },
+    {
+      "file": "foliage_sprites/tree_low_canopy.png",
+      "source_bounds": [
+        612,
+        282,
+        816,
+        469
+      ],
+      "dimensions": [
+        252,
+        235
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 30873,
+        "partial": 1130,
+        "opaque": 27217
+      },
+      "sha256": "e1b7bca768cef171f0b5fb0a6f507ee6fe138a168435b109d865c4a8aa69c887"
+    },
+    {
+      "file": "foliage_sprites/hedge_long_dark.png",
+      "source_bounds": [
+        420,
+        531,
+        814,
+        653
+      ],
+      "dimensions": [
+        442,
+        170
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 35918,
+        "partial": 964,
+        "opaque": 38258
+      },
+      "sha256": "ee11cfee086a53ebf30a274c58f1bd8fc1f779afa7eef8313bfa3e25fc15e8f8"
+    },
+    {
+      "file": "foliage_sprites/hedge_long_light.png",
+      "source_bounds": [
+        52,
+        571,
+        394,
+        672
+      ],
+      "dimensions": [
+        390,
+        149
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 33010,
+        "partial": 633,
+        "opaque": 24467
+      },
+      "sha256": "44997c9c7b83e83443c501d50063a872e2b33002245297951650cb5e10ecb938"
+    },
+    {
+      "file": "foliage_sprites/bush_low.png",
+      "source_bounds": [
+        450,
+        678,
+        620,
+        783
+      ],
+      "dimensions": [
+        218,
+        153
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 20690,
+        "partial": 418,
+        "opaque": 12246
+      },
+      "sha256": "a3370b3b85283eeb1aa4e2e1b247af0f03daabf0fb0db42a4e64c14d04df48f2"
+    },
+    {
+      "file": "foliage_sprites/grass_patch_long.png",
+      "source_bounds": [
+        620,
+        678,
+        707,
+        740
+      ],
+      "dimensions": [
+        135,
+        110
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 11310,
+        "partial": 235,
+        "opaque": 3305
+      },
+      "sha256": "5c8e5085183f31a6ac59ab7783e85cee362be29060f5fa090d47332deae5b482"
+    },
+    {
+      "file": "foliage_sprites/bush_compact.png",
+      "source_bounds": [
+        737,
+        684,
+        820,
+        737
+      ],
+      "dimensions": [
+        131,
+        101
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 10504,
+        "partial": 180,
+        "opaque": 2547
+      },
+      "sha256": "1762cc69b3d0d835ad3cadaedd263e33ad996d9f65eaa8e8e80b55842acf2d39"
+    },
+    {
+      "file": "foliage_sprites/bush_wide.png",
+      "source_bounds": [
+        45,
+        695,
+        421,
+        860
+      ],
+      "dimensions": [
+        424,
+        213
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 39041,
+        "partial": 981,
+        "opaque": 50290
+      },
+      "sha256": "f7b956f9f6141d1d173bd21f610112f690cb6a3240b5201953df1d3bc45ef058"
+    },
+    {
+      "file": "foliage_sprites/grass_tuft_small.png",
+      "source_bounds": [
+        674,
+        759,
+        735,
+        805
+      ],
+      "dimensions": [
+        109,
+        94
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 8433,
+        "partial": 166,
+        "opaque": 1647
+      },
+      "sha256": "97c20622a19c11fd52ea6b215ae54fde3547d8468a7fe092d5117240af77a6b5"
+    },
+    {
+      "file": "foliage_sprites/grass_tuft_tiny.png",
+      "source_bounds": [
+        744,
+        760,
+        800,
+        795
+      ],
+      "dimensions": [
+        104,
+        83
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 7495,
+        "partial": 145,
+        "opaque": 992
+      },
+      "sha256": "ea32c5f8db771c2399ce36d21dd029e7248adb14be65c233f596fa666e668561"
+    },
+    {
+      "file": "foliage_sprites/grass_tuft_medium.png",
+      "source_bounds": [
+        585,
+        785,
+        669,
+        833
+      ],
+      "dimensions": [
+        132,
+        96
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 10333,
+        "partial": 192,
+        "opaque": 2147
+      },
+      "sha256": "e98408d97fe71593a880c4628300f969a931304b96755f4366a609fd0b0da6d4"
+    },
+    {
+      "file": "foliage_sprites/bush_round_medium.png",
+      "source_bounds": [
+        709,
+        810,
+        802,
+        868
+      ],
+      "dimensions": [
+        141,
+        106
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 12058,
+        "partial": 261,
+        "opaque": 2627
+      },
+      "sha256": "d53bcce3ccf5a360770dd867d2c0694f6a4778e5d4e7a54eaa83a1eec2b4952e"
+    },
+    {
+      "file": "foliage_sprites/bush_round_large.png",
+      "source_bounds": [
+        459,
+        815,
+        584,
+        880
+      ],
+      "dimensions": [
+        173,
+        113
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 14600,
+        "partial": 305,
+        "opaque": 4644
+      },
+      "sha256": "f39e3feb4dd986a2b449186e36fe14fb04beaf7789acbce0eadc526a0c4850ab"
+    },
+    {
+      "file": "foliage_sprites/grass_tuft_large.png",
+      "source_bounds": [
+        602,
+        848,
+        694,
+        896
+      ],
+      "dimensions": [
+        140,
+        96
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 10987,
+        "partial": 207,
+        "opaque": 2246
+      },
+      "sha256": "1da73a6aa500ca1b909643c803667a6577e5b625ebc7d159239cdb43c88dbb2c"
+    },
+    {
+      "file": "foliage_sprites/groundcover_wide.png",
+      "source_bounds": [
+        39,
+        894,
+        479,
+        1038
+      ],
+      "dimensions": [
+        488,
+        192
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 49061,
+        "partial": 1140,
+        "opaque": 43495
+      },
+      "sha256": "a69293960ba0f15d76832a614a08c87523c793ef33805c694e10be6b4083ab7f"
+    },
+    {
+      "file": "foliage_sprites/bush_tiny_a.png",
+      "source_bounds": [
+        738,
+        911,
+        813,
+        966
+      ],
+      "dimensions": [
+        123,
+        103
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 10545,
+        "partial": 210,
+        "opaque": 1914
+      },
+      "sha256": "f71d816c9d20de4b00ee6bfe7ff4900c798ea9b83f4cf68781270a5ce67f8434"
+    },
+    {
+      "file": "foliage_sprites/bush_tiny_b.png",
+      "source_bounds": [
+        666,
+        916,
+        733,
+        966
+      ],
+      "dimensions": [
+        115,
+        98
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 9158,
+        "partial": 192,
+        "opaque": 1920
+      },
+      "sha256": "dd7e3cc9884de4519151a64a1d43fc538c5bdef3d66270723db1eb2f9db103ed"
+    },
+    {
+      "file": "foliage_sprites/bush_tiny_c.png",
+      "source_bounds": [
+        481,
+        922,
+        570,
+        972
+      ],
+      "dimensions": [
+        137,
+        98
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 10852,
+        "partial": 200,
+        "opaque": 2374
+      },
+      "sha256": "47e7c4f09fa44d9c4cbfcecdd4db0379c2e8f447813a40296a588c3243dad71a"
+    },
+    {
+      "file": "foliage_sprites/bush_tiny_d.png",
+      "source_bounds": [
+        575,
+        922,
+        653,
+        964
+      ],
+      "dimensions": [
+        126,
+        90
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 9556,
+        "partial": 162,
+        "opaque": 1622
+      },
+      "sha256": "03239d14c4cffa987c0506783054b29cca455d9a46c68f0b4f2d6c89f0761b1e"
+    },
+    {
+      "file": "foliage_sprites/bush_tiny_e.png",
+      "source_bounds": [
+        654,
+        982,
+        706,
+        1030
+      ],
+      "dimensions": [
+        100,
+        96
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 7876,
+        "partial": 144,
+        "opaque": 1580
+      },
+      "sha256": "0c4bd869c6cf7384161ecee1ffacfdb04086b14708a742a2051d005c7bbc1617"
+    },
+    {
+      "file": "foliage_sprites/bush_tiny_f.png",
+      "source_bounds": [
+        706,
+        974,
+        774,
+        1022
+      ],
+      "dimensions": [
+        116,
+        96
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 9541,
+        "partial": 173,
+        "opaque": 1422
+      },
+      "sha256": "bf7d7cf67f5d7df90f7365f844732052d949792d6c90771fab1d17c30183f5f1"
+    },
+    {
+      "file": "foliage_sprites/bush_tiny_g.png",
+      "source_bounds": [
+        543,
+        976,
+        636,
+        1031
+      ],
+      "dimensions": [
+        141,
+        103
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 11411,
+        "partial": 214,
+        "opaque": 2898
+      },
+      "sha256": "10c35c0c594ccea1f0046226a24087df1989d7bd7cef8bd3b7e61dfa87b675eb"
+    },
+    {
+      "file": "foliage_sprites/bush_tiny_h.png",
+      "source_bounds": [
+        772,
+        986,
+        831,
+        1030
+      ],
+      "dimensions": [
+        107,
+        92
+      ],
+      "margin_px": 24,
+      "alpha": {
+        "transparent": 8385,
+        "partial": 161,
+        "opaque": 1298
+      },
+      "sha256": "8d5ef8366ffd46a2d294bea3d0b9b68f12567d37c94b9013815a1dd77da7c9d7"
+    }
+  ]
+}
