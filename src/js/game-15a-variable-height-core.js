@@ -93,6 +93,7 @@ function crHeightfieldClearState(){
   game.verticalProfileWidth = 0;
   game.verticalProfileHeight = 0;
   game.verticalProfileRotationGrid = null;
+  game.groundSurface = null;
   game.heightfieldProof = null;
   game.heightfieldCalibration = null;
 }

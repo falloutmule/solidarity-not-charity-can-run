@@ -185,7 +185,7 @@ for (const required of ['function crGetInterpolatedRenderPose()', 'function crRe
 
 const authoredSource = fs.readFileSync(path.join(root, 'src/levels/district-01-authored.js'), 'utf8');
 assert(authoredSource.includes("district-1-authored-v1"), 'authored D1 identity retained');
-assert(authoredSource.includes('c0b10dd27ac969ce3209556839fc0d8048a8820f36c46c051bb97ae84fc863fb'), 'The Stand authored static SHA retained');
+assert(authoredSource.includes('0aecc59907b843abb990500694b452025589a877b46494d6428712dfc18912af'), 'The Stand authored static SHA retained');
 const assetSource = fs.readFileSync(path.join(root, 'src/imported-handoff-assets/custom_next_001.asset.js'), 'utf8');
 const dataUri = assetSource.match(/data:image\/png;base64,([A-Za-z0-9+/=]+)/);
 assert(dataUri, 'canonical bitmap data URI present');

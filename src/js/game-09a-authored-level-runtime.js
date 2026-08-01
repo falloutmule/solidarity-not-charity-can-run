@@ -112,7 +112,7 @@
     const prepared = {
       validated: true, levelId, authoredLevelSchema: root.SNC_AUTHORED_LEVEL_SCHEMA, authoredStaticSha256: root.SNC_AUTHORED_LEVEL_STATIC_SHA256,
       seed: options.seed, district: 1, modifier, scoreMult: modifier === 'shortage' ? 1.5 : 1,
-      map, MAP_W: 40, MAP_H: 20, wallShade: Array.from({ length: 20 }, () => Array(40).fill(0.5)), streetLayoutMeta: clone(staticLevel.streetLayoutMeta),
+      map, MAP_W: 40, MAP_H: 20, wallShade: Array.from({ length: 20 }, () => Array(40).fill(0.5)), streetLayoutMeta: clone(staticLevel.streetLayoutMeta), groundSurface: clone(staticLevel.groundSurface),
       buildingRegistry: ownership.registry, buildingGrid: ownership.grid, buildingMaterialGrid: Array.from({ length: 20 }, () => new Array(40).fill(null)), buildingMaterialComponents: {}, nextBuildingId: ownership.nextBid,
       verticalProfileGrid: environment.profileGrid, verticalProfileRotationGrid: environment.rotationGrid, environmentObjects: environment.objects,
       playerStart: { x: staticLevel.playerStart.x, y: staticLevel.playerStart.y, angle: staticLevel.playerStart.angleRadians }, pickups: selected,
@@ -128,7 +128,7 @@
     Object.assign(g, {
       authoredLevelId: prepared.levelId, authoredLevelSchema: prepared.authoredLevelSchema, authoredStaticSha256: prepared.authoredStaticSha256,
       seed: prepared.seed, district: prepared.district, modifier: prepared.modifier, scoreMult: prepared.scoreMult, map: prepared.map, MAP_W: prepared.MAP_W, MAP_H: prepared.MAP_H,
-      wallShade: prepared.wallShade, streetLayoutMeta: prepared.streetLayoutMeta, buildingRegistry: prepared.buildingRegistry, buildingGrid: prepared.buildingGrid,
+      wallShade: prepared.wallShade, streetLayoutMeta: prepared.streetLayoutMeta, groundSurface: prepared.groundSurface, buildingRegistry: prepared.buildingRegistry, buildingGrid: prepared.buildingGrid,
       buildingMaterialGrid: prepared.buildingMaterialGrid, buildingMaterialComponents: prepared.buildingMaterialComponents, _nextBuildingId: prepared.nextBuildingId,
       verticalProfileWidth: prepared.verticalProfileGrid ? prepared.MAP_W : 0, verticalProfileHeight: prepared.verticalProfileGrid ? prepared.MAP_H : 0,
       verticalProfileGrid: prepared.verticalProfileGrid, verticalProfileRotationGrid: prepared.verticalProfileRotationGrid, authoredEnvironmentObjects: prepared.environmentObjects,

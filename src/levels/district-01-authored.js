@@ -3,8 +3,8 @@
 
   const SNC_AUTHORED_LEVEL_ID = 'district-1-authored-v1';
   const SNC_AUTHORED_LEVEL_SCHEMA = 'snc-authored-level-static-v2';
-  const SNC_AUTHORED_LEVEL_STATIC_BYTES = 6937;
-  const SNC_AUTHORED_LEVEL_STATIC_SHA256 = 'c0b10dd27ac969ce3209556839fc0d8048a8820f36c46c051bb97ae84fc863fb';
+  const SNC_AUTHORED_LEVEL_STATIC_BYTES = 8288;
+  const SNC_AUTHORED_LEVEL_STATIC_SHA256 = '0aecc59907b843abb990500694b452025589a877b46494d6428712dfc18912af';
   const SNC_AUTHORED_SAVE_SCHEMA = 'snc-authored-save-overlay-v2';
 
   function deepFreeze(value){
@@ -43,6 +43,7 @@
       streetLayoutMeta: source.streetLayoutMeta,
       buildings: source.buildings,
       environmentObjects: source.environmentObjects,
+      groundSurface: source.groundSurface,
       playerStart: source.playerStart,
       canSockets: source.canSockets,
       pickupCount: source.pickupCount,
@@ -89,6 +90,22 @@
     mapRows: makeTheStandMapRows(),
     wallShade: { width: 40, height: 20, fill: 0.5 },
     streetLayoutMeta: { topology: 'figure-eight', centralLoop: 'short-turning', outerLoop: 'sprint', GW: 40, GH: 20 },
+    groundSurface: {
+      schema: 'snc-authored-ground-surface-v1', grassSeed: 219124915,
+      routes: [
+        { id: 'central-loop', width: 2.5, points: [[20.5,14.5],[15.0,14.5],[11.2,12.2],[10.2,9.4],[13.8,6.6],[18.5,5.3],[24.6,7.1],[24.6,11.8],[20.5,14.5]] },
+        { id: 'outer-loop', width: 2.7, points: [[20.5,14.5],[26.5,16.0],[33.8,15.2],[35.8,10.3],[34.0,5.5],[28.0,5.1],[24.6,7.1]] }
+      ],
+      wornAreas: [{ x: 20.5, y: 11.4, radius: 2.3 }, { x: 29.2, y: 11.2, radius: 1.8 }, { x: 8.5, y: 8.5, radius: 1.25 }, { x: 20.5, y: 4.8, radius: 1.45 }, { x: 32.5, y: 12.4, radius: 1.3 }, { x: 26.4, y: 16.0, radius: 1.0 }],
+      decals: [
+        { id: 'path-straight-central', assetId: 'path_modular_straight_001', x: 15.1, y: 14.4, width: 4.1, height: 1.45, rotationRadians: 0 },
+        { id: 'path-corner-central', assetId: 'path_modular_corner_001', x: 12.1, y: 10.0, width: 2.25, height: 2.25, rotationRadians: 0.35 },
+        { id: 'wear-stand-portal', assetId: 'path_organic_wear_001', x: 20.5, y: 11.25, width: 3.2, height: 2.15, rotationRadians: 0 },
+        { id: 'path-cross-crossover', assetId: 'path_modular_cross_001', x: 24.6, y: 7.1, width: 2.35, height: 2.55, rotationRadians: 0 },
+        { id: 'path-t-market', assetId: 'path_modular_t_junction_001', x: 29.2, y: 11.2, width: 3.5, height: 1.75, rotationRadians: 0 },
+        { id: 'wear-tree-outer', assetId: 'path_organic_tree_wear_001', x: 26.4, y: 16.0, width: 2.55, height: 1.45, rotationRadians: 0.1 }
+      ]
+    },
     playerStart: { x: 20.5, y: 14.5, angleRadians: -1.5707963267948966, faces: 'north_toward_the_stand' },
     buildings: [
       { id: 'snc-stand', assetId: 'custom_next_001', x: 17, y: 7, rotation: 0, widthCells: 6, depthCells: 3, front: 'south' },

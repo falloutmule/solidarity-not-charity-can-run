@@ -75,10 +75,16 @@ assert.deepStrictEqual(Array.from(new Set(foliage.map(row => row.assetId))).sort
 ], 'authored foliage maps only to the selected runtime assets');
 assert.strictEqual(foliage.filter(row => row.assetId.startsWith('foliage_tree_')).length, 4, 'four trees create route landmarks without a forest');
 assert(foliage.every(row => definition.mapRows[Math.floor(row.y)][Math.floor(row.x)] === '0'), 'decorative foliage never claims a collision cell');
+assert(definition.groundSurface && definition.groundSurface.schema === 'snc-authored-ground-surface-v1', 'D1 owns its ground appearance separately from collision');
+assert.strictEqual(definition.groundSurface.routes.length, 2, 'central and outer broad routes are authored');
+assert(definition.groundSurface.routes.every(route => route.width >= 2.5 && route.points.length >= 2), 'both broad routes remain sprint width');
+assert.deepStrictEqual(Array.from(definition.groundSurface.decals, row => row.assetId).sort(), [
+  'path_modular_corner_001', 'path_modular_cross_001', 'path_modular_straight_001', 'path_modular_t_junction_001', 'path_organic_tree_wear_001', 'path_organic_wear_001'
+], 'D1 uses a bounded selected set of horizontal path assets');
 
 const canonical = sandbox.sncCanonicalizeAuthoredStatic(sandbox.sncBuildLockedStaticLevel(definition));
-assert.strictEqual(Buffer.byteLength(canonical), 6937, 'static byte identity is locked');
-assert.strictEqual(crypto.createHash('sha256').update(canonical).digest('hex'), 'c0b10dd27ac969ce3209556839fc0d8048a8820f36c46c051bb97ae84fc863fb', 'static hash identity is locked');
+assert.strictEqual(Buffer.byteLength(canonical), 8288, 'static byte identity is locked');
+assert.strictEqual(crypto.createHash('sha256').update(canonical).digest('hex'), '0aecc59907b843abb990500694b452025589a877b46494d6428712dfc18912af', 'static hash identity is locked');
 assert.deepStrictEqual(JSON.parse(JSON.stringify(sandbox.sncValidateAuthoredLevelDefinition(definition))), { pass: true, errors: [] });
 
 for(const seed of [1, 2468, 717, 9001]){
@@ -100,6 +106,7 @@ assert.strictEqual(sandbox.sncCommitAuthoredLevelState(prepared), true, 'The Sta
 const game = sandbox.game, player = sandbox.player;
 assert.strictEqual(player.maxCans, 3, 'D1 capacity is capped at three');
 assert.strictEqual(game.pickups.length, 5);
+assert.strictEqual(game.groundSurface.schema, 'snc-authored-ground-surface-v1', 'ground art prepares as immutable D1 state');
 assert.deepStrictEqual(JSON.parse(JSON.stringify(game.npcs.map(n => n.need))), [1,3,1]);
 assert.deepStrictEqual(JSON.parse(JSON.stringify(game.exit)), { x: 20.5, y: 10.7, active: false });
 

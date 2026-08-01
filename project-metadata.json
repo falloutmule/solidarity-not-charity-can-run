@@ -11,8 +11,8 @@
   },
   "artifact": {
     "path": "index.html",
-    "byteLength": 4000304,
-    "sha256": "ea1dde7440e9989289168f8c6b63e51550f7a7518a31df28daaaf68e11238b59"
+    "byteLength": 5119538,
+    "sha256": "19901c89c28513c4d1d6347b34f670336620d1800463f9eb49e56615846b61e3"
   },
   "distribution": {
     "provider": "github-pages",
@@ -26,8 +26,8 @@
     "district1": {
       "levelId": "district-1-authored-v1",
       "schema": "snc-authored-level-static-v2",
-      "staticByteLength": 6937,
-      "staticSha256": "c0b10dd27ac969ce3209556839fc0d8048a8820f36c46c051bb97ae84fc863fb"
+      "staticByteLength": 8288,
+      "staticSha256": "0aecc59907b843abb990500694b452025589a877b46494d6428712dfc18912af"
     }
   },
   "selection": {
