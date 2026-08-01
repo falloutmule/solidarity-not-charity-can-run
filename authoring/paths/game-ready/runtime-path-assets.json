@@ -3,7 +3,9 @@
   "package": {
     "archiveName": "paths-game-ready.zip",
     "sourceManifest": "authoring/paths/game-ready/source-manifest.json",
-    "sourceManifestSha256": "ad06db7be3b9f93d83fee4493884816bc75cb116b1657d9d79acb7dca787c6a1",
+    "sourceManifestSha256": "3ef7a7295cc3c04590f2a64095d75410388fdc3ef63e83aab5269f8baa486f7d",
+    "sourceManifestArchiveSha256": "ad06db7be3b9f93d83fee4493884816bc75cb116b1657d9d79acb7dca787c6a1",
+    "sourceManifestHashPolicy": "git-lf-canonical-v1",
     "sourceMarginPixels": 24,
     "alphaPolicy": "preserve supplied soft alpha; alpha-zero RGB normalized; visible RGB tone-mapped into the warm dirt range"
   },

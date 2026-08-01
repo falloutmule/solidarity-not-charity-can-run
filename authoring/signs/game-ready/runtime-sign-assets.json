@@ -3,7 +3,9 @@
   "package": {
     "archiveName": "game_ready_signs.zip",
     "sourceManifest": "authoring/signs/game-ready/source-manifest.json",
-    "sourceManifestSha256": "3d1be88eca5435e78ddd95b0d9d1d5f4646cf7c2f909a2206b542ae8699d7f34",
+    "sourceManifestSha256": "0b98db2e988e79ae36838840a54b04e9e11e7f607bb325a1a9bf2dbf70a7bbcd",
+    "sourceManifestArchiveSha256": "3d1be88eca5435e78ddd95b0d9d1d5f4646cf7c2f909a2206b542ae8699d7f34",
+    "sourceManifestHashPolicy": "git-lf-canonical-v1",
     "sourceMarginPixels": 24
   },
   "displayClasses": {

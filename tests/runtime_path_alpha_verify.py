@@ -29,7 +29,10 @@ def color(path):
 
 manifest = json.loads(MANIFEST.read_text(encoding='utf-8'))
 assert manifest['schema'] == 'snc-runtime-path-assets-v1' and len(manifest['assets']) == 6
-assert hashlib.sha256((ROOT / manifest['package']['sourceManifest']).read_bytes()).hexdigest() == manifest['package']['sourceManifestSha256']
+package = manifest['package']
+assert package['sourceManifestHashPolicy'] == 'git-lf-canonical-v1'
+assert len(package['sourceManifestArchiveSha256']) == 64
+assert hashlib.sha256((ROOT / package['sourceManifest']).read_bytes()).hexdigest() == package['sourceManifestSha256']
 rows = []
 for asset in manifest['assets']:
     source, runtime = ROOT / asset['sourcePath'], ROOT / asset['runtimePath']
