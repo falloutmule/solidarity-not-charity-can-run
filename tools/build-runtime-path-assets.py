@@ -35,17 +35,30 @@ def inspect(image):
     return {'size': {'width': rgba.width, 'height': rgba.height}, 'alphaBounds': {'x': left, 'y': top, 'w': right-left, 'h': bottom-top}, 'alphaHistogram': {'zero': histogram[0], 'partial': sum(histogram[1:255]), 'opaque': histogram[255]}}
 
 
+def grade_warm_dirt(rgba):
+    """Keep supplied alpha while compressing path color into a warm, readable range."""
+    pixels = rgba.load()
+    darkest, lightest = (122, 90, 52), (178, 138, 82)
+    for y in range(rgba.height):
+        for x in range(rgba.width):
+            red, green, blue, opacity = pixels[x, y]
+            if opacity == 0:
+                pixels[x, y] = (0, 0, 0, 0)
+                continue
+            # The supplied texture has opaque black detail.  Preserve its luminance
+            # variation, but map it to a constrained warm-brown palette so it reads
+            # as compacted dirt rather than floor holes at nearest-neighbor scale.
+            luminance = (299 * red + 587 * green + 114 * blue) / 255000
+            pixels[x, y] = tuple(round(low + (high - low) * luminance) for low, high in zip(darkest, lightest)) + (opacity,)
+    return rgba
+
+
 def crop_runtime(source):
     rgba = source.convert('RGBA')
     box = rgba.getchannel('A').getbbox()
     if box is None: raise ValueError('source has no visible pixels')
     cropped = rgba.crop(box)
-    pixels = cropped.load()
-    for y in range(cropped.height):
-        for x in range(cropped.width):
-            red, green, blue, opacity = pixels[x, y]
-            if opacity == 0: pixels[x, y] = (0, 0, 0, 0)
-    return cropped
+    return grade_warm_dirt(cropped)
 
 
 def load_manifest():

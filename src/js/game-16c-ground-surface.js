@@ -22,9 +22,11 @@ function crGroundGrassPacked(px, py, seed){
   return (color[0] << 16) | (color[1] << 8) | color[2];
 }
 function crGroundDirtPacked(px, py, seed){
-  const noise = crGroundHash(px, py, seed ^ 0x1b873593) & 15;
-  const palette = [[131,100,59], [145,111,65], [154,120,73], [119,91,54]];
-  const color = palette[noise < 3 ? 3 : noise < 8 ? 0 : noise < 13 ? 1 : 2];
+  // Tight tonal spacing keeps the broad mask warm and textured without the
+  // high-contrast cell pattern that read as checkerboard floor holes.
+  const noise = crGroundHash(px, py, seed ^ 0x1b873593) & 31;
+  const palette = [[126,94,55], [132,99,58], [138,104,62]];
+  const color = palette[noise < 5 ? 0 : noise < 25 ? 1 : 2];
   return (color[0] << 16) | (color[1] << 8) | color[2];
 }
 function crGroundPointSegmentDistanceSq(px, py, ax, ay, bx, by){

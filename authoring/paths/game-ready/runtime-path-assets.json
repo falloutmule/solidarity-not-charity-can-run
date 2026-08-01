@@ -5,7 +5,7 @@
     "sourceManifest": "authoring/paths/game-ready/source-manifest.json",
     "sourceManifestSha256": "ad06db7be3b9f93d83fee4493884816bc75cb116b1657d9d79acb7dca787c6a1",
     "sourceMarginPixels": 24,
-    "alphaPolicy": "preserve supplied soft alpha; alpha-zero RGB normalized"
+    "alphaPolicy": "preserve supplied soft alpha; alpha-zero RGB normalized; visible RGB tone-mapped into the warm dirt range"
   },
   "assets": [
     {
@@ -14,7 +14,7 @@
       "sourcePath": "authoring/paths/game-ready/masters/modular-path_01.png",
       "sourceSha256": "e82828d3ba1717688dbe294c82ce0cd039105fe8e2b01eac5b36efeeebb05039",
       "runtimePath": "authoring/paths/game-ready/runtime/modular-path_01.png",
-      "runtimeSha256": "e800265acc215ff6b3f27b33b798ae73aa34a7d5c8bc5e71956ca9e89cb7ff55",
+      "runtimeSha256": "546adaf2f244183e48adc870428346ebfe5ad008f2563c6dd6017416099375c4",
       "runtimeSize": {
         "width": 464,
         "height": 102
@@ -37,7 +37,7 @@
       "sourcePath": "authoring/paths/game-ready/masters/modular-path_05.png",
       "sourceSha256": "8b69f0c5b35e024e96a2dd6a57f2c306ec4ca127a78c7b582f9d735050e9ea54",
       "runtimePath": "authoring/paths/game-ready/runtime/modular-path_05.png",
-      "runtimeSha256": "7f4d0d93e5d7f4fa5b159366007710ce0812a82c481a28b713005bb1a1fb0dec",
+      "runtimeSha256": "df897245b287d38836b689826d0d979822c634e64e135ccece97dbf1af353983",
       "runtimeSize": {
         "width": 233,
         "height": 225
@@ -60,7 +60,7 @@
       "sourcePath": "authoring/paths/game-ready/masters/organic-path_01.png",
       "sourceSha256": "dbf09f3cecf0ae788017609d0f25124c2e344f34148e0a25f5e2b8c4aa7ddb74",
       "runtimePath": "authoring/paths/game-ready/runtime/organic-path_01.png",
-      "runtimeSha256": "3a87982ae707ad4c133407b22669a1906d681bc1e7e3a15838ee9245fa3466f8",
+      "runtimeSha256": "07d0adb7324c7f130ec16c7f3bc1121f117e3a6f8bd6a28f02c71ceaa4e0ec5b",
       "runtimeSize": {
         "width": 351,
         "height": 199
@@ -83,7 +83,7 @@
       "sourcePath": "authoring/paths/game-ready/masters/modular-path_09.png",
       "sourceSha256": "384c2c49a28baf0e337683812ec4499862ac7503bdc989d4926097fb5257df83",
       "runtimePath": "authoring/paths/game-ready/runtime/modular-path_09.png",
-      "runtimeSha256": "ea278f134e7c94003e50e0ff2beb61c86069167333963242f66e16947fddd1fd",
+      "runtimeSha256": "4e1355cdc88f0be8d252ce03ddc0a76b09606b336cb1b40cfb609ddd96032103",
       "runtimeSize": {
         "width": 200,
         "height": 238
@@ -106,7 +106,7 @@
       "sourcePath": "authoring/paths/game-ready/masters/modular-path_18.png",
       "sourceSha256": "ba2124c95b168af8bdf075dd33eeb8a344a8c442429a8e6b03e211f0320d4296",
       "runtimePath": "authoring/paths/game-ready/runtime/modular-path_18.png",
-      "runtimeSha256": "f65e47c21920471cb54eec5d9b2ef2de95d940599984bc9b69a7f613a3b009e9",
+      "runtimeSha256": "ae382cbb925c40ebf92611e8abe5125f06aa52b2923ed54c230e441f39690fa5",
       "runtimeSize": {
         "width": 475,
         "height": 184
@@ -129,7 +129,7 @@
       "sourcePath": "authoring/paths/game-ready/masters/organic-path_14.png",
       "sourceSha256": "432d3ba910c0fb4ba89df3c12fd77e76c0c234876906d1c6885a29b8c00b155b",
       "runtimePath": "authoring/paths/game-ready/runtime/organic-path_14.png",
-      "runtimeSha256": "4660ef11938703e16713e3456f1047fdd5e3c5c63a53347954c346b3aedde1b1",
+      "runtimeSha256": "26801c85cec005fc46b5c8eb1f579da83ea1225f4a19d00d33c91791a0f013bb",
       "runtimeSize": {
         "width": 368,
         "height": 149
