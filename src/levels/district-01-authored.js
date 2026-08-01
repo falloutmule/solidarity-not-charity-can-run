@@ -2,10 +2,10 @@
   'use strict';
 
   const SNC_AUTHORED_LEVEL_ID = 'district-1-authored-v1';
-  const SNC_AUTHORED_LEVEL_SCHEMA = 'snc-authored-level-static-v1';
-  const SNC_AUTHORED_LEVEL_STATIC_BYTES = 3516;
-  const SNC_AUTHORED_LEVEL_STATIC_SHA256 = '98168c6d1b5c72bbf802ad69caf2badfa2228d878a9b712f72f4a4cae00bdd82';
-  const SNC_AUTHORED_SAVE_SCHEMA = 'snc-authored-save-overlay-v1';
+  const SNC_AUTHORED_LEVEL_SCHEMA = 'snc-authored-level-static-v2';
+  const SNC_AUTHORED_LEVEL_STATIC_BYTES = 8288;
+  const SNC_AUTHORED_LEVEL_STATIC_SHA256 = '0aecc59907b843abb990500694b452025589a877b46494d6428712dfc18912af';
+  const SNC_AUTHORED_SAVE_SCHEMA = 'snc-authored-save-overlay-v2';
 
   function deepFreeze(value){
     if(!value || typeof value !== 'object' || Object.isFrozen(value)) return value;
@@ -13,38 +13,48 @@
     return Object.freeze(value);
   }
 
+  function makeTheStandMapRows(){
+    const width = 40, height = 20;
+    const cells = Array.from({ length: height }, (_, y) => Array.from({ length: width }, (_, x) => (x === 0 || y === 0 || x === width - 1 || y === height - 1) ? '8' : '0'));
+    // The stand is the central anchor. The smaller street-edge building gives the
+    // outer sprint loop a different silhouette without cutting either route off.
+    for(let y = 7; y <= 9; y++) for(let x = 17; x <= 22; x++) cells[y][x] = '1';
+    for(let y = 2; y <= 4; y++) for(let x = 30; x <= 35; x++) cells[y][x] = '1';
+    // Two deliberately broken planter clusters: every block has a visible end and walkable gap.
+    for(const [x, y] of [[10,10], [12,10], [10,12], [28,12], [30,12], [30,14]]) cells[y][x] = '2';
+    return cells.map(row => row.join(''));
+  }
+
+  function withIds(prefix, rows, extra){
+    return rows.map((row, i) => Object.assign({ id: `${prefix}-${String(i).padStart(2, '0')}` }, row, extra));
+  }
+
   function sncBuildLockedStaticLevel(source){
-    const withIds = (prefix, rows, extra) => rows.map((row, i) => Object.assign(
-      { id: `${prefix}-${String(i).padStart(2, '0')}` }, row, extra
-    ));
     return {
-      schema: 'snc-authored-level-static-v1',
+      schema: SNC_AUTHORED_LEVEL_SCHEMA,
       levelId: source.id,
+      levelName: source.name,
       district: source.district,
       width: source.grid.width,
       height: source.grid.height,
       mapRows: source.mapRows,
-      wallShade: { width: 40, height: 20, fill: 0.5 },
-      streetLayoutMeta: { roadY0: 8, roadY1: 11, GW: 40, GH: 20 },
-      building: {
-        id: source.buildings[0].id,
-        ownerBid: 1,
-        assetId: source.buildings[0].assetId,
-        renderMode: 'importedWholeFaceAsset',
-        x: source.buildings[0].x,
-        y: source.buildings[0].y,
-        rotation: source.buildings[0].rotation,
-        widthCells: source.buildings[0].widthCells,
-        depthCells: source.buildings[0].depthCells,
-        front: source.buildings[0].front
-      },
+      mapEncoding: source.mapEncoding,
+      wallShade: source.wallShade,
+      streetLayoutMeta: source.streetLayoutMeta,
+      buildings: source.buildings,
+      environmentObjects: source.environmentObjects,
+      groundSurface: source.groundSurface,
       playerStart: source.playerStart,
-      pickups: withIds('pickup', source.pickups, { taken: false, wob: 0 }),
+      canSockets: source.canSockets,
+      pickupCount: source.pickupCount,
       npcs: withIds('npc', source.npcs, { helped: false, wob: 0, thank: '' }),
       props: withIds('prop', source.props, { wob: 0 }),
       quota: source.quota,
+      requiredCans: source.requiredCans,
+      carryingCapacity: source.carryingCapacity,
       exit: source.exit,
       timeLeftPolicy: source.timeLeftPolicy,
+      timerExpiryPolicy: source.timerExpiryPolicy,
       scoreMultiplierPolicy: source.scoreMultiplierPolicy
     };
   }
@@ -59,132 +69,117 @@
     return value;
   }
 
-  function sncCanonicalizeAuthoredStatic(value){
-    return JSON.stringify(canonicalValue(value));
-  }
+  function sncCanonicalizeAuthoredStatic(value){ return JSON.stringify(canonicalValue(value)); }
 
   const SNC_AUTHORED_LEVEL_01 = deepFreeze({
-    schemaVersion: 1,
+    schemaVersion: 2,
     staticSchema: SNC_AUTHORED_LEVEL_SCHEMA,
     staticHashAlgorithm: 'sha256-canonical-json-lexicographic-v1',
     staticByteLength: SNC_AUTHORED_LEVEL_STATIC_BYTES,
     staticSha256: SNC_AUTHORED_LEVEL_STATIC_SHA256,
     id: SNC_AUTHORED_LEVEL_ID,
+    name: 'World 1, Level 1 — The Stand',
     district: 1,
     grid: { width: 40, height: 20 },
     mapEncoding: {
-      '0': 'walkable asphalt/open space',
-      '1': 'custom bitmap building footprint',
-      '8': 'concrete map boundary'
+      '0': 'walkable park path and street edge',
+      '1': 'SNC stand bitmap-building footprint',
+      '2': 'solid half-height concrete planter block',
+      '8': 'full-height concrete boundary'
     },
-    mapRows: [
-      '8888888888888888888888888888888888888888',
-      '8000000000000000000000000000000000000008',
-      '8000000000000000000000000000000000000008',
-      '8000000000000000000000000000000000000008',
-      '8000000000000000000000000000000000000008',
-      '8000000011111100000000000000000000000008',
-      '8000000011111100000000000000000000000008',
-      '8000000011111100000000000000000000000008',
-      '8000000000000000000000000000000000000008',
-      '8000000000000000000000000000000000000008',
-      '8000000000000000000000000000000000000008',
-      '8000000000000000000000000000000000000008',
-      '8000000000000000000000000000000000000008',
-      '8000000000000000000000000000000000000008',
-      '8000000000000000000000000000000000000008',
-      '8000000000000000000000000000000000000008',
-      '8000000000000000000000000000000000000008',
-      '8000000000000000000000000000000000000008',
-      '8000000000000000000000000000000000000008',
-      '8888888888888888888888888888888888888888'
-    ],
+    mapRows: makeTheStandMapRows(),
     wallShade: { width: 40, height: 20, fill: 0.5 },
-    streetLayoutMeta: { roadY0: 8, roadY1: 11, GW: 40, GH: 20 },
-    playerStart: {
-      x: 11.0,
-      y: 10.5,
-      angleRadians: -1.5707963267948966,
-      faces: 'north_toward_building_south_front'
+    streetLayoutMeta: { topology: 'figure-eight', centralLoop: 'short-turning', outerLoop: 'sprint', GW: 40, GH: 20 },
+    groundSurface: {
+      schema: 'snc-authored-ground-surface-v1', grassSeed: 219124915,
+      routes: [
+        { id: 'central-loop', width: 2.5, points: [[20.5,14.5],[15.0,14.5],[11.2,12.2],[10.2,9.4],[13.8,6.6],[18.5,5.3],[24.6,7.1],[24.6,11.8],[20.5,14.5]] },
+        { id: 'outer-loop', width: 2.7, points: [[20.5,14.5],[26.5,16.0],[33.8,15.2],[35.8,10.3],[34.0,5.5],[28.0,5.1],[24.6,7.1]] }
+      ],
+      wornAreas: [{ x: 20.5, y: 11.4, radius: 2.3 }, { x: 29.2, y: 11.2, radius: 1.8 }, { x: 8.5, y: 8.5, radius: 1.25 }, { x: 20.5, y: 4.8, radius: 1.45 }, { x: 32.5, y: 12.4, radius: 1.3 }, { x: 26.4, y: 16.0, radius: 1.0 }],
+      decals: [
+        { id: 'path-straight-central', assetId: 'path_modular_straight_001', x: 15.1, y: 14.4, width: 4.1, height: 1.45, rotationRadians: 0 },
+        { id: 'path-corner-central', assetId: 'path_modular_corner_001', x: 12.1, y: 10.0, width: 2.25, height: 2.25, rotationRadians: 0.35 },
+        { id: 'wear-stand-portal', assetId: 'path_organic_wear_001', x: 20.5, y: 11.25, width: 3.2, height: 2.15, rotationRadians: 0 },
+        { id: 'path-cross-crossover', assetId: 'path_modular_cross_001', x: 24.6, y: 7.1, width: 2.35, height: 2.55, rotationRadians: 0 },
+        { id: 'path-t-market', assetId: 'path_modular_t_junction_001', x: 29.2, y: 11.2, width: 3.5, height: 1.75, rotationRadians: 0 },
+        { id: 'wear-tree-outer', assetId: 'path_organic_tree_wear_001', x: 26.4, y: 16.0, width: 2.55, height: 1.45, rotationRadians: 0.1 }
+      ]
     },
-    buildings: [{
-      id: 'district-1-main-landmark',
-      assetId: 'custom_next_001',
-      x: 8,
-      y: 5,
-      rotation: 0,
-      widthCells: 6,
-      depthCells: 3,
-      front: 'south'
-    }],
-    pickups: [
-      { x: 4.5, y: 10.5, amt: 1 },
-      { x: 5.5, y: 15.5, amt: 2 },
-      { x: 10.5, y: 15.5, amt: 1 },
-      { x: 16.5, y: 10.5, amt: 2 },
-      { x: 18.5, y: 4.5, amt: 1 },
-      { x: 22.5, y: 14.5, amt: 2 },
-      { x: 26.5, y: 6.5, amt: 1 },
-      { x: 30.5, y: 11.5, amt: 1 },
-      { x: 34.5, y: 4.5, amt: 2 },
-      { x: 35.5, y: 16.5, amt: 1 }
+    playerStart: { x: 20.5, y: 14.5, angleRadians: -1.5707963267948966, faces: 'north_toward_the_stand' },
+    buildings: [
+      { id: 'snc-stand', assetId: 'custom_next_001', x: 17, y: 7, rotation: 0, widthCells: 6, depthCells: 3, front: 'south' },
+      { id: 'outer-street-market', assetId: 'strip_mall_001', x: 30, y: 2, rotation: 0, widthCells: 6, depthCells: 3, front: 'south' }
     ],
+    environmentObjects: [
+      { id: 'central-planter-00', assetId: 'low_block_concrete_001', x: 10, y: 10, rotation: 0, widthCells: 1, depthCells: 1 },
+      { id: 'central-planter-01', assetId: 'low_block_concrete_001', x: 10, y: 12, rotation: 0, widthCells: 1, depthCells: 1 },
+      { id: 'central-planter-02', assetId: 'low_block_concrete_001', x: 12, y: 10, rotation: 1, widthCells: 1, depthCells: 1 },
+      { id: 'outer-planter-00', assetId: 'low_block_concrete_001', x: 28, y: 12, rotation: 2, widthCells: 1, depthCells: 1 },
+      { id: 'outer-planter-01', assetId: 'low_block_concrete_001', x: 30, y: 12, rotation: 2, widthCells: 1, depthCells: 1 },
+      { id: 'outer-planter-02', assetId: 'low_block_concrete_001', x: 30, y: 14, rotation: 3, widthCells: 1, depthCells: 1 }
+    ],
+    canSockets: [
+      { id: 'can-socket-00', x: 15.5, y: 12.5 }, { id: 'can-socket-01', x: 24.5, y: 12.5 },
+      { id: 'can-socket-02', x: 13.5, y: 12.5 }, { id: 'can-socket-03', x: 5.5, y: 5.5 },
+      { id: 'can-socket-04', x: 7.5, y: 15.5 }, { id: 'can-socket-05', x: 15.5, y: 4.5 },
+      { id: 'can-socket-06', x: 29.5, y: 10.5 }, { id: 'can-socket-07', x: 34.5, y: 5.5 },
+      { id: 'can-socket-08', x: 33.5, y: 15.5 }
+    ],
+    pickupCount: 5,
     npcs: [
-      { x: 4.5, y: 5.5, kind: 'hungry', need: 1 },
-      { x: 18.5, y: 8.5, kind: 'family', need: 3 },
-      { x: 23.5, y: 4.5, kind: 'elder', need: 1 },
-      { x: 27.5, y: 14.5, kind: 'volunteer', need: 1 },
-      { x: 33.5, y: 8.5, kind: 'hungry', need: 1 },
-      { x: 32.5, y: 15.5, kind: 'family', need: 3 }
+      { x: 8.5, y: 8.5, kind: 'hungry', assetId: 'npc_unhoused_work_jacket_001', need: 1 },
+      { x: 20.5, y: 4.5, kind: 'family', assetId: 'npc_household_parent_child_001', need: 3 },
+      { x: 32.5, y: 12.5, kind: 'elder', assetId: 'npc_volunteer_elder_cane_001', need: 1 }
     ],
-    quota: 4,
+    quota: 3,
+    requiredCans: 5,
+    carryingCapacity: 3,
     props: [
-      { x: 5.5, y: 9.0, kind: 'bench' },
-      { x: 16.0, y: 5.0, kind: 'mural_panel' },
-      { x: 16.0, y: 8.5, kind: 'utility_box' },
-      { x: 5.5, y: 3.5, kind: 'scrub_bush' },
-      { x: 16.5, y: 3.0, kind: 'agave' },
-      { x: 6.5, y: 14.0, kind: 'cooler' },
-      { x: 18.0, y: 12.5, kind: 'crate_stack' },
-      { x: 24.0, y: 10.0, kind: 'shopping_cart' },
-      { x: 30.0, y: 4.0, kind: 'mailbox' },
-      { x: 34.0, y: 13.0, kind: 'tarp_bundle' },
-      { x: 21.0, y: 17.0, kind: 'signboard' },
-      { x: 28.0, y: 17.0, kind: 'sleeping_bag_pile' }
+      // Stand forecourt: two labeled signs, pantry crates, and a cooler make the
+      // central building readable at the starting pose and keep the portal grounded here.
+      { x: 19.2, y: 10.6, kind: 'signboard', label: 'SNC\nCAN STAND', assetId: 'sign_snc_can_station_001', signSizeClass: 'landmark' },
+      { x: 21.8, y: 10.6, kind: 'signboard', label: 'DROP OFF\nCANS', assetId: 'sign_drop_off_cans_001', signSizeClass: 'tall' },
+      { x: 17.2, y: 10.9, kind: 'crate_stack' }, { x: 22.8, y: 10.9, kind: 'cooler' },
+      { x: 18.0, y: 11.9, kind: 'bench' }, { x: 22.0, y: 11.9, kind: 'bench' },
+      { x: 15.8, y: 12.9, kind: 'foliage', assetId: 'foliage_groundcover_wide_001' }, { x: 24.2, y: 13.2, kind: 'foliage', assetId: 'foliage_grass_tuft_medium_001' },
+      // Central park loop: a broken planter cluster and a one-can neighborhood stop.
+      { x: 9.0, y: 8.1, kind: 'signboard', label: 'NEIGHBOR\n1 CAN', assetId: 'sign_neighbor_1_can_001', signSizeClass: 'standard' },
+      { x: 7.2, y: 9.5, kind: 'bench' }, { x: 9.4, y: 10.9, kind: 'foliage', assetId: 'foliage_bush_low_001' },
+      { x: 11.1, y: 9.4, kind: 'foliage', assetId: 'foliage_grass_patch_long_001' }, { x: 12.9, y: 11.0, kind: 'foliage', assetId: 'foliage_bush_low_001' },
+      { x: 7.0, y: 11.4, kind: 'foliage', assetId: 'foliage_groundcover_wide_001' }, { x: 12.7, y: 12.9, kind: 'foliage', assetId: 'foliage_grass_tuft_medium_001' },
+      // North crossover is the family stop and clear link between the two loops.
+      { x: 18.0, y: 5.1, kind: 'signboard', label: 'FAMILY\n3 CANS', assetId: 'sign_family_3_cans_001', signSizeClass: 'standard' },
+      { x: 22.7, y: 5.1, kind: 'shopping_cart' }, { x: 20.5, y: 5.6, kind: 'cooler' },
+      { x: 13.1, y: 5.8, kind: 'foliage', assetId: 'foliage_tree_low_canopy_001' }, { x: 15.2, y: 3.2, kind: 'foliage', assetId: 'foliage_grass_patch_long_001' },
+      // Outer sprint loop: the market facade, split planter cluster, and elder stop.
+      { x: 29.0, y: 10.8, kind: 'signboard', label: 'OUTER LOOP\nMARKET', assetId: 'sign_summer_loop_market_001', signSizeClass: 'landmark' },
+      { x: 31.0, y: 11.1, kind: 'bench' }, { x: 28.4, y: 13.5, kind: 'foliage', assetId: 'foliage_grass_patch_long_001' },
+      { x: 31.4, y: 13.8, kind: 'foliage', assetId: 'foliage_bush_low_001' }, { x: 33.0, y: 11.0, kind: 'signboard', label: 'NEIGHBOR\n1 CAN', assetId: 'sign_neighbor_1_can_001', signSizeClass: 'standard' },
+      { x: 26.4, y: 16.0, kind: 'foliage', assetId: 'foliage_tree_round_large_001' }, { x: 35.3, y: 7.7, kind: 'foliage', assetId: 'foliage_tree_low_canopy_001' },
+      { x: 29.6, y: 15.8, kind: 'foliage', assetId: 'foliage_groundcover_wide_001' }, { x: 32.2, y: 15.0, kind: 'foliage', assetId: 'foliage_grass_tuft_medium_001' },
+      { x: 34.2, y: 13.0, kind: 'mailbox' }, { x: 26.5, y: 15.5, kind: 'utility_box' },
+      // Sparse edge cues guide the longer route without walling it off.
+      { x: 5.5, y: 5.5, kind: 'mural_panel' }, { x: 6.5, y: 15.5, kind: 'bench' },
+      { x: 5.2, y: 13.4, kind: 'foliage', assetId: 'foliage_tree_slender_001' }, { x: 8.1, y: 14.2, kind: 'foliage', assetId: 'foliage_grass_tuft_medium_001' },
+      { x: 34.5, y: 5.5, kind: 'mural_panel' }, { x: 35.0, y: 15.5, kind: 'mailbox' }
     ],
-    exit: { x: 36.5, y: 17.0, active: false },
-    timeLeftPolicy: 'preserve cfg.baseTime + (district-1)*8',
+    exit: { x: 20.5, y: 10.7, active: false },
+    timeLeftPolicy: 'count down from cfg.baseTime; timer measures completion only',
+    timerExpiryPolicy: 'continue',
     scoreMultiplierPolicy: 'preserve modifier rules'
   });
 
-  const SNC_AUTHORED_LEVEL_REGISTRY = deepFreeze({
-    [SNC_AUTHORED_LEVEL_ID]: SNC_AUTHORED_LEVEL_01
-  });
-
-  function sncGetAuthoredLevelDefinition(levelId){
-    return SNC_AUTHORED_LEVEL_REGISTRY[levelId] || null;
-  }
-
+  const SNC_AUTHORED_LEVEL_REGISTRY = deepFreeze({ [SNC_AUTHORED_LEVEL_ID]: SNC_AUTHORED_LEVEL_01 });
+  function sncGetAuthoredLevelDefinition(levelId){ return SNC_AUTHORED_LEVEL_REGISTRY[levelId] || null; }
   function sncAuthoredStaticIdentity(levelId){
     if(!sncGetAuthoredLevelDefinition(levelId)) return null;
-    return {
-      schema: SNC_AUTHORED_LEVEL_SCHEMA,
-      byteLength: SNC_AUTHORED_LEVEL_STATIC_BYTES,
-      sha256: SNC_AUTHORED_LEVEL_STATIC_SHA256
-    };
+    return { schema: SNC_AUTHORED_LEVEL_SCHEMA, byteLength: SNC_AUTHORED_LEVEL_STATIC_BYTES, sha256: SNC_AUTHORED_LEVEL_STATIC_SHA256 };
   }
 
   Object.assign(root, {
-    SNC_AUTHORED_LEVEL_ID,
-    SNC_AUTHORED_LEVEL_SCHEMA,
-    SNC_AUTHORED_LEVEL_STATIC_BYTES,
-    SNC_AUTHORED_LEVEL_STATIC_SHA256,
-    SNC_AUTHORED_SAVE_SCHEMA,
-    SNC_AUTHORED_LEVEL_01,
-    SNC_AUTHORED_LEVEL_REGISTRY,
-    sncGetAuthoredLevelDefinition,
-    sncBuildLockedStaticLevel,
-    sncCanonicalizeAuthoredStatic,
-    sncAuthoredStaticIdentity
+    SNC_AUTHORED_LEVEL_ID, SNC_AUTHORED_LEVEL_SCHEMA, SNC_AUTHORED_LEVEL_STATIC_BYTES, SNC_AUTHORED_LEVEL_STATIC_SHA256,
+    SNC_AUTHORED_SAVE_SCHEMA, SNC_AUTHORED_LEVEL_01, SNC_AUTHORED_LEVEL_REGISTRY, sncGetAuthoredLevelDefinition,
+    sncBuildLockedStaticLevel, sncCanonicalizeAuthoredStatic, sncAuthoredStaticIdentity
   });
 })(globalThis);

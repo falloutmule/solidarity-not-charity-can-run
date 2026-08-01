@@ -135,9 +135,11 @@ function drawPortraitDashboardChrome(){
     ctx.beginPath(); ctx.moveTo(0, yy); ctx.lineTo(view.width, yy); ctx.stroke();
   });
   if(!crGalleryHudActive()){
-    ctx.font = 'bold 9px monospace';
-    ctx.fillStyle = 'rgba(210,170,110,0.92)';
-    ctx.fillText('build ' + BUILD_ID, L.menuRect.left, L.menuRect.top + L.menuRect.height + 11);
+    if(typeof DEBUG !== 'undefined' && DEBUG){
+      ctx.font = 'bold 9px monospace';
+      ctx.fillStyle = 'rgba(210,170,110,0.92)';
+      ctx.fillText('build ' + BUILD_ID, L.menuRect.left, L.menuRect.top + L.menuRect.height + 11);
+    }
   }
 }
 function drawPortraitStatsPanel(){
@@ -169,9 +171,11 @@ function drawPortraitStatsPanel(){
   const meta = 'D' + game.district + ' [' + game.modifier.toUpperCase() + '] x' + game.scoreMult +
     '   SEED ' + game.seed + '   SCORE ' + game.totalScore;
   ctx.fillText(meta, r.x + 10, r.y + 54);
-  ctx.fillStyle = '#4a4035';
-  ctx.font = '10px monospace';
-  ctx.fillText('build ' + BUILD_ID, r.x + r.w - 88, r.y + r.h - 8);
+  if(typeof DEBUG !== 'undefined' && DEBUG){
+    ctx.fillStyle = '#4a4035';
+    ctx.font = '10px monospace';
+    ctx.fillText('build ' + BUILD_ID, r.x + r.w - 88, r.y + r.h - 8);
+  }
 }
 function drawPortraitFpvOverlay(now){
   const L = portraitLayout();

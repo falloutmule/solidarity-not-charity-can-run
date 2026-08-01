@@ -952,6 +952,8 @@ const HEIGHT = { hungry:0.86, family:1.0, elder:0.84, volunteer:0.92,
                  cooler:0.40, tarp_bundle:0.35, scrub_bush:0.22, agave:0.55, utility_box:0.45,
                  signboard:0.62, mural_panel:0.58 };
 function propTex(kind, prop){
+  const importedAsset = prop && typeof crHeightfieldSpriteRegistryEntry === 'function' ? crHeightfieldSpriteRegistryEntry(prop) : null;
+  if(importedAsset && importedAsset.image && importedAsset.image.complete && importedAsset.image.naturalWidth > 0) return importedAsset.image;
   if(DECOR_PROP_REQUIRED.indexOf(kind) >= 0){
     const v = prop ? decorPropVariantFromProp(prop) : 0;
     return bakeDecorPropTexture(kind, v, prop && prop.label);
@@ -1112,6 +1114,8 @@ function crDebugGroundPlaneAlignment(){
   return { BUILD_ID, pass, records };
 }
 function crGetSpriteFootAnchor(tex, obj){
+  const entry = typeof crHeightfieldSpriteRegistryEntry === 'function' ? crHeightfieldSpriteRegistryEntry(obj) : null;
+  if(entry && Number.isInteger(entry.groundContactSourceY) && entry.groundContactSourceY > 0) return { footY: entry.groundContactSourceY, textureH: tex.height, floating: false };
   if(tex === TEX.exit || (obj && obj === game.exit)) return Object.assign({}, CR_SPRITE_ANCHOR.exit);
   if(tex === TEX.can) return Object.assign({}, CR_SPRITE_ANCHOR.can);
   if(tex && tex.height === 46 && tex.width === 28) return Object.assign({}, CR_SPRITE_ANCHOR.person);

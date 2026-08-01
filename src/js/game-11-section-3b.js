@@ -423,6 +423,13 @@ function npcSpriteHeight(entity, space){
 }
 function crHeightfieldSpriteWorldHeight(kind, entity){
   if(entity && Number.isFinite(entity.worldHeight) && entity.worldHeight > 0) return entity.worldHeight;
+  const asset = entity && typeof crHeightfieldSpriteRegistryEntry === 'function' ? crHeightfieldSpriteRegistryEntry(entity) : null;
+  if(asset){
+    const displayClass = entity.displaySizeClass || entity.signSizeClass || asset.defaultDisplayClass;
+    const classData = asset.displayClasses && asset.displayClasses[displayClass];
+    if(classData && Number.isFinite(classData.worldHeight) && classData.worldHeight > 0) return classData.worldHeight;
+    if(Number.isFinite(asset.worldHeight) && asset.worldHeight > 0) return asset.worldHeight;
+  }
   if(kind === 'can') return CR_HEIGHTFIELD_SPRITE_WORLD_HEIGHTS.can;
   if(kind === 'npc') return npcSpriteHeight(entity, 'world');
   return HEIGHT[entity && entity.kind] || HEIGHT[kind] || 0.5;

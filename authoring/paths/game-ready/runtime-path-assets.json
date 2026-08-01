@@ -1,0 +1,150 @@
+{
+  "schema": "snc-runtime-path-assets-v1",
+  "package": {
+    "archiveName": "paths-game-ready.zip",
+    "sourceManifest": "authoring/paths/game-ready/source-manifest.json",
+    "sourceManifestSha256": "ad06db7be3b9f93d83fee4493884816bc75cb116b1657d9d79acb7dca787c6a1",
+    "sourceMarginPixels": 24,
+    "alphaPolicy": "preserve supplied soft alpha; alpha-zero RGB normalized; visible RGB tone-mapped into the warm dirt range"
+  },
+  "assets": [
+    {
+      "assetId": "path_modular_straight_001",
+      "sourceFile": "modular-path_01.png",
+      "sourcePath": "authoring/paths/game-ready/masters/modular-path_01.png",
+      "sourceSha256": "e82828d3ba1717688dbe294c82ce0cd039105fe8e2b01eac5b36efeeebb05039",
+      "runtimePath": "authoring/paths/game-ready/runtime/modular-path_01.png",
+      "runtimeSha256": "546adaf2f244183e48adc870428346ebfe5ad008f2563c6dd6017416099375c4",
+      "runtimeSize": {
+        "width": 464,
+        "height": 102
+      },
+      "runtimeAlphaBounds": {
+        "x": 0,
+        "y": 0,
+        "w": 464,
+        "h": 102
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 6938,
+        "partial": 27153,
+        "opaque": 13237
+      }
+    },
+    {
+      "assetId": "path_modular_corner_001",
+      "sourceFile": "modular-path_05.png",
+      "sourcePath": "authoring/paths/game-ready/masters/modular-path_05.png",
+      "sourceSha256": "8b69f0c5b35e024e96a2dd6a57f2c306ec4ca127a78c7b582f9d735050e9ea54",
+      "runtimePath": "authoring/paths/game-ready/runtime/modular-path_05.png",
+      "runtimeSha256": "df897245b287d38836b689826d0d979822c634e64e135ccece97dbf1af353983",
+      "runtimeSize": {
+        "width": 233,
+        "height": 225
+      },
+      "runtimeAlphaBounds": {
+        "x": 0,
+        "y": 0,
+        "w": 233,
+        "h": 225
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 20344,
+        "partial": 15590,
+        "opaque": 16491
+      }
+    },
+    {
+      "assetId": "path_organic_wear_001",
+      "sourceFile": "organic-path_01.png",
+      "sourcePath": "authoring/paths/game-ready/masters/organic-path_01.png",
+      "sourceSha256": "dbf09f3cecf0ae788017609d0f25124c2e344f34148e0a25f5e2b8c4aa7ddb74",
+      "runtimePath": "authoring/paths/game-ready/runtime/organic-path_01.png",
+      "runtimeSha256": "07d0adb7324c7f130ec16c7f3bc1121f117e3a6f8bd6a28f02c71ceaa4e0ec5b",
+      "runtimeSize": {
+        "width": 351,
+        "height": 199
+      },
+      "runtimeAlphaBounds": {
+        "x": 0,
+        "y": 0,
+        "w": 351,
+        "h": 199
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 26175,
+        "partial": 28582,
+        "opaque": 15092
+      }
+    },
+    {
+      "assetId": "path_modular_cross_001",
+      "sourceFile": "modular-path_09.png",
+      "sourcePath": "authoring/paths/game-ready/masters/modular-path_09.png",
+      "sourceSha256": "384c2c49a28baf0e337683812ec4499862ac7503bdc989d4926097fb5257df83",
+      "runtimePath": "authoring/paths/game-ready/runtime/modular-path_09.png",
+      "runtimeSha256": "4e1355cdc88f0be8d252ce03ddc0a76b09606b336cb1b40cfb609ddd96032103",
+      "runtimeSize": {
+        "width": 200,
+        "height": 238
+      },
+      "runtimeAlphaBounds": {
+        "x": 0,
+        "y": 0,
+        "w": 200,
+        "h": 238
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 18702,
+        "partial": 16145,
+        "opaque": 12753
+      }
+    },
+    {
+      "assetId": "path_modular_t_junction_001",
+      "sourceFile": "modular-path_18.png",
+      "sourcePath": "authoring/paths/game-ready/masters/modular-path_18.png",
+      "sourceSha256": "ba2124c95b168af8bdf075dd33eeb8a344a8c442429a8e6b03e211f0320d4296",
+      "runtimePath": "authoring/paths/game-ready/runtime/modular-path_18.png",
+      "runtimeSha256": "ae382cbb925c40ebf92611e8abe5125f06aa52b2923ed54c230e441f39690fa5",
+      "runtimeSize": {
+        "width": 475,
+        "height": 184
+      },
+      "runtimeAlphaBounds": {
+        "x": 0,
+        "y": 0,
+        "w": 475,
+        "h": 184
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 37428,
+        "partial": 18259,
+        "opaque": 31713
+      }
+    },
+    {
+      "assetId": "path_organic_tree_wear_001",
+      "sourceFile": "organic-path_14.png",
+      "sourcePath": "authoring/paths/game-ready/masters/organic-path_14.png",
+      "sourceSha256": "432d3ba910c0fb4ba89df3c12fd77e76c0c234876906d1c6885a29b8c00b155b",
+      "runtimePath": "authoring/paths/game-ready/runtime/organic-path_14.png",
+      "runtimeSha256": "26801c85cec005fc46b5c8eb1f579da83ea1225f4a19d00d33c91791a0f013bb",
+      "runtimeSize": {
+        "width": 368,
+        "height": 149
+      },
+      "runtimeAlphaBounds": {
+        "x": 0,
+        "y": 0,
+        "w": 368,
+        "h": 149
+      },
+      "runtimeAlphaHistogram": {
+        "zero": 12133,
+        "partial": 28448,
+        "opaque": 14251
+      }
+    }
+  ]
+}

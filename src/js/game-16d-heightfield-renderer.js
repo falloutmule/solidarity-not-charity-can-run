@@ -134,16 +134,19 @@ function crHeightfieldDrawSprite(kind, obj, tex, hp, px, py, dirX, dirY, planeX,
     const y0 = Math.max(0, Math.floor(top)), y1 = Math.min(RH, Math.ceil(bottom));
     let runStart = -1;
     for(let y = y0; y <= y1; y++){
-      const visible = y < y1 && depth < worldDepthPixels[y * RW + col];
       const sourceY = Math.max(proj.sourceY, Math.min(proj.sourceY + proj.sourceHeight - 1, (proj.sourceY + (y - top) / proj.screenH * proj.sourceHeight) | 0));
       const opaque = y < y1 && crHeightfieldSpriteOpaqueAt(tex, srcX, sourceY);
+      const pixelIndex = y * RW + col;
+      const visible = opaque && depth < worldDepthPixels[pixelIndex];
       if(visible){
         if(runStart < 0) runStart = y;
+        worldDepthPixels[pixelIndex] = depth;
+        crHeightfieldStats.spriteDepthWrites++;
         crHeightfieldStats.spriteVisiblePixels++;
         if(opaque && kind === 'can') crHeightfieldStats.canVisiblePixels++;
         else if(opaque && kind === 'npc') crHeightfieldStats.npcVisiblePixels++;
       } else {
-        if(y < y1) crHeightfieldStats.spriteOccludedPixels++;
+        if(y < y1 && opaque) crHeightfieldStats.spriteOccludedPixels++;
         if(opaque && kind === 'can') crHeightfieldStats.canOccludedPixels++;
         else if(opaque && kind === 'npc') crHeightfieldStats.npcOccludedPixels++;
         if(runStart >= 0){
@@ -161,15 +164,16 @@ function crHeightfieldDrawSprite(kind, obj, tex, hp, px, py, dirX, dirY, planeX,
 function crDrawHeightfieldScene(now, renderPose){
   if(skyBuilt !== game.modifier) buildSky(game.modifier);
   bctx.drawImage(skyCanvas, 0, 0);
-  const floor = bctx.createLinearGradient(0, RH / 2, 0, RH);
-  floor.addColorStop(0, '#3a3a40'); floor.addColorStop(1, '#1a1a1e');
-  bctx.fillStyle = floor; bctx.fillRect(0, RH / 2, RW, RH / 2);
-
   const px = renderPose ? renderPose.x : player.x;
   const py = renderPose ? renderPose.y : player.y;
   const angle = renderPose ? renderPose.angle : player.angle;
   const dirX = Math.cos(angle), dirY = Math.sin(angle);
   const planeX = -Math.sin(angle) * cfg.fov, planeY = Math.cos(angle) * cfg.fov;
+  if(typeof crDrawAuthoredGroundSurface !== 'function' || !crDrawAuthoredGroundSurface(px, py, dirX, dirY, planeX, planeY)){
+    const floor = bctx.createLinearGradient(0, RH / 2, 0, RH);
+    floor.addColorStop(0, '#3a3a40'); floor.addColorStop(1, '#1a1a1e');
+    bctx.fillStyle = floor; bctx.fillRect(0, RH / 2, RW, RH / 2);
+  }
   const visRange = game.modifier === 'rainy' ? 9.0 : 17.0;
   const fog = game.modifier === 'rainy' ? [40, 48, 60] : [196, 168, 128];
   const fogStrength = game.modifier === 'rainy' ? 0.9 : 0.78;

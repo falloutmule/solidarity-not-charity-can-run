@@ -58,7 +58,8 @@ function giveCan(){
     game.totalScore += bonus;
     addPopup('BONUS +'+bonus,'#ffe066');
   }
-  if(game.helped>=game.quota && !game.exit.active){
+  const requiredCans = Math.max(0, Number(game.requiredCans) || 0);
+  if(game.helped>=game.quota && game.delivered>=requiredCans && !game.exit.active){
     game.exit.active=true; setMsg('QUOTA MET — EXIT OPEN!');
     crTriggerSoundCue('quotaExitReady');
   }
@@ -119,4 +120,3 @@ function updateAim(){
   }
   game.aimNpc=best;
 }
-

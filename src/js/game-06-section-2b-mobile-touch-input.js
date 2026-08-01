@@ -9,7 +9,7 @@ const inp = {
   lookDeltaRad:0,
   _active:false, // true when any touch is on screen
 };
-var BUILD_ID = 'authoredlowblockregistryparity1'; window.BUILD_ID = BUILD_ID;
+var BUILD_ID = 'world1thestand1'; window.BUILD_ID = BUILD_ID;
 const CR_FPV_STREET_MATTE = true;
 /** Building visual reset: smooth, low-noise wall masses with sparse readable cues. */
 const CR_BUILDING_SMOOTH_STYLE = 1;
@@ -848,7 +848,9 @@ function syncPortraitMenuLabel(){
   const galleryLabel = typeof crAssetGalleryIsActive === 'function' && crAssetGalleryIsActive();
   const want = galleryLabel
     ? '<span class="mportmenu-t">MENU</span><span class="mportmenu-b">GALLERY</span>'
-    : `<span class="mportmenu-t">MENU</span><span class="mportmenu-b">${BUILD_ID}</span>`;
+    : (typeof DEBUG !== 'undefined' && DEBUG)
+      ? `<span class="mportmenu-t">MENU</span><span class="mportmenu-b">${BUILD_ID}</span>`
+      : '<span class="mportmenu-t">MENU</span>';
   crWriteHtml(mportmenu, want);
 }
 function isMobilePortrait(){

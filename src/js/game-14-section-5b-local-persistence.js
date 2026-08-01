@@ -263,8 +263,8 @@ leaderboards.load();
 
 // --- ACTIVE RUN SAVE (serialize/deserialize/autosave/clear) ---
 const CR_AUTHORED_D1_ID = 'district-1-authored-v1';
-const CR_AUTHORED_D1_SCHEMA = 'snc-authored-level-static-v1';
-const CR_AUTHORED_D1_STATIC_SHA256 = '98168c6d1b5c72bbf802ad69caf2badfa2228d878a9b712f72f4a4cae00bdd82';
+const CR_AUTHORED_D1_SCHEMA = globalThis.SNC_AUTHORED_LEVEL_SCHEMA;
+const CR_AUTHORED_D1_STATIC_SHA256 = globalThis.SNC_AUTHORED_LEVEL_STATIC_SHA256;
 
 function crSerializeCommonRunState(){
   return {
@@ -316,6 +316,7 @@ function crValidateAuthoredCommonRunState(s){
   if(numericFields.some(key => typeof s[key]!=='number' || !Number.isFinite(s[key]))) return false;
   if(typeof s.radar!=='boolean' || typeof s.modifier!=='string' || !crIsSaveRecord(s.upgrades) || !crIsSaveRecord(s.run) || typeof s.run.active!=='boolean') return false;
   if(['pack','sprint','hand','map','radar'].some(key => typeof s.upgrades[key]!=='number' || !Number.isFinite(s.upgrades[key]))) return false;
+  if(s.maxCans !== 3 || s.cans < 0 || s.cans > 3) return false;
   if(s.screenState===STATE.PLAY) return s.upgradeOffered===null || s.upgradeOffered===undefined;
   if(s.screenState!==STATE.UPGRADE || !Array.isArray(s.upgradeOffered) || !s.upgradeOffered.length) return false;
   return s.upgradeOffered.every(o => crIsSaveRecord(o) && typeof o.id==='string' && typeof o.name==='string' && typeof o.desc==='string');
@@ -378,9 +379,9 @@ const SAVE = {
         if(s.authoredLevelId!==CR_AUTHORED_D1_ID ||
            s.authoredLevelSchema!==CR_AUTHORED_D1_SCHEMA || s.authoredStaticSha256!==CR_AUTHORED_D1_STATIC_SHA256) return false;
         const staticIdentity = sncAuthoredStaticIdentity(CR_AUTHORED_D1_ID);
-        if(!staticIdentity || staticIdentity.schema!==CR_AUTHORED_D1_SCHEMA || staticIdentity.byteLength!==3516 ||
+        if(!staticIdentity || staticIdentity.schema!==CR_AUTHORED_D1_SCHEMA || staticIdentity.byteLength!==globalThis.SNC_AUTHORED_LEVEL_STATIC_BYTES ||
            staticIdentity.sha256!==CR_AUTHORED_D1_STATIC_SHA256) return false;
-        const checked = sncValidateAuthoredMutableOverlay(CR_AUTHORED_D1_ID,s.authoredOverlay);
+        const checked = sncValidateAuthoredMutableOverlay(CR_AUTHORED_D1_ID,s.authoredOverlay,s.seed);
         if(!checked || checked.pass!==true || !checked.value) return false;
         const snapshot = crSnapshotAuthoredLoadState();
         try{
@@ -391,7 +392,7 @@ const SAVE = {
              game.authoredStaticSha256!==CR_AUTHORED_D1_STATIC_SHA256){
             crRestoreAuthoredLoadState(snapshot); return false;
           }
-          if(!sncApplyAuthoredMutableOverlay(CR_AUTHORED_D1_ID,checked.value)){
+          if(!sncApplyAuthoredMutableOverlay(CR_AUTHORED_D1_ID,checked.value,s.seed)){
             crRestoreAuthoredLoadState(snapshot); return false;
           }
         } catch(e){

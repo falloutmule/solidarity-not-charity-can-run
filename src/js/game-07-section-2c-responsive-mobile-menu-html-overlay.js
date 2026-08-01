@@ -257,7 +257,7 @@ function drawMobileMenu(){
       ${fileOriginMenuNoteHTML()}
       ${buildTitleRmenuBody()}
       <div class="rclose" style="margin-top:16px;">↑↓ navigate · tap to activate</div>
-      <div class="rclose" style="margin-top:6px;color:#5a4a3a;">build ${BUILD_ID}</div>
+      ${typeof DEBUG !== 'undefined' && DEBUG ? `<div class="rclose" style="margin-top:6px;color:#5a4a3a;">build ${BUILD_ID}</div>` : ''}
     `);
     return;
   }
@@ -329,7 +329,7 @@ function drawMobileMenu(){
     rmenuHTML(`
       <div class="options-scroll-body">
       <div class="rpantit">OPTIONS</div>
-      <div class="rdesc" style="margin-bottom:8px;color:#6a5a4a;">build ${BUILD_ID}</div>
+      ${typeof DEBUG !== 'undefined' && DEBUG ? `<div class="rdesc" style="margin-bottom:8px;color:#6a5a4a;">build ${BUILD_ID}</div>` : ''}
       <div class="options-section-hdr">CONTROLS</div>
       <div class="rit" data-action="option-edit-controls">EDIT CONTROLS</div>
       <div class="rit" data-action="option-reset-controls">RESET CONTROLS</div>
