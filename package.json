@@ -40,6 +40,7 @@
     "test:world1-ground": "node tests/world1_ground_capture.js",
     "test:world1-foliage": "node tests/world1_foliage_capture.js",
     "test:world1-sign-pack": "node tests/world1_sign_pack_capture.js",
+    "test:give-touch-regression": "node tests/give_touch_regression_browser.js",
     "test:billboard-opacity-occlusion": "node tests/billboard_opacity_occlusion_browser.js",
     "test:runtime-character-alpha": "py -3 tests/runtime_character_alpha_verify.py",
     "assets:build-palette": "node tools/build-asset-palette.js",
