@@ -5,14 +5,14 @@
     "name": "Solidarity Not Charity Can Run"
   },
   "runtime": {
-    "buildId": "world1thestand1-givetouch1",
+    "buildId": "world1thestand1-nomurals1",
     "sourcePolicy": "build-manifest",
     "releaseArtifact": "index.html"
   },
   "artifact": {
     "path": "index.html",
-    "byteLength": 4747802,
-    "sha256": "a17c8b136c17c3ac5de545a1959ba7a85646d0b300a96c4bb859ac72bf879ff0"
+    "byteLength": 4747718,
+    "sha256": "316f583652b5e1dcd79db1bcda31db1bee997a8ef6ea9f1efdbf0690c00f5f87"
   },
   "distribution": {
     "provider": "github-pages",
@@ -26,8 +26,8 @@
     "district1": {
       "levelId": "district-1-authored-v1",
       "schema": "snc-authored-level-static-v2",
-      "staticByteLength": 8288,
-      "staticSha256": "0aecc59907b843abb990500694b452025589a877b46494d6428712dfc18912af"
+      "staticByteLength": 8163,
+      "staticSha256": "22b0be0027302d0e09c68df4bfbb22ba709467fb729c513434774b65c7790382"
     }
   },
   "selection": {
