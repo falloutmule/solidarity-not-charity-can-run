@@ -61,6 +61,8 @@ assert.strictEqual(definition.environmentObjects.length, 6, 'two three-block pla
 assert(definition.environmentObjects.every(row => row.assetId === 'low_block_concrete_001'), 'accepted low-block asset is used');
 assert.deepStrictEqual(Array.from(definition.buildings, row => row.assetId), ['custom_next_001', 'strip_mall_001'], 'stand and outer-route market use supported bitmap buildings');
 const signboards = definition.props.filter(row => row.kind === 'signboard');
+assert.strictEqual(definition.props.length, 35, 'only the two legacy mural placements are removed from D1');
+assert.strictEqual(definition.props.filter(row => row.kind === 'mural_panel').length, 0, 'D1 contains no legacy mural panels');
 assert.deepStrictEqual(JSON.parse(JSON.stringify(signboards.map(row => [row.assetId, row.signSizeClass]))), [
   ['sign_snc_can_station_001', 'landmark'], ['sign_drop_off_cans_001', 'tall'], ['sign_neighbor_1_can_001', 'standard'],
   ['sign_family_3_cans_001', 'standard'], ['sign_summer_loop_market_001', 'landmark'], ['sign_neighbor_1_can_001', 'standard']
@@ -83,8 +85,8 @@ assert.deepStrictEqual(Array.from(definition.groundSurface.decals, row => row.as
 ], 'D1 uses a bounded selected set of horizontal path assets');
 
 const canonical = sandbox.sncCanonicalizeAuthoredStatic(sandbox.sncBuildLockedStaticLevel(definition));
-assert.strictEqual(Buffer.byteLength(canonical), 8288, 'static byte identity is locked');
-assert.strictEqual(crypto.createHash('sha256').update(canonical).digest('hex'), '0aecc59907b843abb990500694b452025589a877b46494d6428712dfc18912af', 'static hash identity is locked');
+assert.strictEqual(Buffer.byteLength(canonical), 8163, 'static byte identity is locked');
+assert.strictEqual(crypto.createHash('sha256').update(canonical).digest('hex'), '22b0be0027302d0e09c68df4bfbb22ba709467fb729c513434774b65c7790382', 'static hash identity is locked');
 assert.deepStrictEqual(JSON.parse(JSON.stringify(sandbox.sncValidateAuthoredLevelDefinition(definition))), { pass: true, errors: [] });
 
 for(const seed of [1, 2468, 717, 9001]){
@@ -106,6 +108,7 @@ assert.strictEqual(sandbox.sncCommitAuthoredLevelState(prepared), true, 'The Sta
 const game = sandbox.game, player = sandbox.player;
 assert.strictEqual(player.maxCans, 3, 'D1 capacity is capped at three');
 assert.strictEqual(game.pickups.length, 5);
+assert.strictEqual(game.props.length + game.npcs.length + game.pickups.length + 1, 44, 'projected-sprite placements drop from 46 to 44 after the two mural removals');
 assert.strictEqual(game.groundSurface.schema, 'snc-authored-ground-surface-v1', 'ground art prepares as immutable D1 state');
 assert.deepStrictEqual(JSON.parse(JSON.stringify(game.npcs.map(n => n.need))), [1,3,1]);
 assert.deepStrictEqual(JSON.parse(JSON.stringify(game.exit)), { x: 20.5, y: 10.7, active: false });
@@ -142,4 +145,4 @@ assert.strictEqual(actionSandbox.game.exit.active, true, 'final delivery activat
 actionSandbox.player.x = 1; actionSandbox.player.y = 1; actionSandbox.__tickExit();
 assert.strictEqual(actionSandbox.state, 'upgrade', 'entering active portal completes level');
 
-console.log(JSON.stringify({ pass: true, level: definition.name, staticBytes: Buffer.byteLength(canonical), reachableCells: reachable.size, selectedCans: game.pickups.length, lowBlocks: definition.environmentObjects.length }, null, 2));
+console.log(JSON.stringify({ pass: true, level: definition.name, staticBytes: Buffer.byteLength(canonical), reachableCells: reachable.size, selectedCans: game.pickups.length, lowBlocks: definition.environmentObjects.length, projectedSpritePlacements: game.props.length + game.npcs.length + game.pickups.length + 1 }, null, 2));

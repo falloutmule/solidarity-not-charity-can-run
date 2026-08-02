@@ -3,8 +3,8 @@
 
   const SNC_AUTHORED_LEVEL_ID = 'district-1-authored-v1';
   const SNC_AUTHORED_LEVEL_SCHEMA = 'snc-authored-level-static-v2';
-  const SNC_AUTHORED_LEVEL_STATIC_BYTES = 8288;
-  const SNC_AUTHORED_LEVEL_STATIC_SHA256 = '0aecc59907b843abb990500694b452025589a877b46494d6428712dfc18912af';
+  const SNC_AUTHORED_LEVEL_STATIC_BYTES = 8163;
+  const SNC_AUTHORED_LEVEL_STATIC_SHA256 = '22b0be0027302d0e09c68df4bfbb22ba709467fb729c513434774b65c7790382';
   const SNC_AUTHORED_SAVE_SCHEMA = 'snc-authored-save-overlay-v2';
 
   function deepFreeze(value){
@@ -160,9 +160,9 @@
       { x: 29.6, y: 15.8, kind: 'foliage', assetId: 'foliage_groundcover_wide_001' }, { x: 32.2, y: 15.0, kind: 'foliage', assetId: 'foliage_grass_tuft_medium_001' },
       { x: 34.2, y: 13.0, kind: 'mailbox' }, { x: 26.5, y: 15.5, kind: 'utility_box' },
       // Sparse edge cues guide the longer route without walling it off.
-      { x: 5.5, y: 5.5, kind: 'mural_panel' }, { x: 6.5, y: 15.5, kind: 'bench' },
+      { x: 6.5, y: 15.5, kind: 'bench' },
       { x: 5.2, y: 13.4, kind: 'foliage', assetId: 'foliage_tree_slender_001' }, { x: 8.1, y: 14.2, kind: 'foliage', assetId: 'foliage_grass_tuft_medium_001' },
-      { x: 34.5, y: 5.5, kind: 'mural_panel' }, { x: 35.0, y: 15.5, kind: 'mailbox' }
+      { x: 35.0, y: 15.5, kind: 'mailbox' }
     ],
     exit: { x: 20.5, y: 10.7, active: false },
     timeLeftPolicy: 'count down from cfg.baseTime; timer measures completion only',
