@@ -2,11 +2,9 @@ const CACHE = 'gj-unhoused-phonebook-v1';
 const APP_SHELL = [
   './',
   './index.html',
-  './offline-unhoused-phonebook.html',
   './manifest.webmanifest',
   './icon-192.svg',
-  './icon-512.svg',
-  './share-qr.svg'
+  './icon-512.svg'
 ];
 
 self.addEventListener('install', event => {
