@@ -156,7 +156,8 @@ installButton.addEventListener('click', async () => {
   }
 });
 
-const HOSTED_SOURCE_FILES = ["resources-1.js", "resources-2.js", "resources-3.js", "resources-4.js", "resources-5.js", "app.js"];
+
+const HOSTED_SOURCE_FILES = ["resources-01.js", "resources-02.js", "resources-03.js", "resources-04.js", "resources-05.js", "resources-06.js", "resources-07.js", "resources-08.js", "resources-09.js", "resources-10.js", "resources-11.js", "resources-12.js", "app.js"];
 
 async function makeSingleFileDownload() {
   const clone = document.documentElement.cloneNode(true);
@@ -242,3 +243,4 @@ window.addEventListener('appinstalled', () => {
   installButton.disabled = true;
   showInstallHelp('Installed. The phonebook can now be opened from the home screen and used offline.');
 });
+
