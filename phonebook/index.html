@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#081218">
+<meta name="application-name" content="GJ Offline Phonebook">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GJ Phonebook">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.svg" type="image/svg+xml">
+<title>Offline Unhoused Phonebook — Grand Junction & Mesa County</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bg:#071015;
+  --panel:#0d1b22;
+  --panel2:#11262f;
+  --line:#26434e;
+  --text:#eef8fb;
+  --muted:#abc1c9;
+  --accent:#5fe1ff;
+  --accent2:#aaf57a;
+  --warn:#ffd166;
+  --danger:#ff7b7b;
+  --shadow:0 14px 38px rgba(0,0,0,.28);
+  --radius:16px;
+}
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  margin:0;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(95,225,255,.10), transparent 26rem),
+    linear-gradient(180deg,#061016 0%,#081218 65%,#071015 100%);
+  color:var(--text);
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  line-height:1.45;
+  min-height:100vh;
+}
+button,input,select { font:inherit; }
+a { color:var(--accent); }
+.shell {
+  width:min(1400px,100%);
+  margin:0 auto;
+  padding:env(safe-area-inset-top) max(12px,env(safe-area-inset-right)) env(safe-area-inset-bottom) max(12px,env(safe-area-inset-left));
+}
+header {
+  padding:18px 4px 12px;
+}
+.eyebrow {
+  color:var(--accent2);
+  font-size:.78rem;
+  font-weight:800;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+h1 {
+  margin:.25rem 0 .4rem;
+  font-size:clamp(1.55rem,4.5vw,2.65rem);
+  line-height:1.05;
+}
+.subtitle {
+  margin:0;
+  color:var(--muted);
+  max-width:78ch;
+}
+.alert {
+  margin:12px 0;
+  border:1px solid rgba(255,209,102,.55);
+  background:rgba(255,209,102,.08);
+  padding:12px 14px;
+  border-radius:14px;
+  color:#fff4cf;
+}
+.quick {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+  margin:12px 0;
+}
+.quick a {
+  min-height:64px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:linear-gradient(180deg,var(--panel2),var(--panel));
+  color:var(--text);
+  text-decoration:none;
+  box-shadow:var(--shadow);
+  font-weight:900;
+  font-size:1.15rem;
+}
+.quick small {
+  display:block;
+  color:var(--muted);
+  font-weight:650;
+  font-size:.72rem;
+}
+.countline{margin:10px 0 2px;color:var(--muted);font-size:.9rem}.countline strong{color:var(--accent2)}
+.controls {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(160px,250px) auto;
+  gap:8px;
+  position:sticky;
+  top:0;
+  z-index:20;
+  padding:8px 0;
+  backdrop-filter:blur(14px);
+  background:rgba(7,16,21,.86);
+}
+input,select,.print-btn {
+  width:100%;
+  min-height:48px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:#0d1b22;
+  color:var(--text);
+  padding:0 13px;
+}
+.print-btn {
+  width:auto;
+  cursor:pointer;
+  font-weight:800;
+}
+.layout {
+  display:grid;
+  grid-template-columns:330px minmax(0,1fr);
+  gap:12px;
+  align-items:start;
+}
+nav {
+  position:sticky;
+  top:66px;
+  max-height:calc(100vh - 82px);
+  overflow:auto;
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:8px;
+  background:rgba(10,24,31,.94);
+  box-shadow:var(--shadow);
+}
+.tab {
+  width:100%;
+  min-height:54px;
+  text-align:left;
+  border:1px solid transparent;
+  border-radius:12px;
+  background:transparent;
+  color:var(--text);
+  padding:9px 11px;
+  cursor:pointer;
+  margin-bottom:5px;
+}
+.tab:hover,.tab:focus-visible {
+  border-color:var(--accent);
+  outline:none;
+}
+.tab.active {
+  background:linear-gradient(90deg,rgba(95,225,255,.18),rgba(170,245,122,.08));
+  border-color:rgba(95,225,255,.55);
+}
+.tab .name {
+  display:block;
+  font-weight:820;
+  line-height:1.2;
+}
+.tab .cat {
+  display:block;
+  font-size:.75rem;
+  color:var(--muted);
+  margin-top:4px;
+}
+.tab.urgent .name::before {
+  content:"● ";
+  color:var(--danger);
+}
+.empty {
+  color:var(--muted);
+  padding:16px;
+  text-align:center;
+}
+main {
+  min-width:0;
+}
+.card {
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  background:linear-gradient(180deg,rgba(17,38,47,.96),rgba(10,24,31,.98));
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+.card-head {
+  padding:20px;
+  border-bottom:1px solid var(--line);
+  background:
+    linear-gradient(110deg,rgba(95,225,255,.09),transparent 45%),
+    rgba(10,24,31,.7);
+}
+.badges {
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-bottom:10px;
+}
+.badge {
+  display:inline-flex;
+  align-items:center;
+  min-height:28px;
+  padding:4px 9px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  color:var(--muted);
+  font-size:.75rem;
+  font-weight:750;
+}
+.badge.urgent {
+  color:#ffd5d5;
+  border-color:rgba(255,123,123,.55);
+  background:rgba(255,123,123,.08);
+}
+.card h2 {
+  margin:0 0 8px;
+  font-size:clamp(1.45rem,4vw,2.2rem);
+  line-height:1.1;
+}
+.status {
+  color:var(--accent2);
+  font-weight:750;
+  margin:.35rem 0 0;
+}
+.summary {
+  margin:.75rem 0 0;
+  color:#dcebf0;
+  font-size:1.05rem;
+  max-width:80ch;
+}
+.body {
+  padding:18px 20px 24px;
+}
+.phone-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  gap:8px;
+  margin-bottom:16px;
+}
+.phone {
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  min-height:70px;
+  padding:10px 12px;
+  border:1px solid rgba(95,225,255,.4);
+  border-radius:13px;
+  background:rgba(95,225,255,.07);
+  text-decoration:none;
+  color:var(--text);
+}
+.phone span {
+  color:var(--muted);
+  font-size:.76rem;
+  font-weight:700;
+}
+.phone strong {
+  font-size:1.22rem;
+  letter-spacing:.02em;
+}
+.info-grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  margin-bottom:14px;
+}
+.info {
+  border:1px solid var(--line);
+  background:rgba(3,11,15,.28);
+  border-radius:13px;
+  padding:12px;
+}
+.info h3,.section h3 {
+  font-size:.8rem;
+  text-transform:uppercase;
+  letter-spacing:.09em;
+  margin:0 0 6px;
+  color:var(--accent);
+}
+.info p {
+  margin:0;
+}
+.section {
+  margin-top:14px;
+  padding-top:14px;
+  border-top:1px solid var(--line);
+}
+.steps {
+  margin:0;
+  padding-left:1.25rem;
+}
+.steps li {
+  margin:.45rem 0;
+  padding-left:.15rem;
+}
+.alert-list {
+  list-style:none;
+  padding:0;
+  margin:0;
+}
+.alert-list li {
+  border-left:4px solid var(--warn);
+  background:rgba(255,209,102,.07);
+  padding:9px 11px;
+  margin:7px 0;
+  border-radius:0 10px 10px 0;
+}
+.sources {
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+}
+.sources a {
+  display:inline-block;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:7px 9px;
+  text-decoration:none;
+  font-size:.82rem;
+}
+footer {
+  color:var(--muted);
+  text-align:center;
+  font-size:.8rem;
+  padding:18px 8px 28px;
+}
+.small-note {
+  font-size:.82rem;
+  color:var(--muted);
+}
+.hidden { display:none !important; }
+@media (max-width:900px) {
+  .quick { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width:800px) {
+  .quick { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .controls { grid-template-columns:minmax(0,1fr) 130px; }
+  .print-btn { display:none; }
+  .layout { grid-template-columns:1fr; }
+  nav {
+    position:relative;
+    top:auto;
+    max-height:none;
+    display:flex;
+    overflow-x:auto;
+    overflow-y:hidden;
+    gap:6px;
+    padding:7px;
+    scrollbar-width:thin;
+  }
+  .tab {
+    flex:0 0 190px;
+    min-height:68px;
+    margin:0;
+  }
+  .info-grid { grid-template-columns:1fr; }
+  .card-head,.body { padding:16px; }
+}
+@media (max-width:420px) {
+  .controls { grid-template-columns:1fr; position:relative; }
+  .quick a { min-height:58px; }
+  .tab { flex-basis:175px; }
+}
+@media print {
+  :root { color-scheme:light; }
+  body { background:white; color:black; font-size:10.5pt; }
+  .shell { width:100%; padding:0; }
+  header,.controls,nav,.quick,footer { display:none !important; }
+  .layout { display:block; }
+  .card { display:block !important; box-shadow:none; border:0; background:white; overflow:visible; }
+  .card-head { background:white; border-bottom:2px solid #000; padding:0 0 8px; }
+  .body { padding:8px 0 0; }
+  .badge { border:1px solid #555; color:#222; }
+  .status,.info h3,.section h3,a { color:#000; }
+  .phone-grid,.info-grid { display:grid; grid-template-columns:repeat(2,1fr); }
+  .phone,.info { border:1px solid #777; background:white; color:black; break-inside:avoid; }
+  .section { break-inside:avoid; border-top:1px solid #999; }
+  .sources a { color:black; word-break:break-all; }
+  .print-resource { page-break-after:always; display:block !important; }
+  .print-resource:last-child { page-break-after:auto; }
+}
+
+.share-install {
+  margin-top:16px;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:14px;
+  align-items:center;
+  padding:14px;
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  background:linear-gradient(180deg,rgba(17,38,47,.96),rgba(13,27,34,.96));
+}
+.share-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; }
+.share-actions button,.share-actions a {
+  min-height:46px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:10px 14px;
+  text-decoration:none;
+  font-weight:800;
+  color:var(--text);
+  background:#132b35;
+  cursor:pointer;
+}
+.share-actions .primary { background:var(--accent); color:#041116; border-color:transparent; }
+.share-install img,.share-install .embedded-qr { width:132px; height:132px; padding:8px; border-radius:12px; background:#fff; }
+.install-note { color:var(--muted); font-size:.9rem; margin:.45rem 0 0; }
+#installHelp[hidden] { display:none; }
+#installHelp {
+  margin-top:10px;
+  padding:12px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:#09161c;
+}
+@media (max-width:700px) {
+  .share-install { grid-template-columns:1fr; }
+  .share-install img,.share-install .embedded-qr { width:154px; height:154px; justify-self:center; }
+  .share-actions > * { flex:1 1 145px; }
+}
+@media print { .share-install { display:none !important; } }
+
+</style>
+</head>
+<body>
+<div class="shell">
+<header>
+  <div class="eyebrow">Offline edition v1 • research reviewed 25 August 2026</div>
+  <h1>Offline Unhoused Phonebook</h1>
+  <p class="subtitle">Grand Junction and immediately relevant Mesa County services for people experiencing homelessness or housing instability. Everything needed to use the phonebook is stored inside this file. Internet is only needed to open source/update links.</p>
+  <div class="alert"><strong>Major current change:</strong> HomewardBound's North Avenue emergency shelter closed permanently February 28, 2026. Pathways at 562 29 Road remains open with much less capacity. Shelter access is phone-first: call before traveling.</div>
+  <div class="quick" aria-label="Quick emergency calls">
+    <a href="tel:911"><small>Immediate danger</small>911</a>
+    <a href="tel:988"><small>Mental health crisis</small>988</a>
+    <a href="tel:9707737230"><small>Homelessness help</small>970-773-7230</a>
+    <a href="tel:211"><small>Broad resources</small>211</a>
+    <a href="tel:9702569424"><small>Shelter / Pathways</small>970-256-9424</a>
+    <a href="tel:9706832663"><small>Benefits navigator</small>970-683-2663</a>
+    <a href="tel:8775439520"><small>DV / sexual assault</small>877-543-9520</a>
+    <a href="tel:9703162019"><small>Tuesday Distro</small>970-316-2019</a>
+  </div>
+<div class="countline"><strong>58 resource tabs</strong> • Search works offline • Tap a phone number to call • Print All makes a paper phonebook</div>
+
+  <section class="share-install" aria-label="Install, download, and share this phonebook">
+    <div>
+      <strong>Keep it offline or share it face-to-face</strong>
+      <div class="share-actions">
+        <button class="primary" type="button" id="installApp">Install on this phone</button>
+        <button type="button" id="downloadHtml">Download offline HTML</button>
+        <button type="button" id="shareApp">Share link</button>
+      </div>
+      <p class="install-note">Installed version works offline after the first successful load. Download creates a permanent one-file copy of this same phonebook.</p>
+      <div id="installHelp" hidden aria-live="polite"></div>
+    </div>
+    <a href="https://falloutmule.github.io/solidarity-not-charity-can-run/phonebook/" aria-label="Open the Grand Junction Offline Unhoused Phonebook">
+      <img class="embedded-qr" src="share-qr.svg" alt="QR code for the Grand Junction Offline Unhoused Phonebook" data-share-qr>
+    </a>
+  </section>
+
+</header>
+
+<div class="controls">
+  <input id="search" type="search" placeholder="Search: shower, food, veteran, ID, youth…" aria-label="Search resources">
+  <select id="category" aria-label="Filter by category"><option value="">All categories</option></select>
+  <button class="print-btn" type="button" id="printAll">Print all</button>
+</div>
+
+<div class="layout">
+  <nav id="tabs" aria-label="Resource tabs"></nav>
+  <main id="main" tabindex="-1"></main>
+</div>
+
+<footer>
+  Offline researched edition with 58 tabs. This is a practical directory, not a guarantee of service. Program hours, funding, bed space, weather operations and eligibility can change quickly. CALL FIRST where marked.
+</footer>
+</div>
+
+
+<script src="resources-01.js"></script>
+<script src="resources-02.js"></script>
+<script src="resources-03.js"></script>
+<script src="resources-04.js"></script>
+<script src="resources-05.js"></script>
+<script src="resources-06.js"></script>
+<script src="resources-07.js"></script>
+<script src="resources-08.js"></script>
+<script src="resources-09.js"></script>
+<script src="resources-10.js"></script>
+<script src="resources-11.js"></script>
+<script src="resources-12.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

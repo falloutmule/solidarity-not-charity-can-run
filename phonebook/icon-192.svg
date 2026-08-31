@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 512 512" role="img" aria-label="Grand Junction Offline Unhoused Phonebook">
+  <rect width="512" height="512" rx="108" fill="#071015"/>
+  <rect x="96" y="80" width="320" height="352" rx="44" fill="#0d1b22" stroke="#5fe1ff" stroke-width="20"/>
+  <rect x="128" y="116" width="36" height="280" rx="18" fill="#5fe1ff"/>
+  <circle cx="262" cy="202" r="52" fill="#aaf57a"/>
+  <path d="M177 348c13-58 55-91 85-91s72 33 85 91" fill="none" stroke="#aaf57a" stroke-width="34" stroke-linecap="round"/>
+  <path d="M356 138h34M356 196h34M356 254h34M356 312h34M356 370h34" stroke="#eef8fb" stroke-width="16" stroke-linecap="round"/>
+</svg>
