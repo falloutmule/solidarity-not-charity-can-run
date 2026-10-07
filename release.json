@@ -1,0 +1,14 @@
+{
+  "schema": "public-pages-test-release@1",
+  "buildId": "requirements1",
+  "artifactSha256": "812e4e3918799f8a591cd358d2406addeaec50a2fd382bd31e753eb8ae595a4d",
+  "bytes": 4825678,
+  "sourceReference": "665e16386abf6967cd51735815d3a2ecd50e3338 (documentation 042052544bf979f0ed7fdb4fb1823ca90e2ea83b)",
+  "publishedDate": "2026-10-07",
+  "publicationBranch": "pages-test-20261007",
+  "previousPublicCommit": "b42051aba7d3ca6d03c8775e639c3259c2013555",
+  "previousArtifactSha256": "623355ff8a811dd2eae141d8da8c07e6ceb44d683b61f2a639e38c33d4bcc33e",
+  "rollbackPath": "releases/2026-10-07-before/index.html",
+  "physicalAcceptance": "not claimed",
+  "notes": "Verified nine-route requirements1 test handoff with eight upgrade icons, cancellable New Volunteer confirmation, and separate level restart preserving earlier splits/upgrades and campaign saves during practice. Fresh exact-artifact requirements suite passed. Existing phonebook and all other public subpages are preserved. Approved member/music/venue content and final balance remain open."
+}

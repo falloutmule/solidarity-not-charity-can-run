@@ -6,3 +6,7 @@
 *.gif binary
 *.webp binary
 
+
+index.html -text
+
+releases/** -text
