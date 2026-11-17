@@ -152,7 +152,7 @@ installButton.addEventListener('click', async () => {
   if (ios) {
     showInstallHelp('iPhone/iPad: open this page in Safari, tap Share, choose Add to Home Screen, then tap Add.');
   } else {
-    showInstallHelp('If no install prompt appears: open the browser menu and choose Install app or Add to Home screen. You can always use Download offline HTML instead.');
+    showInstallHelp('If no install prompt appears: open the browser menu and choose Install app or Add to home screen. You can always use Download offline HTML instead.');
   }
 });
 
@@ -244,3 +244,22 @@ window.addEventListener('appinstalled', () => {
   showInstallHelp('Installed. The phonebook can now be opened from the home screen and used offline.');
 });
 
+
+// Companion recovery guide. Keep the link usable in downloaded single-file copies.
+(() => {
+  let link = document.getElementById('recoveryGuideLink');
+  if (!link) {
+    const heading = document.querySelector('header h1');
+    if (!heading) return;
+    const row = document.createElement('div');
+    row.className = 'share-actions';
+    link = document.createElement('a');
+    link.id = 'recoveryGuideLink';
+    link.textContent = 'Recovery programs — Colorado + national';
+    row.appendChild(link);
+    heading.insertAdjacentElement('afterend', row);
+  }
+  link.href = location.protocol === 'file:'
+    ? 'https://falloutmule.github.io/solidarity-not-charity-can-run/phonebook/recovery.html'
+    : './recovery.html';
+})();
