@@ -1,6 +1,6 @@
 'use strict';
 const CACHE_PREFIX = 'gj-unhoused-phonebook-';
-const CACHE = CACHE_PREFIX + 'v3-recovery-20261117';
+const CACHE = CACHE_PREFIX + 'v4-review-20261119';
 const APP_SHELL = [
   './', './index.html', './recovery.html', './manifest.webmanifest',
   './icon-192.svg', './icon-512.svg', './share-qr.svg',
@@ -26,6 +26,21 @@ self.addEventListener('activate', event => {
     await Promise.all(keys.filter(key => key.startsWith(CACHE_PREFIX) && key !== CACHE)
       .map(key => caches.delete(key)));
     await self.clients.claim();
+  })());
+});
+
+// An install icon is not proof that every resource was saved. Reply only after
+// checking the current cache, so pages can show a truthful offline-ready state.
+self.addEventListener('message', event => {
+  if (event.data?.type !== 'CHECK_OFFLINE_READY' || !event.ports?.[0]) return;
+  event.waitUntil((async () => {
+    let ready = false;
+    try {
+      const cache = await caches.open(CACHE);
+      const saved = await Promise.all([...APP_URLS].map(url => cache.match(url)));
+      ready = saved.every(response => response && response.ok);
+    } catch (_) {}
+    event.ports[0].postMessage({type: 'OFFLINE_STATUS', cache: CACHE, ready});
   })());
 });
 
